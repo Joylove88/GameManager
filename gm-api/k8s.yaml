@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gm-api-deployment
+  labels:
+    app: gm-api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gm-api
+  template:
+    metadata:
+      name: gm-api
+      labels:
+        app: gm-api
+    spec:
+      containers:
+        - name: gm-api
+          image: 45.207.58.21:9000/gamemanager/gm-api:<ENV_NAME_TAG_NAME>
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9006
+              protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gm-api-service
+  labels:
+    app: gm-api-service
+spec:
+  selector:
+    app: gm-api
+  type: NodePort
+  ports:
+  - port: 9006
+    targetPort: 9006
+    nodePort: 32106
+    protocol: TCP
+
+

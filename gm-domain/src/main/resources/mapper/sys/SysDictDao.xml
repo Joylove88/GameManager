@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.sys.dao.SysDictDao">
+
+    <select id="getSysDict" resultType="com.gm.modules.sys.entity.SysDictEntity">
+        SELECT a.* FROM sys_dict a WHERE a.name = #{dictName} AND a.type = #{dictType} order by a.order_num
+    </select>
+</mapper>

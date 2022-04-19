@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.basicconfig.dao.EquipmentFragDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.basicconfig.entity.EquipmentFragEntity" id="equinpmentFragMap">
+        <result property="equipmentFragId" column="EQUIPMENT_FRAG_ID"/>
+        <result property="equipmentId" column="EQUIPMENT_ID"/>
+        <result property="equipmentFragNum" column="EQUIPMENT_FRAG_NUM"/>
+        <result property="status" column="STATUS"/>
+        <result property="createUser" column="CREATE_USER"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateUser" column="UPDATE_USER"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+    </resultMap>
+
+    <select id="selectPage" resultType="com.gm.modules.basicconfig.entity.EquipmentFragEntity">
+        SELECT A.*,B.EQUIP_NAME,B.EQUIP_RARECODE
+        from GM_EQUIPMENT_FRAG A
+        LEFT JOIN GM_EQUIPMENT_INFO B ON A.EQUIPMENT_ID = B.EQUIP_ID
+        ${ew.customSqlSegment}
+    </select>
+
+    <!--获取装备卷轴碎片关联稀有度信息-->
+    <select id="getEquipFragInfo" resultType="com.gm.modules.basicconfig.entity.EquipmentFragEntity">
+        SELECT A.*,B.EQUIP_NAME,B.EQUIP_RARECODE
+        FROM GM_EQUIPMENT_FRAG A
+        LEFT JOIN GM_EQUIPMENT_INFO B ON A.EQUIPMENT_ID = B.EQUIP_ID
+        WHERE A.`STATUS` = '1'
+    </select>
+</mapper>

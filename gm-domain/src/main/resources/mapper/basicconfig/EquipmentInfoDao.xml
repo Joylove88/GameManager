@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.basicconfig.dao.EquipmentInfoDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.basicconfig.entity.EquipmentInfoEntity" id="equipmentInfoMap">
+        <result property="equipId" column="EQUIP_ID"/>
+        <result property="equipName" column="EQUIP_NAME"/>
+        <result property="equipRarecode" column="EQUIP_RARECODE"/>
+        <result property="equipLevel" column="EQUIP_LEVEL"/>
+        <result property="status" column="STATUS"/>
+        <result property="equipHealth" column="EQUIP_HEALTH"/>
+        <result property="equipMana" column="EQUIP_MANA"/>
+        <result property="equipHealthRegen" column="EQUIP_HEALTH_REGEN"/>
+        <result property="equipManaRegen" column="EQUIP_MANA_REGEN"/>
+        <result property="equipArmor" column="EQUIP_ARMOR"/>
+        <result property="equipMagicResist" column="EQUIP_MAGIC_RESIST"/>
+        <result property="equipAttackDamage" column="EQUIP_ATTACK_DAMAGE"/>
+        <result property="equipAttackSpell" column="EQUIP_ATTACK_SPELL"/>
+        <result property="createUser" column="CREATE_USER"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateUser" column="UPDATE_USER"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+    </resultMap>
+    <select id="queryList" resultType="com.gm.modules.basicconfig.entity.EquipmentInfoEntity">
+        SELECT EQUIP_ID,EQUIP_NAME,EQUIP_RARECODE
+        FROM GM_EQUIPMENT_INFO
+        <where>
+            <if test="status != null and status != ''">
+                AND STATUS = #{status}
+                AND EQUIP_RARECODE in ('4','5')
+            </if>
+        </where>
+    </select>
+
+</mapper>

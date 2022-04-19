@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.user.dao.UserEquipmentFragDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.user.entity.UserEquipmentFragEntity" id="userEquipmentFragMap">
+        <result property="gmUserEquipmentFragId" column="GM_USER_EQUIPMENT_FRAG_ID"/>
+        <result property="gmEquipmentFragId" column="GM_EQUIPMENT_FRAG_ID"/>
+        <result property="gmUserId" column="GM_USER_ID"/>
+        <result property="gmUserEquipFragNum" column="GM_USER_EQUIP_FRAG_NUM"/>
+        <result property="status" column="STATUS"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+    </resultMap>
+
+    <select id="selectPage" resultType="com.gm.modules.user.entity.UserEquipmentFragEntity">
+        SELECT
+            A.GM_EQUIPMENT_FRAG_ID,
+            A.GM_USER_ID,
+            A.GM_USER_EQUIP_FRAG_NUM,
+            A.`STATUS`,
+            A.CREATE_TIME,
+            C.EQUIP_NAME,
+            C.EQUIP_RARECODE,
+            D.USER_NAME
+        FROM
+            GM_USER_EQUIPMENT_FRAG A
+                LEFT JOIN
+            GM_EQUIPMENT_FRAG B ON A.GM_EQUIPMENT_FRAG_ID = B.EQUIPMENT_FRAG_ID
+                LEFT JOIN
+            GM_EQUIPMENT_INFO C ON B.EQUIPMENT_ID = C.EQUIP_ID
+                LEFT JOIN
+            GM_USER D ON A.GM_USER_ID = D.USER_ID
+
+        ${ew.customSqlSegment}
+        GROUP BY A.GM_EQUIPMENT_FRAG_ID , A.GM_USER_ID , A.GM_USER_EQUIP_FRAG_NUM , A.`STATUS` , A.CREATE_TIME , C.EQUIP_NAME , D.USER_NAME
+        ORDER BY A.CREATE_TIME DESC , A.GM_USER_EQUIP_FRAG_NUM DESC
+    </select>
+
+    <!--获取玩家装备碎片-->
+    <select id="getUserAllEquipFrag" resultType="com.gm.modules.user.rsp.UserEquipmentFragInfoRsp">
+        SELECT
+            COUNT(*) AS EQUIP_FRAG_NUM,
+            B.EQUIP_FRAG_ICON_URL,
+            C.EQUIP_NAME,
+            C.EQUIP_RARECODE
+        FROM
+            GM_USER_EQUIPMENT_FRAG A
+                LEFT JOIN
+            GM_EQUIPMENT_FRAG B ON A.GM_EQUIPMENT_FRAG_ID = B.EQUIPMENT_FRAG_ID
+                LEFT JOIN
+            GM_EQUIPMENT_INFO C ON B.EQUIPMENT_ID = C.EQUIP_ID
+        WHERE A.`STATUS` = '1' AND A.GM_USER_ID = #{userId}
+        GROUP BY A.GM_EQUIPMENT_FRAG_ID,C.EQUIP_NAME,C.EQUIP_RARECODE
+    </select>
+</mapper>

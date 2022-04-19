@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>用户登录日志</title>
+		<#include "/header.html">
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+			<!--<#if shiro.hasPermission("user:userloginlog:update")>-->
+            <!--<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>-->
+			<!--</#if>-->
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+														                    <div class="form-group">
+                        <div class="col-sm-2 control-label">用户ID</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userLoginLog.userId" placeholder="用户ID"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">用户名</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userLoginLog.userCode" placeholder="用户名"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">登录时间</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userLoginLog.loginTime" placeholder="登录时间"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">登录时间</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userLoginLog.loginTimeTs" placeholder="登录时间"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">登录地点</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userLoginLog.loginAddress" placeholder="登录地点"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">登录ip</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userLoginLog.loginIp" placeholder="登录ip"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">登录类型</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userLoginLog.loginType" placeholder="登录类型"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">状态，00登录，01登出，02请求IP变动记录</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userLoginLog.status" placeholder="状态，00登录，01登出，02请求IP变动记录"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">响应状态码</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userLoginLog.rspCode" placeholder="响应状态码"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label"></div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userLoginLog.rspMsg" placeholder=""/>
+                        </div>
+                    </div>
+							            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" id="btnSaveOrUpdate" data-loading-text="保存中..." @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/user/userloginlog.js?_${.now?long}"></script>
+</body>
+</html>

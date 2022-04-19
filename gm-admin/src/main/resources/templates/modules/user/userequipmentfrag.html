@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>玩家装备碎片表</title>
+		<#include "/header.html">
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2" style="padding-left: 0;">
+                <input type="text" class="form-control" v-model="q.userName" @keyup.enter="query" placeholder="会员名称">
+            </div>
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.equipName" @keyup.enter="query" placeholder="装备名称">
+            </div>
+            <div class="form-group col-sm-1">
+                <select class="form-control" v-model="q.fragNum">
+                    <option value="">全部</option>
+                    <option value="1">1个</option>
+                    <option value="2">2个</option>
+                    <option value="3">3个</option>
+                </select>
+            </div>
+            <div class="form-group col-sm-1">
+                <select class="form-control" v-model="q.status">
+                    <option value="">全部</option>
+                    <option value="0">禁用</option>
+                    <option value="1">启用</option>
+                    <option value="2">已消耗</option>
+                </select>
+            </div>
+
+            <a class="btn btn-default" @click="query">查询</a>
+			<!--<#if shiro.hasPermission("user:userequipmentfrag:save")>-->
+            <!--<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>-->
+			<!--</#if>-->
+			<!--<#if shiro.hasPermission("user:userequipmentfrag:update")>-->
+            <!--<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>-->
+			<!--</#if>-->
+			<#if shiro.hasPermission("user:userequipmentfrag:delete")>
+            <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			</#if>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+														                    <div class="form-group">
+                        <div class="col-sm-2 control-label">装备碎片ID</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userEquipmentFrag.gmEquipmentFragId" placeholder="装备碎片ID"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">用户ID</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userEquipmentFrag.gmUserId" placeholder="用户ID"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">玩家获得碎片数量</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userEquipmentFrag.gmUserEquipFragNum" placeholder="玩家获得碎片数量"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">状态('0':禁用，'1':启用)</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userEquipmentFrag.status" placeholder="状态('0':禁用，'1':启用)"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">创建时间</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userEquipmentFrag.createTime" placeholder="创建时间"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">创建时间</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userEquipmentFrag.createTimeTs" placeholder="创建时间"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">修改时间</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userEquipmentFrag.updateTime" placeholder="修改时间"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">修改时间</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="userEquipmentFrag.updateTimeTs" placeholder="修改时间"/>
+                        </div>
+                    </div>
+							            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" id="btnSaveOrUpdate" data-loading-text="保存中..." @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/user/userequipmentfrag.js?_${.now?long}"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gm-job-deployment
+  labels:
+    app: gm-job-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gm-job
+  template:
+    metadata:
+      name: gm-job
+      labels:
+        app: gm-job
+    spec:
+      containers:
+        - name: gm-job
+          image: 45.207.58.21:9000/gamemanager/gm-job:<ENV_NAME_TAG_NAME>
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9008
+              protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gm-job-service
+  labels:
+    app: gm-job-service
+spec:
+  selector:
+    app: gm-job
+  type: NodePort
+  ports:
+  - port: 9008
+    targetPort: 9008
+    nodePort: 32108
+    protocol: TCP
+
+

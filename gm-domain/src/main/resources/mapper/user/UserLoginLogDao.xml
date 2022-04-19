@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.user.dao.UserLoginLogDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.user.entity.UserLoginLogEntity" id="userLoginLogMap">
+        <result property="id" column="ID"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="userCode" column="USER_CODE"/>
+        <result property="loginTime" column="LOGIN_TIME"/>
+        <result property="loginTimeTs" column="LOGIN_TIME_TS"/>
+        <result property="loginAddress" column="LOGIN_ADDRESS"/>
+        <result property="loginIp" column="LOGIN_IP"/>
+        <result property="loginType" column="LOGIN_TYPE"/>
+        <result property="status" column="STATUS"/>
+        <result property="rspCode" column="RSP_CODE"/>
+        <result property="rspMsg" column="RSP_MSG"/>
+    </resultMap>
+
+    <select id="getLogin12H" resultType="com.gm.modules.user.entity.UserLoginLogEntity">
+        SELECT
+        *
+        FROM
+        GM_USER_LOGIN_LOG
+        <where>
+            <if test="userCode != null and userCode != ''">
+              AND USER_CODE = #{userCode}
+            </if>
+
+            <if test="loginTimeTs != null and loginTimeTs != ''">
+                AND LOGIN_TIME_TS &gt;= #{ltTime}
+                AND LOGIN_TIME_TS &lt;= #{gtTime}
+            </if>
+        </where>
+    </select>
+</mapper>

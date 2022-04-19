@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>用户信息表</title>
+		<#include "/header.html">
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+			<#if shiro.hasPermission("user:user:save")>
+            <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			</#if>
+			<#if shiro.hasPermission("user:user:update")>
+            <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			</#if>
+			<#if shiro.hasPermission("user:user:delete")>
+            <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			</#if>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+														                    <div class="form-group">
+                        <div class="col-sm-2 control-label">用户游戏名</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="user.userName" placeholder="用户游戏名"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">用户钱包地址</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="user.userWalletAddress" placeholder="用户钱包地址"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">用户级别</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="user.userLevel" placeholder="用户级别"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">用户类型:普通0，1代理商</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="user.userType" placeholder="用户类型:普通0，1代理商"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">客户端ip</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="user.clientIp" placeholder="客户端ip"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">状态：0失效，1生效</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="user.status" placeholder="状态：0失效，1生效"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">推广码</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="user.expandCode" placeholder="推广码"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">设备类型</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="user.deviceType" placeholder="设备类型"/>
+                        </div>
+                    </div>
+
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">备注</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="user.remark" placeholder="备注"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">头像url</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="user.imgUrl" placeholder="头像url"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">用户在线状态：00离线，01：PC在线，02：H5在线，03：android在线，04：iOS在线</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="user.onlineFlag" placeholder="用户在线状态：00离线，01：PC在线，02：H5在线，03：android在线，04：iOS在线"/>
+                        </div>
+                    </div>
+							            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" id="btnSaveOrUpdate" data-loading-text="保存中..." @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/user/userManager.js?_${.now?long}"></script>
+</body>
+</html>

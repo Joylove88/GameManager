@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.user.dao.UserHeroFragDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.user.entity.UserHeroFragEntity" id="userHeroFragMap">
+        <result property="gmUserHeroFragId" column="GM_USER_HERO_FRAG_ID"/>
+        <result property="gmHeroFragId" column="GM_HERO_FRAG_ID"/>
+        <result property="gmUserId" column="GM_USER_ID"/>
+        <result property="gmUserHeroFragNum" column="GM_USER_HERO_FRAG_NUM"/>
+        <result property="status" column="STATUS"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+    </resultMap>
+
+    <select id="selectPage" resultType="com.gm.modules.user.entity.UserHeroFragEntity">
+        SELECT
+            A.GM_HERO_FRAG_ID,
+            A.GM_USER_ID,
+            A.GM_USER_HERO_FRAG_NUM,
+            A.`STATUS`,
+            A.CREATE_TIME,
+            C.HERO_NAME,
+            D.USER_NAME
+        FROM
+            GM_USER_HERO_FRAG A
+                LEFT JOIN
+            GM_HERO_FRAG B ON A.GM_HERO_FRAG_ID = B.GM_HERO_FRAG_ID
+                LEFT JOIN
+            GM_HERO_INFO C ON B.GM_HERO_INFO_ID = C.HERO_ID
+                LEFT JOIN
+            GM_USER D ON A.GM_USER_ID = D.USER_ID
+
+        ${ew.customSqlSegment}
+        GROUP BY A.GM_HERO_FRAG_ID , A.GM_USER_ID , A.GM_USER_HERO_FRAG_NUM , A.`STATUS` , A.CREATE_TIME , C.HERO_NAME , D.USER_NAME
+        ORDER BY A.CREATE_TIME DESC , A.GM_USER_HERO_FRAG_NUM DESC
+    </select>
+
+    <!--获取玩家英雄碎片-->
+    <select id="getUserAllHeroFrag" resultType="com.gm.modules.user.rsp.UserHeroFragInfoRsp">
+        SELECT
+            COUNT(*) AS HERO_FRAG_NUM,
+            B.HERO_FRAG_ICON_URL,
+            C.HERO_NAME
+        FROM
+            GM_USER_HERO_FRAG A
+                LEFT JOIN
+            GM_HERO_FRAG B ON A.GM_HERO_FRAG_ID = B.GM_HERO_FRAG_ID
+                LEFT JOIN
+            GM_HERO_INFO C ON B.GM_HERO_INFO_ID = C.HERO_ID
+        WHERE A.`STATUS` = '1' AND A.GM_USER_ID = #{userId}
+        GROUP BY A.GM_HERO_FRAG_ID,C.HERO_NAME
+    </select>
+</mapper>

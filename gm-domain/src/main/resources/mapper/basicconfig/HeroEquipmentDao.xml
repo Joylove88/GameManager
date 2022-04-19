@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.basicconfig.dao.HeroEquipmentDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.basicconfig.entity.HeroEquipmentEntity" id="heroEquipmentMap">
+        <result property="gmHeroEquipmentId" column="GM_HERO_EQUIPMENT_ID"/>
+        <result property="gmHeroId" column="GM_HERO_ID"/>
+        <result property="gmEquipId" column="GM_EQUIP_ID"/>
+        <result property="status" column="STATUS"/>
+        <result property="createUser" column="CREATE_USER"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateUser" column="UPDATE_USER"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+    </resultMap>
+
+    <select id="selectPage" resultType="com.gm.modules.basicconfig.entity.HeroEquipmentEntity">
+        SELECT
+            A.*,
+            B.EQUIP_NAME,
+            B.EQUIP_RARECODE,
+            B.EQUIP_LEVEL,
+            C.HERO_NAME
+        FROM
+            GM_HERO_EQUIPMENT A
+        LEFT JOIN
+            GM_EQUIPMENT_INFO B ON A.GM_EQUIP_ID = B.EQUIP_ID
+        LEFT JOIN
+            GM_HERO_INFO C ON A.GM_HERO_ID = C.HERO_ID
+
+        ${ew.customSqlSegment}
+        ORDER BY C.HERO_NAME,A.GM_EQUIP_SOLT,A.CREATE_TIME DESC
+    </select>
+</mapper>

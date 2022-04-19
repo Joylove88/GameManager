@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>装备碎片表</title>
+		<#include "/header.html">
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2" style="padding-left: 0;width: 220px;">
+                <input type="text" class="form-control" v-model="q.equipName" @keyup.enter="query" placeholder="装备名称">
+            </div>
+            <div class="form-group col-sm-1">
+                <select class="form-control" v-model="q.status">
+                    <option value="">全部</option>
+                    <option value="0">禁用</option>
+                    <option value="1">启用</option>
+                </select>
+            </div>
+            <div class="form-group col-sm-1">
+                <select class="form-control" v-model="q.status">
+                    <option value="">全部</option>
+                    <option value="5">橙色</option>
+                    <option value="4">紫色</option>
+                    <option value="3">蓝色</option>
+                    <option value="2">绿色</option>
+                    <option value="1">白色</option>
+                </select>
+            </div>
+            <a class="btn btn-default" @click="query">查询</a>
+			<#if shiro.hasPermission("basicconfig:equipmentfrag:save")>
+            <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			</#if>
+			<#if shiro.hasPermission("basicconfig:equipmentfrag:update")>
+            <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			</#if>
+			<#if shiro.hasPermission("basicconfig:equipmentfrag:delete")>
+            <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			</#if>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+			<div class="form-group">
+                <div class="col-sm-2 control-label">装备名称</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="equipmentFrag.equipmentId" placeholder="装备ID"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">装备碎片数量 默认1</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="equipmentFrag.equipmentFragNum" placeholder="装备碎片数量 默认1"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">物品估值</div>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" v-model="equipmentFrag.itemValuation" placeholder="物品估值"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">状态</div>
+                <div class="col-sm-10">
+                    <div class="radio radio-info radio-inline">
+                        <input type="radio" id="status1" value="0" name="status" v-model="equipmentFrag.status">
+                        <label for="status1"> 禁用 </label>
+                    </div>
+                    <div class="radio radio-info radio-inline">
+                        <input type="radio" id="status2" value="1" name="status" v-model="equipmentFrag.status">
+                        <label for="status2"> 启用 </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" id="btnSaveOrUpdate" data-loading-text="保存中..." @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/basicconfig/equipmentfrag.js?_${.now?long}"></script>
+</body>
+</html>

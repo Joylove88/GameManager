@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.user.dao.UserBalanceDetailDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.user.entity.UserBalanceDetailEntity" id="userBalanceDetailMap">
+        <result property="userBalanceDetailId" column="USER_BALANCE_DETAIL_ID"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="tradeType" column="TRADE_TYPE"/>
+        <result property="amount" column="AMOUNT"/>
+        <result property="tradeTime" column="TRADE_TIME"/>
+        <result property="tradeTimeTs" column="TRADE_TIME_TS"/>
+        <result property="tradeDesc" column="TRADE_DESC"/>
+        <result property="userBalance" column="USER_BALANCE"/>
+        <result property="sourceId" column="SOURCE_ID"/>
+    </resultMap>
+
+
+</mapper>

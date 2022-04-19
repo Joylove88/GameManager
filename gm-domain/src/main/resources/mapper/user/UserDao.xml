@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.user.dao.UserDao">
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.user.entity.UserEntity" id="userMap">
+        <result property="userId" column="USER_ID"/>
+        <result property="userName" column="USER_NAME"/>
+        <result property="userWalletAddress" column="USER_WALLET_ADDRESS"/>
+        <result property="userLevel" column="USER_LEVEL"/>
+        <result property="userType" column="USER_TYPE"/>
+        <result property="clientIp" column="CLIENT_IP"/>
+        <result property="status" column="STATUS"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+        <result property="expandCode" column="EXPAND_CODE"/>
+        <result property="deviceType" column="DEVICE_TYPE"/>
+        <result property="createUser" column="CREATE_USER"/>
+        <result property="updateUser" column="UPDATE_USER"/>
+        <result property="remark" column="REMARK"/>
+        <result property="imgUrl" column="IMG_URL"/>
+        <result property="onlineFlag" column="ONLINE_FLAG"/>
+    </resultMap>
+
+
+</mapper>

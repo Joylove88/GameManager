@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.basicconfig.dao.EquipSynthesisItemDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.basicconfig.entity.EquipSynthesisItemEntity" id="equipSynthesisItemMap">
+        <result property="gmEquipSynthesisItemId" column="GM_EQUIP_SYNTHESIS_ITEM_ID"/>
+        <result property="gmEquipmentId" column="GM_EQUIPMENT_ID"/>
+        <result property="gmEquipmentFragId" column="GM_EQUIPMENT_FRAG_ID"/>
+        <result property="gmEquipFragNum" column="GM_EQUIP_FRAG_NUM"/>
+        <result property="gmEquipSynthesisItem1" column="GM_EQUIP_SYNTHESIS_ITEM1"/>
+        <result property="gmEquipSynthesisItem2" column="GM_EQUIP_SYNTHESIS_ITEM2"/>
+        <result property="gmEquipSynthesisItem3" column="GM_EQUIP_SYNTHESIS_ITEM3"/>
+        <result property="gmEquipWhite" column="GM_EQUIP_WHITE"/>
+        <result property="gmEquipBlue" column="GM_EQUIP_BLUE"/>
+        <result property="status" column="STATUS"/>
+        <result property="createUser" column="CREATE_USER"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateUser" column="UPDATE_USER"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+    </resultMap>
+
+
+</mapper>

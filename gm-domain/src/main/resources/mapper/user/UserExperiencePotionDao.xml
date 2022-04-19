@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.user.dao.UserExperiencePotionDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.user.entity.UserExperiencePotionEntity" id="userExperiencePotionMap">
+        <result property="gmUserExPotionId" column="GM_USER_EX_POTION_ID"/>
+        <result property="gmExPotionId" column="GM_EX_POTION_ID"/>
+        <result property="gmUserId" column="GM_USER_ID"/>
+        <result property="status" column="STATUS"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+    </resultMap>
+
+    <select id="selectPage" resultType="com.gm.modules.user.entity.UserExperiencePotionEntity">
+        SELECT
+            A.USER_EX_NUM,
+            A.`STATUS`,
+            A.CREATE_TIME,
+            B.EX_POTION_NAME,
+            B.EX_POTION_RARECODE,
+            B.EX_VALUE,
+            C.USER_NAME
+        FROM
+            GM_USER_EXPERIENCE_POTION A
+        LEFT JOIN
+            GM_EXPERIENCE_POTION B ON A.GM_EX_POTION_ID = B.GM_EX_POTION_ID
+        LEFT JOIN
+            GM_USER C ON A.GM_USER_ID = C.USER_ID
+
+        ${ew.customSqlSegment}
+        GROUP BY A.USER_EX_NUM , A.`STATUS` , A.CREATE_TIME , B.EX_POTION_NAME, B.EX_POTION_RARECODE, B.EX_VALUE, C.USER_NAME
+        ORDER BY A.CREATE_TIME DESC,A.`STATUS` DESC
+    </select>
+
+    <!--获取玩家经验药水-->
+    <select id="getUserEx" resultType="com.gm.modules.user.rsp.UserExpInfoRsp">
+        SELECT
+            count(*) AS USER_EX_NUM,
+            A.`STATUS`,
+            B.EX_POTION_NAME,
+            B.EX_POTION_RARECODE,
+            B.EX_VALUE,
+            B.EX_ICON_URL,
+            B.EX_DESCRIPTION
+        FROM
+            GM_USER_EXPERIENCE_POTION A
+        LEFT JOIN
+            GM_EXPERIENCE_POTION B ON A.GM_EX_POTION_ID = B.GM_EX_POTION_ID
+        <where>
+            <if test="gmUserId != null and gmUserId != ''">
+                AND A.`STATUS` = '1'
+                AND A.GM_USER_ID = #{gmUserId}
+            </if>
+        </where>
+        GROUP BY  A.`STATUS` ,B.EX_POTION_NAME, B.EX_POTION_RARECODE, B.EX_VALUE,B.EX_ICON_URL,B.EX_DESCRIPTION
+        ORDER BY B.EX_POTION_RARECODE
+    </select>
+
+    <!--获取玩家未使用的药水-->
+    <select id="getUserNotUseEx" resultType="com.gm.modules.user.entity.UserExperiencePotionEntity">
+        SELECT
+            A.*,
+            B.EX_POTION_NAME,
+            B.EX_POTION_RARECODE,
+            B.EX_VALUE
+        FROM
+          GM_USER_EXPERIENCE_POTION A
+        LEFT JOIN
+            GM_EXPERIENCE_POTION B ON A.GM_EX_POTION_ID = B.GM_EX_POTION_ID
+        <where>
+                AND A.`STATUS` = '1'
+
+            <if test="gmUserId != null and gmUserId != ''">
+                AND A.GM_USER_ID = #{gmUserId}
+            </if>
+
+            <if test="exPotionRarecode != null and exPotionRarecode != ''">
+              AND B.EX_POTION_RARECODE = #{exPotionRarecode}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+		<#include "/header.html">
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2" style="padding-left: 0;">
+                <input type="text" class="form-control" v-model="q.userName" @keyup.enter="query" placeholder="会员名称">
+            </div>
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.heroName" @keyup.enter="query" placeholder="英雄名称">
+            </div>
+            <div class="form-group col-sm-1">
+                <select class="form-control" v-model="q.fragNum">
+                    <option value="">全部</option>
+                    <option value="1">1个</option>
+                    <option value="2">2个</option>
+                    <option value="3">3个</option>
+                    <option value="4">4个</option>
+                    <option value="5">5个</option>
+                </select>
+            </div>
+            <div class="form-group col-sm-1">
+                <select class="form-control" v-model="q.status">
+                    <option value="">全部</option>
+                    <option value="0">禁用</option>
+                    <option value="1">启用</option>
+                    <option value="2">已消耗</option>
+                </select>
+            </div>
+
+            <a class="btn btn-default" @click="query">查询</a>
+            <!--<#if shiro.hasPermission("user:userherofrag:save")>-->
+                <!--<a class="btn btn-primary" @click="testDraw"><i class="fa fa-plus"></i>&nbsp;模拟抽奖</a>-->
+            <!--</#if>-->
+			<!--<#if shiro.hasPermission("user:userherofrag:save")>-->
+            <!--<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>-->
+			<!--</#if>-->
+			<!--<#if shiro.hasPermission("user:userherofrag:update")>-->
+            <!--<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>-->
+			<!--</#if>-->
+			<#if shiro.hasPermission("user:userherofrag:delete")>
+            <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			</#if>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <!--<form class="form-horizontal">-->
+            <!--<div class="form-group">-->
+                <!--<div class="col-sm-2 control-label">英雄碎片ID</div>-->
+                <!--<div class="col-sm-10">-->
+                    <!--<input type="text" class="form-control" v-model="userHeroFrag.gmHeroFragId" placeholder="英雄碎片ID"/>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+                <!--<div class="col-sm-2 control-label">用户ID</div>-->
+                <!--<div class="col-sm-10">-->
+                    <!--<input type="text" class="form-control" v-model="userHeroFrag.gmUserId" placeholder="用户ID"/>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+                <!--<div class="col-sm-2 control-label">玩家获得碎片数量</div>-->
+                <!--<div class="col-sm-10">-->
+                    <!--<input type="text" class="form-control" v-model="userHeroFrag.gmUserHeroFragNum" placeholder="玩家获得碎片数量"/>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+                <!--<div class="col-sm-2 control-label">状态('0':禁用，'1':启用, ‘2’:已使用)</div>-->
+                <!--<div class="col-sm-10">-->
+                    <!--<input type="text" class="form-control" v-model="userHeroFrag.status" placeholder="状态('0':禁用，'1':启用, ‘2’:已使用)"/>-->
+                <!--</div>-->
+            <!--</div>-->
+
+            <div style="width: 100%;padding: 50px 30px 50px 100px;">
+                <div style="width: 300px; height: 300px; border-radius: 10px;border: 1px solid #dadce0;">
+                    <div style="height: 200px;text-align: center;">
+                        <h1>英雄抽奖</h1>
+                        <h4>5★英雄</h4>
+                        <h4>4★英雄</h4>
+                        <h4>3★英雄</h4>
+                        <h4>2★英雄</h4>
+                        <h4>1★英雄</h4>
+                        <h4>英雄碎片</h4>
+                    </div>
+                    <div class="form-group" style="margin-top: 30px;">
+                        <div class="col-sm-3 control-label"></div>
+                        <input type="button" class="btn btn-primary" id="btnSaveOrUpdate" data-loading-text="抽奖中..." @click="testDrawStart(1)" value="单抽"/>
+                        <input type="button" class="btn btn-primary" id="btnSaveOrUpdate2" data-loading-text="抽奖中..." @click="testDrawStart(2)" value="十连抽"/>
+                    </div>
+                </div>
+            </div>
+            <div style="width: 100%;padding: 50px 30px 50px 100px;">
+                <div style="width: 300px; height: 300px; border-radius: 10px;border: 1px solid #dadce0;">
+                    <div style="height: 200px;text-align: center;">
+                        <h1>装备抽奖</h1>
+                        <h4 style="color: #c87f0a">橙色装备</h4>
+                        <h4 style="color: #5d59a6">紫色装备</h4>
+                        <h4 style="color: #0d6aad">蓝色装备</h4>
+                        <h4 style="color: #00a65a">绿色装备</h4>
+                        <h4>白色装备</h4>
+                        <h4>装备卷轴\碎片</h4>
+                    </div>
+                    <div class="form-group" style="margin-top: 30px;">
+                        <div class="col-sm-3 control-label"></div>
+                        <input type="button" class="btn btn-primary" id="btnSaveOrUpdateEQ" data-loading-text="抽奖中..." @click="testEQDrawStart(1)" value="单抽"/>
+                        <input type="button" class="btn btn-primary" id="btnSaveOrUpdateEQ2" data-loading-text="抽奖中..." @click="testEQDrawStart(2)" value="十连抽"/>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/user/userherofrag.js?_${.now?long}"></script>
+</body>
+</html>

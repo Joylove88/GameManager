@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.user.dao.UserEquipmentDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.user.entity.UserEquipmentEntity" id="userEquipmentMap">
+        <result property="gmUserEquipmentId" column="GM_USER_EQUIPMENT_ID"/>
+        <result property="gmEquipmentId" column="GM_EQUIPMENT_ID"/>
+        <result property="gmUserId" column="GM_USER_ID"/>
+        <result property="status" column="STATUS"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+    </resultMap>
+
+    <select id="selectPage" resultType="com.gm.modules.user.entity.UserEquipmentEntity">
+        SELECT
+            A.*,
+            B.EQUIP_NAME,
+            B.EQUIP_RARECODE,
+            B.EQUIP_LEVEL,
+            C.USER_NAME
+        FROM
+            GM_USER_EQUIPMENT A
+        LEFT JOIN
+            GM_EQUIPMENT_INFO B ON A.GM_EQUIPMENT_ID = B.EQUIP_ID
+        LEFT JOIN
+            GM_USER C ON A.GM_USER_ID = C.USER_ID
+
+        ${ew.customSqlSegment}
+
+        ORDER BY CREATE_TIME DESC
+    </select>
+
+    <!--获取玩家装备-->
+    <select id="getUserAllEquip" resultType="com.gm.modules.user.rsp.UserEquipInfoRsp">
+        SELECT
+            A.GM_USER_EQUIPMENT_ID,
+            A.EQUIP_POWER,
+            B.EQUIP_NAME,
+            B.EQUIP_RARECODE,
+            B.EQUIP_ICON_URL,
+            B.EQUIP_LEVEL
+        FROM
+            GM_USER_EQUIPMENT A
+        LEFT JOIN
+            GM_EQUIPMENT_INFO B ON A.GM_EQUIPMENT_ID = B.EQUIP_ID
+        WHERE A.`STATUS` = '1' AND A.GM_USER_ID = #{userId}
+    </select>
+</mapper>

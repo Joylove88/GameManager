@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gm-admin-deployment
+  labels:
+    app: gm-admin-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gm-admin
+  template:
+    metadata:
+      name: gm-admin
+      labels:
+        app: gm-admin
+    spec:
+      containers:
+        - name: gm-admin
+          image: 45.207.58.21:9000/gamemanager/gm-admin:<ENV_NAME_TAG_NAME>
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9004
+              protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gm-admin-service
+  labels:
+    app: gm-admin-service
+spec:
+  selector:
+    app: gm-admin
+  type: NodePort
+  ports:
+    - port: 9004
+      targetPort: 9004
+      nodePort: 32104
+      protocol: TCP
+
+
