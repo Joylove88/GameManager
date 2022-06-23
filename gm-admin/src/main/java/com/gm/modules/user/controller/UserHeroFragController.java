@@ -100,6 +100,7 @@ public class UserHeroFragController {
         DrawForm drawForm = new DrawForm();
         drawForm.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
         drawForm.setDrawType(drawType.toString());
+        drawForm.setItemType("1");
         List s = drawGiftService.heroDrawStart(userEntity, drawForm);
         return R.ok().put("s",s);
     }

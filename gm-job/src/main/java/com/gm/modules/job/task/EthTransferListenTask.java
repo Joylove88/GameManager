@@ -58,7 +58,7 @@ public class EthTransferListenTask implements ITask {
 
 	@Override
 	public void run(String params){
-		logger.info("TestTask定时任务正在执行，参数为：{}", params);
+		logger.info("ethTransferListenTask定时任务正在执行，参数为：{}", params);
 		try {
 			contracts.add(Constant.NFT_HERO_ADDRESS.toLowerCase());
 			contracts.add(Constant.NFT_EQUIP_ADDRESS.toLowerCase());

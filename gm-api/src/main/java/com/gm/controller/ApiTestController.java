@@ -9,6 +9,7 @@
 package com.gm.controller;
 
 import com.gm.annotation.LoginUser;
+import com.gm.common.utils.Arith;
 import com.gm.common.utils.R;
 import com.gm.annotation.Login;
 import com.gm.modules.user.entity.UserEntity;
@@ -58,33 +59,31 @@ public class ApiTestController {
 
 
     // 1个矿工可以孵化的鸡蛋(代币)数量 （1天有86400秒，被放大了10倍）
-    static BigDecimal EGGS_TO_HATCH_1MINERS = BigDecimal.valueOf(864000);
-    static BigDecimal PSN = BigDecimal.valueOf(10000);
-    static BigDecimal PSNH = BigDecimal.valueOf(5000);
+    private static BigDecimal EGGS_TO_HATCH_1MINERS = BigDecimal.valueOf(864000);
+    private static BigDecimal PSN = BigDecimal.valueOf(10000);
+    private static BigDecimal PSNH = BigDecimal.valueOf(5000);
     // 用户矿工数量
-    static Map<String,BigDecimal> miners = new HashMap<>();
+    private static Map<String,BigDecimal> miners = new HashMap<>();
     // 用户鸡蛋数量
-    static Map<String,BigDecimal> claimedEggs = new HashMap<>();
+    private static Map<String,BigDecimal> claimedEggs = new HashMap<>();
     // 用户上次购买矿工的时间
-    static Map<String,BigDecimal> lastHatch = new HashMap<>();
-    // 用户的推荐人
-    String referrals;
+    private static Map<String,BigDecimal> lastHatch = new HashMap<>();
     // 初始市场总鸡蛋数量
-    static BigDecimal marketEggs = BigDecimal.valueOf(864000000l);
-    // 总资金
-    static BigDecimal FundPool = BigDecimal.valueOf(100000);
+    private static BigDecimal marketEggs = BigDecimal.valueOf(864000000);
+    // 资金池总资金
+    private static BigDecimal FundPool = BigDecimal.valueOf(10);
 
-    static BigDecimal time = divide(BigDecimal.valueOf(System.currentTimeMillis()),BigDecimal.valueOf(1000));
+    private static BigDecimal time = Arith.divide(BigDecimal.valueOf(System.currentTimeMillis()),BigDecimal.valueOf(1000));
 
-    static Map<String,BigDecimal> userpower =  new HashMap<>(); //用户战力
-    static BigDecimal totalPower = BigDecimal.valueOf(100000); // 主资金池余额
-    static BigDecimal[] maplevel = {BigDecimal.valueOf(0.05)};
+    private static Map<String,BigDecimal> userpower =  new HashMap<>(); // 用户战力
+    private static BigDecimal totalPower = BigDecimal.valueOf(1000); // 总战力
+    private static BigDecimal[] maplevel = {BigDecimal.valueOf(0.05)}; // 地图奖励分配百分比
     static String[] userids = {"a0","a1","a2"};
 //    static long totalPower = 19000;
 
-    public static BigDecimal calculateCombatPower(String userid) {
+    private static BigDecimal calculateCombatPower(String userid) {
         System.out.println("totalPower====："+totalPower);
-        return BigDecimal.valueOf(Long.parseLong(userpower.get(userid).toString()));
+        return userpower.get(userid);
     }
     public static long power(){
         Random random = new Random();
@@ -92,25 +91,26 @@ public class ApiTestController {
         return number;
     }
     public static void main(String[] args) {
-//        totalPower = multiply(totalPower,maplevel[0]);
-        FundPool = multiply(FundPool,maplevel[0]);
-        for (int i = 0 ; i < 1000; i++){
+        FundPool = Arith.multiply(FundPool,maplevel[0]);
+        FundPool = BigDecimal.valueOf(10000);
+        System.out.println("此地图池子余额:" + FundPool);
+        for (int i = 0 ; i < 1; i++){
             //购买
-            time = divide(BigDecimal.valueOf(System.currentTimeMillis()),BigDecimal.valueOf(1000));
-            miners.put("a"+i,BigDecimal.valueOf(0));
+            time = Arith.divide(BigDecimal.valueOf(System.currentTimeMillis()),BigDecimal.valueOf(1000));
+            miners.put("a"+i,BigDecimal.valueOf(19.702970));
             lastHatch.put("a"+i,time);
             claimedEggs.put("a"+i,BigDecimal.valueOf(0));
 
-            userpower.put("a"+i,BigDecimal.valueOf(100));
+            userpower.put("a"+i,Arith.divide(BigDecimal.valueOf(1000),BigDecimal.valueOf(100)));
             buyEggs("a"+i);
             System.out.println("marketEggs:" + marketEggs);
         }
 //        FundPool = totalPower;
-        for(int j = 0 ; j < 30; j++){
+        for(int j = 0 ; j < 1; j++){
             System.out.println("蒂"+j+"天");
             //购买
-            time = add(divide(BigDecimal.valueOf(System.currentTimeMillis()),BigDecimal.valueOf(1000)),multiply(EGGS_TO_HATCH_1MINERS,BigDecimal.valueOf(j)));
-            for (int i = 0 ; i < 1000; i++){
+            time = Arith.add(Arith.divide(BigDecimal.valueOf(System.currentTimeMillis()),BigDecimal.valueOf(1000)),Arith.multiply(EGGS_TO_HATCH_1MINERS,BigDecimal.valueOf(j)));
+            for (int i = 0 ; i < 1; i++){
                 System.out.println("marketEggs:" + marketEggs);
                 System.out.println("miners:" + miners.get("a"+i));
                 System.out.println("lastHatch:" + lastHatch.get("a"+i));
@@ -119,12 +119,13 @@ public class ApiTestController {
             }
         }
         System.out.println("totalPower:"+totalPower);
+        System.out.println("marketEggs:"+marketEggs);
 
     }
 
 
     /// @dev 奖励复投
-    public static void hatchEggs(String userid) {
+    private static void hatchEggs(String userid) {
         if(userid == userid) {
 //            ref = address(0);
         }
@@ -132,167 +133,91 @@ public class ApiTestController {
 //            referrals[msg.sender] = ref;
 //        }
         BigDecimal eggsUsed = getMyEggs(userid);
-        BigDecimal newMiners= divide(eggsUsed,EGGS_TO_HATCH_1MINERS);
-        miners.put(userid,add(miners.get(userid) , newMiners));
+        BigDecimal newMiners= Arith.divide(eggsUsed,EGGS_TO_HATCH_1MINERS);
+        miners.put(userid,Arith.add(miners.get(userid) , newMiners));
         System.out.println("claimedEggs:" + claimedEggs.get(userid));
-//        claimedEggs.put(userid,0);
+//        claimedEggs.put(userid,BigDecimal.valueOf(0));
         lastHatch.put(userid, time);
 
-        // 奖励的1/10分给推荐人
-//        claimedEggs[referrals[msg.sender]] = claimedEggs[referrals[msg.sender]] + eggsUsed / 10;
-
         // 消弱矿工囤积
-        marketEggs = add(marketEggs,divide(eggsUsed,BigDecimal.valueOf(5)));
+        marketEggs = Arith.add(marketEggs,Arith.divide(eggsUsed,BigDecimal.valueOf(5)));
     }
     /// @dev 取出奖励
-    public static void sellEggs(String userid) {
+    private static void sellEggs(String userid) {
         BigDecimal hasEggs = getMyEggs(userid); // 8640000000
         BigDecimal eggValue = calculateEggSell(hasEggs);
 
-        BigDecimal powerRate = divide(eggValue, totalPower);
-
-        BigDecimal userGetGold = multiply(powerRate, FundPool);
-
-        FundPool = subtract(FundPool,userGetGold);
+        // 获取战力率
+        BigDecimal powerRate = Arith.divide(eggValue, totalPower);
+        // 获取用户可获取的金币
+        BigDecimal userGetGold = Arith.multiply(powerRate, FundPool);
+        // 资金池减少
+        FundPool = Arith.subtract(FundPool,userGetGold);
         System.out.println("powerRate:"+powerRate);
         System.out.println("userGetGold:"+userGetGold);
         System.out.println("FundPool:"+FundPool);
 //        BigDecimal fee = devFee(eggValue);
-        totalPower = subtract(totalPower ,eggValue);
+        totalPower = Arith.subtract(totalPower ,eggValue);
 //        System.out.println("fee:"+fee);
         System.out.println("eggValue:"+eggValue);
         claimedEggs.put(userid,BigDecimal.valueOf(0));
         lastHatch.put(userid, time);
-        marketEggs = add(marketEggs,hasEggs);
+        marketEggs = Arith.add(marketEggs,hasEggs);
     }
 
     // eggs = getMyEggs
     // sun = calculateEggSell(eggs)
     // fee = devFee(sun)
     // 可以提取的奖励=sun - fee
-    public static BigDecimal calculateEggSell(BigDecimal eggs) {
+    private static BigDecimal calculateEggSell(BigDecimal eggs) {
         return calculateTrade(eggs,marketEggs,totalPower);
     }
 
     // 贸易平衡算法
-    public static BigDecimal calculateTrade(BigDecimal rt,BigDecimal rs, BigDecimal bs){
+    private static BigDecimal calculateTrade(BigDecimal rt, BigDecimal rs, BigDecimal bs){
 //        return (PSN*bs)/(PSNH+((PSN*rs+PSNH*rt)/rt));
-        BigDecimal a = multiply(PSN,bs);
-        BigDecimal b = divide(
-                add(
-                        multiply(PSN,rs),
-                        multiply(PSNH,rt)
+        BigDecimal a = Arith.multiply(PSN,bs);
+        BigDecimal b = Arith.divide(
+                Arith.add(
+                        Arith.multiply(PSN,rs),
+                        Arith.multiply(PSNH,rt)
                 ),
                 rt);
 
-        BigDecimal c = add(PSNH,b
+        BigDecimal c = Arith.add(PSNH,b
 
         );
 
-        return divide(
+        return Arith.divide(
                 a,
                 c
         );
     }
 
     /// @dev 购买矿工
-    public static void buyEggs(String userid) {
+    private static void buyEggs(String userid) {
         System.out.println("CombatPower:"+calculateCombatPower(userid));
-        totalPower = add(totalPower, calculateCombatPower(userid));
-        BigDecimal eggsBought = calculateEggBuy(calculateCombatPower(userid), subtract(totalPower , calculateCombatPower(userid)));
-//        eggsBought = subtract(eggsBought , devFee(eggsBought));
-//        BigDecimal fee = devFee(calculateCombatPower(userid));
-//        System.out.println("buyFee:"+fee);
-        claimedEggs.put(userid, add(claimedEggs.get(userid) ,eggsBought));
+        totalPower = Arith.add(totalPower, calculateCombatPower(userid));
+        BigDecimal eggsBought = calculateEggBuy(calculateCombatPower(userid), Arith.subtract(totalPower , calculateCombatPower(userid)));
+        claimedEggs.put(userid, Arith.add(claimedEggs.get(userid) ,eggsBought));
         hatchEggs(userid);
     }
 
-    public static BigDecimal calculateEggBuy(BigDecimal eth, BigDecimal contractBalance) {
+    private static BigDecimal calculateEggBuy(BigDecimal eth, BigDecimal contractBalance) {
         return calculateTrade(eth,contractBalance,marketEggs);
     }
-    // 购买矿工兑换数量比例
-//    public static long calculateEggBuySimple(BigDecimal eth) {
-//        return calculateEggBuy(eth,totalPower);
-//    }
-//    public static BigDecimal devFee(BigDecimal amount) {
-//        return divide(multiply(amount ,BigDecimal.valueOf(10)) , BigDecimal.valueOf(100));
-//    }
 
-    public static BigDecimal getMyEggs(String userid) {
-        return add(claimedEggs.get(userid),getEggsSinceLastHatch(userid));
+    private static BigDecimal getMyEggs(String userid) {
+        return Arith.add(claimedEggs.get(userid),getEggsSinceLastHatch(userid));
     }
-    public static BigDecimal getEggsSinceLastHatch(String userid) {
-        BigDecimal secondsPassed = min(EGGS_TO_HATCH_1MINERS, subtract(time ,lastHatch.get(userid)));
-        return multiply(secondsPassed, miners.get(userid));
+    private static BigDecimal getEggsSinceLastHatch(String userid) {
+        BigDecimal secondsPassed = min(EGGS_TO_HATCH_1MINERS, Arith.subtract(time ,lastHatch.get(userid)));
+        return Arith.multiply(secondsPassed, miners.get(userid));
     }
-    public static BigDecimal min(BigDecimal a, BigDecimal b) {
+    private static BigDecimal min(BigDecimal a, BigDecimal b) {
         int flag = a.compareTo(b);
         return flag == -1 ? a : b;
     }
 
 
-
-
-    /**
-     * @return java.math.BigDecimal 总和
-     * 示例：BigDecimalUtils.add(参数,参数,参数,参数,...);
-     * @Description 加法运算
-     * @Param [param] 可变长度数组，把需要计算的数值填进来
-     * @Author Lucky
-     * @Date 2021/10/21
-     */
-    public static BigDecimal add(BigDecimal... param) {
-        BigDecimal sumAdd = BigDecimal.valueOf(0);
-        for (int i = 0; i < param.length; i++) {
-            BigDecimal bigDecimal = param[i] == null ? new BigDecimal(0) : param[i];
-            sumAdd = sumAdd.add(bigDecimal);
-        }
-        return sumAdd;
-    }
-
-    /**
-     * 默认保留6位小数
-     */
-    private static final int scale = 6;
-    /**
-     * 四舍五入
-     */
-    private static final int roundingMode = 4;
-    /**
-     * 相除
-     */
-    public static BigDecimal divide(BigDecimal b1, BigDecimal b2) {
-        return b1.divide(b2, scale, roundingMode);
-    }
-
-    /**
-     * @return java.math.BigDecimal 计算结果
-     * 示例：BigDecimalUtils.subtract(被减数,减数,减数,减数,...);
-     * @Description 加法运算 如果被减数为null 结果就为0
-     * @Param [param] 第一个为被减数 可以传入多个 因为参数是一个可变长度的数组
-     * @Author Lucky
-     * @Date 2021/10/21
-     */
-    public static BigDecimal subtract(BigDecimal... param) {
-        BigDecimal sumLess = param[0];//被减数
-        if (sumLess == null) return new BigDecimal(0);
-        for (int i = 1; i < param.length; i++) {
-            BigDecimal bigDecimal = param[i] == null ? new BigDecimal(0) : param[i];
-            sumLess = sumLess.subtract(bigDecimal);
-        }
-        return sumLess;
-    }
-
-    /**
-     * @return java.math.BigDecimal 计算结果 保留小数点后两位 规则为四舍五入
-     * @Description 乘法运算 如一方参数为0或者null计算结果为0
-     * @Param [first, last]
-     * @Author Lucky
-     * @Date 2021/10/21
-     */
-    public static BigDecimal multiply(BigDecimal first, BigDecimal last) {
-        if (first == null) first = new BigDecimal(0);
-        if (last == null) last = new BigDecimal(0);
-        return first.multiply(last).setScale(2, BigDecimal.ROUND_HALF_UP);
-    }
 }

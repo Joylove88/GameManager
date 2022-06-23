@@ -49,4 +49,20 @@
             A.`STATUS` = '1' AND
             GM_PROBABILITY_ID = #{gmProbabilityId}
     </select>
+
+    <!--获取全部星级英雄-->
+    <select id="getHeroStars" resultType="com.gm.modules.basicconfig.entity.HeroStarEntity">
+        SELECT
+        A.*,
+        C.HERO_ICON_URL,
+        C.HERO_NAME,
+        D.GM_STAR_CODE
+        FROM
+        GM_HERO_STAR A
+        LEFT JOIN GM_HERO_INFO C ON A.GM_HERO_ID = C.HERO_ID
+        LEFT JOIN GM_STAR_INFO D ON A.GM_STAR_ID = D.GM_STAR_ID
+        WHERE
+        A.`STATUS` = '1'
+        ORDER BY C.HERO_NAME ASC,D.GM_STAR_CODE ASC
+    </select>
 </mapper>

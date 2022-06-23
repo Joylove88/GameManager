@@ -48,67 +48,67 @@ public class HeroStarEntity implements Serializable {
 	/**
 	 * 初始生命值
 	 */
-	private Double gmHealth;
+	private Long gmHealth;
 	/**
 	 * 成长属性-生命值
 	 */
-	private Double gmGrowHealth;
+	private Long gmGrowHealth;
 	/**
 	 * 初始法力值
 	 */
-	private Double gmMana;
+	private Long gmMana;
 	/**
 	 * 成长属性-法力值
 	 */
-	private Double gmGrowMana;
+	private Long gmGrowMana;
 	/**
 	 * 初始生命值恢复
 	 */
-	private Double gmHealthRegen;
+	private Long gmHealthRegen;
 	/**
 	 * 成长属性-生命值恢复
 	 */
-	private Double gmGrowHealthRegen;
+	private Long gmGrowHealthRegen;
 	/**
 	 * 初始法力值恢复
 	 */
-	private Double gmManaRegen;
+	private Long gmManaRegen;
 	/**
 	 * 成长属性-法力值恢复
 	 */
-	private Double gmGrowManaRegen;
+	private Long gmGrowManaRegen;
 	/**
 	 * 初始护甲
 	 */
-	private Double gmArmor;
+	private Long gmArmor;
 	/**
 	 * 成长属性-护甲
 	 */
-	private Double gmGrowArmor;
+	private Long gmGrowArmor;
 	/**
 	 * 初始魔抗
 	 */
-	private Double gmMagicResist;
+	private Long gmMagicResist;
 	/**
 	 * 成长属性-魔抗
 	 */
-	private Double gmGrowMagicResist;
+	private Long gmGrowMagicResist;
 	/**
 	 * 初始攻击力
 	 */
-	private Double gmAttackDamage;
+	private Long gmAttackDamage;
 	/**
 	 * 成长属性-攻击力
 	 */
-	private Double gmGrowAttackDamage;
+	private Long gmGrowAttackDamage;
 	/**
 	 * 初始法攻
 	 */
-	private Double gmAttackSpell;
+	private Long gmAttackSpell;
 	/**
 	 * 成长属性-法攻
 	 */
-	private Double gmGrowAttackSpell;
+	private Long gmGrowAttackSpell;
 	/**
 	 * 创建人
 	 */

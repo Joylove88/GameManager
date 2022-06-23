@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2022-02-08 16:26:15
  */
 @RestController
-@RequestMapping("basicconfig/user")
+@RequestMapping("user/user")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -36,7 +36,7 @@ public class UserController {
      * 列表
      */
     @RequestMapping("/list")
-    @RequiresPermissions("basicconfig:user:list")
+    @RequiresPermissions("user:user:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = userService.queryPage(params);
 
@@ -48,7 +48,7 @@ public class UserController {
      * 信息
      */
     @RequestMapping("/info/{userId}")
-    @RequiresPermissions("basicconfig:user:info")
+    @RequiresPermissions("user:user:info")
     public R info(@PathVariable("userId") Long userId){
         UserEntity user = userService.getById(userId);
 
@@ -59,7 +59,7 @@ public class UserController {
      * 保存
      */
     @RequestMapping("/save")
-    @RequiresPermissions("basicconfig:user:save")
+    @RequiresPermissions("user:user:save")
     public R save(@RequestBody UserEntity user){
         userService.save(user);
 
@@ -70,7 +70,7 @@ public class UserController {
      * 修改
      */
     @RequestMapping("/update")
-    @RequiresPermissions("basicconfig:user:update")
+    @RequiresPermissions("user:user:update")
     public R update(@RequestBody UserEntity user){
         ValidatorUtils.validateEntity(user);
         userService.updateById(user);
@@ -82,7 +82,7 @@ public class UserController {
      * 删除
      */
     @RequestMapping("/delete")
-    @RequiresPermissions("basicconfig:user:delete")
+    @RequiresPermissions("user:user:delete")
     public R delete(@RequestBody Long[] userIds){
         userService.removeByIds(Arrays.asList(userIds));
 

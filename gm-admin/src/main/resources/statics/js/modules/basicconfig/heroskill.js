@@ -5,7 +5,10 @@ $(function () {
         datatype: "json",
         colModel: [			
 			{ label: 'gmHeroSkillId', name: 'gmHeroSkillId', index: 'GM_HERO_SKILL_ID', width: 50, key: true },
-			{ label: '英雄ID', name: 'heroName', width: 80 },
+			{ label: '英雄名称', name: 'heroName', width: 80 , formatter: function (value, options, row) {
+			    return value + '[' + row.gmStarCode + '★]';
+            }
+            },
 			{ label: '伤害星级', name: 'skillStarLevel', index: 'SKILL_STAR_LEVEL', width: 80 },
 			{ label: '技能位置', name: 'skillSolt', index: 'SKILL_SOLT', width: 80 }, 			
 			{ label: '固定伤害', name: 'skillFixedDamage', index: 'SKILL_FIXED_DAMAGE', width: 80 }, 			
@@ -143,7 +146,7 @@ var vm = new Vue({
         getHeroInfoList: function () {
             $.ajax({
                 type: "POST",
-                url: baseURL + "basicconfig/heroinfo/getHeroInfoList",
+                url: baseURL + "basicconfig/herostar/getHeroStars",
                 contentType: "application/json",
                 success: function (r) {
                     if (r.code == 0) {

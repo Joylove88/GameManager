@@ -26,9 +26,9 @@ $(function () {
 			{ label: '父级装备链', name: 'parentEquipChain', index: 'PARENT_EQUIP_CHAIN', width: 80 },
             { label: '状态', name: 'status', index: 'STATUS', width: 80, formatter: function (value, options, row) {
                 if (value == '0') {
-                    return '<span class="label badge-danger" style="background-color: #ed5565;">禁用</span>';//禁用
+                    return '<span class="label badge-danger" style="background-color: #ed5565;">未激活</span>';//禁用
                 } else {
-                    return '<span class="label label-info">启用</span>';//启用
+                    return '<span class="label label-info">已激活</span>';//启用
                 }
             }
             },

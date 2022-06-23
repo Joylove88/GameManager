@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.basicconfig.dao.GmDungeonConfigDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.basicconfig.entity.GmDungeonConfigEntity" id="gmDungeonConfigMap">
+        <result property="id" column="ID"/>
+        <result property="dungeonName" column="DUNGEON_NAME"/>
+        <result property="dungeonDescription" column="DUNGEON_DESCRIPTION"/>
+        <result property="dungeonLevelMin" column="DUNGEON_LEVEL_MIN"/>
+        <result property="dungeonLevelMax" column="DUNGEON_LEVEL_MAX"/>
+        <result property="dungeonAward" column="DUNGEON_AWARD"/>
+        <result property="dungeonPower" column="DUNGEON_POWER"/>
+        <result property="requiresStamina" column="REQUIRES_STAMINA"/>
+        <result property="rangeGoldCoins" column="RANGE_GOLD_COINS"/>
+        <result property="rangeEquip" column="RANGE_EQUIP"/>
+        <result property="rangeProps" column="RANGE_PROPS"/>
+        <result property="dungeonImgUrl" column="DUNGEON_IMG_URL"/>
+        <result property="status" column="STATUS"/>
+        <result property="createUser" column="CREATE_USER"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateUser" column="UPDATE_USER"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+    </resultMap>
+
+    <select id="selectPage" resultType="com.gm.modules.basicconfig.entity.GmDungeonConfigEntity">
+        SELECT
+        a.*
+        FROM
+        gm_dungeon_config a
+
+        ${ew.customSqlSegment}
+    </select>
+</mapper>

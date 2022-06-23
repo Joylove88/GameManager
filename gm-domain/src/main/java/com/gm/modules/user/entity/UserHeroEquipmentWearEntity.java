@@ -39,11 +39,15 @@ public class UserHeroEquipmentWearEntity implements Serializable {
 	 */
 	private Long gmUserId;
 	/**
+	 * 玩家英雄ID
+	 */
+	private Long gmUserHeroId;
+	/**
 	 * 父级装备链
 	 */
 	private String parentEquipChain;
 	/**
-	 * 状态('0':禁用，'1':启用)
+	 * 状态('0':未激活，'1':已激活)
 	 */
 	private String status;
 	/**

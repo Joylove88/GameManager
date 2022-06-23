@@ -159,13 +159,14 @@ public class DrawGiftService{
                 userHeroEntity.setCreateTimeTs(now.getTime());
                 // 统计英雄战力
                 double heroPower = 0;
-                double health = gifts.get(entry.getKey()).getGmHealth();//初始生命值
-                double mana = gifts.get(entry.getKey()).getGmMana();//初始法力值
-                double healthRegen = gifts.get(entry.getKey()).getGmHealthRegen();//初始生命值恢复
-                double manaRegen = gifts.get(entry.getKey()).getGmManaRegen();//初始法力值恢复
-                double armor = gifts.get(entry.getKey()).getGmArmor();//gmArmor
-                double magicResist = gifts.get(entry.getKey()).getGmMagicResist();//初始魔抗
-                double attackDamage = gifts.get(entry.getKey()).getGmAttackDamage();//初始攻击力
+                long health = gifts.get(entry.getKey()).getGmHealth();//初始生命值
+                long mana = gifts.get(entry.getKey()).getGmMana();//初始法力值
+                long healthRegen = gifts.get(entry.getKey()).getGmHealthRegen();//初始生命值恢复
+                long manaRegen = gifts.get(entry.getKey()).getGmManaRegen();//初始法力值恢复
+                long armor = gifts.get(entry.getKey()).getGmArmor();//gmArmor
+                long magicResist = gifts.get(entry.getKey()).getGmMagicResist();//初始魔抗
+                long attackDamage = gifts.get(entry.getKey()).getGmAttackDamage();//初始攻击力
+                long gmAttackSpell = gifts.get(entry.getKey()).getGmAttackSpell();//初始法功
                 heroPower = (health * 0.1) + (mana * 0.1) + attackDamage + ((armor + magicResist) * 4.5) + healthRegen * 0.1 + manaRegen * 0.3;
                 userHeroEntity.setHeroPower((long) heroPower);
 
@@ -355,14 +356,14 @@ public class DrawGiftService{
                 entity.setCreateTimeTs(now.getTime());
                 // 统计装备战力
                 double equipPower = 0;
-                double health = gifts.get(entry.getKey()).getEquipHealth() != null ? gifts.get(entry.getKey()).getEquipHealth() : 0;//初始生命值
-                double mana = gifts.get(entry.getKey()).getEquipMana() != null ? gifts.get(entry.getKey()).getEquipMana() : 0;//初始法力值
-                double healthRegen = gifts.get(entry.getKey()).getEquipHealthRegen() != null ? gifts.get(entry.getKey()).getEquipHealthRegen() : 0;//初始生命值恢复
-                double manaRegen = gifts.get(entry.getKey()).getEquipManaRegen() != null ? gifts.get(entry.getKey()).getEquipManaRegen() : 0;//初始法力值恢复
-                double armor = gifts.get(entry.getKey()).getEquipArmor() != null ? gifts.get(entry.getKey()).getEquipArmor() : 0;//gmArmor
-                double magicResist = gifts.get(entry.getKey()).getEquipMagicResist() != null ? gifts.get(entry.getKey()).getEquipMagicResist() : 0;//初始魔抗
-                double attackDamage = gifts.get(entry.getKey()).getEquipAttackDamage() != null ? gifts.get(entry.getKey()).getEquipAttackDamage() : 0;//初始攻击力
-                double attackSpell = gifts.get(entry.getKey()).getEquipAttackSpell() != null ? gifts.get(entry.getKey()).getEquipAttackSpell() : 0;//初始法攻
+                long health = gifts.get(entry.getKey()).getEquipHealth() != null ? gifts.get(entry.getKey()).getEquipHealth() : 0;//初始生命值
+                long mana = gifts.get(entry.getKey()).getEquipMana() != null ? gifts.get(entry.getKey()).getEquipMana() : 0;//初始法力值
+                long healthRegen = gifts.get(entry.getKey()).getEquipHealthRegen() != null ? gifts.get(entry.getKey()).getEquipHealthRegen() : 0;//初始生命值恢复
+                long manaRegen = gifts.get(entry.getKey()).getEquipManaRegen() != null ? gifts.get(entry.getKey()).getEquipManaRegen() : 0;//初始法力值恢复
+                long armor = gifts.get(entry.getKey()).getEquipArmor() != null ? gifts.get(entry.getKey()).getEquipArmor() : 0;//gmArmor
+                long magicResist = gifts.get(entry.getKey()).getEquipMagicResist() != null ? gifts.get(entry.getKey()).getEquipMagicResist() : 0;//初始魔抗
+                long attackDamage = gifts.get(entry.getKey()).getEquipAttackDamage() != null ? gifts.get(entry.getKey()).getEquipAttackDamage() : 0;//初始攻击力
+                long attackSpell = gifts.get(entry.getKey()).getEquipAttackSpell() != null ? gifts.get(entry.getKey()).getEquipAttackSpell() : 0;//初始法攻
                 equipPower = (health * 0.1) + (mana * 0.1) + attackDamage + attackSpell + ((armor + magicResist) * 4.5) + healthRegen * 0.1 + manaRegen * 0.3;
                 entity.setEquipPower((long) equipPower);
 

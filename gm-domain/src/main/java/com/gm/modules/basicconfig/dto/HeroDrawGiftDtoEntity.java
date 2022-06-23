@@ -28,31 +28,35 @@ public class HeroDrawGiftDtoEntity implements Serializable {
 	/**
 	 * 初始生命值
 	 */
-	private Double gmHealth;
+	private Long gmHealth;
 	/**
 	 * 初始法力值
 	 */
-	private Double gmMana;
+	private Long gmMana;
 	/**
 	 * 初始生命值恢复
 	 */
-	private Double gmHealthRegen;
+	private Long gmHealthRegen;
 	/**
 	 * 初始法力值恢复
 	 */
-	private Double gmManaRegen;
+	private Long gmManaRegen;
 	/**
 	 * 初始护甲
 	 */
-	private Double gmArmor;
+	private Long gmArmor;
 	/**
 	 * 初始魔抗
 	 */
-	private Double gmMagicResist;
+	private Long gmMagicResist;
 	/**
 	 * 初始攻击力
 	 */
-	private Double gmAttackDamage;
+	private Long gmAttackDamage;
+	/**
+	 * 初始法功
+	 */
+	private Long gmAttackSpell;
 	/**
 	 * ID
 	 */

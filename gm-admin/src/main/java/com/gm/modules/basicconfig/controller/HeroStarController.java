@@ -138,4 +138,13 @@ public class HeroStarController extends AbstractController {
         return R.ok();
     }
 
+    /**
+     * 获取星级英雄
+     */
+    @RequestMapping("/getHeroStars")
+    @RequiresPermissions("basicconfig:herostar:list")
+    public R getHeroStars(){
+        List<HeroStarEntity> list = heroStarService.getHeroStars();
+        return R.ok().put("list",list);
+    }
 }

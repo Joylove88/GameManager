@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>队伍配置表</title>
+		<#include "/header.html">
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2" style="padding-left: 0;width: 220px;">
+                <input type="text" class="form-control" v-model="q.userAddress" @keyup.enter="query" placeholder="会员名称">
+            </div>
+            <div class="form-group col-sm-1">
+                <select class="form-control" v-model="q.status">
+                    <option value="">全部</option>
+                    <option value="0">未战斗</option>
+                    <option value="1">战斗中</option>
+                    <option value="2">战斗结束</option>
+                </select>
+            </div>
+            <a class="btn btn-default" @click="query">查询</a>
+			<#if shiro.hasPermission("basicconfig:gmteamconfig:save")>
+            <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			</#if>
+			<#if shiro.hasPermission("basicconfig:gmteamconfig:update")>
+            <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			</#if>
+			<#if shiro.hasPermission("basicconfig:gmteamconfig:delete")>
+            <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			</#if>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+														                    <div class="form-group">
+                        <div class="col-sm-2 control-label">用户ID</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmTeamConfig.userId" placeholder="用户ID"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">队伍名称</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmTeamConfig.teamName" placeholder="队伍名称"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">队伍顺序</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmTeamConfig.teamSolt" placeholder="队伍顺序"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">英雄1ID</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmTeamConfig.hero1Id" placeholder="英雄1ID"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">英雄2ID</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmTeamConfig.hero2Id" placeholder="英雄2ID"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">英雄3ID</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmTeamConfig.hero3Id" placeholder="英雄3ID"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">英雄4ID</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmTeamConfig.hero4Id" placeholder="英雄4ID"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">英雄5ID</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmTeamConfig.hero5Id" placeholder="英雄5ID"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">战斗状态（0：未战斗，1：战斗中，2：战斗结束）</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmTeamConfig.status" placeholder="战斗状态（0：未战斗，1：战斗中，2：战斗结束）"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">修改人</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmTeamConfig.updateUser" placeholder="修改人"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">修改时间</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmTeamConfig.updateTime" placeholder="修改时间"/>
+                        </div>
+                    </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" id="btnSaveOrUpdate" data-loading-text="保存中..." @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/basicconfig/gmteamconfig.js?_${.now?long}"></script>
+</body>
+</html>

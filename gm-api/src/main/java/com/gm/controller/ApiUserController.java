@@ -103,9 +103,22 @@ public class ApiUserController {
                 .eq("USER_ID",user.getUserId());
         UserAccountEntity userAccount = userAccountService.getOne(wrapper);
         if (userAccount == null){
-            throw new RRException(ErrorCode.USER_ACCOUNT_EXPIRED.getDesc());
+            throw new RRException(ErrorCode.USER_GET_BAL_FAIL.getDesc());
         }
         BeanUtils.copyProperties(rsp,userAccount);
+        return R.ok().put("userAccount",rsp);
+    }
+
+    @Login
+    @PostMapping("getUserTotalPower")
+    @ApiOperation("获取玩家总战力及体力值")
+    public R getUserTotalPower(@LoginUser UserEntity user) throws InvocationTargetException, IllegalAccessException {
+        UserTotalPowerRsp rsp = new UserTotalPowerRsp();
+        UserEntity userEntity = userService.getById(user.getUserId());
+        if (userEntity == null){
+            throw new RRException(ErrorCode.USER_GET_FAIL.getDesc());
+        }
+        BeanUtils.copyProperties(rsp,userEntity);
         return R.ok().put("userAccount",rsp);
     }
 

@@ -6,6 +6,7 @@ $(function () {
             { label: 'gmUserEquipmentId', name: 'gmUserEquipmentId', index: 'GM_USER_EQUIPMENT_ID', width: 50, key: true },
             { label: '会员名称', name: 'userName', width: 80 },
             { label: '装备名称', name: 'equipName', width: 80 },
+            { label: '装备战力', name: 'equipPower', width: 80 },
             { label: '装备稀有度', name: 'equipRarecode', width: 80, formatter: function (value, options, row) {
                     var erc = '';
                     if (value == '1') {
@@ -36,7 +37,7 @@ $(function () {
             }
             },
 			{ label: '修改时间', name: 'updateTime', index: 'UPDATE_TIME', width: 80, formatter: function (value, options, row) {
-                return value;
+                return value != null ? value : '';
             }
             }
         ],

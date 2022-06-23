@@ -15,8 +15,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
+import com.gm.modules.user.dao.GmMiningInfoDao;
 import com.gm.modules.user.dao.UserAccountDao;
 import com.gm.modules.user.dao.UserDao;
+import com.gm.modules.user.entity.GmMiningInfoEntity;
 import com.gm.modules.user.entity.UserAccountEntity;
 import com.gm.modules.user.entity.UserTokenEntity;
 import com.gm.modules.user.entity.UserEntity;
@@ -37,6 +39,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 	private UserDao userDao;
 	@Autowired
 	private UserAccountDao userAccountDao;
+	@Autowired
+	private GmMiningInfoDao miningInfoDao;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -71,6 +75,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		userRegister.setUserName(userEntity.getUserWalletAddress());
 		userRegister.setUserWalletAddress(userEntity.getUserWalletAddress());
 		userRegister.setUserLevel(1L);
+		userRegister.setTotalPower(0L);
 		userRegister.setUserType("0");
 		userRegister.setStatus(Constant.enable);
 		userRegister.setOnlineFlag(Constant.enable);
@@ -86,6 +91,14 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		userAccountEntity.setStatus(Constant.enable);
 		userAccountDao.insert(userAccountEntity);
 
+		// 用户注册完成后自动添加一条矿工数据
+		GmMiningInfoEntity miningInfoEntity = new GmMiningInfoEntity();
+		miningInfoEntity.setUserId(userRegister.getUserId());
+		miningInfoEntity.setMiners("0");
+		miningInfoEntity.setClaimedEggs("0");
+		miningInfoEntity.setLastHatch("0");
+		miningInfoEntity.setStatus(Constant.enable);
+		miningInfoDao.insert(miningInfoEntity);
 		return userRegister;
 	}
 

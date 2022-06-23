@@ -41,6 +41,14 @@ public class UserEntity implements Serializable {
 	 */
 	private Date signDate;
 	/**
+	 * 总战力
+	 */
+	private Long totalPower;
+	/**
+	 * 体力值
+	 */
+	private Long ftg;
+	/**
 	 * 用户级别
 	 */
 	private Long userLevel;

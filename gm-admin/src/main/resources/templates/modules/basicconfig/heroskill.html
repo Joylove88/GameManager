@@ -38,9 +38,9 @@
             <div class="form-group">
                 <div class="col-sm-2 control-label">英雄</div>
                 <div class="col-sm-10">
-                    <select class="form-control" v-model="heroSkill.gmHeroId">
+                    <select class="form-control" v-model="heroSkill.gmHeroStarId">
                         <option value="">请选择</option>
-                        <option v-for="heroInfo in heroInfoList" :value="heroInfo.heroId">{{heroInfo.heroName}}</option>
+                        <option v-for="heroInfo in heroInfoList" :value="heroInfo.gmHeroStarId">{{heroInfo.heroName}}[{{heroInfo.gmStarCode}}★]</option>
                     </select>
                 </div>
             </div>

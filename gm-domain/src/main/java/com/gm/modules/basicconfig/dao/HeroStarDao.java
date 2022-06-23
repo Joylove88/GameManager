@@ -14,4 +14,5 @@ import java.util.List;
 @Mapper
 public interface HeroStarDao extends BaseMapper<HeroStarEntity> {
     List<HeroStarEntity> getHeroStarPro(Long gmProbabilityId);
+    List<HeroStarEntity> getHeroStars();
 }

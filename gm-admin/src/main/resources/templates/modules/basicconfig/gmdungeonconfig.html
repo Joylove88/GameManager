@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>副本配置表</title>
+		<#include "/header.html">
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-1">
+                <select class="form-control" v-model="q.status">
+                    <option value="">全部</option>
+                    <option value="0">禁用</option>
+                    <option value="1">启用</option>
+                </select>
+            </div>
+            <a class="btn btn-default" @click="query">查询</a>
+            <a class="btn btn-primary" @click="testFight">战斗</a>
+			<#if shiro.hasPermission("basicconfig:gmdungeonconfig:save")>
+            <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			</#if>
+			<#if shiro.hasPermission("basicconfig:gmdungeonconfig:update")>
+            <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			</#if>
+			<#if shiro.hasPermission("basicconfig:gmdungeonconfig:delete")>
+            <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			</#if>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+														                    <div class="form-group">
+                        <div class="col-sm-2 control-label">副本名称</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.dungeonName" placeholder="副本名称"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">副本描述</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.dungeonDescription" placeholder="副本描述"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2 control-label">怪物数量随机范围</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.monsterNum" placeholder="怪物数量随机范围"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2 control-label">副本最小等级限制</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.dungeonLevelMin" placeholder="副本最小等级限制"/>
+                        </div>
+                    </div>
+					<div class="form-group">
+                        <div class="col-sm-2 control-label">副本最大等级限制</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.dungeonLevelMax" placeholder="副本最大等级限制"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">副本奖励分配百分比</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.rewardDistribution" placeholder="副本奖励分配百分比"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">副本奖励等级</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.dungeonAward" placeholder="副本奖励等级"/>
+                        </div>
+                    </div>
+					<div class="form-group">
+                        <div class="col-sm-2 control-label">副本推荐战力</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.dungeonPower" placeholder="副本推荐战力"/>
+                        </div>
+                    </div>
+					<div class="form-group">
+                        <div class="col-sm-2 control-label">所需体力(默认6)</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.requiresStamina" placeholder="所需体力(默认6)"/>
+                        </div>
+                    </div>
+					<div class="form-group">
+                        <div class="col-sm-2 control-label">产出金币范围</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.rangeGoldCoins" placeholder="产出金币范围"/>
+                        </div>
+                    </div>
+					<div class="form-group">
+                        <div class="col-sm-2 control-label">产出装备范围</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.rangeEquip" placeholder="产出装备范围"/>
+                        </div>
+                    </div>
+					<div class="form-group">
+                        <div class="col-sm-2 control-label">产出道具范围</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.rangeProps" placeholder="产出道具范围"/>
+                        </div>
+                    </div>
+					<div class="form-group">
+                        <div class="col-sm-2 control-label">地图图片URL</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.dungeonImgUrl" placeholder="地图图片URL"/>
+                        </div>
+                    </div>
+					<div class="form-group">
+                        <div class="col-sm-2 control-label">账户状态('0':禁用，'1':启用)</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonConfig.status" placeholder="账户状态('0':禁用，'1':启用)"/>
+                        </div>
+                    </div>
+				    <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" id="btnSaveOrUpdate" data-loading-text="保存中..." @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/basicconfig/gmdungeonconfig.js?_${.now?long}"></script>
+</body>
+</html>

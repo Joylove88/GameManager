@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>怪物配置表</title>
+		<#include "/header.html">
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2" style="padding-left: 0;width: 220px;">
+                <input type="text" class="form-control" v-model="q.dungeonName" @keyup.enter="query" placeholder="副本名称">
+            </div>
+            <div class="form-group col-sm-2" style="padding-left: 0;width: 220px;">
+                <input type="text" class="form-control" v-model="q.monsterLevel" @keyup.enter="query" placeholder="怪物等级">
+            </div>
+            <div class="form-group col-sm-2" style="padding-left: 0;width: 220px;">
+                <input type="text" class="form-control" v-model="q.monsterName" @keyup.enter="query" placeholder="怪物名称">
+            </div>
+            <div class="form-group col-sm-1">
+                <select class="form-control" v-model="q.status">
+                    <option value="">全部</option>
+                    <option value="0">禁用</option>
+                    <option value="1">启用</option>
+                </select>
+            </div>
+            <a class="btn btn-default" @click="query">查询</a>
+			<#if shiro.hasPermission("basicconfig:gmmonsterconfig:save")>
+            <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			</#if>
+			<#if shiro.hasPermission("basicconfig:gmmonsterconfig:update")>
+            <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			</#if>
+			<#if shiro.hasPermission("basicconfig:gmmonsterconfig:delete")>
+            <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			</#if>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+														                    <div class="form-group">
+                        <div class="col-sm-2 control-label">副本ID</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.dungeonId" placeholder="副本ID"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">怪物名称</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.monsterName" placeholder="怪物名称"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">怪物描述</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.monsterDescription" placeholder="怪物描述"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">怪物等级</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.monsterLevel" placeholder="怪物等级"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">怪物战力</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.monsterPower" placeholder="怪物战力"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">怪物图片URL</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.monsterImgUrl" placeholder="怪物图片URL"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">怪物图标URL</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.monsterIconUrl" placeholder="怪物图标URL"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2 control-label">怪物专属技能伤害倍数</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.uniqueSkillM" placeholder="怪物专属技能伤害倍数"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2 control-label">怪物致命一击伤害倍数</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.criticalHitM" placeholder="怪物致命一击伤害倍数"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2 control-label">初始生命值</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.monsterHealth" placeholder="初始生命值"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">初始生命值恢复</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.monsterHealthRegen" placeholder="初始生命值恢复"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">初始护甲</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.monsterArmor" placeholder="初始护甲"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">初始魔抗</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.monsterMagicResist" placeholder="初始魔抗"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">初始攻击力</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.monsterAttackDamage" placeholder="初始攻击力"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">法功</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.monsterAttackSpell" placeholder="法功"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">击杀经验</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.monsterExp" placeholder="击杀经验"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">账户状态('0':禁用，'1':启用)</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmMonsterConfig.status" placeholder="账户状态('0':禁用，'1':启用)"/>
+                        </div>
+                    </div>
+							            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" id="btnSaveOrUpdate" data-loading-text="保存中..." @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/basicconfig/gmmonsterconfig.js?_${.now?long}"></script>
+</body>
+</html>

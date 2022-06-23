@@ -20,11 +20,12 @@ public class TransactionVerifyUtils {
 	// 链接链上
 	public static Web3j connect(){
 		System.out.println("Connecting to binanceScan");
-		Web3j web3 = Web3j.build(new HttpService("https://data-seed-prebsc-1-s1.binance.org:8545"));
+		Web3j web3 = Web3j.build(new HttpService("https://data-seed-prebsc-2-s1.binance.org:8545"));
 		System.out.println("Successfuly connected to Ethereum");
 		return web3;
 	}
 
+	//监听链上交易信息
 	public static Optional<TransactionReceipt> isVerify(Web3j web3,String transactionHash) {
 		String status = "0";
 		// Wait for transaction to be mined

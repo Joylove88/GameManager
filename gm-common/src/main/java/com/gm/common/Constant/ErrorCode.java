@@ -4,6 +4,7 @@ public enum ErrorCode {
 
 	USER_NOT_TOKEN(50,"Failed to get user token!"),//获取用户Token失败
 	USER_GET_FAIL(51,"Failed to get user information!"),//获取用户信息失败
+	USER_GET_BAL_FAIL(51,"Failed to get user balance!"),//获取用户余额失败
 	USER_NOT_EXIST(100,"The account does not exist, please contact customer service!"),//账号不存在，请联系客服！
 	USER_PASSWORD_ERROR(101,"wrong password!"),//密码错误
 	USER_ACCOUNT_EXPIRED(102,"Username has expired, please contact customer service!"),//用户名已失效，请联系客服！

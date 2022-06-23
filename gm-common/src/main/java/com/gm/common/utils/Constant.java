@@ -26,7 +26,28 @@ public class Constant {
     public static final String FRONT_TYPE_ANDROID = "android";
     public static final String FRONT_TYPE_IOS = "ios";
     public static final String FRONT_TYPE_PC = "pc";
+    // 区块号
     public static final String BLOCK_NUMBER = "block_number";
+    // 资金池余额
+    public static final String CASH_POOLING_BALANCE = "cash_pooling_balance";
+    // 市场总鸡蛋数量
+    public static final String MARKET_EGGS = "market_eggs";
+    // 玩家赚取总收入
+    public static final String PLAYERS_EARN_TOTAL_REVENUE = "players_earn_total_revenue";
+    // 副本资金池余额（最新）
+    public static final String DUNGEON_POOLING_BALANCE = "dungeon_pooling_balance";
+    /**
+     * 所有权
+     */
+    public static final String ADDRESS = "0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45";
+    /**
+     * BUSD
+     */
+    public static final String BUSD_ADDRESS = "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee";
+    /**
+     * 资金池地址
+     */
+    public static final String CAPITAL_POOL_ADDRESS = "0xb1EE547128A61E3941aC26374038ecB79a3A21B5";
     /**
      * 英雄合约地址
      */

@@ -25,7 +25,7 @@ public class HeroSkillServiceImpl extends ServiceImpl<HeroSkillDao, HeroSkillEnt
                 new Query<HeroSkillEntity>().getPage(params),
                 new QueryWrapper<HeroSkillEntity>()
                         .eq(StringUtils.isNotBlank(status), "A.STATUS", status)
-                        .like(StringUtils.isNotBlank(heroName), "B.HERO_NAME", heroName)
+                        .like(StringUtils.isNotBlank(heroName), "C.HERO_NAME", heroName)
         );
 
         return new PageUtils(page);

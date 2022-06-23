@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -33,6 +34,11 @@ public class HeroStarServiceImpl extends ServiceImpl<HeroStarDao, HeroStarEntity
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<HeroStarEntity> getHeroStars() {
+        return heroStarDao.getHeroStars();
     }
 
 }

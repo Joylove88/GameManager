@@ -6,7 +6,7 @@
 	<!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.gm.modules.basicconfig.entity.HeroSkillEntity" id="heroSkillMap">
         <result property="gmHeroSkillId" column="GM_HERO_SKILL_ID"/>
-        <result property="gmHeroId" column="GM_HERO_ID"/>
+        <result property="gmHeroStarId" column="GM_HERO_STAR_ID"/>
         <result property="skillStarLevel" column="SKILL_STAR_LEVEL"/>
         <result property="skillSolt" column="SKILL_SOLT"/>
         <result property="skillFixedDamage" column="SKILL_FIXED_DAMAGE"/>
@@ -23,11 +23,18 @@
     </resultMap>
 
     <select id="selectPage" resultType="com.gm.modules.basicconfig.entity.HeroSkillEntity">
-        select A.*,B.HERO_NAME
-        from GM_HERO_SKILL A
-        LEFT JOIN GM_HERO_INFO B ON B.HERO_ID = A.GM_HERO_ID
+        SELECT
+            A.*,
+            C.HERO_NAME,
+            D.GM_STAR_CODE
+        FROM
+            GM_HERO_SKILL A
+        LEFT JOIN GM_HERO_STAR B ON B.GM_HERO_STAR_ID = A.GM_HERO_STAR_ID
+        LEFT JOIN GM_HERO_INFO C ON B.GM_HERO_ID = C.HERO_ID
+        LEFT JOIN GM_STAR_INFO D ON B.GM_STAR_ID = D.GM_STAR_ID
+
 
         ${ew.customSqlSegment}
-        ORDER BY A.GM_HERO_ID, A.SKILL_STAR_LEVEL
+        ORDER BY C.HERO_NAME ASC,D.GM_STAR_CODE ASC
     </select>
 </mapper>

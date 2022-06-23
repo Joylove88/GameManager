@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>副本事件表</title>
+		<#include "/header.html">
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <a class="btn btn-default" @click="query">查询</a>
+			<#if shiro.hasPermission("basicconfig:gmdungeonevent:save")>
+            <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			</#if>
+			<#if shiro.hasPermission("basicconfig:gmdungeonevent:update")>
+            <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			</#if>
+			<#if shiro.hasPermission("basicconfig:gmdungeonevent:delete")>
+            <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			</#if>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-sm-2 control-label">副本</div>
+                        <div class="col-sm-10">
+                            <select class="form-control" v-model="gmDungeonEvent.dungeonId">
+                                <option value="">请选择</option>
+                                <option v-for="dungeon in dungeonList" :value="dungeon.id">{{dungeon.dungeonName}}</option>
+                            </select>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">事件名称</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonEvent.eventName" placeholder="事件名称"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">事件描述</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonEvent.eventDescription" placeholder="事件描述"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">状态('0':禁用，'1':启用)</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonEvent.status" placeholder="状态('0':禁用，'1':启用)"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">事件等级</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonEvent.eventLevel" placeholder="事件等级"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">事件触发概率</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmDungeonEvent.eventPron" placeholder="事件触发概率"/>
+                        </div>
+                    </div>
+							            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" id="btnSaveOrUpdate" data-loading-text="保存中..." @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/basicconfig/gmdungeonevent.js?_${.now?long}"></script>
+</body>
+</html>

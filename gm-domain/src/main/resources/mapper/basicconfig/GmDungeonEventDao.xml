@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.basicconfig.dao.GmDungeonEventDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.basicconfig.entity.GmDungeonEventEntity" id="gmDungeonEventMap">
+        <result property="id" column="ID"/>
+        <result property="dungeonId" column="DUNGEON_ID"/>
+        <result property="eventName" column="EVENT_NAME"/>
+        <result property="eventDescription" column="EVENT_DESCRIPTION"/>
+        <result property="status" column="STATUS"/>
+        <result property="eventLevel" column="EVENT_LEVEL"/>
+        <result property="eventPron" column="EVENT_PRON"/>
+        <result property="createUser" column="CREATE_USER"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+    </resultMap>
+
+
+</mapper>
