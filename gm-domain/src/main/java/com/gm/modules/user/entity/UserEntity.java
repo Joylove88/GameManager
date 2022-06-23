@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * 用户信息表
- * 
+ *
  * @author Axiang
  * @email Axiang@gmail.com
  * @date 2022-02-08 16:26:15
@@ -112,5 +112,14 @@ public class UserEntity implements Serializable {
 	 * 用户在线状态：00离线，01：PC在线，02：H5在线，03：android在线，04：iOS在线
 	 */
 	private String onlineFlag;
+	/**
+	 * 父ID
+	 */
+	private Long fatherId;
+	/**
+	 * 爷ID
+	 */
+	private Long grandFatherId;
+
 
 }

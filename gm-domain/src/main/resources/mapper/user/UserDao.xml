@@ -22,6 +22,8 @@
         <result property="remark" column="REMARK"/>
         <result property="imgUrl" column="IMG_URL"/>
         <result property="onlineFlag" column="ONLINE_FLAG"/>
+        <result property="fatherId" column="FATHER_ID"/>
+        <result property="grandFatherId" column="GRANDFATHER_ID"/>
     </resultMap>
 
 
