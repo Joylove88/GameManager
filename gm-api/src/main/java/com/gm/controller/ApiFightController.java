@@ -28,6 +28,8 @@ import com.gm.modules.sys.service.SysDictService;
 import com.gm.modules.user.entity.UserAccountEntity;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.req.DrawForm;
+import com.gm.modules.user.req.FightClaimReq;
+import com.gm.modules.user.rsp.FightClaimRsp;
 import com.gm.modules.user.service.UserAccountService;
 import com.gm.modules.user.service.UserService;
 import com.gm.modules.user.service.UserTokenService;
@@ -89,7 +91,13 @@ public class ApiFightController {
         return R.ok().put("gifts", "");
     }
 
-
+    @Login
+    @PostMapping("claim")
+    @ApiOperation("点击战斗结果领取奖励")
+    public R claim(@LoginUser UserEntity user, @RequestBody FightClaimReq req) throws Exception {
+        FightClaimRsp fightClaimRsp = fightCoreService.claim(user,req.getCombatId());
+        return R.ok().put("claims", fightClaimRsp);
+    }
 
 
 }

@@ -8,6 +8,7 @@
 <div id="rrapp" v-cloak>
     <div v-show="showList">
         <div class="grid-btn">
+            <a class="btn btn-default" @click="query">查询</a>
 			<#if shiro.hasPermission("user:useraccount:save")>
             <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
 			</#if>

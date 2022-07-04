@@ -2,6 +2,9 @@ package com.gm.modules.user.rsp;
 
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 玩家英雄
  */
@@ -10,7 +13,7 @@ public class UserHeroInfoRsp {
 	/**
 	 * ID
 	 */
-	private String gmUserHeroId;
+	private Long gmUserHeroId;
 	/**
 	 * 英雄名称
 	 */
@@ -47,6 +50,8 @@ public class UserHeroInfoRsp {
 	 * 英雄描述
 	 */
 	private String heroDescription;
+
+	private List<UserHeroEquipmentWearRsp> wearEQList = new ArrayList<>();
 
 
 }

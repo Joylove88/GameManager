@@ -23,6 +23,7 @@
             A.GM_USER_EQUIP_FRAG_NUM,
             A.`STATUS`,
             A.CREATE_TIME,
+            A.FROM_TYPE,
             C.EQUIP_NAME,
             C.EQUIP_RARECODE,
             D.USER_NAME
@@ -36,7 +37,7 @@
             GM_USER D ON A.GM_USER_ID = D.USER_ID
 
         ${ew.customSqlSegment}
-        GROUP BY A.GM_EQUIPMENT_FRAG_ID , A.GM_USER_ID , A.GM_USER_EQUIP_FRAG_NUM , A.`STATUS` , A.CREATE_TIME , C.EQUIP_NAME , D.USER_NAME
+        GROUP BY A.GM_EQUIPMENT_FRAG_ID , A.GM_USER_ID , A.GM_USER_EQUIP_FRAG_NUM , A.`STATUS` , A.CREATE_TIME , A.FROM_TYPE , C.EQUIP_NAME , D.USER_NAME
         ORDER BY A.CREATE_TIME DESC , A.GM_USER_EQUIP_FRAG_NUM DESC
     </select>
 

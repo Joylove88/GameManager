@@ -14,5 +14,7 @@
         <result property="currency" column="CURRENCY"/>
     </resultMap>
 
-
+    <update id="updateAccountAdd">
+        UPDATE gm_user_account SET TOTAL_AMOUNT = IFNULL(TOTAL_AMOUNT, 0) + #{addMoney} ,BALANCE = IFNULL(BALANCE,0) + #{addMoney} WHERE USER_ID = #{userId}
+    </update>
 </mapper>

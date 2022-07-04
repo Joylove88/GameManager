@@ -21,7 +21,7 @@
             A.`STATUS`,
             A.CREATE_TIME,
             B.EX_POTION_NAME,
-            B.EX_POTION_RARECODE,
+            B.EX_POTION_RARE_CODE,
             B.EX_VALUE,
             C.USER_NAME
         FROM
@@ -32,7 +32,7 @@
             GM_USER C ON A.GM_USER_ID = C.USER_ID
 
         ${ew.customSqlSegment}
-        GROUP BY A.USER_EX_NUM , A.`STATUS` , A.CREATE_TIME , B.EX_POTION_NAME, B.EX_POTION_RARECODE, B.EX_VALUE, C.USER_NAME
+        GROUP BY A.USER_EX_NUM , A.`STATUS` , A.CREATE_TIME , B.EX_POTION_NAME, B.EX_POTION_RARE_CODE, B.EX_VALUE, C.USER_NAME
         ORDER BY A.CREATE_TIME DESC,A.`STATUS` DESC
     </select>
 
@@ -42,7 +42,7 @@
             count(*) AS USER_EX_NUM,
             A.`STATUS`,
             B.EX_POTION_NAME,
-            B.EX_POTION_RARECODE,
+            B.EX_POTION_RARE_CODE,
             B.EX_VALUE,
             B.EX_ICON_URL,
             B.EX_DESCRIPTION
@@ -56,8 +56,8 @@
                 AND A.GM_USER_ID = #{gmUserId}
             </if>
         </where>
-        GROUP BY  A.`STATUS` ,B.EX_POTION_NAME, B.EX_POTION_RARECODE, B.EX_VALUE,B.EX_ICON_URL,B.EX_DESCRIPTION
-        ORDER BY B.EX_POTION_RARECODE
+        GROUP BY  A.`STATUS` ,B.EX_POTION_NAME, B.EX_POTION_RARE_CODE, B.EX_VALUE,B.EX_ICON_URL,B.EX_DESCRIPTION
+        ORDER BY B.EX_POTION_RARE_CODE
     </select>
 
     <!--获取玩家未使用的药水-->
@@ -65,7 +65,7 @@
         SELECT
             A.*,
             B.EX_POTION_NAME,
-            B.EX_POTION_RARECODE,
+            B.EX_POTION_RARE_CODE,
             B.EX_VALUE
         FROM
           GM_USER_EXPERIENCE_POTION A
@@ -78,8 +78,8 @@
                 AND A.GM_USER_ID = #{gmUserId}
             </if>
 
-            <if test="exPotionRarecode != null and exPotionRarecode != ''">
-              AND B.EX_POTION_RARECODE = #{exPotionRarecode}
+            <if test="exPotionRareCode != null and exPotionRareCode != ''">
+              AND B.EX_POTION_RARE_CODE = #{exPotionRareCode}
             </if>
         </where>
     </select>

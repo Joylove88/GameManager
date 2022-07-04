@@ -42,6 +42,10 @@ public class HeroStarEntity implements Serializable {
 	 */
 	private Double itemValuation;
 	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
+	/**
 	 * 状态('0':禁用，'1':启用)
 	 */
 	private String status;

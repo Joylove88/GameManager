@@ -7,7 +7,7 @@
     <resultMap type="com.gm.modules.basicconfig.entity.ExperiencePotionEntity" id="experiencePotionMap">
         <result property="gmExPotionId" column="GM_EX_POTION_ID"/>
         <result property="exPotionName" column="EX_POTION_NAME"/>
-        <result property="exPotionRarecode" column="EX_POTION_RARECODE"/>
+        <result property="exPotionRareCode" column="EX_POTION_RARE_CODE"/>
         <result property="exValue" column="EX_VALUE"/>
         <result property="exDescription" column="EX_DESCRIPTION"/>
         <result property="status" column="STATUS"/>

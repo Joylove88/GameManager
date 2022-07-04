@@ -31,9 +31,9 @@ public class UserHeroEquipmentWearEntity implements Serializable {
 	 */
 	private Long gmHeroId;
 	/**
-	 * 装备ID
+	 * 玩家装备ID
 	 */
-	private Long gmEquipId;
+	private Long gmUserEquipId;
 	/**
 	 * 用户ID
 	 */

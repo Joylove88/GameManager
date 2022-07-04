@@ -237,15 +237,15 @@ public class EthTransferListenTask implements ITask {
 					// 校验成功后开始抽奖
 					if (type == 1){
 						// 英雄抽奖
-						form.setItemType(Constant.HERO);
+						form.setItemType(Constant.ItemType.HERO.getValue());
 						gifts = drawGiftService.heroDrawStart(user,form);
 					} else if (type == 2){
 						// 装备抽奖
-						form.setItemType(Constant.EQUIPMENT);
+						form.setItemType(Constant.ItemType.EQUIPMENT.getValue());
 						gifts = drawGiftService.equipDrawStart(user,form);
 					} else if (type == 3){
 						// 经验抽奖
-						form.setItemType(Constant.EXPERIENCE);
+						form.setItemType(Constant.ItemType.EXPERIENCE.getValue());
 						gifts = drawGiftService.exDrawStart(user,form);
 					}
 

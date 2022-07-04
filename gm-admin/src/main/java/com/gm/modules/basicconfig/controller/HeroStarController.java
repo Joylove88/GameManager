@@ -78,6 +78,7 @@ public class HeroStarController extends AbstractController {
                 heroStarS.setGmStarId(starInfoEntityList.get(i).getGmStarId());
                 heroStarS.setGmProbabilityId(starInfoEntityList.get(i).getGmStarCode());
                 heroStarS.setStatus(heroStar.getStatus());
+                heroStarS.setScale(heroStar.getScale());
                 heroStarS.setCreateUser(getUserCode());
                 heroStarS.setCreateTime(now);
                 heroStarS.setCreateTimeTs(now.getTime());

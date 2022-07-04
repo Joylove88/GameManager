@@ -47,6 +47,14 @@ public class UserEquipmentFragEntity implements Serializable {
 	 */
 	private String mintStatus;
 	/**
+	 * 获取类型（0：副本，1：抽奖）
+	 */
+	private String fromType;
+	/**
+	 * 来源ID
+	 */
+	private Long sourceId;
+	/**
 	 * 状态('0':禁用，'1':启用)
 	 */
 	private String status;

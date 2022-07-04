@@ -51,19 +51,19 @@ public class LotteryGiftsUtils {
         return sortOrignalRates.indexOf(nextDouble);
     }
 
-    public static Map<Integer, Integer> gifPron(List<Double> orignalRates,long type){
+    public static Map<Integer, Integer> gifPron(List<Double> orignalRates,long Num){
         // statistics
         Map<Integer, Integer> count = new HashMap<Integer, Integer>();
         //抽奖次数
-        // 如果类型为1 说明是单抽模式.类型为2 说明是十连抽模式
-        double num = type == 2 ? Constant.drawTen : Constant.drawOne;
-        for (int d = 0; d < num; d++) {
+//        // 如果类型为1 说明是单抽模式.类型为2 说明是十连抽模式
+//        double num = type == 2 ? Constant.drawTen : Constant.drawOne;
+        for (int d = 0; d < Num; d++) {
             int orignalIndex = lottery(orignalRates);
 
             //出现相同奖品则过滤掉并增加抽奖次数。
             Integer value = count.get(orignalIndex);
             if (value != null){
-                num++;
+                Num++;
             }
             count.put(orignalIndex, value == null ? 1 : value + 1);
         }

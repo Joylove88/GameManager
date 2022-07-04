@@ -47,4 +47,9 @@ public class UserHeroServiceImpl extends ServiceImpl<UserHeroDao, UserHeroEntity
         return userHeroDao.getUserAllHero(userId);
     }
 
+    @Override
+    public UserHeroInfoRsp getUserHeroById(Long userHeroId) {
+        return userHeroDao.getUserHeroById(userHeroId);
+    }
+
 }

@@ -58,11 +58,10 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         if(StringUtils.isBlank(token)){
             throw new RRException("authorization cannot be empty!");
         }
-
         //查询token信息
         UserTokenEntity userTokenEntity = tokenService.queryByToken(token);
         if(userTokenEntity == null || userTokenEntity.getExpireTime().getTime() < System.currentTimeMillis()){
-            throw new RRException("The authorization is invalid, please login again!");
+            throw new RRException("The authorization is invalid, please login again!",4001);
         }
 
         //设置userId到request里，后续根据userId，获取用户信息

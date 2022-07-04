@@ -39,10 +39,7 @@
         SELECT
             A.GM_USER_EQUIPMENT_ID,
             A.EQUIP_POWER,
-            B.EQUIP_NAME,
-            B.EQUIP_RARECODE,
-            B.EQUIP_ICON_URL,
-            B.EQUIP_LEVEL
+            B.*
         FROM
             GM_USER_EQUIPMENT A
         LEFT JOIN

@@ -26,7 +26,7 @@ public class UserExpInfoRsp {
 	/**
 	 * 药水稀有度(1:白色,2:绿色,3:蓝色,4:紫色)
 	 */
-	private String exPotionRarecode;
+	private String exPotionRareCode;
 	/**
 	 * 经验图标地址
 	 */

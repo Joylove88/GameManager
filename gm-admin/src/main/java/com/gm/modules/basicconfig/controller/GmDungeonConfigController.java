@@ -9,6 +9,7 @@ import com.gm.common.validator.ValidatorUtils;
 import com.gm.modules.fightCore.service.FightCoreService;
 import com.gm.modules.sys.controller.AbstractController;
 import com.gm.modules.user.entity.UserEntity;
+import com.gm.modules.user.service.UserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +39,8 @@ public class GmDungeonConfigController extends AbstractController{
     private GmDungeonConfigService gmDungeonConfigService;
     @Autowired
     private FightCoreService fightCoreService;
+    @Autowired
+    private UserService userService;
 
     /**
      * 列表
@@ -110,7 +113,8 @@ public class GmDungeonConfigController extends AbstractController{
      */
     @RequestMapping("/testFight")
     public R useEx(@RequestBody GmDungeonConfigEntity gmDungeonConfig){
-        fightCoreService.attck(new UserEntity());
+        UserEntity user = userService.getById(1508401841157644289L);
+        fightCoreService.attck(user);
         return R.ok();
     }
 

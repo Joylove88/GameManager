@@ -35,6 +35,10 @@ public class UserEquipmentEntity implements Serializable {
 	 */
 	private Long gmUserId;
 	/**
+	 * NFTID
+	 */
+	private Long nftId;
+	/**
 	 * 装备战力
 	 */
 	private Long equipPower;
@@ -47,9 +51,49 @@ public class UserEquipmentEntity implements Serializable {
 	 */
 	private String mintStatus;
 	/**
-	 * 状态('0':禁用，'1':启用)
+	 * 获取类型（0：副本，1：抽奖）
+	 */
+	private String fromType;
+	/**
+	 * 来源ID
+	 */
+	private Long sourceId;
+	/**
+	 * 状态('0':禁用，'1':未激活, '2':已激活)
 	 */
 	private String status;
+	/**
+	 * 生命值
+	 */
+	private Long equipHealth;
+	/**
+	 * 法力值
+	 */
+	private Long equipMana;
+	/**
+	 * 生命值恢复
+	 */
+	private Long equipHealthRegen;
+	/**
+	 * 法力值恢复
+	 */
+	private Long equipManaRegen;
+	/**
+	 * 护甲
+	 */
+	private Long equipArmor;
+	/**
+	 * 魔抗
+	 */
+	private Long equipMagicResist;
+	/**
+	 * 攻击力
+	 */
+	private Long equipAttackDamage;
+	/**
+	 * 法功
+	 */
+	private Long equipAttackSpell;
 	/**
 	 * 创建时间
 	 */

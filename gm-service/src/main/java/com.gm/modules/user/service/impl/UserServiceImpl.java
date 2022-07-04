@@ -74,9 +74,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		userRegister.setCreateTimeTs(now.getTime());
 		userRegister.setUserName(userEntity.getUserWalletAddress());
 		userRegister.setUserWalletAddress(userEntity.getUserWalletAddress());
-		userRegister.setUserLevel(1L);
-		userRegister.setTotalPower(0L);
-		userRegister.setUserType("0");
+		userRegister.setUserLevelId(1L);
+		userRegister.setFtg(60L);
+		userRegister.setScale(1D);
+		userRegister.setTotalPower(Constant.ZERO);
+		userRegister.setExperienceObtain(Constant.ZERO);
+		userRegister.setUserType(Constant.ZERO_);
 		userRegister.setStatus(Constant.enable);
 		userRegister.setOnlineFlag(Constant.enable);
 
@@ -85,18 +88,18 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		// 用户注册完成后自动添加一条用户资金账户数据
 		UserAccountEntity userAccountEntity = new UserAccountEntity();
 		userAccountEntity.setUserId(userRegister.getUserId());
-		userAccountEntity.setBalance(0d);
-		userAccountEntity.setTotalAmount(0d);
-		userAccountEntity.setFrozen(0d);
+		userAccountEntity.setBalance(Constant.ZERO_D);
+		userAccountEntity.setTotalAmount(Constant.ZERO_D);
+		userAccountEntity.setFrozen(Constant.ZERO_D);
 		userAccountEntity.setStatus(Constant.enable);
 		userAccountDao.insert(userAccountEntity);
 
 		// 用户注册完成后自动添加一条矿工数据
 		GmMiningInfoEntity miningInfoEntity = new GmMiningInfoEntity();
 		miningInfoEntity.setUserId(userRegister.getUserId());
-		miningInfoEntity.setMiners("0");
-		miningInfoEntity.setClaimedEggs("0");
-		miningInfoEntity.setLastHatch("0");
+		miningInfoEntity.setMiners(Constant.ZERO_);
+		miningInfoEntity.setClaimedEggs(Constant.ZERO_);
+		miningInfoEntity.setLastHatch(Constant.ZERO_);
 		miningInfoEntity.setStatus(Constant.enable);
 		miningInfoDao.insert(miningInfoEntity);
 		return userRegister;

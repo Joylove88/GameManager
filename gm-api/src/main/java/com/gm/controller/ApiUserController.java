@@ -14,11 +14,10 @@ import com.gm.annotation.Login;
 import com.gm.annotation.LoginUser;
 import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
+import com.gm.common.utils.ExpUtils;
 import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
-import com.gm.modules.user.entity.UserAccountEntity;
-import com.gm.modules.user.entity.UserEntity;
-import com.gm.modules.user.entity.UserExperiencePotionEntity;
+import com.gm.modules.user.entity.*;
 import com.gm.modules.user.req.UseExpReq;
 import com.gm.modules.user.rsp.*;
 import com.gm.modules.user.service.*;
@@ -62,6 +61,10 @@ public class ApiUserController {
     private UserEquipmentFragService userEquipmentFragService;
     @Autowired
     private UserExperiencePotionService userExService;
+    @Autowired
+    private UserHeroEquipmentWearService userHeroEquipmentWearService;
+    @Autowired
+    private UserLevelService userLevelService;
 
     @Login
     @PostMapping("getUserHeroInfo")
@@ -76,6 +79,18 @@ public class ApiUserController {
     @ApiOperation("获取玩家背包信息")
     public R getUserProps(@LoginUser UserEntity user){
         Map<String, Object> map = new HashMap<>();
+        // 获取玩家英雄信息和穿戴的装备信息
+        List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(user.getUserId());
+        int i = 0;
+        while (i < heroList.size()) {
+            // 获取该英雄已穿戴的装备
+            List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearService.getUserWearEQ(heroList.get(i).getGmUserHeroId());
+            if (wearList.size() > 0) {
+                heroList.get(i).setWearEQList(wearList);
+            }
+            i++;
+        }
+        map.put("heroList",heroList);
         // 获取英雄碎片
         List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(user.getUserId());
         map.put("heroFragList",heroFragList);
@@ -85,11 +100,17 @@ public class ApiUserController {
         // 获取装备碎片
         List<UserEquipmentFragInfoRsp> equipmentFragEntities = userEquipmentFragService.getUserAllEquipFrag(user.getUserId());
         map.put("equipFragList",equipmentFragEntities);
+
+        // 获取消耗品
+        Map<String, Object> forUseMap = new HashMap<>();
+
         // 获取经验道具
         UserExperiencePotionEntity exp = new UserExperiencePotionEntity();
         exp.setGmUserId(user.getUserId());
         List<UserExpInfoRsp> expList = userExService.getUserEx(exp);
-        map.put("expList",expList);
+        forUseMap.put("expList",expList);
+
+        map.put("consumables",forUseMap);
         return R.ok(map);
     }
 
@@ -110,16 +131,20 @@ public class ApiUserController {
     }
 
     @Login
-    @PostMapping("getUserTotalPower")
-    @ApiOperation("获取玩家总战力及体力值")
+    @PostMapping("getUserInfo")
+    @ApiOperation("获取玩家信息")
     public R getUserTotalPower(@LoginUser UserEntity user) throws InvocationTargetException, IllegalAccessException {
-        UserTotalPowerRsp rsp = new UserTotalPowerRsp();
-        UserEntity userEntity = userService.getById(user.getUserId());
-        if (userEntity == null){
-            throw new RRException(ErrorCode.USER_GET_FAIL.getDesc());
+        UserInfoRsp rsp = new UserInfoRsp();
+        // 获取玩家等级信息
+        UserLevelEntity userLevel = userLevelService.getById(user.getUserLevelId());
+        if (userLevel == null){
+            throw new RRException(ErrorCode.EXP_GET_FAIL.getDesc());
         }
-        BeanUtils.copyProperties(rsp,userEntity);
-        return R.ok().put("userAccount",rsp);
+        BeanUtils.copyProperties(rsp,user);
+        rsp.setPromotionExperience(userLevel.getPromotionExperience());
+        rsp.setLevelCode(userLevel.getLevelCode());
+        rsp.setCurrentExp(ExpUtils.getCurrentExp(userLevel.getExperienceTotal(), userLevel.getPromotionExperience(), user.getExperienceObtain()));
+        return R.ok().put("userInfo",rsp);
     }
 
 
@@ -145,7 +170,7 @@ public class ApiUserController {
         }
         UserExperiencePotionEntity userEXP = new UserExperiencePotionEntity();
         userEXP.setGmUserId(user.getUserId());
-        userEXP.setExPotionRarecode(useExpReq.getExpRare());
+        userEXP.setExPotionRareCode(useExpReq.getExpRare());
         userEXP.setUserExNum(useExpReq.getExpNum());
         userEXP.setGmUserHeroId(userEXP.getGmUserHeroId());
         userExService.userHeroUseEx(userEXP);

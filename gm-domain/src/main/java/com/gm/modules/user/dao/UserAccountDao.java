@@ -3,6 +3,9 @@ package com.gm.modules.user.dao;
 import com.gm.modules.user.entity.UserAccountEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.math.BigDecimal;
 
 /**
  * 用户资金账户
@@ -13,5 +16,12 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface UserAccountDao extends BaseMapper<UserAccountEntity> {
-	
+    /**
+     * 更新账户金额
+     *
+     * @param userId 用户ID
+     * @param addMoney   增加的金额
+     * @return 影响的行数
+     */
+    Integer updateAccountAdd(@Param("userId") Long userId, @Param("addMoney") BigDecimal addMoney);
 }

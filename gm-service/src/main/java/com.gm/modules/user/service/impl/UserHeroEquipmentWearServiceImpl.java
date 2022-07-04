@@ -1,21 +1,26 @@
 package com.gm.modules.user.service.impl;
 
-import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Service;
-import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
-
 import com.gm.modules.user.dao.UserHeroEquipmentWearDao;
 import com.gm.modules.user.entity.UserHeroEquipmentWearEntity;
+import com.gm.modules.user.rsp.UserHeroEquipmentWearRsp;
 import com.gm.modules.user.service.UserHeroEquipmentWearService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 
 @Service("userHeroEquipmentWearService")
 public class UserHeroEquipmentWearServiceImpl extends ServiceImpl<UserHeroEquipmentWearDao, UserHeroEquipmentWearEntity> implements UserHeroEquipmentWearService {
+    @Autowired
+    private UserHeroEquipmentWearDao userHeroEquipmentWearDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -28,13 +33,18 @@ public class UserHeroEquipmentWearServiceImpl extends ServiceImpl<UserHeroEquipm
                 new Query<UserHeroEquipmentWearEntity>().getPage(params),
                 new QueryWrapper<UserHeroEquipmentWearEntity>()
                     .eq(StringUtils.isNotBlank(status), "A.STATUS", status)
-                    .eq(StringUtils.isNotBlank(equipRarecode), "B.EQUIP_RARECODE", equipRarecode)
-                    .like(StringUtils.isNotBlank(equipName), "B.EQUIP_NAME", equipName)
+                    .eq(StringUtils.isNotBlank(equipRarecode), "B2.EQUIP_RARECODE", equipRarecode)
+                    .like(StringUtils.isNotBlank(equipName), "B2.EQUIP_NAME", equipName)
                     .like(StringUtils.isNotBlank(userName), "E.USER_NAME", userName)
                     .like(StringUtils.isNotBlank(heroName), "C.HERO_NAME", heroName)
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<UserHeroEquipmentWearRsp> getUserWearEQ(Long userHeroId) {
+        return userHeroEquipmentWearDao.getUserWearEQ(userHeroId);
     }
 
 }

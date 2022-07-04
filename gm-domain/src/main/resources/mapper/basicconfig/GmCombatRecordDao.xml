@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.basicconfig.dao.GmCombatRecordDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.basicconfig.entity.GmCombatRecordEntity" id="gmCombatRecordMap">
+        <result property="id" column="ID"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="dungeonId" column="DUNGEON_ID"/>
+        <result property="teamId" column="TEAM_ID"/>
+        <result property="getGoldCoins" column="GET_GOLD_COINS"/>
+        <result property="getEquip" column="GET_EQUIP"/>
+        <result property="getProps" column="GET_PROPS"/>
+        <result property="combatDescription" column="COMBAT_DESCRIPTION"/>
+        <result property="getExp" column="GET_EXP"/>
+        <result property="getUserExp" column="GET_USER_EXP"/>
+        <result property="status" column="STATUS"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+    </resultMap>
+
+
+</mapper>

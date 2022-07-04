@@ -50,6 +50,10 @@ public class GmDungeonConfigEntity implements Serializable {
 	 */
 	private Long dungeonAward;
 	/**
+	 * 副本爆率等级
+	 */
+	private Long burstRate;
+	/**
 	 * 副本奖励分配百分比
 	 */
 	private Double rewardDistribution;

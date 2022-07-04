@@ -97,7 +97,7 @@ public class ApiLoginController {
                 }
 
                 // 获得两个时间的毫秒时间差异
-                long isDate = userEntity.getSignDate().getTime() - Constant.nh;
+                long isDate = userEntity.getSignDate().getTime() - Constant.HOUR12;
 
                 // 赋值接收的日期
                 userEntity.setSignDate(signDate);

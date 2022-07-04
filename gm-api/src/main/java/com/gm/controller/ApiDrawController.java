@@ -203,13 +203,13 @@ public class ApiDrawController {
     private List<Object> drawStart(UserEntity user, DrawForm form) throws Exception {
         List<Object> gifts = new ArrayList<>();
 
-        if (Constant.HERO.equals(form.getItemType())){
+        if (Constant.ItemType.HERO.getValue().equals(form.getItemType())){
             // 英雄抽奖
             gifts = drawGiftService.heroDrawStart(user,form);
-        } else if (Constant.EQUIPMENT.equals(form.getItemType())){
+        } else if (Constant.ItemType.EQUIPMENT.getValue().equals(form.getItemType())){
             // 装备抽奖
             gifts = drawGiftService.equipDrawStart(user,form);
-        } else if (Constant.EXPERIENCE.equals(form.getItemType())){
+        } else if (Constant.ItemType.EXPERIENCE.getValue().equals(form.getItemType())){
             // 经验抽奖
             gifts = drawGiftService.exDrawStart(user,form);
         }

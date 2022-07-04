@@ -30,8 +30,9 @@ $(function () {
                 }
             }
             },
-			{ label: '初始生命值', name: 'equipHealth', index: 'EQUIP_HEALTH', width: 80 }, 			
-			{ label: '初始法力值', name: 'equipMana', index: 'EQUIP_MANA', width: 80 }, 			
+            { label: '矿工兑换比例（增幅,削减）', name: 'scale', index: 'SCALE', width: 80 },
+			{ label: '初始生命值', name: 'equipHealth', index: 'EQUIP_HEALTH', width: 80 },
+			{ label: '初始法力值', name: 'equipMana', index: 'EQUIP_MANA', width: 80 },
 			{ label: '初始生命值恢复', name: 'equipHealthRegen', index: 'EQUIP_HEALTH_REGEN', width: 80 }, 			
 			{ label: '初始法力值恢复', name: 'equipManaRegen', index: 'EQUIP_MANA_REGEN', width: 80 }, 			
 			{ label: '初始护甲', name: 'equipArmor', index: 'EQUIP_ARMOR', width: 80 }, 			

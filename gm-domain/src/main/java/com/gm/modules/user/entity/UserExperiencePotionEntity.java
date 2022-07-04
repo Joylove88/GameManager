@@ -72,7 +72,7 @@ public class UserExperiencePotionEntity implements Serializable {
 	@TableField(exist = false)
 	private String exPotionName;
 	@TableField(exist = false)
-	private String exPotionRarecode;
+	private String exPotionRareCode;
 	@TableField(exist = false)
 	private Long exValue;
 	@TableField(exist = false)

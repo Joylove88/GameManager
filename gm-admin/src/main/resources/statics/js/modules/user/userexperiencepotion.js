@@ -7,7 +7,7 @@ $(function () {
 			{ label: '会员名称', name: 'userName', width: 80 },
             { label: '经验药水名称', name: 'exPotionName', width: 80 },
             { label: '经验值', name: 'exValue', width: 80 },
-            { label: '经验药水稀有度', name: 'exPotionRarecode', width: 80, formatter: function (value, options, row) {
+            { label: '经验药水稀有度', name: 'exPotionRareCode', width: 80, formatter: function (value, options, row) {
                 var erc = '';
                 if (value == '1') {
                     erc = '白色';

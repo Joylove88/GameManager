@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.user.dao.UserDailyOutputIncomeRecordDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.user.entity.UserDailyOutputIncomeRecordEntity" id="userDailyOutputIncomeRecordMap">
+        <result property="id" column="ID"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="teamId" column="TEAM_ID"/>
+        <result property="firstTime" column="FIRST_TIME"/>
+        <result property="maxGoldCoins" column="MAX_GOLD_COINS"/>
+        <result property="remainingGoldCoins" column="REMAINING_GOLD_COINS"/>
+        <result property="maxFight" column="MAX_FIGHT"/>
+        <result property="status" column="STATUS"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+    </resultMap>
+
+    <!--获取24小时内的记录-->
+    <select id="getDataFrom24Hr" resultType="com.gm.modules.user.entity.UserDailyOutputIncomeRecordEntity">
+        SELECT
+        *
+        FROM
+        gm_user_daily_output_income_record
+        WHERE FIRST_TIME >= ( NOW( ) - INTERVAL 24 HOUR ) AND USER_ID = #{userId} AND TEAM_ID = #{teamId}
+    </select>
+
+</mapper>

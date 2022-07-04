@@ -1,5 +1,6 @@
 package com.gm.modules.user.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -49,9 +50,17 @@ public class UserEntity implements Serializable {
 	 */
 	private Long ftg;
 	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
+	/**
 	 * 用户级别
 	 */
-	private Long userLevel;
+	private Long userLevelId;
+	/**
+	 * 累计获得的经验
+	 */
+	private Long experienceObtain;
 	/**
 	 * 用户类型:普通0，1代理商
 	 */
@@ -112,5 +121,4 @@ public class UserEntity implements Serializable {
 	 * 用户在线状态：00离线，01：PC在线，02：H5在线，03：android在线，04：iOS在线
 	 */
 	private String onlineFlag;
-
 }

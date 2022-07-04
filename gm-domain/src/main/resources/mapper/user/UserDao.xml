@@ -7,7 +7,7 @@
         <result property="userId" column="USER_ID"/>
         <result property="userName" column="USER_NAME"/>
         <result property="userWalletAddress" column="USER_WALLET_ADDRESS"/>
-        <result property="userLevel" column="USER_LEVEL"/>
+        <result property="userLevelId" column="USER_LEVEL_ID"/>
         <result property="userType" column="USER_TYPE"/>
         <result property="clientIp" column="CLIENT_IP"/>
         <result property="status" column="STATUS"/>
@@ -23,6 +23,5 @@
         <result property="imgUrl" column="IMG_URL"/>
         <result property="onlineFlag" column="ONLINE_FLAG"/>
     </resultMap>
-
 
 </mapper>

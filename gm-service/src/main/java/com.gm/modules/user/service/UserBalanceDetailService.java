@@ -16,5 +16,10 @@ import java.util.Map;
 public interface UserBalanceDetailService extends IService<UserBalanceDetailEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 更新账户金额
+     */
+    void insertBalanceDetail(UserBalanceDetailEntity balanceDetailEntity);
 }
 

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>战斗记录表</title>
+		<#include "/header.html">
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <a class="btn btn-default" @click="query">查询</a>
+			<#if shiro.hasPermission("basicconfig:gmcombatrecord:save")>
+            <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			</#if>
+			<#if shiro.hasPermission("basicconfig:gmcombatrecord:update")>
+            <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			</#if>
+			<#if shiro.hasPermission("basicconfig:gmcombatrecord:delete")>
+            <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			</#if>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+														                    <div class="form-group">
+                        <div class="col-sm-2 control-label">用户ID</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.userId" placeholder="用户ID"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">副本ID</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.dungeonId" placeholder="副本ID"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">队伍ID</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.teamId" placeholder="队伍ID"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">获得的金币</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.getGoldCoins" placeholder="获得的金币"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">获得的装备</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.getEquip" placeholder="获得的装备"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">获得的道具</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.getProps" placeholder="获得的道具"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">战斗描述</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.combatDescription" placeholder="战斗描述"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">获得的英雄经验</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.getExp" placeholder="获得的英雄经验"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">获得的用户经验</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.getUserExp" placeholder="获得的用户经验"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">战斗结果状态（0：YOULOSE，1：YOUWIN，2：战斗中）</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.status" placeholder="战斗结果状态（0：YOULOSE，1：YOUWIN，2：战斗中）"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">战斗开始时间</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.createTime" placeholder="战斗开始时间"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">战斗开始时间</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.createTimeTs" placeholder="战斗开始时间"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">战斗结束时间</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.updateTime" placeholder="战斗结束时间"/>
+                        </div>
+                    </div>
+											                    <div class="form-group">
+                        <div class="col-sm-2 control-label">战斗结束时间</div>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="gmCombatRecord.updateTimeTs" placeholder="战斗结束时间"/>
+                        </div>
+                    </div>
+							            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" id="btnSaveOrUpdate" data-loading-text="保存中..." @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/basicconfig/gmcombatrecord.js?_${.now?long}"></script>
+</body>
+</html>

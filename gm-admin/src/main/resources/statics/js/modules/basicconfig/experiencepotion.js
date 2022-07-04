@@ -5,7 +5,7 @@ $(function () {
         colModel: [			
 			{ label: 'gmExPotionId', name: 'gmExPotionId', index: 'GM_EX_POTION_ID', width: 50, key: true },
 			{ label: '经验药水名称', name: 'exPotionName', index: 'EX_POTION_NAME', width: 80 }, 			
-			{ label: '药水稀有度', name: 'exPotionRarecode', index: 'EX_POTION_RARECODE', width: 80, formatter: function (value, options, row) {
+			{ label: '药水稀有度', name: 'exPotionRareCode', index: 'EX_POTION_RARE_CODE', width: 80, formatter: function (value, options, row) {
                 var erc = '';
                 if (value == '1') {
                     erc = '白色';

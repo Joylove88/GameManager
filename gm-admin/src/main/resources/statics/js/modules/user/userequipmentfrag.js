@@ -23,6 +23,15 @@ $(function () {
             }
             },
 			{ label: '玩家获得碎片数量', name: 'gmUserEquipFragNum', index: 'GM_USER_EQUIP_FRAG_NUM', width: 80 },
+            { label: '来源ID', name: 'sourceId', width: 80 },
+            { label: '来源类型', name: 'fromType', width: 80, formatter: function (value, options, row) {
+                if (value == '0') {
+                    return '<span class="label badge-info" style="background-color: #ed5565;">副本</span>';
+                } else if (value == '1') {
+                    return '<span class="label label-info">抽奖</span>';
+                }
+            }
+            },
 			{ label: '状态', name: 'status', index: 'STATUS', width: 80 , formatter: function (value, options, row) {
                     if (value == '0') {
                         return '<span class="label badge-danger" style="background-color: #ed5565;">禁用</span>';//禁用

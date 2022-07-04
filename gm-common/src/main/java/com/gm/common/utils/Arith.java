@@ -51,4 +51,29 @@ public class Arith {
     public static BigDecimal divide(BigDecimal b1, BigDecimal b2) {
         return b1.divide(b2, scale, roundingMode);
     }
+
+    /**
+     * 获取范围内随机数 十分位
+     */
+    public static Double randomWithinRangeTen(Double max, Double min){
+        int pow = (int) Math.pow(10, 1); // 用于提取指定小数位
+        return Math.floor((Math.random() * (max - min) + min) * pow) / pow;
+    }
+    /**
+     * 获取范围内随机数 百分位
+     */
+    public static Double randomWithinRangeHundred(Double max, Double min){
+        int pow = (int) Math.pow(100, 1); // 用于提取指定小数位
+        Double n = Math.floor((Math.random() * (max - min) + min) * pow) / pow;
+        n = n > 1 ? 1 : n;
+        return n;
+    }
+    /**
+     * 随机20位整数
+     */
+    public static BigDecimal UUID20(){
+        int randomId= (int) (Math.random() * (9999999-1000000 + 1) ) + 1000000;
+        BigDecimal id = new BigDecimal(System.currentTimeMillis() + "" + randomId);
+        return id;
+    }
 }

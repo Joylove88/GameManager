@@ -5,6 +5,7 @@ import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -25,4 +26,11 @@ public interface UserHeroDao extends BaseMapper<UserHeroEntity> {
 	 * @return
 	 */
 	List<UserHeroInfoRsp> getUserAllHero(Long userId);
+
+	/**
+	 * 获取玩家英雄指定的英雄
+	 * @param userHeroId
+	 * @return
+	 */
+	UserHeroInfoRsp getUserHeroById(@Param("userHeroId")Long userHeroId);
 }

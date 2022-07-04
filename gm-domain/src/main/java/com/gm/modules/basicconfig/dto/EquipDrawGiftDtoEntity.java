@@ -39,6 +39,10 @@ public class EquipDrawGiftDtoEntity implements Serializable {
 
 	private String equipName;
 	private String equipIconUrl;
+	/**
+	 * 装备等级
+	 */
+	private String equipLevel;
 
 	/**
 	 * 初始生命值

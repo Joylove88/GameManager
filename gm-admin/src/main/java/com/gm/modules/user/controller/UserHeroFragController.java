@@ -96,7 +96,7 @@ public class UserHeroFragController {
     public R testDrawStart(@RequestBody Long drawType) throws Exception {
         //开始抽奖
         UserEntity userEntity = new UserEntity();
-        userEntity.setUserId(1L);
+        userEntity.setUserId(1508401841157644289L);
         DrawForm drawForm = new DrawForm();
         drawForm.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
         drawForm.setDrawType(drawType.toString());
@@ -112,7 +112,7 @@ public class UserHeroFragController {
     public R testEQDrawStart(@RequestBody Long drawType)throws Exception{
         //开始抽奖
         UserEntity userEntity = new UserEntity();
-        userEntity.setUserId(1L);
+        userEntity.setUserId(1508401841157644289L);
         DrawForm drawForm = new DrawForm();
         drawForm.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
         drawForm.setDrawType(drawType.toString());
@@ -127,7 +127,7 @@ public class UserHeroFragController {
     public R testEXDrawStart(@RequestBody Long drawType){
         //开始抽奖
         UserEntity userEntity = new UserEntity();
-        userEntity.setUserId(1L);
+        userEntity.setUserId(1508401841157644289L);
         DrawForm drawForm = new DrawForm();
         drawForm.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
         drawForm.setDrawType(drawType.toString());

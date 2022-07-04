@@ -1,8 +1,12 @@
 package com.gm.modules.user.dao;
 
-import com.gm.modules.user.entity.UserHeroEquipmentWearEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gm.modules.user.entity.UserHeroEquipmentWearEntity;
+import com.gm.modules.user.rsp.UserHeroEquipmentWearRsp;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 玩家英雄装备穿戴表
@@ -13,5 +17,10 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface UserHeroEquipmentWearDao extends BaseMapper<UserHeroEquipmentWearEntity> {
-	
+    /**
+     * 获取玩家英雄穿戴中的装备
+     * @param userHeroId
+     * @return
+     */
+	List<UserHeroEquipmentWearRsp> getUserWearEQ(@Param("userHeroId") Long userHeroId);
 }

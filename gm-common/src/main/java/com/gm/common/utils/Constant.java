@@ -36,6 +36,24 @@ public class Constant {
     public static final String PLAYERS_EARN_TOTAL_REVENUE = "players_earn_total_revenue";
     // 副本资金池余额（最新）
     public static final String DUNGEON_POOLING_BALANCE = "dungeon_pooling_balance";
+    // 装备属性随机最大百分比
+    public static final Double eqAttMax = 1.01;
+    // 装备属性随机最小百分比
+    public static final Double eqAttMin = 0.5;
+    // 装备属性随机最小百分比(抽奖)
+    public static final Double eqAttCryptoMin = 0.5;
+    /**
+     *  0
+     */
+    public static final Long ZERO = 0L;
+    /**
+     *  0d
+     */
+    public static final Double ZERO_D = 0d;
+    /**
+     *  0值
+     */
+    public static final String ZERO_ = "0";
     /**
      * 所有权
      */
@@ -75,19 +93,11 @@ public class Constant {
     /**
      * 12小时的毫秒数
      */
-    public static final long nh = 1000 * 12 * 60 * 60;
+    public static final long HOUR12 = 1000 * 12 * 60 * 60;
     /**
-     * 英雄
+     * 24小时的毫秒数
      */
-    public static final String HERO = "1";
-    /**
-     * 装备
-     */
-    public static final String EQUIPMENT = "2";
-    /**
-     * 药水
-     */
-    public static final String EXPERIENCE = "3";
+    public static final long HOUR24 = 1000 * 24 * 60 * 60;
     /**
      * 当前页码
      */
@@ -124,14 +134,6 @@ public class Constant {
      *  已使用状态
      */
     public static final String used = "2";
-    /**
-     *  抽奖次数 单抽
-     */
-    public static final double drawOne = 1;
-    /**
-     *  抽奖次数 十连抽
-     */
-    public static final double drawTen = 10;
     /**
      *  概率等级1
      */
@@ -250,6 +252,72 @@ public class Constant {
         }
 
         public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 账变类型
+     */
+    public enum TradeType {
+        WITHDRAW("00"),//提现
+        DUNGEON_REVENUE("01"),//副本产出
+        DRAW_HERO("02"),//英雄抽奖
+        DRAW_EQUIP("03"),//装备抽奖
+        DRAW_EXP("04"),//经验抽奖
+        WITHDRAW_SERVICE("12"),//提现手续费
+        WITHDRAW_FREEZE("16"),//后台提现冻结
+        WITHDRAW_THAW("19"),//后台提现解冻
+        WITHDRAW_SUCCESS("14");//后台提现成功
+        private String value;
+
+        TradeType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 物品类型
+     */
+    public enum ItemType {
+        HERO("1"),//英雄
+        EQUIPMENT("2"),//装备
+        EXPERIENCE("3");//药水
+        private String value;
+
+        ItemType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+    /**
+     * 抽奖次数
+     */
+    public enum DrawNum {
+        DRAW1(1),
+        DRAW2(2),
+        DRAW3(3),
+        DRAW4(4),
+        DRAW5(5),
+        DRAW6(6),
+        DRAW7(7),
+        DRAW8(8),
+        DRAW9(9),
+        DRAW10(10);
+        private long value;
+
+        DrawNum(long value) {
+            this.value = value;
+        }
+
+        public long getValue() {
             return value;
         }
     }

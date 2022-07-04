@@ -22,7 +22,7 @@ public class UserEquipInfoRsp {
 	/**
      * 装备等级
 	 */
-	private String equipLevel;
+	private Long equipLevel;
 	/**
      * 装备图标地址
 	 */
@@ -31,5 +31,47 @@ public class UserEquipInfoRsp {
 	 * 装备战力
 	 */
 	private Long equipPower;
+	/**
+	 * 生命值
+	 */
+	private Long equipHealth;
+	/**
+	 * 法力值
+	 */
+	private Long equipMana;
+	/**
+	 * 生命值恢复
+	 */
+	private Long equipHealthRegen;
+	/**
+	 * 法力值恢复
+	 */
+	private Long equipManaRegen;
+	/**
+	 * 护甲
+	 */
+	private Long equipArmor;
+	/**
+	 * 魔抗
+	 */
+	private Long equipMagicResist;
+	/**
+	 * 攻击力
+	 */
+	private Long equipAttackDamage;
+	/**
+	 * 法功
+	 */
+	private Long equipAttackSpell;
+
+	/**
+	 * 0:装备, 1:装备卷轴\碎片
+	 */
+	private Long equipType;
+
+	/**
+	 * 装备卷轴\碎片数量 默认1
+	 */
+	private Long equipFragNum;
 
 }

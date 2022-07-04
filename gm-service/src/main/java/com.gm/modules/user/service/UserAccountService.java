@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.user.entity.UserAccountEntity;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -16,5 +17,14 @@ import java.util.Map;
 public interface UserAccountService extends IService<UserAccountEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 给用户添加金额
+     *
+     * @param userId 用户ID
+     * @param addMoney   金额
+     * @return boolean
+     */
+    boolean updateAccountAdd(Long userId, BigDecimal addMoney);
 }
 

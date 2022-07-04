@@ -39,6 +39,10 @@ public class EquipmentInfoEntity implements Serializable {
 	 */
 	private Double itemValuation;
 	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
+	/**
 	 * 装备等级
 	 */
 	private Long equipLevel;

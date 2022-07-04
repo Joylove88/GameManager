@@ -30,6 +30,10 @@ public class UserHeroEntity implements Serializable {
 	 */
 	private Long gmUserId;
 	/**
+	 * NFTID
+	 */
+	private Long nftId;
+	/**
 	 * 用户获得的英雄ID
 	 */
 	private Long gmHeroStarId;

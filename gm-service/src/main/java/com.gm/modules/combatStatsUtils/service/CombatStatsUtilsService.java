@@ -7,6 +7,7 @@ import com.gm.modules.basicconfig.dto.AttributeEntity;
 import com.gm.modules.basicconfig.entity.*;
 import com.gm.modules.user.dao.*;
 import com.gm.modules.user.entity.UserEntity;
+import com.gm.modules.user.entity.UserEquipmentEntity;
 import com.gm.modules.user.entity.UserHeroEquipmentWearEntity;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
@@ -46,6 +47,8 @@ public class CombatStatsUtilsService {
     private StarInfoDao starInfoDao;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private UserEquipmentDao userEquipmentDao;
 
 
     // 获取英雄属性
@@ -147,15 +150,26 @@ public class CombatStatsUtilsService {
         attackSpell = 0;
 
         for (UserHeroEquipmentWearEntity equipmentWear_ : equipmentWears){
-            // 获取装备信息方法
+            // 获取玩家拥有的装备
+            UserEquipmentEntity userEquipment = userEquipmentDao.selectOne(new QueryWrapper<UserEquipmentEntity>()
+                    .eq("STATUS", Constant.enable)
+                    .eq("GM_USER_EQUIPMENT_ID", equipmentWear_.getGmUserEquipId())
+            );
+
+            if (userEquipment == null){
+                System.out.println("玩家装备失效,玩家装备编码:" + userEquipment.getGmEquipmentId());
+            }
+
+            // 通过玩家背包获取装备信息方法
             EquipmentInfoEntity equipmentInfo = equipmentInfoDao.selectOne(new QueryWrapper<EquipmentInfoEntity>()
                     .eq("STATUS", Constant.enable)
-                    .eq("EQUIP_ID", equipmentWear_.getGmEquipId())
+                    .eq("EQUIP_ID", userEquipment.getGmEquipmentId())
             );
 
             if (equipmentInfo == null){
-                System.out.println("官方已停用改装备,装备编码:" + equipmentWear_.getGmEquipId());
+                System.out.println("官方已停用改装备,装备编码:" + equipmentInfo.getEquipId());
             }
+
             // 将全部已穿戴装备属性累加
             health = health + (equipmentInfo.getEquipHealth() != null ? equipmentInfo.getEquipHealth() : 0);//装备初始生命值
             mana = mana + (equipmentInfo.getEquipMana() != null ? equipmentInfo.getEquipMana() : 0);//装备初始法力值
@@ -230,8 +244,5 @@ public class CombatStatsUtilsService {
         userDao.updateById(user);
 
     }
-
-
-
 }
 

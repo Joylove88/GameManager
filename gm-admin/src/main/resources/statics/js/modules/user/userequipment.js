@@ -24,14 +24,33 @@ $(function () {
                 }
             },
             { label: '装备等级', name: 'equipLevel', width: 80 },
+            { label: '来源ID', name: 'sourceId', width: 80 },
+			{ label: '来源类型', name: 'fromType', width: 80, formatter: function (value, options, row) {
+                    if (value == '0') {
+                        return '<span class="label badge-info" style="background-color: #ed5565;">副本</span>';
+                    } else if (value == '1') {
+                        return '<span class="label label-info">抽奖</span>';
+                    }
+                }
+            },
 			{ label: '状态', name: 'status', index: 'STATUS', width: 80, formatter: function (value, options, row) {
                     if (value == '0') {
                         return '<span class="label badge-danger" style="background-color: #ed5565;">禁用</span>';//禁用
                     } else if (value == '1') {
                         return '<span class="label label-info">正常</span>';//启用
+                    } else if (value == '2') {
+                        return '<span class="label label-info">已激活</span>';//启用
                     }
                 }
             },
+            { label: '初始生命值', name: 'equipHealth', index: 'EQUIP_HEALTH', width: 80 },
+            { label: '初始法力值', name: 'equipMana', index: 'EQUIP_MANA', width: 80 },
+            { label: '初始生命值恢复', name: 'equipHealthRegen', index: 'EQUIP_HEALTH_REGEN', width: 80 },
+            { label: '初始法力值恢复', name: 'equipManaRegen', index: 'EQUIP_MANA_REGEN', width: 80 },
+            { label: '初始护甲', name: 'equipArmor', index: 'EQUIP_ARMOR', width: 80 },
+            { label: '初始魔抗', name: 'equipMagicResist', index: 'EQUIP_MAGIC_RESIST', width: 80 },
+            { label: '初始攻击力', name: 'equipAttackDamage', index: 'EQUIP_ATTACK_DAMAGE', width: 80 },
+            { label: '初始法功', name: 'equipAttackSpell', index: 'EQUIP_ATTACK_SPELL', width: 80 },
 			{ label: '创建时间', name: 'createTime', index: 'CREATE_TIME', width: 80, formatter: function (value, options, row) {
 			    return value;
             }

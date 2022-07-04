@@ -57,6 +57,7 @@
         WHERE A.`STATUS` = '1' AND A.MINT_HASH = #{mintHash}
     </select>
 
+    <!--获取玩家全部英雄-->
     <select id="getUserAllHero" resultType="com.gm.modules.user.rsp.UserHeroInfoRsp">
         SELECT
         A.GM_USER_HERO_ID,
@@ -80,5 +81,30 @@
         LEFT JOIN
         GM_HERO_LEVEL F ON A.GM_HERO_LEVEL_ID = F.GM_HERO_LEVE_ID
         WHERE A.`STATUS` = '1' AND A.GM_USER_ID = #{userId}
+    </select>
+    <!--获取玩家英雄指定的英雄-->
+    <select id="getUserHeroById" resultType="com.gm.modules.user.rsp.UserHeroInfoRsp">
+        SELECT
+        A.GM_USER_HERO_ID,
+        A.EXPERIENCE_OBTAIN,
+        A.HERO_POWER,
+        C.HERO_NAME,
+        C.HERO_IMG_URL,
+        C.HERO_ICON_URL,
+        C.HERO_KEEL_URL,
+        C.HERO_DESCRIPTION,
+        F.GM_LEVEL_CODE,
+        D.GM_STAR_CODE
+        FROM
+        GM_USER_HERO A
+        LEFT JOIN
+        GM_HERO_STAR B ON A.GM_HERO_STAR_ID = B.GM_HERO_STAR_ID
+        LEFT JOIN
+        GM_HERO_INFO C ON B.GM_HERO_ID = C.HERO_ID
+        LEFT JOIN
+        GM_STAR_INFO D ON B.GM_STAR_ID = D.GM_STAR_ID
+        LEFT JOIN
+        GM_HERO_LEVEL F ON A.GM_HERO_LEVEL_ID = F.GM_HERO_LEVE_ID
+        WHERE A.GM_USER_HERO_ID = #{userHeroId}
     </select>
 </mapper>

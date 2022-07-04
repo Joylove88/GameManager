@@ -3,7 +3,10 @@ package com.gm.modules.user.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.user.entity.UserHeroEquipmentWearEntity;
+import com.gm.modules.user.rsp.UserHeroEquipmentWearRsp;
+import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +19,12 @@ import java.util.Map;
 public interface UserHeroEquipmentWearService extends IService<UserHeroEquipmentWearEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 获取玩家英雄穿戴中的装备
+     * @param userHeroId
+     * @return
+     */
+    List<UserHeroEquipmentWearRsp> getUserWearEQ(@Param("userHeroId") Long userHeroId);
 }
 

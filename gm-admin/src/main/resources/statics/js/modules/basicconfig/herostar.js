@@ -22,6 +22,7 @@ $(function () {
                 }
             }
             },
+            { label: '矿工兑换比例（增幅,削减）', name: 'scale', index: 'SCALE', width: 80 },
 			{ label: '初始生命值', name: 'gmHealth', index: 'GM_HEALTH', width: 80, formatter: function (value, options, row) {
                 return value + ' (+ ' + row.gmGrowHealth + ')*1';
             }
