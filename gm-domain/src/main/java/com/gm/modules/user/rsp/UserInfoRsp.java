@@ -13,11 +13,19 @@ public class UserInfoRsp {
 	 */
 	private Long totalPower;
 	/**
-	 * 体力值
+	 * 当前体力值
 	 */
 	private Long ftg;
 	/**
-	 * 用户级别
+	 * 最大体力值
+	 */
+	private Long ftgMax;
+	/**
+	 * 总资产
+	 */
+	private Double totalAmount;
+	/**
+	 * 玩家级别
 	 */
 	private Long levelCode;
 	/**

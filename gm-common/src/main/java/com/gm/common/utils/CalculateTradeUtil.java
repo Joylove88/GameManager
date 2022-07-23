@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 public class CalculateTradeUtil {
     // 1个矿工可以孵化的鸡蛋(代币)数量 （1天有86400秒，被放大了1倍）
     public static BigDecimal EGGS_TO_HATCH_1MINERS = BigDecimal.valueOf(86400);
+    public static BigDecimal EGGS_TO_HATCH_1MINERS30 = BigDecimal.valueOf(86400*30);
     private static BigDecimal PSN = BigDecimal.valueOf(10000);
     private static BigDecimal PSNH = BigDecimal.valueOf(5000);
 
@@ -19,10 +20,11 @@ public class CalculateTradeUtil {
     public static BigDecimal miners = BigDecimal.valueOf(0);
     // 玩家鸡蛋数量
     public static BigDecimal eggsBought = BigDecimal.valueOf(0);
-    // 玩家上次购买矿工的时间
-    public static BigDecimal lastHatch = BigDecimal.valueOf(0);
     // 获取玩家可获取的金币
     public static BigDecimal userGetGold = BigDecimal.valueOf(0);
+    // 玩家赚取总收入
+    public static BigDecimal totalPlayersGold = BigDecimal.valueOf(0);
+
 
     public static BigDecimal time = Arith.divide(BigDecimal.valueOf(System.currentTimeMillis()),BigDecimal.valueOf(1000));
 
@@ -42,16 +44,22 @@ public class CalculateTradeUtil {
     }
 
     /// @dev 奖励复投
-    private static void hatchEggs() {
+    private static void hatchEggs(BigDecimal changePower) {
         // 获取我的鸡蛋
-        BigDecimal eggsUsed = getMyEggs();
+        BigDecimal eggsUsed = eggsBought;
         // 计算新的矿工数量
-        BigDecimal newMiners= Arith.divide(eggsUsed,CalculateTradeUtil.EGGS_TO_HATCH_1MINERS);
-        miners = Arith.add(miners, newMiners);
-        lastHatch = time;
+        BigDecimal newMiners= Arith.divide(eggsUsed,CalculateTradeUtil.EGGS_TO_HATCH_1MINERS30);
+        if (changePower.compareTo(BigDecimal.valueOf(0)) == 1) {
+            miners = Arith.add(miners, newMiners);
+            // 消弱矿工囤积
+            marketEggs = Arith.add(marketEggs, Arith.divide(eggsUsed, BigDecimal.valueOf(5)));
+        } else if (changePower.compareTo(BigDecimal.valueOf(0)) == -1) {
+            miners = Arith.subtract(miners, newMiners);
+            // 消弱矿工囤积
+            marketEggs = Arith.add(marketEggs, eggsUsed);
+        }
 
-        // 消弱矿工囤积
-        marketEggs = Arith.add(marketEggs,Arith.divide(eggsUsed,BigDecimal.valueOf(5)));
+
     }
     /// @dev 计算可产出收益
     public static void sellEggs() {
@@ -59,19 +67,15 @@ public class CalculateTradeUtil {
         BigDecimal hasEggs = getMyEggs(); // 8640000000
         // 计算可以获取的奖励
         BigDecimal eggValue = calculateEggSell(hasEggs);
-        // 获取战力率
-        BigDecimal powerRate = Arith.divide(eggValue, totalPower);
         // 获取用户可获取的金币
-        userGetGold = Arith.multiply(powerRate, FundPool);
+        userGetGold = eggValue;
         // 资金池减少
         FundPool = Arith.subtract(FundPool,userGetGold);
-        System.out.println("powerRate:"+powerRate);
-        System.out.println("玩家收益:"+userGetGold);
-        System.out.println("资金池剩余:"+FundPool);
-        totalPower = Arith.subtract(totalPower ,eggValue);
-        System.out.println("eggValue:"+eggValue);
-        lastHatch = time;
-        marketEggs = Arith.add(marketEggs,hasEggs);
+        System.out.println("玩家一天的最大可产出收益: " + userGetGold);
+        System.out.println("资金池剩余: " + FundPool);
+        totalPower = Arith.subtract(totalPower , eggValue);
+        System.out.println("eggValue: " + eggValue);
+        marketEggs = Arith.add(marketEggs, hasEggs);
     }
 
     // eggs = getMyEggs
@@ -79,42 +83,49 @@ public class CalculateTradeUtil {
     // fee = devFee(sun)
     // 可以提取的奖励=sun - fee
     private static BigDecimal calculateEggSell(BigDecimal eggs) {
-        return CalculateTradeUtil.calculateTrade(eggs,marketEggs,totalPower);
+        return CalculateTradeUtil.calculateTrade(eggs,marketEggs,FundPool);
     }
 
 
     // 更新矿工
-    public static void updateMiner() {
-        System.out.println("CombatPower:" + userpower);
-        // 获取系统全部用户全部队伍总战力
-        totalPower = Arith.add(totalPower, userpower);
-        eggsBought = calculateEggBuy(userpower, Arith.subtract(totalPower , userpower));
-        hatchEggs();
+    public static void updateMiner(BigDecimal changePower) {
+        // 如果改变的值为0 则跳出
+        if (changePower.compareTo(BigDecimal.valueOf(0)) == 0) return;
+
+        eggsBought = calculateEggBuy(changePower.abs(), FundPool);
+        hatchEggs(changePower);
     }
 
-    private static BigDecimal calculateEggBuy(BigDecimal eth, BigDecimal contractBalance) {
-        return CalculateTradeUtil.calculateTrade(eth,contractBalance,marketEggs);
+    // 战力兑换矿工数
+    public static BigDecimal calculateEggBuySimple(BigDecimal userPower) {
+        BigDecimal eggsBought = calculateEggBuy(userpower, Arith.add(Arith.subtract(totalPower , userpower), FundPool));
+        BigDecimal miners = Arith.divide(eggsBought, CalculateTradeUtil.EGGS_TO_HATCH_1MINERS30);
+        return miners;
+    }
+
+    private static BigDecimal calculateEggBuy(BigDecimal userPower, BigDecimal totalPowerAndFundPool) {
+        return CalculateTradeUtil.calculateTrade(userPower,totalPowerAndFundPool, marketEggs);
     }
 
     private static BigDecimal getMyEggs() {
-        return Arith.add(eggsBought,getEggsSinceLastHatch());
+        return Arith.add(eggsBought, getEggsSinceLastHatch());
     }
     private static BigDecimal getEggsSinceLastHatch() {
 //        BigDecimal secondsPassed = CalculateTradeUtil.min(CalculateTradeUtil.EGGS_TO_HATCH_1MINERS, Arith.subtract(time ,lastHatch));
         return Arith.multiply(CalculateTradeUtil.EGGS_TO_HATCH_1MINERS, miners);
     }
 
-    // 贸易平衡算法
+    // 经济平衡算法
     private static BigDecimal calculateTrade(BigDecimal rt, BigDecimal rs, BigDecimal bs){
-        BigDecimal a = Arith.multiply(PSN,bs);
+        BigDecimal a = Arith.multiply(PSN, bs);
         BigDecimal b = Arith.divide(
                 Arith.add(
-                        Arith.multiply(PSN,rs),
-                        Arith.multiply(PSNH,rt)
+                        Arith.multiply(PSN, rs),
+                        Arith.multiply(PSNH, rt)
                 ),
                 rt);
 
-        BigDecimal c = Arith.add(PSNH,b
+        BigDecimal c = Arith.add(PSNH, b
 
         );
 

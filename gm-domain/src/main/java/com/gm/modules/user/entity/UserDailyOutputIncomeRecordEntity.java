@@ -24,15 +24,11 @@ public class UserDailyOutputIncomeRecordEntity implements Serializable {
 	 * ID
 	 */
 	@TableId
-	private BigDecimal id;
+	private Long id;
 	/**
 	 * 用户ID
 	 */
-	private BigDecimal userId;
-	/**
-	 * 队伍ID
-	 */
-	private BigDecimal teamId;
+	private Long userId;
 	/**
 	 * 第一次时间
 	 */
@@ -48,7 +44,7 @@ public class UserDailyOutputIncomeRecordEntity implements Serializable {
 	/**
 	 * 当日可以战斗的最大场数
 	 */
-	private BigDecimal maxFight;
+	private Long maxFight;
 	/**
 	 * 状态('0':禁用，'1':启用)
 	 */

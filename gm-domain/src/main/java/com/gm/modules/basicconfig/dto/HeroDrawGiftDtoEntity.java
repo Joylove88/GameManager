@@ -67,6 +67,10 @@ public class HeroDrawGiftDtoEntity implements Serializable {
 	private Long gmHeroFragNum;
 
 	private Double pron;
+	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
 
 	/**
 	 * 0:英雄, 1:英雄碎片

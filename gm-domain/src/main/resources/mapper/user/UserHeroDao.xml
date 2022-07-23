@@ -80,7 +80,17 @@
         GM_STAR_INFO D ON B.GM_STAR_ID = D.GM_STAR_ID
         LEFT JOIN
         GM_HERO_LEVEL F ON A.GM_HERO_LEVEL_ID = F.GM_HERO_LEVE_ID
-        WHERE A.`STATUS` = '1' AND A.GM_USER_ID = #{userId}
+        <where>
+            <if test="status != null and status != ''">
+                AND A.`STATUS` = #{status}
+            </if>
+            <if test="gmUserId != null and gmUserId != ''">
+                AND A.GM_USER_ID = #{gmUserId}
+            </if>
+            <if test="statePlay != null and statePlay != ''">
+                AND A.STATE_PLAY = #{statePlay}
+            </if>
+        </where>
     </select>
     <!--获取玩家英雄指定的英雄-->
     <select id="getUserHeroById" resultType="com.gm.modules.user.rsp.UserHeroInfoRsp">
@@ -105,6 +115,13 @@
         GM_STAR_INFO D ON B.GM_STAR_ID = D.GM_STAR_ID
         LEFT JOIN
         GM_HERO_LEVEL F ON A.GM_HERO_LEVEL_ID = F.GM_HERO_LEVE_ID
-        WHERE A.GM_USER_HERO_ID = #{userHeroId}
+        <where>
+            <if test="status != null and status != ''">
+                AND A.`STATUS` = #{status}
+            </if>
+            <if test="gmUserHeroId != null and gmUserHeroId != ''">
+                AND A.GM_USER_HERO_ID = #{gmUserHeroId}
+            </if>
+        </where>
     </select>
 </mapper>

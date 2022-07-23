@@ -1,8 +1,11 @@
 package com.gm.modules.basicconfig.dao;
 
-import com.gm.modules.basicconfig.entity.GmMonsterConfigEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gm.modules.basicconfig.entity.GmMonsterConfigEntity;
+import com.gm.modules.basicconfig.rsp.MonsterInfoRsp;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * 怪物配置表
@@ -13,5 +16,11 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface GmMonsterConfigDao extends BaseMapper<GmMonsterConfigEntity> {
+    /**
+     * 获取怪物信息
+     * @param monsterConfigEntity
+     * @return
+     */
+    List<MonsterInfoRsp> getMonsterInfo(GmMonsterConfigEntity monsterConfigEntity);
 	
 }

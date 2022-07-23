@@ -11,9 +11,15 @@ package com.gm.interceptor;
 
 import com.gm.common.exception.RRException;
 import com.gm.annotation.Login;
+import com.gm.common.utils.Constant;
+import com.gm.modules.user.entity.UserDailyOutputIncomeRecordEntity;
+import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserTokenEntity;
+import com.gm.modules.user.service.UserDailyOutputIncomeRecordService;
+import com.gm.modules.user.service.UserService;
 import com.gm.modules.user.service.UserTokenService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -21,6 +27,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 权限(Token)验证
@@ -31,6 +38,10 @@ import javax.servlet.http.HttpServletResponse;
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     private UserTokenService tokenService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private UserDailyOutputIncomeRecordService userDailyOutputIncomeRecordService;
 
     public static final String USER_KEY = "userId";
 
@@ -47,26 +58,35 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
             return true;
         }
 
-        //从header中获取token
+        // 从header中获取token
         String token = request.getHeader("authorization");
-        //如果header中不存在token，则从参数中获取token
+        // 如果header中不存在token，则从参数中获取token
         if(StringUtils.isBlank(token)){
             token = request.getParameter("authorization");
         }
 
-        //token为空
+        // token为空
         if(StringUtils.isBlank(token)){
             throw new RRException("authorization cannot be empty!");
         }
-        //查询token信息
+        // 查询token信息
         UserTokenEntity userTokenEntity = tokenService.queryByToken(token);
         if(userTokenEntity == null || userTokenEntity.getExpireTime().getTime() < System.currentTimeMillis()){
             throw new RRException("The authorization is invalid, please login again!",4001);
         }
 
-        //设置userId到request里，后续根据userId，获取用户信息
+        // 设置userId到request里，后续根据userId，获取用户信息
         request.setAttribute(USER_KEY, userTokenEntity.getUserId());
 
+        // 玩家首次战斗24小时后重置体力值
+        List list = userDailyOutputIncomeRecordService.getDataFrom24Hr(userTokenEntity.getUserId());
+        // 如果存在数据说明还没有达到24小时则无需操作。不存在数据则进行重置体力操作
+        if (list.size() == 0) {
+            UserEntity user = new UserEntity();
+            user.setUserId(userTokenEntity.getUserId());
+            user.setFtg(Constant.FTG);
+            userService.updateById(user);
+        }
         return true;
     }
 }

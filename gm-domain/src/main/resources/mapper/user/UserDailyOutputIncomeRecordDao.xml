@@ -7,7 +7,6 @@
     <resultMap type="com.gm.modules.user.entity.UserDailyOutputIncomeRecordEntity" id="userDailyOutputIncomeRecordMap">
         <result property="id" column="ID"/>
         <result property="userId" column="USER_ID"/>
-        <result property="teamId" column="TEAM_ID"/>
         <result property="firstTime" column="FIRST_TIME"/>
         <result property="maxGoldCoins" column="MAX_GOLD_COINS"/>
         <result property="remainingGoldCoins" column="REMAINING_GOLD_COINS"/>
@@ -25,7 +24,12 @@
         *
         FROM
         gm_user_daily_output_income_record
-        WHERE FIRST_TIME >= ( NOW( ) - INTERVAL 24 HOUR ) AND USER_ID = #{userId} AND TEAM_ID = #{teamId}
+        <where>
+            FIRST_TIME >= ( NOW( ) - INTERVAL 24 HOUR )
+            <if test="userId != null and userId != ''">
+                AND USER_ID = #{userId}
+            </if>
+        </where>
     </select>
 
 </mapper>

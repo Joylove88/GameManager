@@ -34,4 +34,18 @@
 
         ${ew.customSqlSegment}
     </select>
+
+    <!--获取副本信息-->
+    <select id="getDungeonInfo" resultType="com.gm.modules.basicconfig.rsp.DungeonInfoRsp">
+        SELECT
+        *
+        FROM
+        gm_dungeon_config
+        <where>
+            <if test="status != null and status != ''">
+                AND STATUS = #{status}
+            </if>
+        </where>
+        ORDER BY DUNGEON_LEVEL_MIN ASC
+    </select>
 </mapper>

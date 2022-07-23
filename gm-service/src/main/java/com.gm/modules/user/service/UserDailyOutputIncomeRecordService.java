@@ -22,9 +22,8 @@ public interface UserDailyOutputIncomeRecordService extends IService<UserDailyOu
     /**
      * 获取24小时内的记录
      * @param userId 用户ID
-     * @param teamId 队伍ID
      * @return
      */
-    List<UserDailyOutputIncomeRecordEntity> getDataFrom24Hr(Long userId, Long teamId);
+    List<UserDailyOutputIncomeRecordEntity> getDataFrom24Hr(Long userId);
 }
 

@@ -1,6 +1,7 @@
 package com.gm.modules.basicconfig.service.impl;
 
 import com.gm.common.utils.Constant;
+import com.gm.modules.basicconfig.rsp.DungeonInfoRsp;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,5 +42,11 @@ public class GmDungeonConfigServiceImpl extends ServiceImpl<GmDungeonConfigDao, 
         map.put("STATUS", Constant.enable);
         return dungeonConfigDao.selectByMap(map);
     }
+
+    @Override
+    public List<DungeonInfoRsp> getDungeonInfo(GmDungeonConfigEntity dungeonConfigEntity) {
+        return dungeonConfigDao.getDungeonInfo(dungeonConfigEntity);
+    }
+
 
 }

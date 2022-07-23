@@ -55,6 +55,10 @@ public class Constant {
      */
     public static final String ZERO_ = "0";
     /**
+     *  玩家默认最大体力值
+     */
+    public static final Long FTG = 60L;
+    /**
      * 所有权
      */
     public static final String ADDRESS = "0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45";
@@ -90,6 +94,10 @@ public class Constant {
      * hex zero
      */
     public static final String HEX_ZERO = "000000000000000000000000";
+    /**
+     * 1小时的毫秒数
+     */
+    public static final long HOUR1 = 1000 * 60 * 60;
     /**
      * 12小时的毫秒数
      */
@@ -318,6 +326,21 @@ public class Constant {
         }
 
         public long getValue() {
+            return value;
+        }
+    }
+
+    public enum BattleState {
+        BATTLE0("0"), // 未战斗
+        BATTLE1("1"), // 战斗中
+        BATTLE2("2"); // 战斗结束
+        private String value;
+
+        BattleState(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
             return value;
         }
     }

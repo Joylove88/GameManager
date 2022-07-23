@@ -42,6 +42,10 @@ public class UserHeroEntity implements Serializable {
 	 */
 	private Long gmHeroId;
 	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
+	/**
 	 * 英雄战力
 	 */
 	private Long heroPower;
@@ -61,6 +65,10 @@ public class UserHeroEntity implements Serializable {
 	 * 状态('0':禁用，'1':启用)
 	 */
 	private String status;
+	/**
+	 * 上阵状态('0':未上阵，'1':上阵中)
+	 */
+	private String statePlay;
 	/**
 	 * 英雄等级ID
 	 */

@@ -128,7 +128,7 @@ public class UserEntity implements Serializable {
 	/**
 	 * 爷ID
 	 */
-	private Long grandFatherId;
+	private Long grandfatherId;
 
 
 }

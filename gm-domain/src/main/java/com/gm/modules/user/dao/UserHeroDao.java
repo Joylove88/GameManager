@@ -22,15 +22,15 @@ public interface UserHeroDao extends BaseMapper<UserHeroEntity> {
 
 	/**
 	 * 获取玩家英雄
-	 * @param userId
+	 * @param userHeroEntity
 	 * @return
 	 */
-	List<UserHeroInfoRsp> getUserAllHero(Long userId);
+	List<UserHeroInfoRsp> getUserAllHero(UserHeroEntity userHeroEntity);
 
 	/**
 	 * 获取玩家英雄指定的英雄
-	 * @param userHeroId
+	 * @param userHeroEntity
 	 * @return
 	 */
-	UserHeroInfoRsp getUserHeroById(@Param("userHeroId")Long userHeroId);
+	UserHeroInfoRsp getUserHeroById(UserHeroEntity userHeroEntity);
 }

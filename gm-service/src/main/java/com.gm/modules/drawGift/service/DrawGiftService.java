@@ -159,8 +159,10 @@ public class DrawGiftService{
                 userHeroEntity.setGmHeroLevelId(100000009L);
                 userHeroEntity.setGmUserId(user.getUserId());
                 userHeroEntity.setStatus(Constant.enable);
+                userHeroEntity.setStatePlay(Constant.disabled); // 默认：未上阵
                 userHeroEntity.setMintStatus(Constant.enable);
                 userHeroEntity.setMintHash(drawForm.getTransactionHash());
+                userHeroEntity.setScale(gifts.get(entry.getKey()).getScale());// 插入矿工比例
                 userHeroEntity.setCreateTime(now);
                 userHeroEntity.setCreateTimeTs(now.getTime());
                 // 生成NFT唯一编码
@@ -474,11 +476,10 @@ public class DrawGiftService{
                 userEquip.setGmEquipmentId(gifts.get(entry.getKey()).getEquipId());
                 userEquip.setGmUserId(user.getUserId());
                 userEquip.setStatus(Constant.enable);
-
+                userEquip.setScale(gifts.get(entry.getKey()).getScale()); // 矿工比例
                 userEquip.setCreateTime(now);
                 userEquip.setCreateTimeTs(now.getTime());
-                // 统计装备战力
-                double equipPower = 0;
+
                 long health = gifts.get(entry.getKey()).getEquipHealth() != null ? gifts.get(entry.getKey()).getEquipHealth() : 0;//初始生命值
                 long mana = gifts.get(entry.getKey()).getEquipMana() != null ? gifts.get(entry.getKey()).getEquipMana() : 0;//初始法力值
                 long healthRegen = gifts.get(entry.getKey()).getEquipHealthRegen() != null ? gifts.get(entry.getKey()).getEquipHealthRegen() : 0;//初始生命值恢复
@@ -509,7 +510,7 @@ public class DrawGiftService{
                 userEquip.setEquipAttackDamage((long) (attackDamage * rap));
                 userEquip.setEquipAttackSpell((long) (attackSpell * rap));
                 // 更新装备战力
-                equipPower = (health * 0.1) + (mana * 0.1) + attackDamage + attackSpell + ((armor + magicResist) * 4.5) + healthRegen * 0.1 + manaRegen * 0.3;
+                double equipPower = (health * 0.1) + (mana * 0.1) + attackDamage + attackSpell + ((armor + magicResist) * 4.5) + healthRegen * 0.1 + manaRegen * 0.3;
                 userEquip.setEquipPower((long) equipPower);
 
                 userEquipmentDao.insert(userEquip);

@@ -14,11 +14,14 @@ import com.gm.annotation.Login;
 import com.gm.annotation.LoginUser;
 import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
+import com.gm.common.utils.Constant;
 import com.gm.common.utils.ExpUtils;
 import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
 import com.gm.modules.user.entity.*;
+import com.gm.modules.user.req.FightInfoReq;
 import com.gm.modules.user.req.UseExpReq;
+import com.gm.modules.user.req.UserHeroInfoReq;
 import com.gm.modules.user.rsp.*;
 import com.gm.modules.user.service.*;
 import io.swagger.annotations.Api;
@@ -70,7 +73,10 @@ public class ApiUserController {
     @PostMapping("getUserHeroInfo")
     @ApiOperation("获取玩家英雄信息")
     public R getUserHeroInfo(@LoginUser UserEntity user){
-        List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(user.getUserId());
+        UserHeroEntity userHero = new UserHeroEntity();
+        userHero.setGmUserId(user.getUserId());
+        userHero.setStatus(Constant.enable);
+        List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(userHero);
         return R.ok().put("heroList",heroList);
     }
 
@@ -80,7 +86,10 @@ public class ApiUserController {
     public R getUserProps(@LoginUser UserEntity user){
         Map<String, Object> map = new HashMap<>();
         // 获取玩家英雄信息和穿戴的装备信息
-        List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(user.getUserId());
+        UserHeroEntity userHero = new UserHeroEntity();
+        userHero.setGmUserId(user.getUserId());
+        userHero.setStatus(Constant.enable);
+        List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(userHero);
         int i = 0;
         while (i < heroList.size()) {
             // 获取该英雄已穿戴的装备
@@ -120,14 +129,23 @@ public class ApiUserController {
     public R getUserBalance(@LoginUser UserEntity user) throws InvocationTargetException, IllegalAccessException {
         UserQueryBalanceRsp rsp = new UserQueryBalanceRsp();
         // 获取用户账户余额
-        QueryWrapper<UserAccountEntity> wrapper = new QueryWrapper<UserAccountEntity>()
-                .eq("USER_ID",user.getUserId());
-        UserAccountEntity userAccount = userAccountService.getOne(wrapper);
+        UserAccountEntity userAccount = getUserAccount(user);
         if (userAccount == null){
             throw new RRException(ErrorCode.USER_GET_BAL_FAIL.getDesc());
         }
         BeanUtils.copyProperties(rsp,userAccount);
         return R.ok().put("userAccount",rsp);
+    }
+
+    /**
+     * 获取用户账户余额
+     * @param user
+     * @return
+     */
+    private UserAccountEntity getUserAccount(UserEntity user){
+        QueryWrapper<UserAccountEntity> wrapper = new QueryWrapper<UserAccountEntity>()
+                .eq("USER_ID",user.getUserId());
+        return userAccountService.getOne(wrapper);
     }
 
     @Login
@@ -141,12 +159,32 @@ public class ApiUserController {
             throw new RRException(ErrorCode.EXP_GET_FAIL.getDesc());
         }
         BeanUtils.copyProperties(rsp,user);
+
+        // 获取用户账户余额
+        UserAccountEntity userAccount = getUserAccount(user);
+        if (userAccount == null){
+            throw new RRException(ErrorCode.USER_GET_BAL_FAIL.getDesc());
+        }
         rsp.setPromotionExperience(userLevel.getPromotionExperience());
         rsp.setLevelCode(userLevel.getLevelCode());
+        rsp.setFtgMax(Constant.FTG);
+        rsp.setTotalAmount(userAccount.getTotalAmount());
         rsp.setCurrentExp(ExpUtils.getCurrentExp(userLevel.getExperienceTotal(), userLevel.getPromotionExperience(), user.getExperienceObtain()));
         return R.ok().put("userInfo",rsp);
     }
 
+    @Login
+    @PostMapping("getHeroDetail")
+    @ApiOperation("获取英雄详细信息")
+    public R getHeroDetail(@LoginUser UserEntity user,  @RequestBody UserHeroInfoReq req){
+        // 获取英雄
+        UserHeroEntity userHero = new UserHeroEntity();
+        userHero.setGmUserHeroId(req.getGmUserHeroId());
+        UserHeroInfoRsp rsp = userHeroService.getUserHeroById(userHero);
+
+
+        return R.ok().put("userInfo",null);
+    }
 
     @Login
     @PostMapping("playerUseExpForHero")

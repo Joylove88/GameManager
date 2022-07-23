@@ -34,12 +34,11 @@ public class UserDailyOutputIncomeRecordServiceImpl extends ServiceImpl<UserDail
     /**
      * 获取24小时内的记录
      * @param userId 用户ID
-     * @param teamId 队伍ID
      * @return
      */
     @Override
-    public List<UserDailyOutputIncomeRecordEntity> getDataFrom24Hr(Long userId, Long teamId) {
-        return userDailyOutputIncomeRecordDao.getDataFrom24Hr(userId, teamId);
+    public List<UserDailyOutputIncomeRecordEntity> getDataFrom24Hr(Long userId) {
+        return userDailyOutputIncomeRecordDao.getDataFrom24Hr(userId);
     }
 
 }

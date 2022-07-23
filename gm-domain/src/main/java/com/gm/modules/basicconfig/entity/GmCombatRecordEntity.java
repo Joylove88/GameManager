@@ -68,18 +68,18 @@ public class GmCombatRecordEntity implements Serializable {
 	/**
 	 * 战斗开始时间
 	 */
-	private Date createTime;
+	private Date startTime;
 	/**
 	 * 战斗开始时间
 	 */
-	private Long createTimeTs;
+	private Long startTimeTs;
 	/**
 	 * 战斗结束时间
 	 */
-	private Date updateTime;
+	private Date endTime;
 	/**
 	 * 战斗结束时间
 	 */
-	private Long updateTimeTs;
+	private Long endTimeTs;
 
 }

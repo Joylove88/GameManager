@@ -6,24 +6,35 @@
  * 版权所有，侵权必究！
  */
 
-package com.gm.modules.user.req;
+package com.gm.modules.user.rsp;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- * 战斗结果奖励领取
+ * 战斗信息
  *
- * @author Mark sunlightcs@gmail.com
+ * @author Axiang
  */
 @Data
-@ApiModel(value = "战斗结果奖励领取")
-public class FightClaimReq {
+@ApiModel(value = "战斗信息")
+public class FightInfoRsp {
     /**
      * 战斗记录ID
      */
     @ApiModelProperty(value = "战斗记录ID")
     private Long combatId;
+
+    /**
+     * 战斗过程
+     */
+    private List<BattleDetailsRsp> battleDetails = null;
+
 
 }

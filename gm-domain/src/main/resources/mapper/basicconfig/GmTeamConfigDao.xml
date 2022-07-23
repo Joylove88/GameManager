@@ -7,13 +7,9 @@
     <resultMap type="com.gm.modules.basicconfig.entity.GmTeamConfigEntity" id="gmTeamConfigMap">
         <result property="id" column="ID"/>
         <result property="userId" column="USER_ID"/>
+        <result property="dungeonId" column="DUNGEON_ID"/>
         <result property="teamName" column="TEAM_NAME"/>
         <result property="teamSolt" column="TEAM_SOLT"/>
-        <result property="hero1Id" column="HERO1_ID"/>
-        <result property="hero2Id" column="HERO2_ID"/>
-        <result property="hero3Id" column="HERO3_ID"/>
-        <result property="hero4Id" column="HERO4_ID"/>
-        <result property="hero5Id" column="HERO5_ID"/>
         <result property="status" column="STATUS"/>
         <result property="updateUser" column="UPDATE_USER"/>
         <result property="updateTime" column="UPDATE_TIME"/>
@@ -28,5 +24,83 @@
         LEFT JOIN gm_user b ON b.USER_ID = a.USER_ID
         ${ew.customSqlSegment}
     </select>
+
+    <!--获取该玩家队伍信息-->
+    <select id="getTeamInfoList" resultType="com.gm.modules.basicconfig.rsp.TeamInfoRsp">
+        SELECT
+        *
+        FROM
+        gm_team_config
+        <where>
+            <if test="status != null and status != ''">
+                AND STATUS = #{status}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND USER_ID = #{userId}
+            </if>
+            <if test="dungeonId != null and dungeonId != ''">
+                AND DUNGEON_ID = #{dungeonId}
+            </if>
+        </where>
+        ORDER BY TEAM_SOLT ASC
+    </select>
+
+    <!--获取该玩家队伍信息-->
+    <select id="getTeamInfo" resultType="com.gm.modules.basicconfig.rsp.TeamInfoRsp">
+        SELECT
+        *
+        FROM
+        gm_team_config
+        <where>
+            <if test="status != null and status != ''">
+                AND STATUS = #{status}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND USER_ID = #{userId}
+            </if>
+            <if test="dungeonId != null and dungeonId != ''">
+                AND DUNGEON_ID = #{dungeonId}
+            </if>
+            <if test="id != null and id != ''">
+                AND ID = #{id}
+            </if>
+        </where>
+    </select>
+
+    <!--获取该玩家除当前队伍的其他两个队伍的总战力-->
+    <select id="getOtherTeamTotalPower" resultType="com.gm.modules.basicconfig.rsp.TeamInfoRsp">
+        SELECT
+          SUM(TEAM_POWER) AS TEAM_POWER
+        FROM
+        gm_team_config
+        <where>
+            <if test="status != null and status != ''">
+                AND STATUS = #{status}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND USER_ID = #{userId}
+            </if>
+            <if test="id != null and id != ''">
+                AND ID NOT IN (#{id})
+            </if>
+        </where>
+    </select>
+
+    <!--英雄上下阵-->
+    <update id="setTeamHero" parameterType="com.gm.modules.basicconfig.entity.GmTeamConfigEntity">
+        UPDATE gm_team_config
+        <set>
+            USER_HERO1_ID = #{userHero1Id},
+            USER_HERO2_ID = #{userHero2Id},
+            USER_HERO3_ID = #{userHero3Id},
+            USER_HERO4_ID = #{userHero4Id},
+            USER_HERO5_ID = #{userHero5Id},
+            TEAM_POWER = #{teamPower},
+            UPDATE_USER = #{updateUser},
+            UPDATE_TIME = #{updateTime},
+            UPDATE_TIME_TS = #{updateTimeTs},
+        </set>
+        WHERE ID = #{id}
+    </update>
 
 </mapper>

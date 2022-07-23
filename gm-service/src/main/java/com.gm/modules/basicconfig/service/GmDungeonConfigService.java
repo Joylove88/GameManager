@@ -3,6 +3,7 @@ package com.gm.modules.basicconfig.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.basicconfig.entity.GmDungeonConfigEntity;
+import com.gm.modules.basicconfig.rsp.DungeonInfoRsp;
 
 import java.util.List;
 import java.util.Map;
@@ -19,5 +20,12 @@ public interface GmDungeonConfigService extends IService<GmDungeonConfigEntity> 
     PageUtils queryPage(Map<String, Object> params);
 
     List<GmDungeonConfigEntity> getDungeons();
+
+    /**
+     * 获取副本信息
+     * @param dungeonConfigEntity
+     * @return
+     */
+    List<DungeonInfoRsp> getDungeonInfo(GmDungeonConfigEntity dungeonConfigEntity);
 }
 

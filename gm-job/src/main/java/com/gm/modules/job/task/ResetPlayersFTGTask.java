@@ -31,19 +31,19 @@ public class ResetPlayersFTGTask implements ITask {
 	
 	@Override
 	public void run(String params){
-		logger.info("resetPlayersFTGTask定时任务正在执行，参数为：{}", params);
-		try {
-			// 开始重置全部玩家体力值
-			Map<String,Object> map = new HashMap<>();
-			List<UserEntity> users = userDao.selectByMap(map);
-			for (UserEntity userEntity : users){
-				UserEntity user = new UserEntity();
-				user.setUserId(userEntity.getUserId());
-				user.setFtg(60L);
-				userDao.updateById(user);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		logger.info("resetPlayersFTGTask定时任务正在执行，参数为：{}", params);
+//		try {
+//			// 开始重置全部玩家体力值
+//			Map<String,Object> map = new HashMap<>();
+//			List<UserEntity> users = userDao.selectByMap(map);
+//			for (UserEntity userEntity : users){
+//				UserEntity user = new UserEntity();
+//				user.setUserId(userEntity.getUserId());
+//				user.setFtg(60L);
+//				userDao.updateById(user);
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 }

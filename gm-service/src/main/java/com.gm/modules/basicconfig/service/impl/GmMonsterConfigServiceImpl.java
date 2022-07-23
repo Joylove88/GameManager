@@ -1,7 +1,11 @@
 package com.gm.modules.basicconfig.service.impl;
 
+import com.gm.modules.basicconfig.rsp.MonsterInfoRsp;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -16,7 +20,8 @@ import com.gm.modules.basicconfig.service.GmMonsterConfigService;
 
 @Service("gmMonsterConfigService")
 public class GmMonsterConfigServiceImpl extends ServiceImpl<GmMonsterConfigDao, GmMonsterConfigEntity> implements GmMonsterConfigService {
-
+    @Autowired
+    private GmMonsterConfigDao monsterConfigDao;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         String monsterName = (String) params.get("monsterName");
@@ -33,6 +38,11 @@ public class GmMonsterConfigServiceImpl extends ServiceImpl<GmMonsterConfigDao, 
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<MonsterInfoRsp> getMonsterInfo(GmMonsterConfigEntity monsterConfigEntity) {
+        return monsterConfigDao.getMonsterInfo(monsterConfigEntity);
     }
 
 }

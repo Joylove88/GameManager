@@ -31,6 +31,14 @@ public class GmTeamConfigEntity implements Serializable {
 	 */
 	private Long userId;
 	/**
+	 * 副本ID
+	 */
+	private Long dungeonId;
+	/**
+	 * 战斗记录ID
+	 */
+	private Long combatId;
+	/**
 	 * 队伍名称
 	 */
 	private String teamName;
@@ -39,25 +47,25 @@ public class GmTeamConfigEntity implements Serializable {
 	 */
 	private Integer teamSolt;
 	/**
-	 * 英雄1ID
-	 */
-	private Long hero1Id;
+	* 玩家英雄1ID
+	*/
+	private Long userHero1Id;
 	/**
-	 * 英雄2ID
+	 * 玩家英雄2ID
 	 */
-	private Long hero2Id;
+	private Long userHero2Id;
 	/**
-	 * 英雄3ID
+	 * 玩家英雄3ID
 	 */
-	private Long hero3Id;
+	private Long userHero3Id;
 	/**
-	 * 英雄4ID
+	 * 玩家英雄4ID
 	 */
-	private Long hero4Id;
+	private Long userHero4Id;
 	/**
-	 * 英雄5ID
+	 * 玩家英雄5ID
 	 */
-	private Long hero5Id;
+	private Long userHero5Id;
 	/**
 	 * 队伍战力
 	 */
@@ -78,6 +86,22 @@ public class GmTeamConfigEntity implements Serializable {
 	 * 修改时间
 	 */
 	private Long updateTimeTs;
+	/**
+	 * 战斗开始时间
+	 */
+	private Date startTime;
+	/**
+	 * 战斗开始时间
+	 */
+	private Long startTimeTs;
+	/**
+	 * 战斗结束时间
+	 */
+	private Date endTime;
+	/**
+	 * 战斗结束时间
+	 */
+	private Long endTimeTs;
 
 	@TableField(exist = false)
 	private String userAddress;

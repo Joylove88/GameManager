@@ -39,6 +39,10 @@ public class UserEquipmentEntity implements Serializable {
 	 */
 	private Long nftId;
 	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
+	/**
 	 * 装备战力
 	 */
 	private Long equipPower;

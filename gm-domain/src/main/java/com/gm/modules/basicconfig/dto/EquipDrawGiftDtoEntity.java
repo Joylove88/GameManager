@@ -76,4 +76,8 @@ public class EquipDrawGiftDtoEntity implements Serializable {
 	 * 法功
 	 */
 	private Long equipAttackSpell;
+	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
 }

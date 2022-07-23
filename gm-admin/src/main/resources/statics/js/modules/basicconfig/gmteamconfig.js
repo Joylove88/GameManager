@@ -7,11 +7,11 @@ $(function () {
 			{ label: '会员名称', name: 'userAddress', width: 80 },
 			{ label: '队伍名称', name: 'teamName', index: 'TEAM_NAME', width: 80 }, 			
 			{ label: '队伍顺序', name: 'teamSolt', index: 'TEAM_SOLT', width: 80 }, 			
-			{ label: '英雄1ID', name: 'hero1Id', index: 'HERO1_ID', width: 80 }, 			
-			{ label: '英雄2ID', name: 'hero2Id', index: 'HERO2_ID', width: 80 }, 			
-			{ label: '英雄3ID', name: 'hero3Id', index: 'HERO3_ID', width: 80 }, 			
-			{ label: '英雄4ID', name: 'hero4Id', index: 'HERO4_ID', width: 80 }, 			
-			{ label: '英雄5ID', name: 'hero5Id', index: 'HERO5_ID', width: 80 }, 			
+			{ label: '英雄1ID', name: 'userHero1Id', index: 'HERO1_ID', width: 80 },
+			{ label: '英雄2ID', name: 'userHero2Id', index: 'HERO2_ID', width: 80 },
+			{ label: '英雄3ID', name: 'userHero3Id', index: 'HERO3_ID', width: 80 },
+			{ label: '英雄4ID', name: 'userHero4Id', index: 'HERO4_ID', width: 80 },
+			{ label: '英雄5ID', name: 'userHero5Id', index: 'HERO5_ID', width: 80 },
             { label: '战斗状态', name: 'status', index: 'STATUS', width: 80 , formatter: function (value, options, row) {
                 if (value == '0') {
                     return '<span class="label badge-danger" style="background-color: #ddd;">未战斗</span>';//禁用

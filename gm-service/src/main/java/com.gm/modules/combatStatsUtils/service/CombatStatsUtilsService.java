@@ -160,25 +160,15 @@ public class CombatStatsUtilsService {
                 System.out.println("玩家装备失效,玩家装备编码:" + userEquipment.getGmEquipmentId());
             }
 
-            // 通过玩家背包获取装备信息方法
-            EquipmentInfoEntity equipmentInfo = equipmentInfoDao.selectOne(new QueryWrapper<EquipmentInfoEntity>()
-                    .eq("STATUS", Constant.enable)
-                    .eq("EQUIP_ID", userEquipment.getGmEquipmentId())
-            );
-
-            if (equipmentInfo == null){
-                System.out.println("官方已停用改装备,装备编码:" + equipmentInfo.getEquipId());
-            }
-
             // 将全部已穿戴装备属性累加
-            health = health + (equipmentInfo.getEquipHealth() != null ? equipmentInfo.getEquipHealth() : 0);//装备初始生命值
-            mana = mana + (equipmentInfo.getEquipMana() != null ? equipmentInfo.getEquipMana() : 0);//装备初始法力值
-            healthRegen = healthRegen + (equipmentInfo.getEquipHealthRegen() != null ? equipmentInfo.getEquipHealthRegen() : 0);//装备初始生命值恢复
-            manaRegen = manaRegen + (equipmentInfo.getEquipManaRegen() != null ? equipmentInfo.getEquipManaRegen() : 0);//装备初始法力值恢复
-            armor = armor + (equipmentInfo.getEquipArmor() != null ? equipmentInfo.getEquipArmor() : 0);//装备初始护甲
-            magicResist = magicResist + (equipmentInfo.getEquipMagicResist() != null ? equipmentInfo.getEquipMagicResist() : 0);//装备初始魔抗
-            attackDamage = attackDamage + (equipmentInfo.getEquipAttackDamage() != null ? equipmentInfo.getEquipAttackDamage() : 0);//装备初始攻击力
-            attackSpell = attackSpell + (equipmentInfo.getEquipAttackSpell() != null ? equipmentInfo.getEquipAttackSpell() : 0);//装备初始法功
+            health = health + (userEquipment.getEquipHealth() != null ? userEquipment.getEquipHealth() : 0);//装备初始生命值
+            mana = mana + (userEquipment.getEquipMana() != null ? userEquipment.getEquipMana() : 0);//装备初始法力值
+            healthRegen = healthRegen + (userEquipment.getEquipHealthRegen() != null ? userEquipment.getEquipHealthRegen() : 0);//装备初始生命值恢复
+            manaRegen = manaRegen + (userEquipment.getEquipManaRegen() != null ? userEquipment.getEquipManaRegen() : 0);//装备初始法力值恢复
+            armor = armor + (userEquipment.getEquipArmor() != null ? userEquipment.getEquipArmor() : 0);//装备初始护甲
+            magicResist = magicResist + (userEquipment.getEquipMagicResist() != null ? userEquipment.getEquipMagicResist() : 0);//装备初始魔抗
+            attackDamage = attackDamage + (userEquipment.getEquipAttackDamage() != null ? userEquipment.getEquipAttackDamage() : 0);//装备初始攻击力
+            attackSpell = attackSpell + (userEquipment.getEquipAttackSpell() != null ? userEquipment.getEquipAttackSpell() : 0);//装备初始法功
         }
 
         // 将统计的已穿戴装备属性存入到战斗属性表
@@ -243,6 +233,15 @@ public class CombatStatsUtilsService {
         user.setTotalPower(totalPower);
         userDao.updateById(user);
 
+    }
+
+    // 获取除去当前队伍的队伍总战力
+    public Long getOtherTeamTotalPower(Long userId, Long id){
+//        Map<String,Object> teamMap = new HashMap<>();
+//        teamMap.put("userId", userId);
+//        teamMap.put("id", id);
+//        return teamConfigDao.getOtherTeamTotalPower(teamMap);
+        return null;
     }
 }
 

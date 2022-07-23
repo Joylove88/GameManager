@@ -15,7 +15,7 @@ import lombok.Data;
 /**
  * 抽奖参数
  *
- * @author Mark sunlightcs@gmail.com
+ * @author Axiang
  */
 @Data
 @ApiModel(value = "抽奖参数")

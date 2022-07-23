@@ -17,7 +17,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 验签类
  *
- * @author Mark Axiang@gmail.com
+ * @author Axiang Axiang@gmail.com
  */
 @Data
 @ApiModel(value = "验签类")

@@ -173,7 +173,7 @@ public class ApiTestController {
         return calculateTrade(eggs,marketEggs,totalPower);
     }
 
-    // 贸易平衡算法
+    // 经济平衡算法
     private static BigDecimal calculateTrade(BigDecimal rt, BigDecimal rs, BigDecimal bs){
 //        return (PSN*bs)/(PSNH+((PSN*rs+PSNH*rt)/rt));
         BigDecimal a = Arith.multiply(PSN,bs);

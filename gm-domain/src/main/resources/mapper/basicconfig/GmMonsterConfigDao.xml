@@ -39,4 +39,21 @@
         ${ew.customSqlSegment}
     </select>
 
+    <!--获取怪物信息-->
+    <select id="getMonsterInfo" resultType="com.gm.modules.basicconfig.rsp.MonsterInfoRsp">
+        SELECT
+        *
+        FROM
+        gm_monster_config a
+        <where>
+            <if test="status != null and status != ''">
+                AND a.STATUS = #{status}
+            </if>
+            <if test="dungeonId != null and dungeonId != ''">
+                AND a.DUNGEON_ID = #{dungeonId}
+            </if>
+        </where>
+        ORDER BY a.MONSTER_LEVEL ASC
+    </select>
+
 </mapper>

@@ -75,7 +75,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		userRegister.setUserName(userEntity.getUserWalletAddress());
 		userRegister.setUserWalletAddress(userEntity.getUserWalletAddress());
 		userRegister.setUserLevelId(1L);
-		userRegister.setFtg(60L);
+		userRegister.setFtg(Constant.FTG);
 		userRegister.setScale(1D);
 		userRegister.setTotalPower(Constant.ZERO);
 		userRegister.setExperienceObtain(Constant.ZERO);
