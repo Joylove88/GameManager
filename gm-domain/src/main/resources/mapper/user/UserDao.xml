@@ -24,6 +24,7 @@
         <result property="onlineFlag" column="ONLINE_FLAG"/>
         <result property="fatherId" column="FATHER_ID"/>
         <result property="grandFatherId" column="GRANDFATHER_ID"/>
+        <result property="vipLevelId" column="VIP_LEVEL_ID"/>
     </resultMap>
 
 </mapper>

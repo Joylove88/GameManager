@@ -2,6 +2,7 @@ package com.gm.modules.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
+import com.gm.modules.order.entity.TransactionOrderEntity;
 import com.gm.modules.user.entity.GmUserVipLevelEntity;
 
 import java.util.Map;
@@ -16,5 +17,7 @@ import java.util.Map;
 public interface GmUserVipLevelService extends IService<GmUserVipLevelEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void updateUserVipLevel(TransactionOrderEntity order);
 }
 

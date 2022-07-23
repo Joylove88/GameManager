@@ -129,6 +129,10 @@ public class UserEntity implements Serializable {
 	 * 爷ID
 	 */
 	private Long grandfatherId;
+	/**
+	 * 用户消费等级
+	 */
+	private Long vipLevelId;
 
 
 }

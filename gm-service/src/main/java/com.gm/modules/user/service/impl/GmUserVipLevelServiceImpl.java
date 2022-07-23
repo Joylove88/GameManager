@@ -1,5 +1,6 @@
 package com.gm.modules.user.service.impl;
 
+import com.gm.modules.order.entity.TransactionOrderEntity;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,6 +25,11 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void updateUserVipLevel(TransactionOrderEntity order) {
+
     }
 
 }

@@ -11,6 +11,7 @@ import com.gm.modules.order.entity.TransactionOrderEntity;
 import com.gm.modules.order.service.TransactionOrderService;
 import com.gm.modules.user.req.DrawForm;
 import com.gm.modules.user.entity.UserEntity;
+import com.gm.modules.user.service.GmUserVipLevelService;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.Map;
 @Service("transactionOrderService")
 public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao, TransactionOrderEntity> implements TransactionOrderService {
     @Autowired TransactionOrderDao transactionOrderDao;
+    @Autowired GmUserVipLevelService gmUserVipLevelService;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<TransactionOrderEntity> page = this.page(
@@ -80,6 +82,12 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
         QueryWrapper<TransactionOrderEntity> wrapper = new QueryWrapper<TransactionOrderEntity>()
                 .eq("TRANSACTION_HASH",transactionHash);
         transactionOrderDao.update(order, wrapper);
+
+        // 如果抽奖成功，则升级用户消费等级
+        if (Constant.enable.equals(order.getStatus())){
+            gmUserVipLevelService.updateUserVipLevel(order);
+        }
+
     }
 
     @Override
