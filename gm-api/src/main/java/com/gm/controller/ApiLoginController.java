@@ -14,6 +14,7 @@ import com.gm.common.exception.RRException;
 import com.gm.common.utils.*;
 import com.gm.common.validator.ValidatorUtils;
 import com.gm.annotation.Login;
+import com.gm.modules.user.req.InviteForm;
 import com.gm.modules.user.req.SignIn;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserLoginLogEntity;
@@ -30,6 +31,8 @@ import org.web3j.utils.Numeric;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -164,6 +167,40 @@ public class ApiLoginController {
     @ApiOperation("退出")
     public R logout(@ApiIgnore @RequestAttribute("userId") long userId){
         tokenService.expireToken(userId);
+        return R.ok();
+    }
+
+    /**
+     * 重定向邀请链接
+     */
+    @RequestMapping("redirect/{expandCode:[a-zA-Z0-9]+}")
+    public void invite(@PathVariable String expandCode, HttpServletResponse response) throws IOException {
+        UserEntity userEntity = userService.queryByExpandCode(expandCode);
+        response.sendRedirect("http://abest.com?invite="+userEntity.getUserWalletAddress());
+    }
+
+
+    @PostMapping("invite")
+    @ApiOperation("邀请注册")
+    public R invite(@RequestBody InviteForm form) {
+        // 1.表单校验
+        ValidatorUtils.validateEntity(form);
+        // 2.校验两个地址
+        UserEntity userEntity = userService.queryByAddress(form.getAddress());
+        if (userEntity != null) {
+            throw new RRException(ErrorCode.ADDRESS_HAS_EXIST.getDesc());
+        }
+        UserEntity userInviteEntity = userService.queryByAddress(form.getInviteAddress());
+        if (userInviteEntity == null) {
+            throw new RRException(ErrorCode.INVITE_ADDRESS_NOT_EXIST.getDesc());
+        }
+        // 3.保存用户
+        UserEntity user = new UserEntity();
+        user.setSignDate(new Date());
+        user.setUserWalletAddress(form.getAddress());
+        user.setFatherId(userInviteEntity.getUserId());
+        user.setGrandfatherId(userInviteEntity.getFatherId());
+        userService.userRegister(user);
         return R.ok();
     }
 

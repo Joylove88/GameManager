@@ -16,6 +16,8 @@ public enum ErrorCode {
 	SIGN_HASH_EXCEPTION(107,"transaction hash exception!"),
 	EXP_NUM_NOT_NULL(108,"Please select the amount of experience potion!"),//请选择经验药水的数量
 	EXP_RARE_NOT_NULL(108,"Please select the type of experience potion!"),//请选择经验药水的种类
+	ADDRESS_HAS_EXIST(109,"address already exists!"),//地址已存在
+	INVITE_ADDRESS_NOT_EXIST(110,"invite address not exists!"),//上级地址不存在
 
 
 

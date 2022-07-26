@@ -24,6 +24,7 @@ import com.gm.modules.user.entity.UserTokenEntity;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.service.UserTokenService;
 import com.gm.modules.user.service.UserService;
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -83,6 +84,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		userRegister.setStatus(Constant.enable);
 		userRegister.setOnlineFlag(Constant.enable);
 
+		userRegister.setExpandCode(RandomStringUtils.randomAlphanumeric(6));
+		userRegister.setFatherId(userEntity.getFatherId());
+		userRegister.setGrandfatherId(userEntity.getGrandfatherId());
+
 		userDao.insert(userRegister);
 
 		// 用户注册完成后自动添加一条用户资金账户数据
@@ -121,6 +126,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		map.put("expire", userTokenEntity.getExpireTime().getTime() - System.currentTimeMillis());
 
 		return map;
+	}
+
+	@Override
+	public UserEntity queryByExpandCode(String expandCode) {
+		return baseMapper.selectOne(new QueryWrapper<UserEntity>()
+				.eq("expand_code",expandCode)
+		);
 	}
 
 }

@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
+ * <p>
  * https://www.renren.io
- *
+ * <p>
  * 版权所有，侵权必究！
  */
 
@@ -21,14 +21,14 @@ import javax.validation.constraints.NotBlank;
  * @author Axiang
  */
 @Data
-@ApiModel(value = "注册表单")
-public class RegisterForm {
-    @ApiModelProperty(value = "手机号")
-    @NotBlank(message="手机号不能为空")
-    private String mobile;
+@ApiModel(value = "邀请注册表单")
+public class InviteForm {
+    @ApiModelProperty(value = "地址")
+    @NotBlank(message = "地址不能为空")
+    private String address;
 
-    @ApiModelProperty(value = "密码")
-    @NotBlank(message="密码不能为空")
-    private String password;
+    @ApiModelProperty(value = "上级地址")
+    @NotBlank(message = "上级地址不能为空")
+    private String inviteAddress;
 
 }

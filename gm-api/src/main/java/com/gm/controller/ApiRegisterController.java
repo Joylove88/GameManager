@@ -10,7 +10,6 @@ package com.gm.controller;
 
 import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
-import com.gm.modules.user.req.RegisterForm;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.service.UserService;
 import io.swagger.annotations.Api;
@@ -35,19 +34,5 @@ public class ApiRegisterController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("register")
-    @ApiOperation("注册")
-    public R register(@RequestBody RegisterForm form){
-        //表单校验
-        ValidatorUtils.validateEntity(form);
 
-        UserEntity user = new UserEntity();
-//        user.setMobile(form.getMobile());
-//        user.setUsername(form.getMobile());
-//        user.setPassword(DigestUtils.sha256Hex(form.getPassword()));
-        user.setCreateTime(new Date());
-        userService.save(user);
-
-        return R.ok();
-    }
 }
