@@ -52,7 +52,7 @@ public class GmUserVipLevelEntity implements Serializable {
 	/**
 	 * 等级code
 	 */
-	private String vipLevelCode;
+	private Integer vipLevelCode;
 	/**
 	 * 等级名称
 	 */

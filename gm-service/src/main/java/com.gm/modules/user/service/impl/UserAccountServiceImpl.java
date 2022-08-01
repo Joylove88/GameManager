@@ -34,4 +34,11 @@ public class UserAccountServiceImpl extends ServiceImpl<UserAccountDao, UserAcco
         return retBool(userAccountDao.updateAccountAdd(userId,addMoney));
     }
 
+    @Override
+    public UserAccountEntity queryByUserId(Long userId) {
+        return baseMapper.selectOne(new QueryWrapper<UserAccountEntity>()
+                .eq("user_id",userId)
+        );
+    }
+
 }

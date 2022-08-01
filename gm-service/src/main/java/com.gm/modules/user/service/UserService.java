@@ -42,4 +42,11 @@ public interface UserService extends IService<UserEntity> {
 	Map<String, Object> login(UserEntity userEntity);
 
 	UserEntity queryByExpandCode(String expandCode);
+
+	/**
+	 * 根据ID查询用户
+	 * @param gmUserId 用户ID
+	 * @return 用户
+	 */
+	UserEntity queryByUserId(Long gmUserId);
 }

@@ -21,5 +21,20 @@
         <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
     </resultMap>
 
+    <select id="queryTotalMoneyByUserId" resultType="double">
+        SELECT IFNULL(sum(TRANSACTION_FEE),0) FROM GM_TRANSACTION_ORDER WHERE GM_USER_ID = #{gmUserId} AND CURRENCY_TYPE = '1' AND STATUS = '1'
+    </select>
+
+    <select id="querySonTotalMoneyByFatherId" resultType="double">
+        SELECT
+            IFNULL(sum(TRANSACTION_FEE),0)
+        FROM
+            gm_user t1
+            LEFT JOIN gm_user t2 ON t1.USER_ID = t2.FATHER_ID
+            LEFT JOIN gm_transaction_order t3 ON t2.USER_ID = t3.GM_USER_ID
+        WHERE
+            1 = 1
+            AND t1.USER_ID = #{gmUserId}
+    </select>
 
 </mapper>

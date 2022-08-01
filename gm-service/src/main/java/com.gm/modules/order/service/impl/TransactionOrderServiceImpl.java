@@ -99,5 +99,15 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
         return orderEntity;
     }
 
+    @Override
+    public Double queryTotalMoneyByUserId(Long gmUserId) {
+        return transactionOrderDao.queryTotalMoneyByUserId(gmUserId);
+    }
+
+    @Override
+    public Double querySonTotalMoneyByFatherId(Long gmUserId) {
+        return transactionOrderDao.querySonTotalMoneyByFatherId(gmUserId);
+    }
+
 
 }

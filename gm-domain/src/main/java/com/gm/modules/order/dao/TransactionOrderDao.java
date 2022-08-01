@@ -13,5 +13,14 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface TransactionOrderDao extends BaseMapper<TransactionOrderEntity> {
-	
+
+    /**
+     * 根据用户ID查询该用户消费总额
+     */
+    Double queryTotalMoneyByUserId(Long gmUserId);
+
+    /**
+     * 根据用户ID查询该用户儿子的消费总额
+     */
+    Double querySonTotalMoneyByFatherId(Long gmUserId);
 }

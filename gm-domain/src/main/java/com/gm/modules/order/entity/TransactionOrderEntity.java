@@ -57,7 +57,7 @@ public class TransactionOrderEntity implements Serializable {
 	/**
 	 * 消耗金额
 	 */
-	private Long transactionFee;
+	private Double transactionFee;
 	/**
 	 * GAS费
 	 */

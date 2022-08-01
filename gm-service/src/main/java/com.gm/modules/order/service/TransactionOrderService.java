@@ -29,5 +29,19 @@ public interface TransactionOrderService extends IService<TransactionOrderEntity
     void updateOrder(DrawForm form, List gifts, Map map);
 
     TransactionOrderEntity getOrderHash(String hash);
+
+    /**
+     * 根据用户ID查询该用户消费总额
+     * @param gmUserId 用户ID
+     * @return 消费总额
+     */
+    Double queryTotalMoneyByUserId(Long gmUserId);
+
+    /**
+     * 根据用户ID查询该用户儿子的消费总额
+     * @param gmUserId 用户ID
+     * @return 儿子的消费总额
+     */
+    Double querySonTotalMoneyByFatherId(Long gmUserId);
 }
 

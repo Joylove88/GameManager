@@ -135,4 +135,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		);
 	}
 
+	@Override
+	public UserEntity queryByUserId(Long gmUserId) {
+		return baseMapper.selectById(gmUserId);
+	}
+
 }
