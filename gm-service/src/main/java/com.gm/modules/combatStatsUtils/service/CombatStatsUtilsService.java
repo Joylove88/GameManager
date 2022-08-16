@@ -1,6 +1,7 @@
 package com.gm.modules.combatStatsUtils.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.gm.common.exception.RRException;
 import com.gm.common.utils.Constant;
 import com.gm.modules.basicconfig.dao.*;
 import com.gm.modules.basicconfig.dto.AttributeEntity;
@@ -62,20 +63,20 @@ public class CombatStatsUtilsService {
                 .eq("GM_HERO_STAR_ID", heroStarId)// 星级英雄编码
         );
         if(heroStar == null) {
-            System.out.println("官方已停用改英雄,英雄编码为:" + heroStarId);
+            throw new RRException("官方已停用改英雄,英雄编码为:" + heroStarId);
         }
 
         // 获取星级
         StarInfoEntity starInfo = starInfoDao.selectById(heroStar.getGmStarId());
         if(starInfo == null){
-            System.out.println("获取星级信息失败");
+            throw new RRException("获取星级信息失败");
         }
         attribute.setHeroStar(starInfo.getGmStarCode());
 
         // 获取英雄信息
         HeroInfoEntity heroInfo = heroInfoDao.selectById(heroStar.getGmHeroId());
         if (heroInfo == null){
-            System.out.println("获取英雄信息失败");
+            throw new RRException("获取英雄信息失败");
         }
         attribute.setHeroName(heroInfo.getHeroName());
 
@@ -85,9 +86,10 @@ public class CombatStatsUtilsService {
                 .eq("GM_HERO_STAR_ID", heroStarId)// 星级英雄编码
         );
         if (heroSkill == null) {
-            System.out.println("获取英雄技能信息失败");
+            throw new RRException("获取英雄技能信息失败");
         }
         attribute.setSkillName(heroSkill.getSkillName());
+        attribute.setSkillType(heroSkill.getSkillType());
         attribute.setSkillSolt(heroSkill.getSkillSolt());
         attribute.setSkillStarLevel(heroSkill.getSkillStarLevel());
         attribute.setSkillFixedDamage(heroSkill.getSkillFixedDamage());
@@ -157,7 +159,7 @@ public class CombatStatsUtilsService {
             );
 
             if (userEquipment == null){
-                System.out.println("玩家装备失效,玩家装备编码:" + userEquipment.getGmEquipmentId());
+                throw new RRException("玩家装备失效,玩家装备编码:" + userEquipment.getGmEquipmentId());
             }
 
             // 将全部已穿戴装备属性累加
@@ -221,7 +223,7 @@ public class CombatStatsUtilsService {
         teamMap.put("USER_ID", userId);
         List<GmTeamConfigEntity> teams = teamConfigDao.selectByMap(teamMap);
         if (teams == null) {
-            System.out.println("获取玩家队伍信息异常");
+            throw new RRException("获取玩家队伍信息异常");
         }
         for(GmTeamConfigEntity teamConfig : teams){
             totalPower = totalPower + teamConfig.getTeamPower();

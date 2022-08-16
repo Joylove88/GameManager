@@ -21,15 +21,15 @@ public interface UserHeroService extends IService<UserHeroEntity> {
 
     /**
      * 获取玩家英雄
-     * @param userHeroEntity
+     * @param map
      * @return
      */
-    List<UserHeroInfoRsp> getUserAllHero(UserHeroEntity userHeroEntity);
+    List<UserHeroInfoRsp> getUserAllHero(Map<String, Object> map);
     /**
      * 获取玩家英雄指定的英雄
-     * @param userHeroEntity
+     * @param map
      * @return
      */
-    UserHeroInfoRsp getUserHeroById(UserHeroEntity userHeroEntity);
+    UserHeroEntity getUserHeroById(Map<String, Object> map);
 }
 

@@ -1,5 +1,6 @@
 package com.gm.modules.user.rsp;
 
+import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -14,6 +15,10 @@ public class UserHeroInfoRsp {
 	 * ID
 	 */
 	private Long gmUserHeroId;
+	/**
+	 * 英雄ID
+	 */
+	private Long gmHeroId;
 	/**
 	 * 英雄名称
 	 */
@@ -43,15 +48,27 @@ public class UserHeroInfoRsp {
 	 */
 	private String heroKeelUrl;
 	/**
-	 * 累计获得的经验
+	 * 晋级到下一级所需经验值
 	 */
-	private Long experienceObtain;
+	private Long promotionExperience;
+	/**
+	 * 当前等级获取的经验值
+	 */
+	private Long currentExp;
 	/**
 	 * 英雄描述
 	 */
 	private String heroDescription;
 
+	/**
+	 * 英雄已穿戴装备
+	 */
 	private List<UserHeroEquipmentWearRsp> wearEQList = new ArrayList<>();
+
+	/**
+	 * 英雄技能
+	 */
+	private HeroSkillRsp heroSkillRsp = null;
 
 
 }

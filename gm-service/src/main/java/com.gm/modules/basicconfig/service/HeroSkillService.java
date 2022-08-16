@@ -16,5 +16,12 @@ import java.util.Map;
 public interface HeroSkillService extends IService<HeroSkillEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 获取英雄技能信息
+     * @param map
+     * @return
+     */
+    HeroSkillEntity getHeroSkill(Map<String, Object> map);
 }
 

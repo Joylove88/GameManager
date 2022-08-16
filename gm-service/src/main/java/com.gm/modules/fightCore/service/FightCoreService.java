@@ -15,16 +15,18 @@ import com.gm.modules.basicconfig.rsp.TeamInfoRsp;
 import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
 import com.gm.modules.drawGift.service.DrawGiftService;
 import com.gm.modules.sys.service.SysConfigService;
-import com.gm.modules.user.dao.*;
+import com.gm.modules.user.dao.GmMiningInfoDao;
+import com.gm.modules.user.dao.UserDao;
+import com.gm.modules.user.dao.UserHeroDao;
 import com.gm.modules.user.entity.*;
 import com.gm.modules.user.req.FightInfoReq;
 import com.gm.modules.user.rsp.*;
 import com.gm.modules.user.service.UserAccountService;
 import com.gm.modules.user.service.UserBalanceDetailService;
 import com.gm.modules.user.service.UserDailyOutputIncomeRecordService;
-import org.apache.tomcat.jni.BIOCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +56,7 @@ public class FightCoreService {
     @Autowired
     private GmDungeonEventDao dungeonEventDao;
     @Autowired
-    private GmMiningInfoDao gmMiningInfoDao;
+    private GmMiningInfoDao miningInfoDao;
     @Autowired
     private SysConfigService sysConfigService;
     @Autowired
@@ -77,16 +79,55 @@ public class FightCoreService {
      * 经验值
      */
     private static Long EXP = 0L;
-    private static List<BattleDetailsRsp> battleDetails = new ArrayList();
+    /**
+     * 战斗状态
+     */
+    private static int combatStatus = 0;// 战斗状态
+    /**
+     * 战斗过程
+     */
+    private static List<BattleDetailsRsp> battleDetails = new ArrayList<>();
+    /**
+     * 英雄集合
+     */
+    private static List<AttributeEntity> heros = null;
+    /**
+     * 怪物集合
+     */
+    private static List<GmMonsterConfigEntity> monsters = null;
 
     /**
-     * 开始战斗
+     * 存活的英雄数量
+     */
+    private static int survivingHero = 0;
+
+    /**
+     * 存活的怪物数量
+     */
+    private static int survivingMonster = 0;
+
+    /**
+     * 初始化战斗
      * @param user
      * @param req
      */
-    public FightInfoRsp attck(UserEntity user, FightInfoReq req) {
+    public FightInfoRsp initAttack(UserEntity user, FightInfoReq req) {
+        System.out.println("初始化战斗场景");
         // 重置全局经验值
         EXP = 0L;
+        // 重置战斗状态
+        combatStatus = 0;
+        // 重置战斗过程
+        battleDetails = new ArrayList<>();
+        // 重置英雄集合
+        heros = null;
+        // 重置怪物集合
+        monsters = null;
+        // 重置存活的英雄数量
+        survivingHero = 0;
+        // 重置存活的怪物数量
+        survivingMonster = 0;
+
         Date now = new Date();
         long currentTime = System.currentTimeMillis() + 1000 * 60 * 60;
         Date end = new Date(currentTime);
@@ -117,35 +158,37 @@ public class FightCoreService {
         }
 
         Long teamPower = teamConfig.getTeamPower() != null ? teamConfig.getTeamPower() : 0;// 队伍战力
-
+        System.out.println("加载英雄中...");
         // 创建集合存储每个英雄的属性
         List<AttributeEntity> attributes = new ArrayList<>();
         // 获取英雄1
-        if(teamConfig.getUserHero1Id() != null){
+        if(teamConfig.getUserHero1Id() != null && !teamConfig.getUserHero1Id().equals(0L)){
             AttributeEntity att = getHeroStats(teamConfig.getUserHero1Id());
             attributes.add(att);
         }
         // 获取英雄2
-        if(teamConfig.getUserHero2Id() != null){
+        if(teamConfig.getUserHero2Id() != null && !teamConfig.getUserHero2Id().equals(0L)){
             AttributeEntity att = getHeroStats(teamConfig.getUserHero2Id());
             attributes.add(att);
         }
         // 获取英雄3
-        if(teamConfig.getUserHero3Id() != null){
+        if(teamConfig.getUserHero3Id() != null && !teamConfig.getUserHero3Id().equals(0L)){
             AttributeEntity att = getHeroStats(teamConfig.getUserHero3Id());
             attributes.add(att);
         }
         // 获取英雄4
-        if(teamConfig.getUserHero4Id() != null){
+        if(teamConfig.getUserHero4Id() != null && !teamConfig.getUserHero4Id().equals(0L)){
             AttributeEntity att = getHeroStats(teamConfig.getUserHero4Id());
             attributes.add(att);
         }
         // 获取英雄5
-        if(teamConfig.getUserHero5Id() != null){
+        if(teamConfig.getUserHero5Id() != null && !teamConfig.getUserHero5Id().equals(0L)){
             AttributeEntity att = getHeroStats(teamConfig.getUserHero5Id());
             attributes.add(att);
         }
+        System.out.println("英雄加载完成");
 
+        System.out.println("加载副本中...");
         // 获取副本信息
         GmDungeonConfigEntity dungeon = dungeonConfigDao.selectById(req.getDungeonId());
         if (dungeon == null){
@@ -157,6 +200,7 @@ public class FightCoreService {
             throw new RRException("玩家疲劳值不足");
         }
 
+
         // 获取副本事件信息
         Map<String, Object> eventMap = new HashMap<>();
         eventMap.put("STATUS", Constant.enable);
@@ -165,17 +209,20 @@ public class FightCoreService {
         if (dungeonEvents == null) {
             throw new RRException("获取副本事件信息失败");
         }
+        System.out.println("副本加载完成");
 
+        System.out.println("加载怪物中...");
         // 获取怪物信息
         Map<String,Object> monsterMap = new HashMap<>();
         monsterMap.put("STATUS", Constant.enable);
         monsterMap.put("DUNGEON_ID", dungeon.getId());
-        List<GmMonsterConfigEntity> monsters = monsterConfigDao.selectByMap(monsterMap);
-        if (monsters == null) {
+        List<GmMonsterConfigEntity> monsterList = monsterConfigDao.selectByMap(monsterMap);
+        if (monsterList == null) {
             throw new RRException("怪物修炼中");
         } else {
-            Collections.shuffle(monsters);
+            Collections.shuffle(monsterList);
         }
+        System.out.println("怪物加载完成");
 
 
         // 扣除玩家体力
@@ -197,9 +244,6 @@ public class FightCoreService {
         setBattleProcess(new BattleDetailsRsp(null, dungeon.getDungeonName(),null, null,  null, null,
                 null, null, null,
                 "尊敬的领主指引[" + teamConfig.getTeamName() + "] 战力[{teamPower}] 进入[{name}]", Constant.enable, teamPower));
-
-        // 战斗状态
-        long combatStatus = 0;
 
         //获取每个事件的概率
         List<Double> orignalRates = new ArrayList<Double>(dungeonEvents.size());
@@ -225,10 +269,16 @@ public class FightCoreService {
             System.out.println(eventDescription);
 
             // 事件等级5 为福利关卡 无需战斗 玩家直接胜利 // 惩罚关卡 无需战斗直接失败
-            if ( eventLevel == 5L ) {
+            if ( eventLevel == 5 ) {
                 combatStatus = 2;
+            } else if ( eventLevel == 4 ) {
+                combatStatus = 4;
             } else {
-                combatStatus = attcks(attributes, monsters, dungeonEvents.get(entry.getKey()).getEventLevel(), dungeon);
+//                combatStatus = attcks(attributes, monsterList, dungeonEvents.get(entry.getKey()).getEventLevel(), dungeon);
+                heros = attributes;
+                monsters = monsterList;
+                survivingHero = attributes.size();
+                attack(dungeon);
             }
         }
 
@@ -305,9 +355,6 @@ public class FightCoreService {
             CalculateTradeUtil.totalPlayersGold = Arith.add(CalculateTradeUtil.totalPlayersGold, goldCoins);
             sysConfigService.updateValueByKey(Constant.PLAYERS_EARN_TOTAL_REVENUE, CalculateTradeUtil.totalPlayersGold.toString());
 
-            System.out.println("怪物全部击杀 战斗胜利");
-            setBattleProcess(new BattleDetailsRsp(null, null, null, null, null, null,
-                    null, null, null, "怪物全部击杀 战斗胜利", Constant.enable, null));
         }
 
         // 插入战斗记录
@@ -322,10 +369,10 @@ public class FightCoreService {
             state = Constant.enable;
             combatRecord.setGetExp(EXP);
             combatRecord.setGetUserExp(EXP);
-            combatRecord.setGetGoldCoins(goldCoins);
             combatRecord.setGetEquip(dungeon.getRangeEquip());
             combatRecord.setGetProps(dungeon.getRangeProps());
         }
+        combatRecord.setGetGoldCoins(goldCoins);
         String combatDescription = "";
         JSONArray jsonObject = (JSONArray) JSONArray.toJSON(battleDetails);
         combatDescription = jsonObject.toJSONString();
@@ -338,19 +385,28 @@ public class FightCoreService {
         combatRecordDao.insert(combatRecord);
 
         FightInfoRsp rsp = new FightInfoRsp();
+        rsp.setTeamId(req.getTeamId());
         rsp.setCombatId(combatRecord.getId());
         rsp.setBattleDetails(battleDetails);
+        // 获取倒计时
+        Long endSec = (end.getTime() - now.getTime()) / 1000;
+        if (endSec > 0) {
+            rsp.setEndSec(endSec);
+        }
+        rsp.setStartTimeTs(now.getTime());
+        rsp.setCountdown("00:00:00");
 
         // 更新队伍战斗状态
         GmTeamConfigEntity upTeam = new GmTeamConfigEntity();
         upTeam.setId(teamConfig.getId());
-//        upTeam.setStatus(Constant.enable);// 战斗中
+        upTeam.setStatus(Constant.enable);// 战斗中===================================
         upTeam.setStartTime(now);
         upTeam.setStartTimeTs(now.getTime());
         upTeam.setEndTime(end);
         upTeam.setEndTimeTs(end.getTime());
         upTeam.setCombatId(combatRecord.getId());
         teamConfigDao.updateById(upTeam);
+
         return rsp;
     }
 
@@ -384,10 +440,14 @@ public class FightCoreService {
 
     }
 
-    // 获取玩家矿工数量
+    /**
+     * 获取玩家矿工数量
+     * @param userId
+     * @return
+     */
     public Long getMiners(Long userId){
         // 获取玩家矿工信息
-        GmMiningInfoEntity miningInfo = gmMiningInfoDao.selectOne(new QueryWrapper<GmMiningInfoEntity>()
+        GmMiningInfoEntity miningInfo = miningInfoDao.selectOne(new QueryWrapper<GmMiningInfoEntity>()
                 .eq("STATUS", Constant.enable)
                 .eq("USER_ID", userId)// 玩家ID
         );
@@ -401,7 +461,10 @@ public class FightCoreService {
         return miningInfo.getId();
     }
 
-    // 获取系统全部用户总战力
+    /**
+     * 获取系统全部用户总战力
+     * @return
+     */
     private Long getTotalPower(){
         long total = 0;
         Map<String,Object> map = new HashMap<>();
@@ -412,205 +475,379 @@ public class FightCoreService {
         return total;
     }
 
-    // 构建战斗过程
+    /**
+     * 构建战斗过程
+     * @param rsp
+     */
     private void setBattleProcess(BattleDetailsRsp rsp) {
         battleDetails.add(rsp);
     }
 
-    // =========================差个装备属性累加
-    private long attcks(List<AttributeEntity> a ,List<GmMonsterConfigEntity> monsters, long fightEvet, GmDungeonConfigEntity dungeon) {
-        long status = 0;
-        int i = 0;
-        // 回合数
-        int totalFightNum = 0;
+    /**
+     * 攻击方法
+     */
+    private void attack(GmDungeonConfigEntity dungeon){
+        // 加载英雄属性
+        int initHero = 0;
+        while ( initHero < heros.size() ){
+            attributeAdd(heros.get(initHero), initHero);
+            // 英雄等级
+            long hLevel = heros.get(initHero).getHeroLevel();
+            // 英雄星级
+            long hStar = heros.get(initHero).getHeroStar();
+            // 英雄名称
+            String hName = heros.get(initHero).getHeroName();
+            // 英雄血量
+            long hHp = heros.get(initHero).getHp();
+            // 英雄魔法值
+            long hMP = heros.get(initHero).getMp();
+            System.out.println("[LV" + hLevel + " " + hName + " " + hStar + "★] 剩余HP: " + hHp);
+            setBattleProcess(new BattleDetailsRsp(hLevel, hName, null, null, hStar, null, null, hHp, null,
+                    "[LV{level} {name} {starCode}★] HP: " + hHp, Constant.enable, null));
+            initHero++;
+        }
 
-        int heroNum = a.size();
+
         // 随机怪物出现的数量
         Random rm = new Random();
         int rmon = rm.nextInt(dungeon.getMonsterNum());
-        if ( rmon < 1 ) {
-            rmon = 6;
+        if ( rmon < 3 ) {
+            rmon = 3;
         }
-        // 怪物数量
-        int monsterNum = rmon;
-        System.out.println("怪物数量：" + monsterNum);
+        // 怪物剩余数量
+        survivingMonster = rmon;
+        int initMoster = 0;
+        while ( initMoster < rmon ){
+            // 怪物名称
+            String mname = monsters.get(initMoster).getMonsterName();
+            // 怪物等级
+            long mlevel = monsters.get(initMoster).getMonsterLevel();
+            // 获取当前怪物最大血量
+            long mMaxHP = monsters.get(initMoster).getMonsterHealth();
+//            System.out.println("[LV" + mlevel + " " + mname + "] 剩余HP: " + mMaxHP);
+//            setBattleProcess(new BattleDetailsRsp(null, null, mlevel, mname, null, null, null, mMaxHP, null,
+//                    "[LV{mlevel} {mname}] HP: " + mMaxHP, Constant.disabled, null));
+            initMoster++;
+        }
 
-        while (i < a.size()) {
-
-            // 怪物全部击杀 玩家胜利
-            if (monsterNum < 1) {
-                // 战斗状态 2为玩家胜利
-                status = 2;
-                break;
-            }
-            String fightContent = "";
-
-            // 循环攻击每只怪物
-            for (int m = 0; m < rmon; m++) {
-                // 怪物全部击杀 玩家胜利
-                if (monsterNum < 1) {
+        int h = 1;// 回合数
+        while (true){
+            System.out.println("英雄剩余数量：" + survivingHero);
+            System.out.println("怪物剩余数量：" + survivingMonster);
+            System.out.println("---------------第" + h + "回合---------------");
+            System.out.println("探索中...");
+            setBattleProcess(new BattleDetailsRsp(null, null, null, null, null, null,
+                    null, null, null, "探索中...", Constant.enable, null));
+            System.out.println("怪物出现了,接近中...");
+            setBattleProcess(new BattleDetailsRsp(null,null, null, null, null, null, null, null, null,
+                    "怪物出现了,接近中...", Constant.disabled, null));
+            // 玩家攻击怪物
+            int hero = 0;
+            while ( hero < survivingHero ){
+                // 开始攻击
+                HAttackM(heros.get(hero), dungeon, hero);
+                // 怪物全部死亡，玩家阵营胜利
+                if ( survivingMonster < 1) {
+                    combatStatus = 2;
+                    System.out.println("怪物全部击杀 战斗胜利");
+                    setBattleProcess(new BattleDetailsRsp(null, null, null, null, null, null,
+                            null, null, null, "怪物全部击杀 战斗胜利", Constant.enable, null));
                     break;
                 }
-                // 玩家英雄全部被击杀 玩家失败
-                if(heroNum < 1) break;
-                Double skillDamage = 0.0;
-                // 获取玩家普通攻击
-                long attackDamag = a.get(i).getAttackDamage();
-                if (a.get(i).getSkillDamageBonusHero() != null) {
-                    // 获取法攻英雄技能伤害
-                    skillDamage = a.get(i).getSkillFixedDamage() + (attackDamag * (a.get(i).getSkillDamageBonusHero()));
-
-                } else if (a.get(i).getSkillDamageBonusEquip() != null) {
-                    // 获取物攻英雄技能伤害
-                    skillDamage = a.get(i).getSkillFixedDamage() + (a.get(i).getEquipAttackDamage() * (a.get(i).getSkillDamageBonusEquip()));
+                hero++;
+            }
+            if ( combatStatus == 2) break;
+            // 怪物攻击玩家
+            int mos = 0;
+            while ( mos < survivingMonster){
+                MAttackH(monsters.get(mos), dungeon, mos);
+                // 英雄全部死亡，玩家阵营失败
+                if ( survivingHero < 1 ) {
+                    combatStatus = 4;
+                    System.out.println("英雄全部被击杀 战斗失败");
+                    setBattleProcess(new BattleDetailsRsp(null, null,null, null, null, null,
+                            null, null, null, "英雄全部阵亡 战斗失败", Constant.enable, null));
+                    break;
                 }
+                mos++;
+            }
+            if ( combatStatus == 4 ) break;
+            h++;
+        }
+    }
 
-                // 怪物名称
-                String mName = monsters.get(m).getMonsterName();
-                // 怪物等级
-                long mLevel = monsters.get(m).getMonsterLevel();
+    /**
+     * 累加属性
+     */
+    private void attributeAdd(AttributeEntity a, int i) {
+        // 装备血量
+        long hMAXHPEQ = a.getEquipHealth() != null ? a.getEquipHealth() : 0;
+        // 将装备血量累加到英雄身上
+        hMAXHPEQ = a.getHp() + hMAXHPEQ;
+        heros.get(i).setHp(hMAXHPEQ);
+        heros.get(i).setMaxHp(hMAXHPEQ);
+        heros.get(i).setAddMaxHp(hMAXHPEQ);
 
-                // 获取当前怪物最大血量
-                long mMaxHP = monsters.get(m).getMonsterHealth();
-                // 获取怪物最新血量
-                long mHP = monsters.get(m).getMonsterHealth();
-                // 获取怪物恢复血量
-                long mHPRegen = monsters.get(m).getMonsterHealthRegen();
-                // 获取怪物护甲
-                long mArmor = monsters.get(m).getMonsterArmor();
-                // 获取怪物魔抗
-                long mMagicResist = monsters.get(m).getMonsterMagicResist();
+        // 装备魔法值
+        long hMAXMPEQ = a.getEquipMana() != null ? a.getEquipMana() : 0;
+        // 将装备魔法值累加到英雄身上
+        hMAXMPEQ = a.getMp() + hMAXMPEQ;
+        heros.get(i).setMp(hMAXMPEQ);
+        heros.get(i).setMaxMp(hMAXMPEQ);
+        // 装备普攻
+        long attackDamagEQ = a.getEquipAttackDamage() != null ? a.getEquipAttackDamage() : 0;
+        // 将装备普攻累加到英雄身上
+        attackDamagEQ = a.getAttackDamage() + attackDamagEQ;
+        heros.get(i).setAttackDamage(attackDamagEQ);
+        // 装备法功
+        long attackSpellEQ = a.getEquipAttackSpell() != null ? a.getEquipAttackSpell() : 0;
+        // 将装备法功累加到英雄上
+        attackSpellEQ = a.getAttackSpell() + attackSpellEQ;
+        heros.get(i).setAttackSpell(attackSpellEQ);
+        // 装备护甲
+        long armorEQ = a.getEquipArmor() != null ? a.getEquipArmor() : 0;
+        // 将装备护甲累加到英雄上
+        armorEQ = a.getArmor() + armorEQ;
+        heros.get(i).setArmor(armorEQ);
+        // 装备魔抗
+        long magicResistEQ = a.getEquipMagicResist() != null ? a.getEquipMagicResist() : 0;
+        // 将装备魔抗累加到英雄上
+        magicResistEQ = a.getMagicResist() + magicResistEQ;
+        heros.get(i).setMagicResist(magicResistEQ);
+    }
 
-                // 英雄等级
-                long hLevel = a.get(i).getHeroLevel();
-                // 英雄星级
-                long hStar = a.get(i).getHeroStar();
-                // 英雄名称
-                String hName = a.get(i).getHeroName();
-                // 英雄血量
-                long hMAXHP = a.get(i).getHp();
-                System.out.println("突然" + "[LV" + mLevel + " " + mName + "] 向你发起了进攻" + " 开始战斗:");
-                setBattleProcess(new BattleDetailsRsp(null,null, mLevel, mName, null, null, null, null, null,
-                        "突然[LV{mLevel} {mName}] 向你发起了进攻 开始战斗:", Constant.disabled, null));
+    /**
+     * 玩家英雄攻击怪物
+     * @param a
+     * @param dungeon
+     * @param index
+     */
+    private void HAttackM(AttributeEntity a, GmDungeonConfigEntity dungeon, int index){
+        //======================玩家英雄信息====================
+        // 英雄等级
+        long hLevel = a.getHeroLevel();
+        // 英雄星级
+        long hStar = a.getHeroStar();
+        // 英雄名称
+        String hName = a.getHeroName();
+        // 英雄血量
+        long hHp = a.getHp();
+        // 英雄魔法值
+        long hMP = a.getMp();
+        // 英雄最大魔法值
+        long hMaxMP = a.getMaxMp();
 
-                System.out.println("[LV" + mLevel + " " + mName + "] 血量为" + mMaxHP);
-                setBattleProcess(new BattleDetailsRsp(null, null, mLevel, mName, null, null, null, mMaxHP, null,
-                        "[LV{mLevel} {mName}] 血量为" + mMaxHP, Constant.disabled, null));
+        Double skillDamage = 0.0;
+        // 英雄普攻
+        long attackDamag = a.getAttackDamage();
+        // 英雄法功
+        long attackSpell = a.getAttackSpell() != null ? a.getAttackSpell() : 0;
+        // 英雄技能恢复血量
+        long hSkillHp = 0L;
+        if (a.getSkillDamageBonusHero() != null) {
+            // 获取物攻英雄技能伤害
+            skillDamage = a.getSkillFixedDamage() + (attackDamag * (a.getSkillDamageBonusHero() / 10));
+        } else if (a.getSkillDamageBonusEquip() != null) {
+            // 获取法攻英雄技能伤害
+            skillDamage = a.getSkillFixedDamage() + (attackSpell * (a.getSkillDamageBonusEquip() / 10));
+            hSkillHp = (long) (a.getSkillFixedDamage() + (attackSpell * (a.getSkillDamageBonusEquip() / 10)));
+        }
 
-                System.out.println("[LV" + hLevel + " " + hName + " " + hStar + "★] 血量为" + hMAXHP);
-                setBattleProcess(new BattleDetailsRsp(hLevel, hName, null, null, hStar, null, null, hMAXHP, null,
-                        "[LV{level} {name} {starCode}★] 血量为" + hMAXHP, Constant.enable, null));
-                while (true) {
-                    // 存放普功+技能伤害
-                    long at1 = (attackDamag - (mArmor + mMagicResist));
-                    long at2 = (long) ((attackDamag * 1.5) - (mArmor + mMagicResist));
-                    long at3 = (long) (skillDamage - (mArmor + mMagicResist));
-                    long[] skillHarm = {at1, at1, at1, at2, at2, at3};
-                    //随机普功、技能
-                    Random rk = new Random();
-                    int ras = rk.nextInt(skillHarm.length);
+        //======================怪物信息======================
+        // 随机某个位置的怪物
+//        Random rm = new Random();
+//        int attM = rm.nextInt(survivingMonster);
+//        if ( attM < 1 ) {
+//            attM = 0;
+//        }
+        int attM = survivingMonster - 1;
+        // 怪物名称
+        String mname = monsters.get(attM).getMonsterName();
+        // 怪物等级
+        long mlevel = monsters.get(attM).getMonsterLevel();
+        // 获取当前怪物最大血量
+        long mMaxHP = monsters.get(attM).getMonsterHealth();
+        // 获取怪物最新血量
+        long mHP = monsters.get(attM).getMonsterHealth();
+        // 获取怪物恢复血量
+        long mHPRegen = monsters.get(attM).getMonsterHealthRegen();
+        // 获取怪物护甲
+        long mArmor = monsters.get(attM).getMonsterArmor();
+        // 获取怪物魔抗
+        long mMagicResist = monsters.get(attM).getMonsterMagicResist();
 
-                    if (mHP >= 0) {
-                        if (skillHarm[ras] < 1) {
-                            skillHarm[ras] = 0;
-                        }
-                        mHP = mHP - skillHarm[ras];
-                        mHP = mHP < 1 ? 0 : mHP;
-                        String skillName = "【普通攻击】";
-                        if (ras == 5) {
-                            skillName = "【" + a.get(i).getSkillName() + "】";
-                        }
-                        // 回合数统计
-                        totalFightNum ++;
 
-                        System.out.println("[LV" + hLevel + " " + hName + " " + hStar + "★]" + "使用" + skillName + "对[LV" + mLevel + " " + mName + "]造成" + skillHarm[ras] + "的伤害，[LV" + mLevel + " " + mName + "]剩余" + (mHP < 1 ? 0 : mHP) + "的血量");
-                        setBattleProcess(new BattleDetailsRsp(hLevel, hName, mLevel, mName, hStar, skillName,
-                                skillHarm[ras], mHP, null,
-                                "[LV{level} {name} {starCode}★]使用{skillName}对[LV{mLevel} {mName}]造成{dealDamage}的伤害，[LV{mLevel} {mName}]剩余{HP}的血量", Constant.enable, null));
+        // 普攻伤害
+        long at1 = (attackDamag - (mArmor + mMagicResist));
+        // 技能伤害
+        long at3 = (long) (skillDamage - (mArmor + mMagicResist));
+        // 存放普功+技能伤害
+        long[] skillHarm = {at1, at1, at1, at1, at1, at3};
+        //随机普功、技能
+        Random rk = new Random();
+        int ras = rk.nextInt(skillHarm.length);
+        String skillName = "[普通攻击]";
+        String skillDescription = a.getSkillDescription();
+        // 怪物血量大于0执行
+        if (mHP >= 0) {
+            // 随机的技能位置不能为负数
+            if (skillHarm[ras] < 1) {
+                skillHarm[ras] = 0;
+            }
 
-                        // 怪物随机触发被动恢复血量
-                        Random rbhp = new Random();
-                        int backHp = rbhp.nextInt(99);
-                        if (mHP > 0) {
-                            if (backHp % 3 == 0) {
-                                long addhp = addHP(mHP, mHPRegen);
-                                mHP = addhp > mMaxHP ? mMaxHP : addhp; // 恢复的HP
+            // 攻击内容
+            String attContent = "[LV{level} {name} {starCode}★] 释放 ";
+            String attContentLog = "[LV" + hLevel + " " + hName + " " + hStar + "★] 释放 ";
 
-                                System.out.println("[LV" + mLevel + " " + mName + "]" + "触发被动，恢复了" + mHPRegen + "的血量，" + "剩余" + (addhp) + "的血量");
-                                setBattleProcess(new BattleDetailsRsp(null, null, mLevel, mName, null, null,null, addhp, mHP,
-                                        "[LV{mLevel} {mName}]触发被动，恢复了{HPRegen}的血量，" + "剩余{HP}的血量", Constant.disabled, null));
+            // 低于当前释放技能所需MP 直接改为释放普攻
+            double MPPerTime = hMaxMP * 0.2;
+            if (hMP < MPPerTime) {
+                System.out.println("MP不足，释放普攻");
+                ras = 0;
+            }
+            // ras=5 攻击方式为技能
+            if (ras == 5) {
+                // 消耗MP
+                hMP = (long) (hMP - MPPerTime);
+                heros.get(index).setMp(hMP);
+
+                // 技能名称
+                skillName = "[" + a.getSkillName() + "]";
+
+                attContent += "{skillName}";
+                attContentLog += skillName;
+
+                // 输出英雄
+                if ( Constant.SkillType.TYPE0.getValue().equals(a.getSkillType()) ) {
+                    mHP = mHP - skillHarm[ras];
+                    mHP = mHP < 1 ? 0 : mHP;
+                    attContent += " 对[LV{mlevel} {mname}]造成{dealDamage}的伤害，[LV{mlevel} {mname}]剩余{HP}HP";
+                    attContentLog += " 对[LV" + mlevel + " " + mname + "]造成" + skillHarm[ras] + "的伤害，[LV" + mlevel + " " + mname + "]剩余" + (mHP < 1 ? 0 : mHP) + "HP";
+                } else if ( Constant.SkillType.TYPE1.getValue().equals(a.getSkillType()) ||
+                        Constant.SkillType.TYPE2.getValue().equals(a.getSkillType()) ) {// 辅助类英雄
+                    // 对单体英雄或全体英雄恢复血量或血量加成
+                    int huifu = 0;
+                    while ( huifu < heros.size() ) {
+                        // 全体玩家恢复生命值技能
+                        if ( Constant.SkillType.TYPE1.getValue().equals(a.getSkillType()) ) {
+
+                            long hp = heros.get(huifu).getHp();// 获取英雄的生命值
+                            long addhp = addHP(hp, hSkillHp);
+                            addhp = addhp > hp ? hp : addhp;// 恢复的HP
+                            heros.get(huifu).setHp(addhp);
+                            attContent += " 全体英雄恢复HP:" + addhp;
+                            attContentLog += " 全体英雄恢复HP:" + addhp;
+
+                        } else if ( Constant.SkillType.TYPE2.getValue().equals(a.getSkillType()) ) {// 玩家属性加成技能
+                            // 随机给某个英雄释放辅助技能
+                            Random rdSUP = new Random();
+                            int supNum = rdSUP.nextInt(heros.size());
+                            supNum = supNum < 1 ? 0 : supNum;
+                            // 英雄等级
+                            long hLevelSUP = heros.get(supNum).getHeroLevel();
+                            // 英雄星级
+                            long hStarSUP = heros.get(supNum).getHeroStar();
+                            // 英雄名称
+                            String hNameSUP = heros.get(supNum).getHeroName();
+                            if ( heros.get(supNum).getMaxHp().equals(heros.get(supNum).getAddMaxHp()) ) {
+                                long hp = heros.get(supNum).getHp();// 获取英雄的生命值
+                                long addhp = addHP(hp, hSkillHp);
+                                heros.get(supNum).setHp(addhp);
+                                heros.get(supNum).setAddMaxHp(addhp);
                             }
+                            attContent += "对[LV" + hLevelSUP + " " + hNameSUP + " " + hStarSUP + "★] 额外增加HP" + hSkillHp;
+                            attContentLog += "对[LV" + hLevelSUP + " " + hNameSUP + " " + hStarSUP + "★] 额外增加HP" + hSkillHp;
+                            huifu = heros.size();
                         }
-
-                        // 怪物死亡 血量为0
-                        if (mHP <= 0) {
-                            monsterNum--;
-                            EXP = EXP + monsters.get(m).getMonsterExp();
-                            System.out.println("[LV" + hLevel + hName + " " + hStar + "★]" + "击杀了[LV" + mLevel + " " + mName + "]");
-                            setBattleProcess(new BattleDetailsRsp(null, null, mLevel, mName, null, null, null, null, null,
-                                    "[LV{level} {name} {starCode}★]击杀了[LV{mLevel} {mName}]", Constant.disabled, null));
-
-                            System.out.println("怪物剩余量:" + monsterNum);
-                            break;
-                        }
-
-                        // 怪物反击玩家英雄
-                        long atkHeroStatus = attckHero(monsters.get(m),a.get(i));
-                        if (atkHeroStatus == 4) {
-                            i++;
-                            heroNum--;
-                            if(heroNum < 1) break;
-                        }
-
+                        huifu++;
                     }
                 }
+            } else {
+                attContent += "{skillName}";
+                attContentLog += skillName;
+                mHP = mHP - skillHarm[ras];
+                mHP = mHP < 1 ? 0 : mHP;
+                attContent += " 对[LV{mlevel} {mname}]造成{dealDamage}的伤害，[LV{mlevel} {mname}]剩余{HP}HP";
+                attContentLog += " 对[LV" + mlevel + " " + mname + "]造成" + skillHarm[ras] + "的伤害，[LV" + mlevel + " " + mname + "]剩余" + (mHP < 1 ? 0 : mHP) + "HP";
+            }
+
+            monsters.get(attM).setMonsterHealth(mHP);
+
+            System.out.println(attContentLog);
+            setBattleProcess(new BattleDetailsRsp(hLevel, hName, mlevel, mname, hStar, skillName,
+                    skillHarm[ras], mHP, null,
+                    attContent, Constant.enable, null));
+
+            // 怪物随机触发被动恢复血量
+            Random rbhp = new Random();
+            int backHp = rbhp.nextInt(99);
+            if (mHP > 0) {
+                if (backHp % 3 == 0) {
+                    long addhp = addHP(mHP, mHPRegen);
+                    mHP = addhp > mMaxHP ? mMaxHP : addhp; // 恢复后的HP
+
+                    System.out.println("[LV" + mlevel + " " + mname + "]" + "触发被动，恢复了" + mHPRegen + "HP，" + "剩余" + (mHP) + "HP");
+                    setBattleProcess(new BattleDetailsRsp(null, null, mlevel, mname, null, null,null, mHP, mHPRegen,
+                            "[LV{mlevel} {mname}]触发被动，恢复了{HPRegen}HP，" + "剩余{HP}HP", Constant.disabled, null));
+                }
+            }
+
+            // 怪物死亡 血量为0
+            if (mHP <= 0) {
+                survivingMonster--;
+                EXP = EXP + monsters.get(attM).getMonsterExp();
+                System.out.println("[LV" + hLevel + hName + " " + hStar + "★]" + "击杀了[LV" + mlevel + " " + mname + "]");
+                setBattleProcess(new BattleDetailsRsp(hLevel, hName, mlevel, mname, hStar, null, null, null, null,
+                        "[LV{level} {name} {starCode}★]击杀了[LV{mlevel} {mname}]", Constant.disabled, null));
+
+                System.out.println("怪物剩余量: " + survivingMonster);
             }
         }
-
-        // 玩家英雄全部被击杀 玩家失败
-        if(heroNum < 1) {
-            status = 4;
-            System.out.println("英雄全部被击杀 战斗失败");
-            setBattleProcess(new BattleDetailsRsp(null, null,null, null, null, null,
-                    null, null, null, "英雄全部被击杀 战斗失败", Constant.enable, null));
-        }
-        System.out.println("回合数："+totalFightNum);
-        return status;
     }
 
-    // 恢复血量
-    private long addHP(long HP, long HpRegen){
-        return HP + HpRegen;
-    }
-    private long attckHero(GmMonsterConfigEntity a, AttributeEntity b){
-        long status = 0;
+    /**
+     * 怪物攻击玩家英雄
+     * @param m
+     * @param dungeon
+     * @param index
+     */
+    private void MAttackH(GmMonsterConfigEntity m, GmDungeonConfigEntity dungeon, int index){
+        // 随机某个位置的英雄
+//        Random rm = new Random();
+//        int attH = rm.nextInt(survivingHero);
+//        if ( attH < 1 ) {
+//            attH = 0;
+//        }
+        int attH = survivingHero - 1;
+        //======================玩家英雄信息====================
         // 英雄名称
-        String hName = b.getHeroName();
+        String hName = heros.get(attH).getHeroName();
         // 英雄等级
-        long hLevel = b.getHeroLevel();
+        long hLevel = heros.get(attH).getHeroLevel();
         // 当前英雄最大血量
-        long hMaxHP = b.getHp();
+        long hMaxHP = heros.get(attH).getHp();
         // 英雄最新血量
-        long hHP = b.getHp();
+        long hHP = heros.get(attH).getHp();
         // 英雄恢复血量
-        long hHPRegen = b.getHpRegen();
+        long hHPRegen = heros.get(attH).getHpRegen();
         // 英雄护甲
-        long hArmor = b.getArmor();
+        long hArmor = heros.get(attH).getArmor();
         // 英雄魔抗
-        long hMagicResist = b.getMagicResist();
+        long hMagicResist = heros.get(attH).getMagicResist();
         // 英雄星级
-        long hStar = b.getHeroStar();
+        long hStar = heros.get(attH).getHeroStar();
 
+        //======================怪物信息======================
         // 怪物名称
-        String mName = a.getMonsterName();
+        String mname = m.getMonsterName();
         // 怪物等级
-        long mLevel = a.getMonsterLevel();
+        long mlevel = m.getMonsterLevel();
         // 怪物普通攻击
-        long mAttackDamag = a.getMonsterAttackDamage();
+        long mAttackDamag = m.getMonsterAttackDamage();
         // 怪物的专属技能伤害
-        long uniqueSkill = mAttackDamag * a.getUniqueSkillM() - hArmor;
+        long uniqueSkill = mAttackDamag * m.getUniqueSkillM() - hArmor;
         // 怪物的致命一击伤害
-        long criticalHit = mAttackDamag * a.getCriticalHitM() - hArmor;
+        long criticalHit = mAttackDamag * m.getCriticalHitM() - hArmor;
 
         // 存放普功+技能伤害
         long at1 = (mAttackDamag - (hArmor));
@@ -629,44 +866,55 @@ public class FightCoreService {
             }
             hHP = hHP - skillHarm[ras];
             hHP = (hHP < 1 ? 0 : hHP);
-            String skillName = "【普通攻击】";
+            String skillName = "[普通攻击]";
             if (ras == 2 || ras == 3) {
-                skillName = "【专属技能】";
-            } else if (ras == 4) {
-                skillName += "触发了【致命一击】";
-            }
-
-            System.out.println("[LV" + mLevel + " " + mName + "]" + "使用" + skillName + "对[LV" + hLevel + " " + hName + " " + hStar + "★]造成" + skillHarm[ras] + "的伤害，[" + hName + "]剩余" + (hHP < 1 ? 0 : hHP) + "的血量");
-            setBattleProcess(new BattleDetailsRsp(null, null, mLevel, mName, null, skillName, skillHarm[ras], null, null,
-                    "[LV{mLevel} {mName}]使用{skillName}对[LV{level} {name} {starCode}★]造成{dealDamage}的伤害，[{name}]剩余{HP}的血量", Constant.disabled, null));
-
-            // 随机恢复血量
-            Random rbhp = new Random();
-            int backHp = rbhp.nextInt(99);
-            if (hHP > 0) {
-                if (backHp % 4 == 0) {
-                    long addhp = addHP(hHP, hHPRegen);
-                    hHP = addhp > hMaxHP ? hMaxHP : addhp; // 被击后恢复的HP
-                    System.out.println("[LV" + hLevel + " " + hName + " " + hStar + "★]" + "触发被动，恢复了" + hHPRegen + "的血量，" + "剩余" + (addhp) + "的血量");
-                    setBattleProcess(new BattleDetailsRsp(hLevel, hName, null, null, hStar, null, null, addhp, hHPRegen,
-                            "[LV{level} {name} {starCode}★]触发被动，恢复了{HPRegen}的血量，剩余{HP}的血量", Constant.enable, null));
-
+                if ( dungeon.getDungeonAward().equals(2L) ) {
+                    skillName = Constant.SkillNameM.LV2.getValue();
+                } else if ( dungeon.getDungeonAward().equals(3L) ) {
+                    skillName = Constant.SkillNameM.LV3.getValue();
+                } else if ( dungeon.getDungeonAward().equals(4L) ) {
+                    skillName = Constant.SkillNameM.LV4.getValue();
+                } else if ( dungeon.getDungeonAward().equals(5L) ) {
+                    skillName = Constant.SkillNameM.LV5.getValue();
+                } else {
+                    skillName = Constant.SkillNameM.LV1.getValue();
                 }
+            } else if (ras == 4) {
+                skillName += "触发了[致命一击]";
             }
-            b.setHp(hHP);
+
+            System.out.println("[LV" + mlevel + " " + mname + "]" + "释放" + skillName + "对[LV" + hLevel + " " + hName + " " + hStar + "★]造成" + skillHarm[ras] + "的伤害，[" + hName + "]剩余" + (hHP < 1 ? 0 : hHP) + "HP");
+            setBattleProcess(new BattleDetailsRsp(hLevel, hName, mlevel, mname, hStar, skillName, skillHarm[ras], hHP, null,
+                    "[LV{mlevel} {mname}]使用{skillName}对[LV{level} {name} {starCode}★]造成{dealDamage}的伤害，[{name}]剩余{HP}HP", Constant.disabled, null));
+
+            heros.get(attH).setHp(hHP);
 
             // 玩家英雄死亡 血量为0
             if (hHP <= 0) {
-                status = 4;
-                System.out.println("[LV" + mLevel + " " + mName + "]" + "击杀了[LV" + hLevel + " " + hName + " " + hStar + "★]");
+                survivingHero--;
+                System.out.println("[LV" + mlevel + " " + mname + "]" + "击杀了[LV" + hLevel + " " + hName + " " + hStar + "★]");
                 setBattleProcess(new BattleDetailsRsp(hLevel, hName, null, null, hStar, null, null, null, null,
-                        "[LV{mLevel} {mName}]击杀了[LV{level} {name} {starCode}★]", Constant.enable, null));
+                        "[LV{mlevel} {mname}]击杀了[LV{level} {name} {starCode}★]", Constant.enable, null));
             }
         }
-        return status;
     }
 
-    public AttributeEntity getHeroStats(long id){
+    /**
+     * HP恢复
+     * @param HP
+     * @param HpRegen
+     * @return
+     */
+    private long addHP(long HP, long HpRegen){
+        return HP + HpRegen;
+    }
+
+    /**
+     * 通过玩家英雄的等级、星级、装备获取该英雄的全部属性
+     * @param id
+     * @return
+     */
+    private AttributeEntity getHeroStats(long id){
         AttributeEntity attribute = new AttributeEntity();
 
         UserHeroEntity userHero = userHeroDao.selectOne(new QueryWrapper<UserHeroEntity>()
@@ -692,9 +940,15 @@ public class FightCoreService {
     }
 
     private UserHeroInfoRsp getUserHeroInfo(long id){
-        UserHeroEntity userHero = new UserHeroEntity();
-        userHero.setGmUserHeroId(id);
-        return userHeroDao.getUserHeroById(userHero);
+        Map<String, Object> userHeroMap = new HashMap<>();
+        userHeroMap.put("gmUserHeroId", id);
+        UserHeroEntity userHero = userHeroDao.getUserHeroById(userHeroMap);
+        if ( userHero == null ) {
+            System.out.println("英雄获取失败getUserHeroInfo");
+        }
+        UserHeroInfoRsp rsp = new UserHeroInfoRsp();
+        BeanUtils.copyProperties(rsp, userHero);
+        return rsp;
     }
 
     public List<UserHeroInfoRsp> getTeamHeroInfoList(Long teamId, TeamInfoRsp rsp){
@@ -704,46 +958,55 @@ public class FightCoreService {
             rsp = teamConfigDao.getTeamInfo(teamParams);
         }
         if (rsp == null){
-            throw new RRException("领取奖励时获取队伍信息异常");
+            throw new RRException("获取队伍信息异常");
         }
 
         // 存储英雄集合
         List<UserHeroInfoRsp> userHeroInfoRsps = new ArrayList<>();
         // 获取英雄1
-        if(rsp.getUserHero1Id() != null){
+        if(rsp.getUserHero1Id() != null && rsp.getUserHero1Id() != 0){
             userHeroInfoRsps.add(getUserHeroInfo(rsp.getUserHero1Id()));
         }
         // 获取英雄2
-        if(rsp.getUserHero2Id() != null){
+        if(rsp.getUserHero2Id() != null && rsp.getUserHero2Id() != 0){
             userHeroInfoRsps.add(getUserHeroInfo(rsp.getUserHero2Id()));
         }
         // 获取英雄3
-        if(rsp.getUserHero3Id() != null){
+        if(rsp.getUserHero3Id() != null && rsp.getUserHero3Id() != 0){
             userHeroInfoRsps.add(getUserHeroInfo(rsp.getUserHero3Id()));
         }
         // 获取英雄4
-        if(rsp.getUserHero4Id() != null){
+        if(rsp.getUserHero4Id() != null && rsp.getUserHero4Id() != 0){
             userHeroInfoRsps.add(getUserHeroInfo(rsp.getUserHero4Id()));
         }
         // 获取英雄5
-        if(rsp.getUserHero5Id() != null){
+        if(rsp.getUserHero5Id() != null && rsp.getUserHero5Id() != 0){
             userHeroInfoRsps.add(getUserHeroInfo(rsp.getUserHero5Id()));
         }
 
         return userHeroInfoRsps;
     }
 
-    // 玩家点击领取奖励后系统发放奖品到玩家账户
+
+    /**
+     * 玩家点击领取奖励后系统发放奖品到玩家账户
+     * @param user
+     * @param id
+     * @return
+     */
     public FightClaimRsp claim(UserEntity user, long id) {
         FightClaimRsp rsp = new FightClaimRsp();
-
         GmCombatRecordEntity combatRecord = combatRecordDao.selectOne(new QueryWrapper<GmCombatRecordEntity>()
                 .eq("ID",id)
         );
         if (combatRecord == null){
             throw new RRException("战斗记录失效");
         }
-
+        // 校验战斗时间是否结束
+        Date now = new Date();
+        if (combatRecord.getEndTimeTs() > now.getTime()) {
+            throw new RRException("该场战斗还未完成，请等待...");
+        }
         rsp.setStatus(combatRecord.getStatus());
 
         if (Constant.enable.equals(combatRecord.getStatus())) {
@@ -802,6 +1065,58 @@ public class FightCoreService {
     }
 
     /**
+     * 更新玩家战力，队伍战力，矿工
+     * @param changePower
+     * @param user
+     * @param team
+     */
+    public void updateCombat(long changePower, long oldPower, long newPower, UserEntity user, GmTeamConfigEntity team){
+        Date now = new Date();
+        // 如果更新战力为0 则无需更新矿工 （针对不同顺序）
+        if (changePower != 0) {
+
+            // 获取玩家矿工数量
+            Long minId = getMiners(user.getUserId());
+
+            // 初始化经济平衡方法
+            initTradeBalanceParameter();
+
+            // 通过经济平衡系统更新玩家矿工
+            CalculateTradeUtil.updateMiner(BigDecimal.valueOf(changePower));
+
+            // 更新系统中保存的市场总鸡蛋
+            sysConfigService.updateValueByKey(Constant.MARKET_EGGS, CalculateTradeUtil.marketEggs.toString());
+
+            // 更新玩家矿工数据
+            GmMiningInfoEntity mini = new GmMiningInfoEntity();
+            mini.setId(minId);
+            mini.setMiners(CalculateTradeUtil.miners.toString());
+            mini.setUpdateTime(now);
+            mini.setUpdateTimeTs(now.getTime());
+            miningInfoDao.updateById(mini);
+
+            // 更新玩家战力
+            UserEntity userEntity = new UserEntity();
+            userEntity.setUserId(user.getUserId());
+            Long totalPower = (user.getTotalPower() - oldPower) + newPower;// 获取最新用户战力
+            userEntity.setTotalPower(totalPower);
+            userEntity.setUpdateTime(now);
+            userEntity.setUpdateTimeTs(now.getTime());
+            userDao.updateById(userEntity);
+        }
+
+        // 队伍战力
+        team.setTeamPower(newPower);
+        // 更新队伍
+        team.setId(team.getId());
+        team.setUpdateUser(user.getUserId());
+        team.setUpdateTime(now);
+        team.setUpdateTimeTs(now.getTime());
+        teamConfigDao.setTeamHero(team);
+    }
+
+
+    /**
      * 将json字符串转为Javabean
      *
      * @param json  json
@@ -809,7 +1124,7 @@ public class FightCoreService {
      * @param <T>   泛型对象
      * @return 目标对象
      */
-    public static <T> T json2bean(String json, Class<T> clazz) {
+    private static <T> T json2bean(String json, Class<T> clazz) {
         return JSONObject.parseObject(json, clazz);
     }
 
@@ -849,6 +1164,20 @@ public class FightCoreService {
 //        int rannum= (int)(Math.random()*(9999999-1000000 + 1))+ 1000000;
 //        System.out.println(Arith.UUID20());
 
+        int num = 0;
+        int i =0;
+        while (i<100){
+            Random rd = new Random();
+            int rdEQ = rd.nextInt(99);
+            if (rdEQ % 16 == 0) {
+                num++;
+                System.out.println("爆装备了");
+            }
+            i++;
+        }
+
+
+        System.out.println("爆装数量："+ num);
 
     }
 }

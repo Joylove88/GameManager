@@ -9,6 +9,7 @@
 package com.gm.controller;
 
 
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gm.annotation.Login;
 import com.gm.annotation.LoginUser;
@@ -18,16 +19,19 @@ import com.gm.common.utils.Constant;
 import com.gm.common.utils.ExpUtils;
 import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
+import com.gm.modules.basicconfig.entity.EquipmentInfoEntity;
+import com.gm.modules.basicconfig.entity.HeroEquipmentEntity;
+import com.gm.modules.basicconfig.entity.HeroLevelEntity;
+import com.gm.modules.basicconfig.entity.HeroSkillEntity;
+import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
+import com.gm.modules.basicconfig.service.*;
 import com.gm.modules.user.entity.*;
-import com.gm.modules.user.req.FightInfoReq;
-import com.gm.modules.user.req.UseExpReq;
 import com.gm.modules.user.req.UserHeroInfoReq;
 import com.gm.modules.user.rsp.*;
 import com.gm.modules.user.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,31 +70,41 @@ public class ApiUserController {
     @Autowired
     private UserExperiencePotionService userExService;
     @Autowired
+    private HeroEquipmentService heroEquipmentService;
+    @Autowired
+    private EquipmentInfoService equipmentInfoService;
+    @Autowired
+    private EquipSynthesisItemService equipSynthesisItemService;
+    @Autowired
     private UserHeroEquipmentWearService userHeroEquipmentWearService;
     @Autowired
     private UserLevelService userLevelService;
+    @Autowired
+    private HeroLevelService heroLevelService;
+    @Autowired
+    private HeroSkillService heroSkillService;
 
     @Login
     @PostMapping("getUserHeroInfo")
     @ApiOperation("获取玩家英雄信息")
-    public R getUserHeroInfo(@LoginUser UserEntity user){
-        UserHeroEntity userHero = new UserHeroEntity();
-        userHero.setGmUserId(user.getUserId());
-        userHero.setStatus(Constant.enable);
-        List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(userHero);
+    public R getUserHeroInfo(@LoginUser UserEntity user) {
+        Map<String, Object> userHeroMap = new HashMap<>();
+        userHeroMap.put("status", Constant.enable);
+        userHeroMap.put("gmUserId", user.getUserId());
+        List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(userHeroMap);
         return R.ok().put("heroList",heroList);
     }
 
     @Login
     @PostMapping("getUserProps")
     @ApiOperation("获取玩家背包信息")
-    public R getUserProps(@LoginUser UserEntity user){
+    public R getUserProps(@LoginUser UserEntity user) {
         Map<String, Object> map = new HashMap<>();
         // 获取玩家英雄信息和穿戴的装备信息
-        UserHeroEntity userHero = new UserHeroEntity();
-        userHero.setGmUserId(user.getUserId());
-        userHero.setStatus(Constant.enable);
-        List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(userHero);
+        Map<String, Object> userHeroMap = new HashMap<>();
+        userHeroMap.put("status", Constant.enable);
+        userHeroMap.put("gmUserId", user.getUserId());
+        List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(userHeroMap);
         int i = 0;
         while (i < heroList.size()) {
             // 获取该英雄已穿戴的装备
@@ -104,7 +119,10 @@ public class ApiUserController {
         List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(user.getUserId());
         map.put("heroFragList",heroFragList);
         // 获取装备
-        List<UserEquipInfoRsp> equipmentEntities = userEquipmentService.getUserAllEquip(user.getUserId());
+        UserEquipmentEntity userEquipment = new UserEquipmentEntity();
+        userEquipment.setStatus(Constant.enable);
+        userEquipment.setGmUserId(user.getUserId());
+        List<UserEquipInfoRsp> equipmentEntities = userEquipmentService.getUserEquip(userEquipment);
         map.put("equipList",equipmentEntities);
         // 获取装备碎片
         List<UserEquipmentFragInfoRsp> equipmentFragEntities = userEquipmentFragService.getUserAllEquipFrag(user.getUserId());
@@ -173,45 +191,63 @@ public class ApiUserController {
         return R.ok().put("userInfo",rsp);
     }
 
+
     @Login
     @PostMapping("getHeroDetail")
     @ApiOperation("获取英雄详细信息")
-    public R getHeroDetail(@LoginUser UserEntity user,  @RequestBody UserHeroInfoReq req){
-        // 获取英雄
-        UserHeroEntity userHero = new UserHeroEntity();
-        userHero.setGmUserHeroId(req.getGmUserHeroId());
-        UserHeroInfoRsp rsp = userHeroService.getUserHeroById(userHero);
-
-
-        return R.ok().put("userInfo",null);
-    }
-
-    @Login
-    @PostMapping("playerUseExpForHero")
-    @ApiOperation("玩家对英雄使用经验药水功能")
-    public R playerUseExpForHero(@LoginUser UserEntity user, @RequestBody UseExpReq useExpReq) {
+    public R getHeroDetail(@LoginUser UserEntity user,  @RequestBody UserHeroInfoReq req) throws InvocationTargetException, IllegalAccessException {
         // 表单校验
-        ValidatorUtils.validateEntity(useExpReq);
-        // 经验药水数量
-        if (useExpReq.getExpNum() != null){
-        } else {
-            throw new RRException(ErrorCode.EXP_NUM_NOT_NULL.getDesc());
+        ValidatorUtils.validateEntity(req);
+        // 获取英雄
+        Map<String, Object> userHeroMap = new HashMap<>();
+        userHeroMap.put("gmUserHeroId", req.getGmUserHeroId());
+        UserHeroEntity userHero = userHeroService.getUserHeroById(userHeroMap);
+        if ( userHero == null ) {
+            System.out.println("获取玩家英雄失败");
         }
-        // 药水稀有度
-        if (StringUtils.isNotBlank(useExpReq.getExpRare())){
-            // 参数安全校验 防止注入攻击;
-            if(ValidatorUtils.securityVerify(useExpReq.getExpRare())){
-                throw new RRException(ErrorCode.EXP_RARE_NOT_NULL.getDesc());
-            }
-        } else {
-            throw new RRException(ErrorCode.EXP_RARE_NOT_NULL.getDesc());
+        UserHeroInfoRsp rsp = new UserHeroInfoRsp();
+        BeanUtils.copyProperties(rsp, userHero);
+        // 获取英雄等级信息
+        HeroLevelEntity heroLevel = heroLevelService.getById(userHero.getGmHeroLevelId());
+        if (heroLevel == null){
+            throw new RRException(ErrorCode.EXP_GET_FAIL.getDesc());
         }
-        UserExperiencePotionEntity userEXP = new UserExperiencePotionEntity();
-        userEXP.setGmUserId(user.getUserId());
-        userEXP.setExPotionRareCode(useExpReq.getExpRare());
-        userEXP.setUserExNum(useExpReq.getExpNum());
-        userEXP.setGmUserHeroId(userEXP.getGmUserHeroId());
-        userExService.userHeroUseEx(userEXP);
-        return R.ok();
+        // 晋级到下一级所需经验值
+        rsp.setPromotionExperience(heroLevel.getGmPromotionExperience());
+        // 当前等级获取的经验值
+        rsp.setCurrentExp(ExpUtils.getCurrentExp(heroLevel.getGmExperienceTotal(), heroLevel.getGmPromotionExperience(), user.getExperienceObtain()));
+        // 获取系统全部装备
+        Map<String, Object> equipMap = new HashMap<>();
+        equipMap.put("STATUS", Constant.enable);
+        List<EquipmentInfoEntity> equipments = equipmentInfoService.getEquipmentInfos(equipMap);
+        // 获取英雄装备栏
+        Map<String, Object> heroEquipMap = new HashMap<>();
+        heroEquipMap.put("status",  Constant.enable);
+        heroEquipMap.put("gmHeroId",  rsp.getGmHeroId());
+        List<HeroEquipmentEntity> heroEquipments = heroEquipmentService.getHeroEquipments(heroEquipMap);
+        JSONArray jsonArray = new JSONArray();
+        for ( HeroEquipmentEntity heroEquipment : heroEquipments ) {
+            // 获取英雄已激活/未激活装备
+            jsonArray.add(equipmentInfoService.updateEquipJson2(heroEquipment.getGmEquipId(),equipments, rsp));
+
+        }
+        // 获取英雄技能
+        Map<String, Object> skillMap = new HashMap<>();
+        skillMap.put("status", Constant.enable);
+        skillMap.put("gmHeroStarId", userHero.getGmHeroStarId());
+        HeroSkillEntity heroSkill = heroSkillService.getHeroSkill(skillMap);
+        if ( heroSkill == null ) {
+            System.out.println("英雄技能获取失败");
+        }
+        HeroSkillRsp skillRsp = new HeroSkillRsp();
+        BeanUtils.copyProperties(skillRsp,heroSkill);
+
+        rsp.setHeroSkillRsp(skillRsp);
+
+        Map<String, Object> map = new HashMap();
+        map.put("heroInfo", rsp);
+        map.put("equipments", jsonArray);
+        return R.ok().put("data",map);
     }
+
 }

@@ -46,15 +46,34 @@
     <!--获取玩家英雄穿戴中的装备-->
     <select id="getUserWearEQ" resultType="com.gm.modules.user.rsp.UserHeroEquipmentWearRsp">
         SELECT
-            A.*,
-            B2.*
+            A.GM_USER_HERO_EQUIPMENT_WEAR_ID,
+            A.GM_HERO_ID,
+            A.GM_USER_EQUIP_ID,
+            A.GM_USER_HERO_ID,
+            B.GM_EQUIPMENT_ID,
+            A.PARENT_EQUIP_CHAIN,
+            A.`STATUS`,
+            B2.EQUIP_NAME,
+            B2.EQUIP_RARECODE,
+            B2.EQUIP_LEVEL,
+            B2.EQUIP_IMG_URL,
+            B2.EQUIP_ICON_URL,
+            B.EQUIP_POWER,
+            B.EQUIP_HEALTH,
+            B.EQUIP_HEALTH_REGEN,
+            B.EQUIP_MANA,
+            B.EQUIP_MANA_REGEN,
+            B.EQUIP_ARMOR,
+            B.EQUIP_MAGIC_RESIST,
+            B.EQUIP_ATTACK_DAMAGE,
+            B.EQUIP_ATTACK_SPELL
         FROM
             gm_user_hero_equipment_wear A
         LEFT JOIN
                 gm_user_equipment B ON A.GM_USER_EQUIP_ID = B.GM_USER_EQUIPMENT_ID
         LEFT JOIN
                 GM_EQUIPMENT_INFO B2 ON B.GM_EQUIPMENT_ID = B2.EQUIP_ID
-        WHERE A.STATUS = '1' AND B.STATUS = '1' AND B2.STATUS = '1' AND GM_USER_HERO_ID = #{userHeroId}
+        WHERE A.STATUS = '1' AND B.STATUS = '1' AND GM_USER_HERO_ID = #{userHeroId}
     </select>
 
 

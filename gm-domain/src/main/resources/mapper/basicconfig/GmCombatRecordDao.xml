@@ -22,5 +22,20 @@
         <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
     </resultMap>
 
-
+    <!--获取某个队伍当前时间战斗中的记录-->
+    <select id="getCombatRecordNow" resultType="com.gm.modules.basicconfig.entity.GmCombatRecordEntity">
+        SELECT
+        *
+        FROM
+        gm_combat_record
+        <where>
+            END_TIME > NOW()
+            <if test="userId != null and userId != ''">
+                AND USER_ID = #{userId}
+            </if>
+            <if test="teamId != null and teamId != ''">
+                AND TEAM_ID = #{teamId}
+            </if>
+        </where>
+    </select>
 </mapper>

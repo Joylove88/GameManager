@@ -1,13 +1,12 @@
 package com.gm.modules.user.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -22,15 +21,15 @@ public interface UserHeroDao extends BaseMapper<UserHeroEntity> {
 
 	/**
 	 * 获取玩家英雄
-	 * @param userHeroEntity
+	 * @param map
 	 * @return
 	 */
-	List<UserHeroInfoRsp> getUserAllHero(UserHeroEntity userHeroEntity);
+	List<UserHeroInfoRsp> getUserAllHero(Map<String, Object> map);
 
 	/**
 	 * 获取玩家英雄指定的英雄
-	 * @param userHeroEntity
+	 * @param map
 	 * @return
 	 */
-	UserHeroInfoRsp getUserHeroById(UserHeroEntity userHeroEntity);
+	UserHeroEntity getUserHeroById(Map<String, Object> map);
 }

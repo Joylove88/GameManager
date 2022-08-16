@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.basicconfig.entity.GmCombatRecordEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +17,12 @@ import java.util.Map;
 public interface GmCombatRecordService extends IService<GmCombatRecordEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 获取某个队伍当前时间战斗中的记录
+     * @param params
+     * @return
+     */
+    List<GmCombatRecordEntity> getCombatRecordNow(Map<String, Object> params);
 }
 

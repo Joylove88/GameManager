@@ -39,6 +39,14 @@ public class HeroSkillEntity implements Serializable {
 	 */
 	private Long skillStarLevel;
 	/**
+	 * 魔法值消耗
+	 */
+	private Long skillMp;
+	/**
+	 * 技能类型（0：输出，1：辅助）
+	 */
+	private String skillType;
+	/**
 	 * 技能位置
 	 */
 	private Integer skillSolt;

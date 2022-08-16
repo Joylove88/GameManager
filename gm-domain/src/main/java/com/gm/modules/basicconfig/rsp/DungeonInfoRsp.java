@@ -1,13 +1,9 @@
 package com.gm.modules.basicconfig.rsp;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.gm.modules.user.rsp.UserHeroInfoRsp;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -76,5 +72,9 @@ public class DungeonInfoRsp implements Serializable {
 	 */
 	private TeamInfoInBattleRsp teamInfoInBattleRsps = null;
 
+	/**
+	 * 装备集合
+	 */
+	private List<EquipmentInfoRsp> equipmentInfoRsps = new ArrayList<>();
 
 }

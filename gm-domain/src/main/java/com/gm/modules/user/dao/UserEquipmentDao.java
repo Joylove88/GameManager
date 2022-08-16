@@ -19,8 +19,8 @@ public interface UserEquipmentDao extends BaseMapper<UserEquipmentEntity> {
 
     /**
      * 获取装备
-     * @param userId
+     * @param userEquipmentEntity
      * @return
      */
-    List<UserEquipInfoRsp> getUserAllEquip(Long userId);
+    List<UserEquipInfoRsp> getUserEquip(UserEquipmentEntity userEquipmentEntity);
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -32,7 +33,7 @@ public class UserHeroEntity implements Serializable {
 	/**
 	 * NFTID
 	 */
-	private Long nftId;
+	private BigDecimal nftId;
 	/**
 	 * 用户获得的英雄ID
 	 */
@@ -95,8 +96,36 @@ public class UserHeroEntity implements Serializable {
 	@TableField(exist = false)
 	private String userName;
 	@TableField(exist = false)
-	private Long gmStarCode;
-	@TableField(exist = false)
 	private String gmLevelName;
+	/**
+	 * 英雄星级
+	 */
+	@TableField(exist = false)
+	private String gmStarCode;
+	/**
+	 * 英雄等级编码
+	 */
+	@TableField(exist = false)
+	private String gmLevelCode;
+	/**
+	 * 英雄图片地址
+	 */
+	@TableField(exist = false)
+	private String heroImgUrl;
+	/**
+	 * 英雄图标地址
+	 */
+	@TableField(exist = false)
+	private String heroIconUrl;
+	/**
+	 * 英雄龙骨地址
+	 */
+	@TableField(exist = false)
+	private String heroKeelUrl;
+	/**
+	 * 英雄描述
+	 */
+	@TableField(exist = false)
+	private String heroDescription;
 
 }

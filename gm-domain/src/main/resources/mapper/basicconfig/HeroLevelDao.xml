@@ -20,6 +20,7 @@
         <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
     </resultMap>
 
+    <!--通过玩家英雄经验值匹配英雄等级信息-->
     <select id="getHeroLevel" resultType="com.gm.modules.basicconfig.entity.HeroLevelEntity">
         SELECT * FROM GM_HERO_LEVEL
         WHERE GM_DELETED = '0' AND GM_EXPERIENCE_TOTAL &lt;= #{gmExperienceTotal}

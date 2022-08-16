@@ -61,6 +61,7 @@
     <select id="getUserAllHero" resultType="com.gm.modules.user.rsp.UserHeroInfoRsp">
         SELECT
         A.GM_USER_HERO_ID,
+        A.GM_HERO_STAR_ID,
         A.EXPERIENCE_OBTAIN,
         A.HERO_POWER,
         C.HERO_NAME,
@@ -93,11 +94,9 @@
         </where>
     </select>
     <!--获取玩家英雄指定的英雄-->
-    <select id="getUserHeroById" resultType="com.gm.modules.user.rsp.UserHeroInfoRsp">
+    <select id="getUserHeroById" resultType="com.gm.modules.user.entity.UserHeroEntity">
         SELECT
-        A.GM_USER_HERO_ID,
-        A.EXPERIENCE_OBTAIN,
-        A.HERO_POWER,
+        A.*,
         C.HERO_NAME,
         C.HERO_IMG_URL,
         C.HERO_ICON_URL,
@@ -118,6 +117,9 @@
         <where>
             <if test="status != null and status != ''">
                 AND A.`STATUS` = #{status}
+            </if>
+            <if test="gmUserId != null and gmUserId != ''">
+                AND A.GM_USER_ID = #{gmUserId}
             </if>
             <if test="gmUserHeroId != null and gmUserHeroId != ''">
                 AND A.GM_USER_HERO_ID = #{gmUserHeroId}

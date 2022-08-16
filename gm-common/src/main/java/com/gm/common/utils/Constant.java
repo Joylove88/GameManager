@@ -319,17 +319,20 @@ public class Constant {
         DRAW8(8),
         DRAW9(9),
         DRAW10(10);
-        private long value;
+        private int value;
 
-        DrawNum(long value) {
+        DrawNum(int value) {
             this.value = value;
         }
 
-        public long getValue() {
+        public int getValue() {
             return value;
         }
     }
 
+    /**
+     * 战斗状态
+     */
     public enum BattleState {
         BATTLE0("0"), // 未战斗
         BATTLE1("1"), // 战斗中
@@ -337,6 +340,66 @@ public class Constant {
         private String value;
 
         BattleState(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 技能类型
+     */
+    public enum SkillType {
+        TYPE0("0"), // 输出
+        TYPE1("1"), // 恢复
+        TYPE2("2"); // 加成
+        private String value;
+
+        SkillType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 怪物技能名称
+     */
+    public enum SkillNameM {
+        LV1("[暗影一击]"), // 一级副本怪物专属技能
+        LV2("[梦魇诅咒]"), // 二级副本怪物专属技能
+        LV3("[狱火炼魂]"), // 三级副本怪物专属技能
+        LV4("[邪龙之怒]"), // 四级副本怪物专属技能
+        LV5("[神技·九天神雷]"); // 五级副本怪物专属技能
+
+        private String value;
+
+        SkillNameM(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 装备稀有度
+     */
+    public enum RareCode {
+        rareCode1("1"), // 稀有度白色
+        rareCode2("2"), // 稀有度绿色
+        rareCode3("3"), // 稀有度蓝色
+        rareCode4("4"), // 稀有度紫色
+        rareCode5("5"); // 稀有度橙色
+
+        private String value;
+
+        RareCode(String value) {
             this.value = value;
         }
 

@@ -114,7 +114,7 @@ public class GmDungeonConfigController extends AbstractController{
     @RequestMapping("/testFight")
     public R useEx(@RequestBody GmDungeonConfigEntity gmDungeonConfig){
         UserEntity user = userService.getById(1508401841157644289L);
-        fightCoreService.attck(user, null);
+        fightCoreService.initAttack(user, null);
         return R.ok();
     }
 

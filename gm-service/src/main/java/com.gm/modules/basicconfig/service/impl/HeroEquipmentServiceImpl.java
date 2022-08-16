@@ -1,6 +1,9 @@
 package com.gm.modules.basicconfig.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,7 +18,8 @@ import com.gm.modules.basicconfig.service.HeroEquipmentService;
 
 @Service("heroEquipmentService")
 public class HeroEquipmentServiceImpl extends ServiceImpl<HeroEquipmentDao, HeroEquipmentEntity> implements HeroEquipmentService {
-
+    @Autowired
+    private HeroEquipmentDao heroEquipmentDao;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<HeroEquipmentEntity> page = this.page(
@@ -24,6 +28,11 @@ public class HeroEquipmentServiceImpl extends ServiceImpl<HeroEquipmentDao, Hero
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<HeroEquipmentEntity> getHeroEquipments(Map<String, Object> map) {
+        return heroEquipmentDao.getHeroEquipments(map);
     }
 
 }

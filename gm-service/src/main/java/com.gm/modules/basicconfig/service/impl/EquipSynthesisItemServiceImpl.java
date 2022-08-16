@@ -27,6 +27,8 @@ import com.gm.modules.basicconfig.service.EquipSynthesisItemService;
 public class EquipSynthesisItemServiceImpl extends ServiceImpl<EquipSynthesisItemDao, EquipSynthesisItemEntity> implements EquipSynthesisItemService {
     @Autowired
     private EquipmentInfoDao equipmentInfoDao;
+    @Autowired
+    private EquipSynthesisItemDao equipSynthesisItemDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -121,6 +123,11 @@ public class EquipSynthesisItemServiceImpl extends ServiceImpl<EquipSynthesisIte
         }
         System.out.println("=============data:"+jsonArray.toJSONString());
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<EquipSynthesisItemEntity> getEquipSynthesisItemEntitys(Map<String, Object> map) {
+        return equipSynthesisItemDao.selectByMap(map);
     }
 
 }

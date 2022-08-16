@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.basicconfig.entity.EquipSynthesisItemEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +17,12 @@ import java.util.Map;
 public interface EquipSynthesisItemService extends IService<EquipSynthesisItemEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 获取装备合成公式
+     * @param map
+     * @return
+     */
+    List<EquipSynthesisItemEntity> getEquipSynthesisItemEntitys(Map<String, Object> map);
 }
 

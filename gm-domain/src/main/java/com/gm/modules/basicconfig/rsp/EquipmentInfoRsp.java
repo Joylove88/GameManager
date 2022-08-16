@@ -1,44 +1,24 @@
-package com.gm.modules.user.rsp;
+package com.gm.modules.basicconfig.rsp;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
- * 玩家英雄装备穿戴表
+ * 装备基础表
  * 
  * @author Axiang
  * @email Axiang@gmail.com
- * @date 2022-02-18 14:47:27
+ * @date 2022-02-11 17:20:39
  */
 @Data
-public class UserHeroEquipmentWearRsp implements Serializable {
+public class EquipmentInfoRsp implements Serializable {
 	private static final long serialVersionUID = 1L;
-
 	/**
 	 * ID
 	 */
-	private Long gmUserHeroEquipmentWearId;
-	/**
-	 * 玩家装备ID
-	 */
-	private Long gmUserEquipId;
-	/**
-	 * 装备ID
-	 */
-	private Long gmEquipmentId;
-	/**
-	 * 父级装备链
-	 */
-	private String parentEquipChain;
-	/**
-	 * 状态('0':未激活，'1':已激活)
-	 */
-	private String status;
+	private Long equipId;
 	/**
 	 * 装备名称
 	 */
@@ -60,31 +40,31 @@ public class UserHeroEquipmentWearRsp implements Serializable {
 	 */
 	private String equipIconUrl;
 	/**
-	 * 生命值
+	 * 初始生命值
 	 */
 	private Long equipHealth;
 	/**
-	 * 法力值
+	 * 初始法力值
 	 */
 	private Long equipMana;
 	/**
-	 * 生命值恢复
+	 * 初始生命值恢复
 	 */
 	private Long equipHealthRegen;
 	/**
-	 * 法力值恢复
+	 * 初始法力值恢复
 	 */
 	private Long equipManaRegen;
 	/**
-	 * 护甲
+	 * 初始护甲
 	 */
 	private Long equipArmor;
 	/**
-	 * 魔抗
+	 * 初始魔抗
 	 */
 	private Long equipMagicResist;
 	/**
-	 * 攻击力
+	 * 初始攻击力
 	 */
 	private Long equipAttackDamage;
 	/**

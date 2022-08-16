@@ -24,6 +24,10 @@ public class UserEquipInfoRsp {
 	 */
 	private Long equipLevel;
 	/**
+	 * 装备图片地址
+	 */
+	private String equipImgUrl;
+	/**
      * 装备图标地址
 	 */
 	private String equipIconUrl;

@@ -28,6 +28,10 @@ public class AttributeEntity {
      */
     private Long skillStarLevel;
     /**
+     * 技能类型（0：输出，1：辅助恢复，2：辅助加成）
+     */
+    private String skillType;
+    /**
      * 技能位置
      */
     private Integer skillSolt;
@@ -48,6 +52,14 @@ public class AttributeEntity {
      */
     private String skillDescription;
     /**
+     * 最大生命值
+     */
+    private Long MaxHp;
+    /**
+     * 加成的生命
+     */
+    private Long addMaxHp;
+    /**
      * 初始生命值
      */
     private Long hp;
@@ -59,6 +71,10 @@ public class AttributeEntity {
      * 初始法力值
      */
     private Long mp;
+    /**
+     * 最大法力值
+     */
+    private Long MaxMp;
     /**
      * 成长属性-法力值
      */

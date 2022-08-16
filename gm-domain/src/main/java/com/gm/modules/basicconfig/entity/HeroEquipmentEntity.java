@@ -77,6 +77,12 @@ public class HeroEquipmentEntity implements Serializable {
 	@TableField(exist = false)
 	private String equipLevel;
 	@TableField(exist = false)
+	private String equipImgUrl;
+	@TableField(exist = false)
+	private String equipIconUrl;
+	@TableField(exist = false)
+	private String equipJson;
+	@TableField(exist = false)
 	private String heroName;
 
 }

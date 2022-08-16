@@ -35,15 +35,28 @@
     </select>
 
     <!--获取玩家装备-->
-    <select id="getUserAllEquip" resultType="com.gm.modules.user.rsp.UserEquipInfoRsp">
+    <select id="getUserEquip" resultType="com.gm.modules.user.rsp.UserEquipInfoRsp">
         SELECT
-            A.GM_USER_EQUIPMENT_ID,
-            A.EQUIP_POWER,
-            B.*
+            A.*,
+            B.EQUIP_NAME,
+            B.EQUIP_RARECODE,
+            B.EQUIP_LEVEL,
+            B.EQUIP_IMG_URL,
+            B.EQUIP_ICON_URL
         FROM
             GM_USER_EQUIPMENT A
         LEFT JOIN
             GM_EQUIPMENT_INFO B ON A.GM_EQUIPMENT_ID = B.EQUIP_ID
-        WHERE A.`STATUS` = '1' AND A.GM_USER_ID = #{userId}
+        <where>
+            <if test="status != null and status != ''">
+                AND A.STATUS = #{status}
+            </if>
+            <if test="gmUserId != null and gmUserId != ''">
+                AND A.GM_USER_ID = #{gmUserId}
+            </if>
+            <if test="gmUserEquipmentId != null and gmUserEquipmentId != ''">
+                AND A.GM_USER_EQUIPMENT_ID = #{gmUserEquipmentId}
+            </if>
+        </where>
     </select>
 </mapper>

@@ -51,7 +51,7 @@ public class LotteryGiftsUtils {
         return sortOrignalRates.indexOf(nextDouble);
     }
 
-    public static Map<Integer, Integer> gifPron(List<Double> orignalRates,long Num){
+    public static Map<Integer, Integer> gifPron(List<Double> orignalRates,int Num){
         // statistics
         Map<Integer, Integer> count = new HashMap<Integer, Integer>();
         //抽奖次数

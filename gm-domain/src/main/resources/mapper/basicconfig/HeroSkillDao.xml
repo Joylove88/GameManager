@@ -37,4 +37,20 @@
         ${ew.customSqlSegment}
         ORDER BY C.HERO_NAME ASC,D.GM_STAR_CODE ASC
     </select>
+
+    <!--获取英雄技能信息-->
+    <select id="getHeroSkill" resultType="com.gm.modules.basicconfig.entity.HeroSkillEntity">
+        SELECT
+            A.*
+        FROM
+            GM_HERO_SKILL A
+        <where>
+            <if test="status != null and status != ''">
+                AND A.STATUS = #{status}
+            </if>
+            <if test="gmHeroStarId != null and gmHeroStarId != ''">
+                AND A.GM_HERO_STAR_ID = #{gmHeroStarId}
+            </if>
+        </where>
+    </select>
 </mapper>

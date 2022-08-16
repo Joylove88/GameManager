@@ -144,7 +144,9 @@ public class DrawGiftService{
             orignalRates.add(probabilityN);
         }
 
-        Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates,Long.parseLong(drawForm.getDrawType()));
+        // 如果类型为1 说明是单抽模式.类型为2 说明是十连抽模式
+        int num = Long.parseLong(drawForm.getDrawType()) == 2 ? Constant.DrawNum.DRAW10.getValue() : Constant.DrawNum.DRAW1.getValue();
+        Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates, num);
 
         // 奖品集合
         List<Object> gifList = new ArrayList<>();
@@ -159,14 +161,14 @@ public class DrawGiftService{
                 userHeroEntity.setGmHeroLevelId(100000009L);
                 userHeroEntity.setGmUserId(user.getUserId());
                 userHeroEntity.setStatus(Constant.enable);
-                userHeroEntity.setStatePlay(Constant.disabled); // 默认：未上阵
+                userHeroEntity.setStatePlay(Constant.disabled);// 默认：未上阵
                 userHeroEntity.setMintStatus(Constant.enable);
                 userHeroEntity.setMintHash(drawForm.getTransactionHash());
                 userHeroEntity.setScale(gifts.get(entry.getKey()).getScale());// 插入矿工比例
                 userHeroEntity.setCreateTime(now);
                 userHeroEntity.setCreateTimeTs(now.getTime());
                 // 生成NFT唯一编码
-                userHeroEntity.setNftId(Arith.UUID20().longValue());
+                userHeroEntity.setNftId(Arith.UUID20());
                 // 统计英雄战力
                 double heroPower = 0;
                 long health = gifts.get(entry.getKey()).getGmHealth();//初始生命值
@@ -381,7 +383,9 @@ public class DrawGiftService{
             orignalRates.add(probabilityN);
         }
 
-        Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates,Long.parseLong(drawForm.getDrawType()));
+        // 如果类型为1 说明是单抽模式.类型为2 说明是十连抽模式
+        int num = Long.parseLong(drawForm.getDrawType()) == 2 ? Constant.DrawNum.DRAW10.getValue() : Constant.DrawNum.DRAW1.getValue();
+        Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates, num);
 
         // 奖品集合
         List<Object> gifList = new ArrayList<>();
@@ -445,7 +449,7 @@ public class DrawGiftService{
         }
 
         // 抽奖次数
-        long drawNum = 0;
+        int drawNum = 0;
         // 如果为副本产出分为3级别每级对应抽奖次数 为抽奖产出固定单抽十连抽
         if (combatRecordEntity != null){
             // 随机副本产出装备数量
@@ -476,7 +480,7 @@ public class DrawGiftService{
                 userEquip.setGmEquipmentId(gifts.get(entry.getKey()).getEquipId());
                 userEquip.setGmUserId(user.getUserId());
                 userEquip.setStatus(Constant.enable);
-                userEquip.setScale(gifts.get(entry.getKey()).getScale()); // 矿工比例
+                userEquip.setScale(gifts.get(entry.getKey()).getScale());// 矿工比例
                 userEquip.setCreateTime(now);
                 userEquip.setCreateTimeTs(now.getTime());
 
@@ -489,7 +493,7 @@ public class DrawGiftService{
                 long attackDamage = gifts.get(entry.getKey()).getEquipAttackDamage() != null ? gifts.get(entry.getKey()).getEquipAttackDamage() : 0;//初始攻击力
                 long attackSpell = gifts.get(entry.getKey()).getEquipAttackSpell() != null ? gifts.get(entry.getKey()).getEquipAttackSpell() : 0;//初始法攻
                 // 生成NFT唯一编码
-                userEquip.setNftId(Arith.UUID20().longValue());
+                userEquip.setNftId(Arith.UUID20());
                 // 区分抽奖或副本产出
                 if (combatRecordEntity != null) {
                     userEquip.setFromType("0");

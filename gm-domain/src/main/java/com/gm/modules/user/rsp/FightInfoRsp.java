@@ -30,6 +30,23 @@ public class FightInfoRsp {
      */
     @ApiModelProperty(value = "战斗记录ID")
     private Long combatId;
+    /**
+     * 队伍ID
+     */
+    @ApiModelProperty(value = "队伍ID")
+    private Long teamId;
+    /**
+     * 战斗开始时间
+     */
+    private Long startTimeTs;
+    /**
+     * 战斗结束倒计时
+     */
+    private Long endSec;
+    /**
+     * 固定时间格式
+     */
+    private String countdown;
 
     /**
      * 战斗过程

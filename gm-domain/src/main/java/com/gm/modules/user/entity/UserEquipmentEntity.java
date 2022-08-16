@@ -37,7 +37,7 @@ public class UserEquipmentEntity implements Serializable {
 	/**
 	 * NFTID
 	 */
-	private Long nftId;
+	private BigDecimal nftId;
 	/**
 	 * 矿工兑换比例（增幅,削减）
 	 */
@@ -125,5 +125,7 @@ public class UserEquipmentEntity implements Serializable {
 	private String equipLevel;
 	@TableField(exist = false)
 	private String equipIconUrl;
+	@TableField(exist = false)
+	private String activationState;
 
 }

@@ -1,8 +1,10 @@
 package com.gm.modules.basicconfig.dao;
 
-import com.gm.modules.basicconfig.entity.HeroSkillEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gm.modules.basicconfig.entity.HeroSkillEntity;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.Map;
 
 /**
  * 英雄技能表
@@ -13,5 +15,11 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface HeroSkillDao extends BaseMapper<HeroSkillEntity> {
-	
+
+    /**
+     * 获取英雄技能信息
+     * @param map
+     * @return
+     */
+    HeroSkillEntity getHeroSkill(Map<String, Object> map);
 }

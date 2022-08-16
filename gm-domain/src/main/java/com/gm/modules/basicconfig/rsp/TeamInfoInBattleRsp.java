@@ -22,6 +22,14 @@ import java.util.List;
 @Data
 public class TeamInfoInBattleRsp {
     /**
+     * ID
+     */
+    private Long id;
+    /**
+     * 战斗记录ID
+     */
+    private Long combatId;
+    /**
      * 队伍名称
      */
     private String teamName;

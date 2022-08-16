@@ -1,5 +1,7 @@
 package com.gm.common.utils;
 
+import sun.font.BidiUtils;
+
 import java.math.BigDecimal;
 
 /**
@@ -68,12 +70,16 @@ public class Arith {
         n = n > 1 ? 1 : n;
         return n;
     }
+
     /**
      * 随机20位整数
      */
     public static BigDecimal UUID20(){
         int randomId= (int) (Math.random() * (9999999-1000000 + 1) ) + 1000000;
-        BigDecimal id = new BigDecimal(System.currentTimeMillis() + "" + randomId);
-        return id;
+        return new BigDecimal(System.currentTimeMillis() + "" + randomId);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(UUID20());
     }
 }

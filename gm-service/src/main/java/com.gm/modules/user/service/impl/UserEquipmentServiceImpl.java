@@ -40,8 +40,8 @@ public class UserEquipmentServiceImpl extends ServiceImpl<UserEquipmentDao, User
     }
 
     @Override
-    public List<UserEquipInfoRsp> getUserAllEquip(Long userId) {
-        return userEquipmentDao.getUserAllEquip(userId);
+    public List<UserEquipInfoRsp> getUserEquip(UserEquipmentEntity userEquipmentEntity) {
+        return userEquipmentDao.getUserEquip(userEquipmentEntity);
     }
 
 }

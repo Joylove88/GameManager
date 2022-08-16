@@ -89,6 +89,6 @@ public class TeamInfoRsp {
     /**
      * 英雄集合
      */
-    private List<UserHeroInfoRsp> userHeroInfoRsps = new ArrayList<>();
+    private List<UserHeroInfoRsp> userHeroInfoRsps = null;
 
 }

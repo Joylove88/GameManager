@@ -36,4 +36,20 @@
         </where>
     </select>
 
+    <!--获取装备信息-->
+    <select id="getEquipmentInfo" resultType="com.gm.modules.basicconfig.rsp.EquipmentInfoRsp">
+        SELECT
+        *
+        FROM
+        gm_equipment_info a
+        <where>
+            <if test="status != null and status != ''">
+                AND a.STATUS = #{status}
+            </if>
+            <if test="equipRarecode != null and equipRarecode != ''">
+                AND a.EQUIP_RARECODE = #{equipRarecode}
+            </if>
+        </where>
+    </select>
+
 </mapper>

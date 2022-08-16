@@ -34,4 +34,28 @@
         ${ew.customSqlSegment}
         ORDER BY C.HERO_NAME,A.GM_EQUIP_SOLT,A.CREATE_TIME DESC
     </select>
+
+    <select id="getHeroEquipments" resultType="com.gm.modules.basicconfig.entity.HeroEquipmentEntity">
+        SELECT
+            A.*,
+            B.EQUIP_NAME,
+            B.EQUIP_RARECODE,
+            B.EQUIP_LEVEL,
+            B.EQUIP_IMG_URL,
+            B.EQUIP_ICON_URL,
+            B.EQUIP_JSON
+        FROM
+            GM_HERO_EQUIPMENT A
+        LEFT JOIN
+            GM_EQUIPMENT_INFO B ON A.GM_EQUIP_ID = B.EQUIP_ID
+        <where>
+            <if test="status != null and status != ''">
+                AND A.STATUS = #{status}
+            </if>
+            <if test="gmHeroId != null and gmHeroId != ''">
+                AND A.GM_HERO_ID = #{gmHeroId}
+            </if>
+        </where>
+        ORDER BY A.GM_EQUIP_SOLT
+    </select>
 </mapper>

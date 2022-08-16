@@ -41,6 +41,13 @@
             <if test="dungeonId != null and dungeonId != ''">
                 AND DUNGEON_ID = #{dungeonId}
             </if>
+            <if test="gmUserHeroId != null and gmUserHeroId != ''">
+                AND (USER_HERO1_ID = #{gmUserHeroId}
+                OR USER_HERO2_ID = #{gmUserHeroId}
+                OR USER_HERO3_ID = #{gmUserHeroId}
+                OR USER_HERO4_ID = #{gmUserHeroId}
+                OR USER_HERO5_ID = #{gmUserHeroId})
+            </if>
         </where>
         ORDER BY TEAM_SOLT ASC
     </select>

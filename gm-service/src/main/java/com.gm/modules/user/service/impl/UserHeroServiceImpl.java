@@ -43,13 +43,13 @@ public class UserHeroServiceImpl extends ServiceImpl<UserHeroDao, UserHeroEntity
     }
 
     @Override
-    public List<UserHeroInfoRsp> getUserAllHero(UserHeroEntity userHeroEntity) {
-        return userHeroDao.getUserAllHero(userHeroEntity);
+    public List<UserHeroInfoRsp> getUserAllHero(Map<String, Object> map) {
+        return userHeroDao.getUserAllHero(map);
     }
 
     @Override
-    public UserHeroInfoRsp getUserHeroById(UserHeroEntity userHeroEntity) {
-        return userHeroDao.getUserHeroById(userHeroEntity);
+    public UserHeroEntity getUserHeroById(Map<String, Object> map) {
+        return userHeroDao.getUserHeroById(map);
     }
 
 }
