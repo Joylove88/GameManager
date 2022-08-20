@@ -40,8 +40,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 用户信息接口
@@ -273,7 +275,15 @@ public class ApiUserController {
             // 提现超额
             throw new RRException(ErrorCode.WITHDRAW_OVER_TIMES.getDesc());
         }
-        gmUserWithdrawService.withdraw(user,useWithdrawReq);
+        try {
+            gmUserWithdrawService.withdraw(user,useWithdrawReq);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return R.ok();
     }
 

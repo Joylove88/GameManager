@@ -13,6 +13,7 @@
         <result property="createTimeTs" column="CREATE_TIME_TS"/>
         <result property="updateTime" column="UPDATE_TIME"/>
         <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+        <result property="withdrawHash" column="WITHDRAW_HASH"/>
     </resultMap>
 
 

@@ -6,7 +6,9 @@ import com.gm.modules.user.entity.GmUserWithdrawEntity;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.req.UseWithdrawReq;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 提现表
@@ -21,6 +23,6 @@ public interface GmUserWithdrawService extends IService<GmUserWithdrawEntity> {
 
     GmUserWithdrawEntity lastWithdraw(UserEntity user);
 
-    void withdraw(UserEntity user,UseWithdrawReq useWithdrawReq);
+    void withdraw(UserEntity user,UseWithdrawReq useWithdrawReq) throws ExecutionException, InterruptedException, IOException;
 }
 
