@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -19,6 +20,8 @@ import com.gm.modules.user.service.UserBalanceDetailService;
 
 @Service("userBalanceDetailService")
 public class UserBalanceDetailServiceImpl extends ServiceImpl<UserBalanceDetailDao, UserBalanceDetailEntity> implements UserBalanceDetailService {
+    @Autowired
+    private UserBalanceDetailDao userBalanceDetailDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -39,6 +42,11 @@ public class UserBalanceDetailServiceImpl extends ServiceImpl<UserBalanceDetailD
         if (!b) {
             throw new RRException("插入账变失败!");// 插入账变失败
         }
+    }
+
+    @Override
+    public List<UserBalanceDetailEntity> getUserBalanceDetail(Map<String, Object> map) {
+        return userBalanceDetailDao.getUserBalanceDetail(map);
     }
 
 }

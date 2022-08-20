@@ -8,12 +8,15 @@
 
 package com.gm.modules.job.task;
 
+import com.alibaba.fastjson.JSONObject;
 import com.gm.common.utils.Constant;
 import com.gm.common.web3Utils.TransactionVerifyUtils;
 import com.gm.modules.drawGift.service.DrawGiftService;
 import com.gm.modules.order.entity.TransactionOrderEntity;
 import com.gm.modules.order.service.TransactionOrderService;
+import com.gm.modules.sys.entity.SysDictEntity;
 import com.gm.modules.sys.service.SysConfigService;
+import com.gm.modules.sys.service.SysDictService;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.req.DrawForm;
 import com.gm.modules.user.service.UserService;
@@ -39,6 +42,7 @@ import org.web3j.protocol.core.methods.response.EthCall;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.utils.Convert;
+import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -58,13 +62,17 @@ public class EthBalanceListenTask implements ITask {
 	private static Web3j web3j;
 	@Autowired
 	private SysConfigService sysConfigService;
+	@Autowired
+	private SysDictService sysDictService;
 	
 	@Override
 	public void run(String params){
 		logger.info("ethBalanceListenTask定时任务正在执行，参数为：{}", params);
 		try {
-			contracts.add(Constant.ADDRESS.toLowerCase());
-			contracts.add(Constant.BUSD_ADDRESS.toLowerCase());
+			// 获取地址
+			JSONObject address = sysDictService.getContractsAddress();
+			contracts.add(address.getString("ADDRESS").toLowerCase());
+			contracts.add(address.getString("BUSD_ADDRESS").toLowerCase());
 			// 开始链上监听
 			startReplayListen_ETH();
 		} catch (Exception e) {
@@ -82,7 +90,7 @@ public class EthBalanceListenTask implements ITask {
 		// 获取资金池余额
 		String code = getERC20Balance(web3j,contracts.get(0),contracts.get(1));
 		// 更新系统中保存的余额
-		sysConfigService.updateValueByKey(Constant.CASH_POOLING_BALANCE, code);
+		sysConfigService.updateValueByKey(Constant.CashPool._MAIN.getValue(), code);
 	}
 
 	/**
@@ -126,10 +134,13 @@ public class EthBalanceListenTask implements ITask {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String address = "0x25B15dE515eBBD047e026D64463801f044785cc6";
-		String fromAddress = "0x1cabea67c565b5337e688894960839ef1D48b0cD";
-		contracts.add(Constant.ADDRESS.toLowerCase());
-		contracts.add(Constant.BUSD_ADDRESS.toLowerCase());
+//		String address = "0x25B15dE515eBBD047e026D64463801f044785cc6";
+//		String fromAddress = "0x1cabea67c565b5337e688894960839ef1D48b0cD";
+		Address fromAddress = new Address("0x000000000000000000000000000000000000000000000000002386f26fc10000");
+		System.out.println(fromAddress);
+		System.out.println( Convert.fromWei(Numeric.toBigInt("0x000000000000000000000000000000000000000000000000002386f26fc10000").toString(), Convert.Unit.ETHER));
+//		contracts.add(Constant.ADDRESS.toLowerCase());
+//		contracts.add(Constant.BUSD_ADDRESS.toLowerCase());
 
 //		startReplayListen_ETH();
 		//获取起始区块号

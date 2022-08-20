@@ -43,6 +43,12 @@ public class UserHeroEquipmentWearServiceImpl extends ServiceImpl<UserHeroEquipm
     }
 
     @Override
+    public void insertEquipmentWear(UserHeroEquipmentWearEntity userHeroEquipmentWear) {
+
+        userHeroEquipmentWearDao.insert(userHeroEquipmentWear);
+    }
+
+    @Override
     public List<UserHeroEquipmentWearRsp> getUserWearEQ(Long userHeroId) {
         return userHeroEquipmentWearDao.getUserWearEQ(userHeroId);
     }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.user.entity.UserBalanceDetailEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,5 +22,12 @@ public interface UserBalanceDetailService extends IService<UserBalanceDetailEnti
      * 更新账户金额
      */
     void insertBalanceDetail(UserBalanceDetailEntity balanceDetailEntity);
+
+    /**
+     * 获取账变明细
+     * @param map
+     * @return
+     */
+    List<UserBalanceDetailEntity> getUserBalanceDetail(Map<String, Object> map);
 }
 

@@ -125,12 +125,12 @@ public class ApiIncreaseCombatPowerController {
             userEquipmentService.updateById(setUserEquip);
             // 穿戴表新增一条装备穿戴记录
             UserHeroEquipmentWearEntity userHeroEquipmentWear = new UserHeroEquipmentWearEntity();
-            userHeroEquipmentWear.setGmUserId(user.getUserId());
             userHeroEquipmentWear.setGmHeroId(rsp.getGmHeroId());
             userHeroEquipmentWear.setGmUserHeroId(req.getGmUserHeroId());
             userHeroEquipmentWear.setGmUserEquipId(req.getGmUserEquipmentId());
             userHeroEquipmentWear.setParentEquipChain(req.getParentEquipChain());
             userHeroEquipmentWear.setStatus(Constant.enable);
+            userHeroEquipmentWear.setGmUserId(user.getUserId());
             userHeroEquipmentWear.setCreateUser(user.getUserId());
             userHeroEquipmentWear.setCreateTime(now);
             userHeroEquipmentWear.setCreateTimeTs(now.getTime());
@@ -175,8 +175,7 @@ public class ApiIncreaseCombatPowerController {
         // 表单校验
         ValidatorUtils.validateEntity(useExpReq);
         // 经验药水数量
-        if (useExpReq.getExpNum() != null){
-        } else {
+        if (useExpReq.getExpNum() == null && useExpReq.getExpNum() == 0){
             throw new RRException(ErrorCode.EXP_NUM_NOT_NULL.getDesc());
         }
         // 药水稀有度
@@ -188,12 +187,7 @@ public class ApiIncreaseCombatPowerController {
         } else {
             throw new RRException(ErrorCode.EXP_RARE_NOT_NULL.getDesc());
         }
-        UserExperiencePotionEntity userEXP = new UserExperiencePotionEntity();
-        userEXP.setGmUserId(user.getUserId());
-        userEXP.setExPotionRareCode(useExpReq.getExpRare());
-        userEXP.setUserExNum(useExpReq.getExpNum());
-        userEXP.setGmUserHeroId(userEXP.getGmUserHeroId());
-        userExService.userHeroUseEx(userEXP);
+        userExService.userHeroUseEx(user, useExpReq);
         return R.ok();
     }
 }

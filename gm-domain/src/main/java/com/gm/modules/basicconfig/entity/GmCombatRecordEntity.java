@@ -62,7 +62,7 @@ public class GmCombatRecordEntity implements Serializable {
 	 */
 	private Long getUserExp;
 	/**
-	 * 战斗结果状态（0：YOULOSE，1：YOUWIN，2：战斗中）
+	 * 战斗结果状态（0：YOULOSE，1：YOUWIN）
 	 */
 	private String status;
 	/**

@@ -685,7 +685,7 @@ public class ApiFightController {
         // 说明玩家有上下阵操作
         if (num != 0){
             // 获取本次操作之前的战力值
-            oldPower = teamInfo.getTeamPower();
+            oldPower = teamInfo.getTeamPower() == null ? 0L : teamInfo.getTeamPower();
             // 获取本次操作改变的战力值
             changePower = newPower - oldPower;
             team.setId(req.getTeamId());

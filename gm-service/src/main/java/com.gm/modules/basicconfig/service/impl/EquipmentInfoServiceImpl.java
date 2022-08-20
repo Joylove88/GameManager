@@ -331,9 +331,9 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
                 getEquipmentAttributes(jsonObject, userEquipment);
 
                 // 如果为可合成装备继续获取装备合成配方
-                if( equipRarecode.equals(Constant.RareCode.rareCode2.getValue()) ||
-                        equipRarecode.equals(Constant.RareCode.rareCode4.getValue()) ||
-                        equipRarecode.equals(Constant.RareCode.rareCode5.getValue()) ){
+                if( equipRarecode.equals(Constant.RareCode._GREEN.getValue()) ||
+                        equipRarecode.equals(Constant.RareCode._PURPLE.getValue()) ||
+                        equipRarecode.equals(Constant.RareCode._ORANGE.getValue()) ){
                     EquipSynthesisItemEntity eqSIEsChildren = getEquipSyntheticFormula(equipId);
                     if ( eqSIEsChildren == null ) {
                         break;

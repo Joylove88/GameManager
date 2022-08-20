@@ -8,6 +8,7 @@ import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Event;
 import org.web3j.abi.datatypes.Uint;
+import org.web3j.crypto.Hash;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -15,6 +16,7 @@ import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.utils.Convert;
+import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -26,32 +28,41 @@ import java.util.*;
  * Created by axiang on 2022/3/20 0020.
  */
 public class EthTransferListenUtils {
-    private static List<String> contracts = new ArrayList<>();  //代币合约地址列表,可以存放多个地址
-    private static Disposable tokenSubscription;   //token事件订阅对象
-    private static Disposable ethMissSubscription; //ETH交易空档事件订阅对象
-    private static Disposable ethSubscription;     //ETH交易事件订阅对象
-    private static int block_TokenSub = 0;
-    private static int block_EthSub = 0;
-    private static int block_EthMissSub = 0;
-    private static Map htAddress = new HashMap<>();
-    private static Web3j web3j;
+//    private static List<String> contracts = new ArrayList<>();  //代币合约地址列表,可以存放多个地址
+//    private static Disposable tokenSubscription;   //token事件订阅对象
+//    private static Disposable ethMissSubscription; //ETH交易空档事件订阅对象
+//    private static Disposable ethSubscription;     //ETH交易事件订阅对象
+//    private static int block_TokenSub = 0;
+//    private static int block_EthSub = 0;
+//    private static int block_EthMissSub = 0;
+//    private static Map htAddress = new HashMap<>();
+//    private static Web3j web3j;
+//
+//    private static void run() throws Exception {
+//        web3j = TransactionVerifyUtils.connect();
+//
+//    }
 
-    private static void run() throws Exception {
-        web3j = TransactionVerifyUtils.connect();
-
+    /**
+     * 获取链上交易日志事件名称的hash值
+     * @return
+     */
+    public static String getTopics0(){
+        byte[] hash = Hash.sha3(String.valueOf(Constant.EVENT_NAME).getBytes());
+        return Numeric.toHexString(hash);
     }
 //
-    public static void main(String[] args) throws Exception {
-        String address = "0x25B15dE515eBBD047e026D64463801f044785cc6";
-        String fromAddress = "0x1cabea67c565b5337e688894960839ef1D48b0cD";
-        contracts.add(address);
-        htAddress.put(address.toLowerCase(),address);
-        htAddress.put(fromAddress.toLowerCase(),fromAddress);
-        //获取起始区块号
-        startReplayListen_ETH(BigInteger.valueOf(17666907));
-//        startTransferListen_Token(BigInteger.valueOf(17720623));
-//        startTransactionListen_ETH();
-    }
+//    public static void main(String[] args) throws Exception {
+//        String address = "0x25B15dE515eBBD047e026D64463801f044785cc6";
+//        String fromAddress = "0x1cabea67c565b5337e688894960839ef1D48b0cD";
+//        contracts.add(address);
+//        htAddress.put(address.toLowerCase(),address);
+//        htAddress.put(fromAddress.toLowerCase(),fromAddress);
+//        //获取起始区块号
+//        startReplayListen_ETH(BigInteger.valueOf(17666907));
+////        startTransferListen_Token(BigInteger.valueOf(17720623));
+////        startTransactionListen_ETH();
+//    }
 //
 //    /**
 //     *  启动监听， 从startBlock区块开始监听token转账事件
@@ -116,62 +127,62 @@ public class EthTransferListenUtils {
 //    }
 //
 //
-    //启动监听以太坊上的过往交易
-    public static void startReplayListen_ETH(BigInteger startBlockNum) throws Exception {
-        // 启动区块链
-        run();
-        System.out.println("  startReplayListen_ETH:  startBlockNum="+startBlockNum);
-        //回放空档期间的交易
-        BigInteger currentBlockNum=null;
-        try {
-            //获取当前区块号
-            currentBlockNum = web3j.ethBlockNumber().send().getBlockNumber();
-            System.out.println("  000 currentBlockNum= "+currentBlockNum.intValue());
-            if(startBlockNum.compareTo(currentBlockNum) > 0) {
-                return;  //测试曾经出现 currentBlockNum得到错误数字，比startBlockNum还小，这时不能启动监听
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            System.out.println("  111 getBlockNumber() Error: ");
-            e.printStackTrace();
-            return;   //出现异常不能启动监听
-        }
-
-        //创建开始与结束区块， 重放这段时间内的交易，防止遗漏
-        DefaultBlockParameter startBlock = new DefaultBlockParameterNumber(startBlockNum);
-        DefaultBlockParameter endBlock = new DefaultBlockParameterNumber(BigInteger.valueOf(17666908));
-        System.out.println("[ startTransferListen_ETH:  miss  startBlock="+startBlockNum+", endBlock="+currentBlockNum+"]");
-
-        block_EthMissSub = startBlockNum.intValue();
-        ethMissSubscription = web3j.replayPastTransactionsFlowable(startBlock, endBlock)
-            .subscribe(tx -> {
-                //更新检查过的区块高度
-                block_EthMissSub = tx.getBlockNumber().intValue();
-                setBlock_Num(block_EthMissSub);
-                System.out.println("  ---replayPastTransactionsFlowable    block_EthMissSub = "+block_EthMissSub);
-                String fromAddress = tx.getFrom();
-                String toAddress   = tx.getTo();
-                System.out.println("fromAddress="+fromAddress + "toAddress="+toAddress);
-                if(htAddress.containsKey(fromAddress) || htAddress.containsKey(toAddress)) {  //发现了指定地址上的交易
-                    String txHash = tx.getHash();
-                    BigDecimal value = Convert.fromWei(tx.getValue().toString(), Convert.Unit.ETHER);
-                    String timestamp = "";
-                    try {
-                        EthBlock ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(tx.getBlockNumber()), false).send();
-                        timestamp = String.valueOf(ethBlock.getBlock().getTimestamp());
-                    } catch (IOException e) {
-                        System.out.println("Block timestamp get failure,block number is {}" + tx.getBlockNumber());
-                        System.out.println("Block timestamp get failure,{}"+  e.getMessage());
-
-                    }
-                    // 监听以太坊上是否有系统生成地址的交易
-                    callBack_ETH(txHash,fromAddress,toAddress,value,timestamp);
-                }
-            }, error->{
-                System.out.println("   ### replayPastTransactionsFlowable  error= "+ error);
-                error.printStackTrace();
-            });
-    }
+//    //启动监听以太坊上的过往交易
+//    public static void startReplayListen_ETH(BigInteger startBlockNum) throws Exception {
+//        // 启动区块链
+//        run();
+//        System.out.println("  startReplayListen_ETH:  startBlockNum="+startBlockNum);
+//        //回放空档期间的交易
+//        BigInteger currentBlockNum=null;
+//        try {
+//            //获取当前区块号
+//            currentBlockNum = web3j.ethBlockNumber().send().getBlockNumber();
+//            System.out.println("  000 currentBlockNum= "+currentBlockNum.intValue());
+//            if(startBlockNum.compareTo(currentBlockNum) > 0) {
+//                return;  //测试曾经出现 currentBlockNum得到错误数字，比startBlockNum还小，这时不能启动监听
+//            }
+//        } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            System.out.println("  111 getBlockNumber() Error: ");
+//            e.printStackTrace();
+//            return;   //出现异常不能启动监听
+//        }
+//
+//        //创建开始与结束区块， 重放这段时间内的交易，防止遗漏
+//        DefaultBlockParameter startBlock = new DefaultBlockParameterNumber(startBlockNum);
+//        DefaultBlockParameter endBlock = new DefaultBlockParameterNumber(BigInteger.valueOf(17666908));
+//        System.out.println("[ startTransferListen_ETH:  miss  startBlock="+startBlockNum+", endBlock="+currentBlockNum+"]");
+//
+//        block_EthMissSub = startBlockNum.intValue();
+//        ethMissSubscription = web3j.replayPastTransactionsFlowable(startBlock, endBlock)
+//            .subscribe(tx -> {
+//                //更新检查过的区块高度
+//                block_EthMissSub = tx.getBlockNumber().intValue();
+//                setBlock_Num(block_EthMissSub);
+//                System.out.println("  ---replayPastTransactionsFlowable    block_EthMissSub = "+block_EthMissSub);
+//                String fromAddress = tx.getFrom();
+//                String toAddress   = tx.getTo();
+//                System.out.println("fromAddress="+fromAddress + "toAddress="+toAddress);
+//                if(htAddress.containsKey(fromAddress) || htAddress.containsKey(toAddress)) {  //发现了指定地址上的交易
+//                    String txHash = tx.getHash();
+//                    BigDecimal value = Convert.fromWei(tx.getValue().toString(), Convert.Unit.ETHER);
+//                    String timestamp = "";
+//                    try {
+//                        EthBlock ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(tx.getBlockNumber()), false).send();
+//                        timestamp = String.valueOf(ethBlock.getBlock().getTimestamp());
+//                    } catch (IOException e) {
+//                        System.out.println("Block timestamp get failure,block number is {}" + tx.getBlockNumber());
+//                        System.out.println("Block timestamp get failure,{}"+  e.getMessage());
+//
+//                    }
+//                    // 监听以太坊上是否有系统生成地址的交易
+//                    callBack_ETH(txHash,fromAddress,toAddress,value,timestamp);
+//                }
+//            }, error->{
+//                System.out.println("   ### replayPastTransactionsFlowable  error= "+ error);
+//                error.printStackTrace();
+//            });
+//    }
 //
 //
 //    //启动监听以太坊上的交易
@@ -231,21 +242,21 @@ public class EthTransferListenUtils {
 
 
     }
-
-    //txHash转账事件的处理函数
-    public static void callBack_ETH(String txHash, String from, String to, BigDecimal value, String timestamp) {
-        System.out.println("----------------------------------------------------------------------------------------------------------------------callBack_Token:");
-
-        System.out.println("----------------------------------------------------------------------------------------------------------------------    txHash = "+txHash);
-
-        System.out.println("----------------------------------------------------------------------------------------------------------------------    from = "+from);
-
-        System.out.println("----------------------------------------------------------------------------------------------------------------------    to = "+to);
-
-        System.out.println("----------------------------------------------------------------------------------------------------------------------    value = "+value.doubleValue());
-        TransactionVerifyUtils.isVerify(web3j,txHash);
-
-    }
+//
+//    //txHash转账事件的处理函数
+//    public static void callBack_ETH(String txHash, String from, String to, BigDecimal value, String timestamp) {
+//        System.out.println("----------------------------------------------------------------------------------------------------------------------callBack_Token:");
+//
+//        System.out.println("----------------------------------------------------------------------------------------------------------------------    txHash = "+txHash);
+//
+//        System.out.println("----------------------------------------------------------------------------------------------------------------------    from = "+from);
+//
+//        System.out.println("----------------------------------------------------------------------------------------------------------------------    to = "+to);
+//
+//        System.out.println("----------------------------------------------------------------------------------------------------------------------    value = "+value.doubleValue());
+//        TransactionVerifyUtils.isVerify(web3j,txHash);
+//
+//    }
 
     public static void setBlock_Num(int blockNum){
 

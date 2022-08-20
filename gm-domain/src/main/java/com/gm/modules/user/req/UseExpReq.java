@@ -18,6 +18,6 @@ public class UseExpReq {
 	/**
 	 * 玩家英雄ID
 	 */
-	private String userHeroId;
+	private String gmUserHeroId;
 
 }

@@ -14,12 +14,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gm.annotation.LoginUser;
 import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
+import com.gm.common.utils.Arith;
 import com.gm.common.utils.Constant;
+import com.gm.common.utils.EthTransferListenUtils;
 import com.gm.common.utils.R;
 import com.gm.annotation.Login;
 import com.gm.common.validator.ValidatorUtils;
 import com.gm.common.web3Utils.TransactionVerifyUtils;
 import com.gm.modules.drawGift.service.DrawGiftService;
+import com.gm.modules.ethTransfer.service.EthTransferService;
 import com.gm.modules.order.entity.TransactionOrderEntity;
 import com.gm.modules.order.service.TransactionOrderService;
 import com.gm.modules.sys.entity.SysDictEntity;
@@ -50,9 +53,12 @@ import org.web3j.tx.TransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.tx.response.PollingTransactionReceiptProcessor;
 import org.web3j.tx.response.TransactionReceiptProcessor;
+import org.web3j.utils.Convert;
+import org.web3j.utils.Numeric;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -77,6 +83,8 @@ public class ApiDrawController {
     private UserAccountService userAccountService;
     @Autowired
     private SysDictService sysDictService;
+    @Autowired
+    private EthTransferService ethTransferService;
 
     @PostMapping("drawCrypto")
     @ApiOperation("抽奖CRYPTO")
@@ -84,7 +92,7 @@ public class ApiDrawController {
         // 表单校验
         ValidatorUtils.validateEntity(form);
         // 设置货币类型 为加密货币
-        form.setCurType(Constant.enable);
+        form.setCurType(Constant.CurrencyType._CRYPTO.getValue());
         // HASH校验
         if (StringUtils.isNotBlank(form.getTransactionHash())){
             // HASH安全校验 防止注入攻击;
@@ -95,56 +103,20 @@ public class ApiDrawController {
             throw new RRException(ErrorCode.SIGN_HASH_EXCEPTION.getDesc());
         }
         Map<String,Object> map = new HashMap<>();
+        List gifts = new ArrayList();
         Optional<TransactionReceipt> receipt = null;
-        // 获取用户信息
+        // 实例化用户类
         UserEntity user = new UserEntity();
         // 通过交易hash查找订单是否存在
-        TransactionOrderEntity orderEntity = transactionOrderService.getOrderHash(form.getTransactionHash());
-        if (orderEntity == null){
+        TransactionOrderEntity order = transactionOrderService.getOrderHash(form.getTransactionHash());
+
+        if (order == null){// 如果订单为空说明是初次请求 先创建订单
             // 插入一笔订单,订单状态默认待处理
             transactionOrderService.addOrder(user, null ,form);
-        }
-        List gifts = new ArrayList();
-
-        // 如果订单为空说明是初次请求 则不进行验证
-        if (orderEntity != null){
+        } else {// 订单不为空说明是二次请求 验证成功后执行核心业务
             // 校验用户是否链上交易成功
             receipt = TransactionVerifyUtils.isVerify(TransactionVerifyUtils.connect(),form.getTransactionHash());
-        }
-        // 验证完成 更新订单
-        if(receipt != null){
-            String status = receipt.get().getStatus();
-            String address = receipt.get().getFrom();
-
-            // 初次查询用户信息，如果为空说明该用户为新用户
-            user = userService.queryByAddress(address);
-            if (user == null){
-                // 用户不存在则执行自动注册
-                UserEntity userRegister = new UserEntity();
-                Date date = new Date();
-                userRegister.setSignDate(date);
-                userRegister.setUserWalletAddress(address);
-                user = userService.userRegister(userRegister);
-            }
-
-            map.put("userId",user.getUserId());
-            map.put("from",address);
-            map.put("gasUsed",receipt.get().getGasUsed());
-            map.put("blockNumber",receipt.get().getBlockNumber());
-            if (status.equals(Constant.CHAIN_STATE1)){
-
-                // 校验成功后开始抽奖
-                gifts = drawStart(user, form);
-
-                // 更新当前订单状态为成功
-                map.put("status",Constant.enable);
-                transactionOrderService.updateOrder(form,gifts,map);
-
-            } else if(status.equals(Constant.CHAIN_STATE0)) {
-                // 更新当前订单状态为失败
-                map.put("status",Constant.failed);
-                transactionOrderService.updateOrder(form,gifts,map);
-            }
+            ethTransferService.eth(form.getTransactionHash(), order, receipt, form);
         }
         return R.ok().put("gifts", gifts);
     }
@@ -154,7 +126,7 @@ public class ApiDrawController {
     @ApiOperation("抽奖Gold")
     public R drawGold(@LoginUser UserEntity user, @RequestBody DrawForm form) throws Exception {
         // 设置货币类型 为金币
-        form.setCurType(Constant.disabled);
+        form.setCurType(Constant.CurrencyType._GOLD_COINS.getValue());
 
         List gifts = new ArrayList();
 
@@ -186,7 +158,7 @@ public class ApiDrawController {
                 }
 
                 // 校验成功后开始抽奖
-                gifts = drawStart(user, form);
+                gifts = drawGiftService.drawStart(user, form);
 
                 // 插入一笔订单,订单状态为成功
                 transactionOrderService.addOrder(user,gifts,form);
@@ -200,21 +172,7 @@ public class ApiDrawController {
 
         return R.ok().put("gifts", gifts);
     }
-    private List<Object> drawStart(UserEntity user, DrawForm form) throws Exception {
-        List<Object> gifts = new ArrayList<>();
 
-        if (Constant.ItemType.HERO.getValue().equals(form.getItemType())){
-            // 英雄抽奖
-            gifts = drawGiftService.heroDrawStart(user,form);
-        } else if (Constant.ItemType.EQUIPMENT.getValue().equals(form.getItemType())){
-            // 装备抽奖
-            gifts = drawGiftService.equipDrawStart(user,form);
-        } else if (Constant.ItemType.EXPERIENCE.getValue().equals(form.getItemType())){
-            // 经验抽奖
-            gifts = drawGiftService.exDrawStart(user,form);
-        }
-        return gifts;
-    }
     @PostMapping("getNFTURL")
     @ApiOperation("英雄抽奖")
     public String getNFTURL(@RequestBody String id){

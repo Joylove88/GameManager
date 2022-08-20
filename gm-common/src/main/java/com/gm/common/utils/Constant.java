@@ -26,22 +26,33 @@ public class Constant {
     public static final String FRONT_TYPE_ANDROID = "android";
     public static final String FRONT_TYPE_IOS = "ios";
     public static final String FRONT_TYPE_PC = "pc";
-    // 区块号
-    public static final String BLOCK_NUMBER = "block_number";
-    // 资金池余额
-    public static final String CASH_POOLING_BALANCE = "cash_pooling_balance";
-    // 市场总鸡蛋数量
+    /**
+     * 市场总鸡蛋数量
+     */
     public static final String MARKET_EGGS = "market_eggs";
-    // 玩家赚取总收入
+    /**
+     * 区块号
+     */
+    public static final String BLOCK_NUMBER = "block_number";
+
+    /**
+     * 玩家赚取总收入
+     */
     public static final String PLAYERS_EARN_TOTAL_REVENUE = "players_earn_total_revenue";
     // 副本资金池余额（最新）
     public static final String DUNGEON_POOLING_BALANCE = "dungeon_pooling_balance";
+
     // 装备属性随机最大百分比
     public static final Double eqAttMax = 1.01;
     // 装备属性随机最小百分比
     public static final Double eqAttMin = 0.5;
     // 装备属性随机最小百分比(抽奖)
     public static final Double eqAttCryptoMin = 0.5;
+    /**
+     * 合约事件名称
+     */
+    public static final String EVENT_NAME = "Transfer(address,address,uint256)";
+
     /**
      *  0
      */
@@ -58,14 +69,14 @@ public class Constant {
      *  玩家默认最大体力值
      */
     public static final Long FTG = 60L;
-    /**
-     * 所有权
-     */
-    public static final String ADDRESS = "0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45";
-    /**
-     * BUSD
-     */
-    public static final String BUSD_ADDRESS = "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee";
+//    /**
+//     * 所有权
+//     */
+//    public static final String ADDRESS = "0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45";
+//    /**
+//     * BUSD
+//     */
+//    public static final String BUSD_ADDRESS = "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee";
     /**
      * 资金池地址
      */
@@ -162,27 +173,6 @@ public class Constant {
      *  概率等级5
      */
     public static final double pronFive = 0.001;
-    /**
-     *  稀有度白色
-     */
-    public static final String rareCode1 = "1";
-    /**
-     *  稀有度绿色
-     */
-    public static final String rareCode2 = "2";
-    /**
-     *  稀有度蓝色
-     */
-    public static final String rareCode3 = "3";
-    /**
-     *  稀有度紫色
-     */
-    public static final String rareCode4 = "4";
-    /**
-     *  稀有度橙色
-     */
-    public static final String rareCode5 = "5";
-
 
 	/**
 	 * 菜单类型
@@ -334,9 +324,9 @@ public class Constant {
      * 战斗状态
      */
     public enum BattleState {
-        BATTLE0("0"), // 未战斗
-        BATTLE1("1"), // 战斗中
-        BATTLE2("2"); // 战斗结束
+        _IDLE("0"), // 未战斗
+        _IN_BATTLE("1"), // 战斗中
+        _BATTLE_IS_OVER("2"); // 战斗结束
         private String value;
 
         BattleState(String value) {
@@ -349,12 +339,29 @@ public class Constant {
     }
 
     /**
+     * 战斗结果
+     */
+    public enum BattleResult {
+        _LOSE("0"), // LOSE
+        _WIN("1"); // WIN
+        private String value;
+
+        BattleResult(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    /**
      * 技能类型
      */
     public enum SkillType {
-        TYPE0("0"), // 输出
-        TYPE1("1"), // 恢复
-        TYPE2("2"); // 加成
+        _ATTACK("0"), // 输出
+        _SUP("1"), // 恢复
+        _SUP_ADD("2"); // 加成
         private String value;
 
         SkillType(String value) {
@@ -391,11 +398,11 @@ public class Constant {
      * 装备稀有度
      */
     public enum RareCode {
-        rareCode1("1"), // 稀有度白色
-        rareCode2("2"), // 稀有度绿色
-        rareCode3("3"), // 稀有度蓝色
-        rareCode4("4"), // 稀有度紫色
-        rareCode5("5"); // 稀有度橙色
+        _WHITE("1"), // 稀有度白色
+        _GREEN("2"), // 稀有度绿色
+        _BLUE("3"), // 稀有度蓝色
+        _PURPLE("4"), // 稀有度紫色
+        _ORANGE("5"); // 稀有度橙色
 
         private String value;
 
@@ -408,4 +415,42 @@ public class Constant {
         }
     }
 
+    /**
+     * 货币类型
+     */
+    public enum CurrencyType {
+        _GOLD_COINS("0"), // 金币
+        _CRYPTO("1"); // 加密货币
+
+        private String value;
+
+        CurrencyType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 资金池
+     */
+    public enum CashPool {
+        _MAIN("main_cash_pool"), // 主资金池余额
+        _USER("user_cash_pool"), // 用户资金池
+        _DUNGEON("dungeon_cash_pool"), // 副本资金池
+        _REPO("repo_cash_pool"), // 回购资金池
+        _TEAM("team_cash_pool"); // 团队抽成资金池
+
+        private String value;
+
+        CashPool(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
 }

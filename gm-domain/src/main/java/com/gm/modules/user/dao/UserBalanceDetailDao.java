@@ -1,8 +1,11 @@
 package com.gm.modules.user.dao;
 
-import com.gm.modules.user.entity.UserBalanceDetailEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gm.modules.user.entity.UserBalanceDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 用户资金明细：记录余额变动
@@ -13,5 +16,10 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface UserBalanceDetailDao extends BaseMapper<UserBalanceDetailEntity> {
-	
+    /**
+     * 获取账变明细
+     * @param map
+     * @return
+     */
+	List<UserBalanceDetailEntity> getUserBalanceDetail(Map<String, Object> map);
 }

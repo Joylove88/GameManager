@@ -20,6 +20,8 @@ public interface UserHeroEquipmentWearService extends IService<UserHeroEquipment
 
     PageUtils queryPage(Map<String, Object> params);
 
+    void insertEquipmentWear(UserHeroEquipmentWearEntity userHeroEquipmentWearEntity);
+
     /**
      * 获取玩家英雄穿戴中的装备
      * @param userHeroId

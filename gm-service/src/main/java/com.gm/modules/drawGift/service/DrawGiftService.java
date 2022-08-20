@@ -23,6 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
+ * 抽奖业务类
  * @author Axiang
  * @email Axiang@gmail.com
  * @date 2022-01-23 19:06:59
@@ -56,6 +57,22 @@ public class DrawGiftService{
     private TransactionOrderDao transactionOrderDao;
     @Autowired
     private SysConfigService sysConfigService;
+
+    public List<Object> drawStart(UserEntity user, DrawForm form) throws Exception {
+        List<Object> gifts = new ArrayList<>();
+
+        if (Constant.ItemType.HERO.getValue().equals(form.getItemType())){
+            // 英雄抽奖
+            gifts = heroDrawStart(user,form);
+        } else if (Constant.ItemType.EQUIPMENT.getValue().equals(form.getItemType())){
+            // 装备抽奖
+            gifts = equipDrawStart(user,form);
+        } else if (Constant.ItemType.EXPERIENCE.getValue().equals(form.getItemType())){
+            // 经验抽奖
+            gifts = exDrawStart(user,form);
+        }
+        return gifts;
+    }
 
     // 英雄抽奖池
     public List<Object> heroDrawStart(UserEntity user,DrawForm drawForm) throws Exception {
@@ -299,73 +316,73 @@ public class DrawGiftService{
                 entity.setExDescription(ex.getExDescription());
                 if (pronLv == 1) {
                     // 概率等级为1
-                    if (exRC.equals(Constant.rareCode1)) {
+                    if (exRC.equals(Constant.RareCode._WHITE.getValue())) {
                         // 如果稀有度为白色
                         entity.setExNum(2L);
                         gifts.add(AddExGiftInfo(entity));
                     }
-                    if (exRC.equals(Constant.rareCode2)) {
+                    if (exRC.equals(Constant.RareCode._GREEN.getValue())) {
                         // 如果稀有度为绿色
                         entity.setExNum(1L);
                         gifts.add(AddExGiftInfo(entity));
                     }
                 } else if (pronLv == 2) {
                     // 概率等级为2
-                    if (exRC.equals(Constant.rareCode1)) {
+                    if (exRC.equals(Constant.RareCode._WHITE.getValue())) {
                         // 如果稀有度为白色
                         entity.setExNum(4L);
                         gifts.add(AddExGiftInfo(entity));
                     }
-                    if (exRC.equals(Constant.rareCode2)) {
+                    if (exRC.equals(Constant.RareCode._GREEN.getValue())) {
                         // 如果稀有度为绿色
                         entity.setExNum(2L);
                         gifts.add(AddExGiftInfo(entity));
                     }
-                    if (exRC.equals(Constant.rareCode3)) {
+                    if (exRC.equals(Constant.RareCode._BLUE.getValue())) {
                         // 如果稀有度为蓝色
                         entity.setExNum(1L);
                         gifts.add(AddExGiftInfo(entity));
                     }
                 } else if (pronLv == 3) {
                     // 概率等级为3
-                    if (exRC.equals(Constant.rareCode1)) {
+                    if (exRC.equals(Constant.RareCode._WHITE.getValue())) {
                         // 如果稀有度为白色
                         entity.setExNum(6L);
                         gifts.add(AddExGiftInfo(entity));
                     }
-                    if (exRC.equals(Constant.rareCode2)) {
+                    if (exRC.equals(Constant.RareCode._GREEN.getValue())) {
                         // 如果稀有度为绿色
                         entity.setExNum(3L);
                         gifts.add(AddExGiftInfo(entity));
                     }
-                    if (exRC.equals(Constant.rareCode3)) {
+                    if (exRC.equals(Constant.RareCode._BLUE.getValue())) {
                         // 如果稀有度为蓝色
                         entity.setExNum(2L);
                         gifts.add(AddExGiftInfo(entity));
                     }
-                    if (exRC.equals(Constant.rareCode4)) {
+                    if (exRC.equals(Constant.RareCode._PURPLE.getValue())) {
                         // 如果稀有度为紫色
                         entity.setExNum(1L);
                         gifts.add(AddExGiftInfo(entity));
                     }
                 } else if (pronLv == 4) {
                     // 概率等级为3
-                    if (exRC.equals(Constant.rareCode1)) {
+                    if (exRC.equals(Constant.RareCode._WHITE.getValue())) {
                         // 如果稀有度为白色
                         entity.setExNum(8L);
                         gifts.add(AddExGiftInfo(entity));
                     }
-                    if (exRC.equals(Constant.rareCode2)) {
+                    if (exRC.equals(Constant.RareCode._GREEN.getValue())) {
                         // 如果稀有度为绿色
                         entity.setExNum(5L);
                         gifts.add(AddExGiftInfo(entity));
                     }
-                    if (exRC.equals(Constant.rareCode3)) {
+                    if (exRC.equals(Constant.RareCode._BLUE.getValue())) {
                         // 如果稀有度为蓝色
                         entity.setExNum(3L);
                         gifts.add(AddExGiftInfo(entity));
                     }
-                    if (exRC.equals(Constant.rareCode4)) {
+                    if (exRC.equals(Constant.RareCode._PURPLE.getValue())) {
                         // 如果稀有度为紫色
                         entity.setExNum(2L);
                         gifts.add(AddExGiftInfo(entity));
@@ -620,41 +637,41 @@ public class DrawGiftService{
                 if (aProbability.getGmPronLv() == 1) {
                     // 概率为1级
                     // 如果装备卷轴碎片稀有度为绿色将封装1-3级的概率
-                    if (eqRC.equals(Constant.rareCode2)) {
+                    if (eqRC.equals(Constant.RareCode._GREEN.getValue())) {
                         entity.setEquipmentFragNum(1L);
                         gifts.add(AddEqGiftInfo(entity));
                     }
                 } else if (aProbability.getGmPronLv() == 2) {
                     // 概率为2级
                     // 如果装备卷轴碎片稀有度为绿色将封装1-3级的概率
-                    if (eqRC.equals(Constant.rareCode2)) {
+                    if (eqRC.equals(Constant.RareCode._GREEN.getValue())) {
                         entity.setEquipmentFragNum(2L);
                         gifts.add(AddEqGiftInfo(entity));
                     }
                 } else if (aProbability.getGmPronLv() == 3) {
                     // 概率为3级
                     // 如果装备卷轴碎片稀有度为绿色将封装1-3级的概率
-                    if (eqRC.equals(Constant.rareCode2)) {
+                    if (eqRC.equals(Constant.RareCode._GREEN.getValue())) {
                         entity.setEquipmentFragNum(3L);
                         gifts.add(AddEqGiftInfo(entity));
                     }
 
                     // 如果装备卷轴碎片稀有度为紫色将封装3-4级的概率
-                    if (eqRC.equals(Constant.rareCode4)) {
+                    if (eqRC.equals(Constant.RareCode._PURPLE.getValue())) {
                         entity.setEquipmentFragNum(1L);
                         gifts.add(AddEqGiftInfo(entity));
                     }
                 } else if (aProbability.getGmPronLv() == 4) {
                     // 概率为4级
                     // 如果装备卷轴碎片稀有度为紫色将封装3-4级的概率
-                    if (eqRC.equals(Constant.rareCode4)) {
+                    if (eqRC.equals(Constant.RareCode._PURPLE.getValue())) {
                         entity.setEquipmentFragNum(2L);
                         gifts.add(AddEqGiftInfo(entity));
                     }
                 } else if (aProbability.getGmPronLv() == 5) {
                     // 概率为5级
                     // 如果装备卷轴碎片稀有度为橙色将封装4级的概率
-                    if (eqRC.equals(Constant.rareCode5)) {
+                    if (eqRC.equals(Constant.RareCode._ORANGE.getValue())) {
                         entity.setEquipmentFragNum(1L);
                         gifts.add(AddEqGiftInfo(entity));
                     }

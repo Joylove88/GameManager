@@ -32,4 +32,11 @@ public interface UserHeroDao extends BaseMapper<UserHeroEntity> {
 	 * @return
 	 */
 	UserHeroEntity getUserHeroById(Map<String, Object> map);
+
+	/**
+	 * 获取玩家英雄指定的英雄
+	 * @param map
+	 * @return
+	 */
+	UserHeroInfoRsp getUserHeroByIdRsp(Map<String, Object> map);
 }

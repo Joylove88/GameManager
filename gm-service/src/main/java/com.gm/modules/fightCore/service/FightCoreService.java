@@ -34,6 +34,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 /**
+ * 战斗核心业务类
  * @author Axiang
  * @email Axiang@gmail.com
  * @date 2022-01-23 19:06:59
@@ -149,11 +150,11 @@ public class FightCoreService {
             throw new RRException("战斗时获取队伍失败");
         }
 
-        if (Constant.BattleState.BATTLE1.getValue().equals(teamConfig.getStatus())) {
+        if (Constant.BattleState._IN_BATTLE.getValue().equals(teamConfig.getStatus())) {
             throw new RRException("该队伍状态为正在战斗中，请等待战斗结束");
         }
 
-        if (Constant.BattleState.BATTLE2.getValue().equals(teamConfig.getStatus())) {
+        if (Constant.BattleState._BATTLE_IS_OVER.getValue().equals(teamConfig.getStatus())) {
             throw new RRException("该队伍状态为战斗结束，请先领取奖励后发起战斗");
         }
 
@@ -300,15 +301,15 @@ public class FightCoreService {
             // 经济平衡系统初始化方法
             initTradeBalanceParameter();
 
-            // 获取当前副本奖励分配百分比
-            CalculateTradeUtil.FundPool = Arith.multiply(CalculateTradeUtil.FundPool, BigDecimal.valueOf(dungeon.getRewardDistribution()));
-
-            // 副本资金池余额（最新）
-            BigDecimal dungeonPoolBal = CalculateTradeUtil.FundPool;
-            System.out.println("当前副本池子余额: " + dungeonPoolBal);
-            // 更新系统中保存的副本资金池余额
-            dungeonPoolBal = Arith.subtract(dungeonPoolBal, CalculateTradeUtil.totalPlayersGold);
-            sysConfigService.updateValueByKey(Constant.DUNGEON_POOLING_BALANCE, dungeonPoolBal.toString());
+//            // 获取当前副本奖励分配百分比
+//            CalculateTradeUtil.FundPool = Arith.multiply(CalculateTradeUtil.FundPool, BigDecimal.valueOf(dungeon.getRewardDistribution()));
+//
+//            // 副本资金池余额（最新）
+//            BigDecimal dungeonPoolBal = CalculateTradeUtil.FundPool;
+//            System.out.println("当前副本池子余额: " + dungeonPoolBal);
+//            // 更新系统中保存的副本资金池余额
+//            dungeonPoolBal = Arith.subtract(dungeonPoolBal, CalculateTradeUtil.totalPlayersGold);
+//            sysConfigService.updateValueByKey(Constant.DUNGEON_POOLING_BALANCE, dungeonPoolBal.toString());
 
             // 出售/计算收益
             System.out.println("marketEggs: " + CalculateTradeUtil.marketEggs);
@@ -341,8 +342,10 @@ public class FightCoreService {
         BigDecimal goldCoins = BigDecimal.valueOf(0);
         // 怪物全部击杀 战斗胜利 获取奖励结算信息
         if ( combatStatus == 2){
+            // 获取当前副本奖励分配百分比
+            goldCoins = Arith.multiply(uDOIRList.get(0).getRemainingGoldCoins(), BigDecimal.valueOf(dungeon.getRewardDistribution()));
             // 该场战斗可得金币
-            goldCoins = Arith.divide(uDOIRList.get(0).getRemainingGoldCoins(), BigDecimal.valueOf(fightNum));
+            goldCoins = Arith.divide(goldCoins, BigDecimal.valueOf(fightNum));
             // 更新当日剩余奖励金币数
             UserDailyOutputIncomeRecordEntity uDOIR = new UserDailyOutputIncomeRecordEntity();
             uDOIR.setId(uDOIRList.get(0).getId());
@@ -362,11 +365,11 @@ public class FightCoreService {
         combatRecord.setUserId(user.getUserId());
         combatRecord.setDungeonId(dungeon.getId());// 副本ID
         combatRecord.setTeamId(teamConfig.getId());// 队伍ID
-        String state = Constant.disabled;
+        String state = Constant.BattleResult._LOSE.getValue();
         // 战斗胜利的情况下触发
         if (combatStatus == 2) {
 //            CombatDescription = "YOU WIN";
-            state = Constant.enable;
+            state = Constant.BattleResult._WIN.getValue();
             combatRecord.setGetExp(EXP);
             combatRecord.setGetUserExp(EXP);
             combatRecord.setGetEquip(dungeon.getRangeEquip());
@@ -399,7 +402,7 @@ public class FightCoreService {
         // 更新队伍战斗状态
         GmTeamConfigEntity upTeam = new GmTeamConfigEntity();
         upTeam.setId(teamConfig.getId());
-        upTeam.setStatus(Constant.enable);// 战斗中===================================
+        upTeam.setStatus(Constant.BattleState._IN_BATTLE.getValue());// 战斗中===================================
         upTeam.setStartTime(now);
         upTeam.setStartTimeTs(now.getTime());
         upTeam.setEndTime(end);
@@ -426,7 +429,7 @@ public class FightCoreService {
         System.out.println("获取系统全部玩家总战力: " + CalculateTradeUtil.totalPower);
 
         // 获取资金池70%余额
-        String poolBalance = sysConfigService.getValue(Constant.CASH_POOLING_BALANCE);
+        String poolBalance = sysConfigService.getValue(Constant.CashPool._MAIN.getValue());
         CalculateTradeUtil.FundPool = new BigDecimal((Double.parseDouble(poolBalance) * 0.7) + "");
         System.out.println("获取资金池70%余额: " + CalculateTradeUtil.FundPool);
 
@@ -718,18 +721,18 @@ public class FightCoreService {
                 attContentLog += skillName;
 
                 // 输出英雄
-                if ( Constant.SkillType.TYPE0.getValue().equals(a.getSkillType()) ) {
+                if ( Constant.SkillType._ATTACK.getValue().equals(a.getSkillType()) ) {
                     mHP = mHP - skillHarm[ras];
                     mHP = mHP < 1 ? 0 : mHP;
                     attContent += " 对[LV{mlevel} {mname}]造成{dealDamage}的伤害，[LV{mlevel} {mname}]剩余{HP}HP";
                     attContentLog += " 对[LV" + mlevel + " " + mname + "]造成" + skillHarm[ras] + "的伤害，[LV" + mlevel + " " + mname + "]剩余" + (mHP < 1 ? 0 : mHP) + "HP";
-                } else if ( Constant.SkillType.TYPE1.getValue().equals(a.getSkillType()) ||
-                        Constant.SkillType.TYPE2.getValue().equals(a.getSkillType()) ) {// 辅助类英雄
+                } else if ( Constant.SkillType._SUP.getValue().equals(a.getSkillType()) ||
+                        Constant.SkillType._SUP_ADD.getValue().equals(a.getSkillType()) ) {// 辅助类英雄
                     // 对单体英雄或全体英雄恢复血量或血量加成
                     int huifu = 0;
                     while ( huifu < heros.size() ) {
                         // 全体玩家恢复生命值技能
-                        if ( Constant.SkillType.TYPE1.getValue().equals(a.getSkillType()) ) {
+                        if ( Constant.SkillType._SUP.getValue().equals(a.getSkillType()) ) {
 
                             long hp = heros.get(huifu).getHp();// 获取英雄的生命值
                             long addhp = addHP(hp, hSkillHp);
@@ -738,7 +741,7 @@ public class FightCoreService {
                             attContent += " 全体英雄恢复HP:" + addhp;
                             attContentLog += " 全体英雄恢复HP:" + addhp;
 
-                        } else if ( Constant.SkillType.TYPE2.getValue().equals(a.getSkillType()) ) {// 玩家属性加成技能
+                        } else if ( Constant.SkillType._SUP_ADD.getValue().equals(a.getSkillType()) ) {// 玩家属性加成技能
                             // 随机给某个英雄释放辅助技能
                             Random rdSUP = new Random();
                             int supNum = rdSUP.nextInt(heros.size());
@@ -942,13 +945,11 @@ public class FightCoreService {
     private UserHeroInfoRsp getUserHeroInfo(long id){
         Map<String, Object> userHeroMap = new HashMap<>();
         userHeroMap.put("gmUserHeroId", id);
-        UserHeroEntity userHero = userHeroDao.getUserHeroById(userHeroMap);
+        UserHeroInfoRsp userHero = userHeroDao.getUserHeroByIdRsp(userHeroMap);
         if ( userHero == null ) {
             System.out.println("英雄获取失败getUserHeroInfo");
         }
-        UserHeroInfoRsp rsp = new UserHeroInfoRsp();
-        BeanUtils.copyProperties(rsp, userHero);
-        return rsp;
+        return userHero;
     }
 
     public List<UserHeroInfoRsp> getTeamHeroInfoList(Long teamId, TeamInfoRsp rsp){
@@ -1002,14 +1003,31 @@ public class FightCoreService {
         if (combatRecord == null){
             throw new RRException("战斗记录失效");
         }
+
         // 校验战斗时间是否结束
         Date now = new Date();
         if (combatRecord.getEndTimeTs() > now.getTime()) {
             throw new RRException("该场战斗还未完成，请等待...");
         }
+
+        // 校验玩家是否已领取奖励
+        Map<String, Object> balanceMap = new HashMap<>();
+        balanceMap.put("sourceId", combatRecord.getId());
+        List<UserBalanceDetailEntity> balanceDetails = userBalanceDetailService.getUserBalanceDetail(balanceMap);
+        if ( balanceDetails.size() > 0 ){
+            throw new RRException("已领取奖励，请刷新页面");
+        }
+
         rsp.setStatus(combatRecord.getStatus());
 
-        if (Constant.enable.equals(combatRecord.getStatus())) {
+        // 更新队伍状态为未战斗
+        GmTeamConfigEntity team = new GmTeamConfigEntity();
+        team.setId(combatRecord.getTeamId());
+        team.setStatus(Constant.BattleState._IDLE.getValue());
+        teamConfigDao.updateById(team);
+
+        // 战斗胜利为玩家发放奖励
+        if (Constant.BattleResult._WIN.getValue().equals(combatRecord.getStatus()) && balanceDetails.size() == 0) {
             // 更新玩家账户余额
             boolean effect = userAccountService.updateAccountAdd(user.getUserId(), combatRecord.getGetGoldCoins());
             if (!effect) {
@@ -1058,7 +1076,6 @@ public class FightCoreService {
                 }
                 rsp.setUserEquipInfoRsps(userEquipInfoRsps);
             }
-
         }
         return rsp;
 

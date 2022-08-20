@@ -28,7 +28,7 @@
               AND USER_CODE = #{userCode}
             </if>
 
-            <if test="loginTimeTs != null and loginTimeTs != ''">
+            <if test="gtTime != null and ltTime != ''">
                 AND LOGIN_TIME_TS &gt;= #{ltTime}
                 AND LOGIN_TIME_TS &lt;= #{gtTime}
             </if>

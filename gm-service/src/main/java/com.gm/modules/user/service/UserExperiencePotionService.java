@@ -2,7 +2,9 @@ package com.gm.modules.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
+import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserExperiencePotionEntity;
+import com.gm.modules.user.req.UseExpReq;
 import com.gm.modules.user.rsp.UserExpInfoRsp;
 
 import java.util.List;
@@ -21,6 +23,6 @@ public interface UserExperiencePotionService extends IService<UserExperiencePoti
 
     List<UserExpInfoRsp> getUserEx(UserExperiencePotionEntity userExperiencePotionEntity);
 
-    boolean userHeroUseEx(UserExperiencePotionEntity userExperiencePotionEntity);
+    boolean userHeroUseEx(UserEntity user, UseExpReq useExpReq);
 }
 

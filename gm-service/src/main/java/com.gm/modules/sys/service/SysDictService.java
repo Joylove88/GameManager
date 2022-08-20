@@ -8,6 +8,7 @@
 
 package com.gm.modules.sys.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.sys.entity.SysDictEntity;
@@ -26,5 +27,7 @@ public interface SysDictService extends IService<SysDictEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     List<SysDictEntity> getSysDict(@Param("dictName") String dictName, @Param("dictType") String dictType);
+
+    JSONObject getContractsAddress();
 }
 

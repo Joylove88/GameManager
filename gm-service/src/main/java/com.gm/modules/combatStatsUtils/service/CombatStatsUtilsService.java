@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 获取英雄属性，更新战力
+ * 玩家战斗力业务类
  * @author Axiang
  * @email Axiang@gmail.com
  * @date 2022-01-23 19:06:59

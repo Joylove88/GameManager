@@ -8,9 +8,11 @@
 
 package com.gm.modules.sys.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gm.common.exception.RRException;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.modules.sys.dao.SysDictDao;
@@ -44,6 +46,18 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictDao, SysDictEntity> i
     @Override
     public List<SysDictEntity> getSysDict(String dictName, String dictType) {
         return sysDictDao.getSysDict(dictName,dictType);
+    }
+
+    @Override
+    public JSONObject getContractsAddress() {
+        SysDictEntity sysDict = sysDictDao.selectOne(new QueryWrapper<SysDictEntity>()
+                .eq("name", "CONTRACTS")
+                .eq("type", "ADDRESS")
+        );
+        if ( sysDict == null ) {
+            throw new RRException("Could not get address!");
+        }
+        return JSONObject.parseObject(sysDict.getValue());
     }
 
 }

@@ -16,5 +16,16 @@
         <result property="sourceId" column="SOURCE_ID"/>
     </resultMap>
 
+    <select id="getUserBalanceDetail" resultType="com.gm.modules.user.entity.UserBalanceDetailEntity">
+        SELECT
+        A.*
+        FROM
+        gm_user_balance_detail A
+        <where>
+            <if test="sourceId != null and sourceId != ''">
+                AND A.SOURCE_ID = #{sourceId}
+            </if>
+        </where>
+    </select>
 
 </mapper>

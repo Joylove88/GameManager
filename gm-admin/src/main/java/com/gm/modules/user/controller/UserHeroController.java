@@ -104,7 +104,7 @@ public class UserHeroController {
     @RequestMapping("/userHeroUseEx")
     @RequiresPermissions("user:userhero:list")
     public R useEx(@RequestBody UserExperiencePotionEntity userExperiencePotionEntity){
-        userExService.userHeroUseEx(userExperiencePotionEntity);
+        userExService.userHeroUseEx(null, null);
         return R.ok();
     }
 }
