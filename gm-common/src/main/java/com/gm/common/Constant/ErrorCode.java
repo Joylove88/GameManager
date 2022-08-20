@@ -18,6 +18,8 @@ public enum ErrorCode {
 	EXP_RARE_NOT_NULL(108,"Please select the type of experience potion!"),//请选择经验药水的种类
 	ADDRESS_HAS_EXIST(109,"address already exists!"),//地址已存在
 	INVITE_ADDRESS_NOT_EXIST(110,"invite address not exists!"),//上级地址不存在
+	WITHDRAW_OVER_TIMES(111,"24 hours only once!"),//24小时只能提现一次
+	WITHDRAW_OVER_MONEY(112,"withdraw over!"),//提现超额
 
 
 

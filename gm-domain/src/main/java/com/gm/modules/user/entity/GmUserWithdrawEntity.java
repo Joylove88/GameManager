@@ -28,7 +28,7 @@ public class GmUserWithdrawEntity implements Serializable {
 	/**
 	 * 用户ID
 	 */
-	private BigDecimal userId;
+	private Long userId;
 	/**
 	 * 提现金额
 	 */

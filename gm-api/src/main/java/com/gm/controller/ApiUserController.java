@@ -16,6 +16,7 @@ import com.gm.annotation.LoginUser;
 import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
 import com.gm.common.utils.Constant;
+import com.gm.common.utils.DateUtils;
 import com.gm.common.utils.ExpUtils;
 import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
@@ -26,6 +27,7 @@ import com.gm.modules.basicconfig.entity.HeroSkillEntity;
 import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
 import com.gm.modules.basicconfig.service.*;
 import com.gm.modules.user.entity.*;
+import com.gm.modules.user.req.UseWithdrawReq;
 import com.gm.modules.user.req.UserHeroInfoReq;
 import com.gm.modules.user.rsp.*;
 import com.gm.modules.user.service.*;
@@ -39,10 +41,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 用户信息接口
@@ -83,6 +82,10 @@ public class ApiUserController {
     private HeroLevelService heroLevelService;
     @Autowired
     private HeroSkillService heroSkillService;
+    @Autowired
+    private GmUserWithdrawService gmUserWithdrawService;
+    @Autowired
+    private GmUserVipLevelService gmUserVipLevelService;
 
     @Login
     @PostMapping("getUserHeroInfo")
@@ -248,6 +251,30 @@ public class ApiUserController {
         map.put("heroInfo", rsp);
         map.put("equipments", jsonArray);
         return R.ok().put("data",map);
+    }
+
+    @Login
+    @PostMapping("withdraw")
+    @ApiOperation("玩家提现")
+    public R withdraw(@LoginUser UserEntity user, @RequestBody UseWithdrawReq useWithdrawReq) {
+        // 表单校验
+        ValidatorUtils.validateEntity(useWithdrawReq);
+        // 1.查询该会员上次提现时间
+        GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(user);
+        Date date = DateUtils.addDateHours(lastWithdraw.getCreateTime(), 24);// 上次提现时间加24小时，然后和当前时间做比较
+        if (date.after(new Date())){// 24小时只能发起一次提现
+            throw new RRException(ErrorCode.WITHDRAW_OVER_TIMES.getDesc());
+        }
+        // 2.查询该会员消费等级
+        GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.getById(user.getVipLevelId());
+        // 3.查询该会员当前余额
+        UserAccountEntity userAccountEntity = userAccountService.queryByUserId(user.getUserId());
+        if (userAccountEntity.getBalance()*gmUserVipLevel.getWithdrawLimit() < Double.valueOf(useWithdrawReq.getWithdrawMoney())){
+            // 提现超额
+            throw new RRException(ErrorCode.WITHDRAW_OVER_TIMES.getDesc());
+        }
+        gmUserWithdrawService.withdraw(user,useWithdrawReq);
+        return R.ok();
     }
 
 }

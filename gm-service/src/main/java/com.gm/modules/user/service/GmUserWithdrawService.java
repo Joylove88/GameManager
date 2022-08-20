@@ -3,6 +3,8 @@ package com.gm.modules.user.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.user.entity.GmUserWithdrawEntity;
+import com.gm.modules.user.entity.UserEntity;
+import com.gm.modules.user.req.UseWithdrawReq;
 
 import java.util.Map;
 
@@ -16,5 +18,9 @@ import java.util.Map;
 public interface GmUserWithdrawService extends IService<GmUserWithdrawEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    GmUserWithdrawEntity lastWithdraw(UserEntity user);
+
+    void withdraw(UserEntity user,UseWithdrawReq useWithdrawReq);
 }
 

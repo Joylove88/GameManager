@@ -87,6 +87,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		userRegister.setExpandCode(RandomStringUtils.randomAlphanumeric(6));
 		userRegister.setFatherId(userEntity.getFatherId());
 		userRegister.setGrandfatherId(userEntity.getGrandfatherId());
+		userRegister.setVipLevelId(1539878146445455362L);
 
 		userDao.insert(userRegister);
 
