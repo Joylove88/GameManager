@@ -6,6 +6,7 @@ import com.gm.modules.user.rsp.UserHeroFragInfoRsp;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -19,8 +20,14 @@ public interface UserHeroFragDao extends BaseMapper<UserHeroFragEntity> {
 
     /**
      * 获取玩家英雄碎片
-     * @param userId
+     * @param map
      * @return
      */
-	List<UserHeroFragInfoRsp> getUserAllHeroFrag(Long userId);
+	List<UserHeroFragInfoRsp> getUserAllHeroFrag(Map<String, Object> map);
+
+    /**
+     * 消耗英雄碎片升星
+     * @param map
+     */
+	void depleteHeroFrag(Map<String, Object> map);
 }

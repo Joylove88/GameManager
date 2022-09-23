@@ -70,8 +70,8 @@ public class EthBalanceListenTask implements ITask {
 		logger.info("ethBalanceListenTask定时任务正在执行，参数为：{}", params);
 		try {
 			// 获取地址
-			JSONObject address = sysDictService.getContractsAddress();
-			contracts.add(address.getString("ADDRESS").toLowerCase());
+			JSONObject address = sysDictService.getContractsAddress("CONTRACTS", "ADDRESS");
+			contracts.add(address.getString("OWNER_ADDRESS").toLowerCase());
 			contracts.add(address.getString("BUSD_ADDRESS").toLowerCase());
 			// 开始链上监听
 			startReplayListen_ETH();

@@ -21,7 +21,7 @@ public interface UserBalanceDetailService extends IService<UserBalanceDetailEnti
     /**
      * 更新账户金额
      */
-    void insertBalanceDetail(UserBalanceDetailEntity balanceDetailEntity);
+    void insertBalanceDetail(Map<String, Object> params);
 
     /**
      * 获取账变明细

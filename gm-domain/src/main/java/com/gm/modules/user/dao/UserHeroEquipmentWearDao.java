@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 玩家英雄装备穿戴表
@@ -19,8 +20,8 @@ import java.util.List;
 public interface UserHeroEquipmentWearDao extends BaseMapper<UserHeroEquipmentWearEntity> {
     /**
      * 获取玩家英雄穿戴中的装备
-     * @param userHeroId
+     * @param map
      * @return
      */
-	List<UserHeroEquipmentWearRsp> getUserWearEQ(@Param("userHeroId") Long userHeroId);
+	List<UserHeroEquipmentWearRsp> getUserWearEQ(Map<String, Object> map);
 }

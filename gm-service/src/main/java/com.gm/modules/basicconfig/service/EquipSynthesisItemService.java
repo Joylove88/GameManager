@@ -24,5 +24,12 @@ public interface EquipSynthesisItemService extends IService<EquipSynthesisItemEn
      * @return
      */
     List<EquipSynthesisItemEntity> getEquipSynthesisItemEntitys(Map<String, Object> map);
+
+    /**
+     * 获取装备合成配方（单件装备）
+     * @param equipId
+     * @return
+     */
+    EquipSynthesisItemEntity getEquipSyntheticFormula(Long equipId);
 }
 

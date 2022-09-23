@@ -28,6 +28,15 @@ public interface UserAccountService extends IService<UserAccountEntity> {
     boolean updateAccountAdd(Long userId, BigDecimal addMoney);
 
     /**
+     * 给用户减少金额
+     *
+     * @param userId 用户ID
+     * @param subMoney   金额
+     * @return boolean
+     */
+    boolean updateAccountSub(Long userId, BigDecimal subMoney);
+
+    /**
      * 根据用户ID查询账户
      * @param userId 用户ID
      * @return 用户账户

@@ -36,6 +36,10 @@ public class StarInfoEntity implements Serializable {
 	@NotNull(message = "The star attribute bonus cannot be empty!")
 	private Long gmStarAttributes;
 	/**
+	 * 升星所需碎片数量
+	 */
+	private Long upStarFragNum;
+	/**
 	 * 创建人
 	 */
 	private String createUser;

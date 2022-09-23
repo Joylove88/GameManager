@@ -12,6 +12,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * 抽奖参数
  *
@@ -39,5 +41,7 @@ public class DrawForm {
      * 物品类型('1':英雄，'2':装备，'3':药水)
      */
     private String itemType;
+
+    private BigDecimal fee;
 
 }

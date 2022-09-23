@@ -3,21 +3,27 @@ package com.gm.modules.order.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gm.common.utils.Arith;
 import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
+import com.gm.modules.fundsAccounting.service.FundsAccountingService;
 import com.gm.modules.order.dao.TransactionOrderDao;
 import com.gm.modules.order.entity.TransactionOrderEntity;
 import com.gm.modules.order.service.TransactionOrderService;
+import com.gm.modules.user.entity.UserBalanceDetailEntity;
 import com.gm.modules.user.req.DrawForm;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.service.GmUserVipLevelService;
+import com.gm.modules.user.service.UserBalanceDetailService;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +32,10 @@ import java.util.Map;
 public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao, TransactionOrderEntity> implements TransactionOrderService {
     @Autowired TransactionOrderDao transactionOrderDao;
     @Autowired GmUserVipLevelService gmUserVipLevelService;
+    @Autowired
+    private FundsAccountingService fundsAccountingService;
+    @Autowired
+    private UserBalanceDetailService userBalanceDetailService;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<TransactionOrderEntity> page = this.page(
@@ -38,24 +48,56 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
 
     @Override
     public void addOrder(UserEntity user, List gifts, DrawForm form) {
-        TransactionOrderEntity orderEntity = new TransactionOrderEntity();
+        TransactionOrderEntity order = new TransactionOrderEntity();
         Date date = new Date();
         // 为加密货币类型时 订单状态为待处理，并且插入hash值。否则为金币类型时 订单状态为成功，并且插入用户ID
-        if (Constant.enable.equals(form.getCurType())){
-            orderEntity.setStatus(Constant.disabled);// 订单状态：默认0：待处理
-            orderEntity.setTransactionHash(form.getTransactionHash());
+        if (Constant.CurrencyType._CRYPTO.getValue().equals(form.getCurType())){
+            order.setStatus(Constant.disabled);// 订单状态：默认0：待处理
+            order.setTransactionHash(form.getTransactionHash());
         } else {
             JSONArray jsonArray = JSONArray.fromObject(gifts);
-            orderEntity.setItemData(jsonArray.toString());
-            orderEntity.setStatus(Constant.enable);// 订单状态：1：成功
-            orderEntity.setGmUserId(user.getUserId());
+            order.setTransactionFee(form.getFee());
+            order.setItemData(jsonArray.toString());
+            order.setStatus(Constant.enable);// 订单状态：1：成功
+            order.setGmUserId(user.getUserId());
+            // 用户池出账
+            fundsAccountingService.setCashPoolSub(Constant.CashPool._USER.getValue(), order.getTransactionFee());// 扣除本次抽奖金币数量
+            // 副本池入账
+            BigDecimal dungeonFee = Arith.multiply(order.getTransactionFee(), Constant.CashPoolScale._DUNGEON.getValue());// 获取该订单金额的75%
+            fundsAccountingService.setCashPoolAdd(Constant.CashPool._DUNGEON.getValue(), dungeonFee);
+            // 回购池入账
+            BigDecimal repoFee = Arith.multiply(order.getTransactionFee(), Constant.CashPoolScale._REPO.getValue());// 获取该订单金额的20%
+            fundsAccountingService.setCashPoolAdd(Constant.CashPool._REPO.getValue(), repoFee);
+            // 团队抽成池入账
+            BigDecimal teamFee = Arith.multiply(order.getTransactionFee(), Constant.CashPoolScale._TEAM.getValue());// 获取该订单金额的5%
+            fundsAccountingService.setCashPoolAdd(Constant.CashPool._TEAM.getValue(), teamFee);
         }
-        orderEntity.setCurrencyType(form.getCurType());
-        orderEntity.setLottyType(form.getDrawType());
-        orderEntity.setItemType(form.getItemType());// 物品类型('1':英雄，'2':装备，'3':药水)
-        orderEntity.setCreateTime(date);
-        orderEntity.setCreateTimeTs(date.getTime());
-        transactionOrderDao.insert(orderEntity);
+        order.setCurrencyType(form.getCurType());
+        order.setLottyType(form.getDrawType());
+        order.setItemType(form.getItemType());// 物品类型('1':英雄，'2':装备，'3':药水)
+        order.setCreateTime(date);
+        order.setCreateTimeTs(date.getTime());
+        transactionOrderDao.insert(order);
+
+        // 金币抽奖时插入账变明细
+        if ( Constant.CurrencyType._GOLD_COINS.getValue().equals(form.getCurType()) ) {
+            String tradeType = "";
+            if ( form.getItemType().equals(Constant.ItemType.HERO.getValue()) ) {
+                tradeType = Constant.TradeType.DRAW_HERO.getValue();
+            } else  if ( form.getItemType().equals(Constant.ItemType.EQUIPMENT.getValue()) ) {
+                tradeType = Constant.TradeType.DRAW_EQUIP.getValue();
+            } else  if ( form.getItemType().equals(Constant.ItemType.EXPERIENCE.getValue()) ) {
+                tradeType = Constant.TradeType.DRAW_EXP.getValue();
+            }
+            Map<String, Object> balanceMap = new HashMap<>();
+            balanceMap.put("userId", user.getUserId());
+            balanceMap.put("amount", order.getTransactionFee());
+            balanceMap.put("tradeType", tradeType);
+            balanceMap.put("tradeDesc", "抽奖");
+            balanceMap.put("sourceId", order.getGmTransactionOrderId());// 抽奖订单ID
+            userBalanceDetailService.insertBalanceDetail(balanceMap);
+        }
+
     }
 
     @Override
@@ -69,16 +111,21 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
         order.setItemData(jsonArray.toString());
         order.setUpdateTime(date);
         order.setUpdateTimeTs(date.getTime());
+        // 加密货币类型订单
         if (map.size() > 0){
             Long blockNumber = Long.valueOf(map.get("blockNumber").toString());
-            Long gasUsed = Long.valueOf(map.get("gasUsed").toString());
+            BigDecimal gasUsed = new BigDecimal(map.get("gasUsed").toString());
+            BigDecimal fee = new BigDecimal(map.get("fee").toString());
             Long userId = Long.valueOf(map.get("userId").toString());
             String status = map.get("status").toString();
             order.setStatus(status);
             order.setBlockNumber(blockNumber);
             order.setTransactionGasFee(gasUsed);
             order.setGmUserId(userId);
+            order.setTransactionFee(fee);
         }
+
+        // 通过HASH更新订单
         QueryWrapper<TransactionOrderEntity> wrapper = new QueryWrapper<TransactionOrderEntity>()
                 .eq("TRANSACTION_HASH",transactionHash);
         transactionOrderDao.update(order, wrapper);

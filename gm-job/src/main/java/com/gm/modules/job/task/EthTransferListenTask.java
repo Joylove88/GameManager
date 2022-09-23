@@ -84,7 +84,7 @@ public class EthTransferListenTask implements ITask {
 		logger.info("ethTransferListenTask定时任务正在执行，参数为：{}", params);
 		try {
 			// 获取地址
-			JSONObject address = sysDictService.getContractsAddress();
+			JSONObject address = sysDictService.getContractsAddress("CONTRACTS", "ADDRESS");
 			NFT_HERO_ADDRESS = address.getString("NFT_HERO_ADDRESS");
 			NFT_EQUIP_ADDRESS = address.getString("NFT_EQUIP_ADDRESS");
 			NFT_EX_ADDRESS = address.getString("NFT_EX_ADDRESS");
@@ -190,7 +190,7 @@ public class EthTransferListenTask implements ITask {
 		logger.info("to = "+to);
 		logger.info("value = "+value.doubleValue());
 		Optional<TransactionReceipt> receipt = TransactionVerifyUtils.isVerify(web3j,txHash);
-		ethTransferService.eth(txHash, null, receipt, null);
+		ethTransferService.eth(txHash, null, receipt, new DrawForm());
 	}
 
 	// 更新系统中保存的区块号

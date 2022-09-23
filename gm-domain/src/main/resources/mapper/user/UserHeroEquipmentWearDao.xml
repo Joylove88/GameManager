@@ -73,7 +73,20 @@
                 gm_user_equipment B ON A.GM_USER_EQUIP_ID = B.GM_USER_EQUIPMENT_ID
         LEFT JOIN
                 GM_EQUIPMENT_INFO B2 ON B.GM_EQUIPMENT_ID = B2.EQUIP_ID
-        WHERE A.STATUS = '1' AND B.STATUS = '1' AND GM_USER_HERO_ID = #{userHeroId}
+        <where>
+            <if test="status != null and status != ''">
+                AND A.`STATUS` = #{status}
+            </if>
+            <if test="statusB != null and statusB != ''">
+                AND B.`STATUS` = #{statusB}
+            </if>
+            <if test="userHeroId != null and userHeroId != ''">
+                AND A.GM_USER_HERO_ID = #{userHeroId}
+            </if>
+            <if test="parentEquipChain != null and parentEquipChain != ''">
+                AND A.PARENT_EQUIP_CHAIN LIKE '%${parentEquipChain}%'
+            </if>
+        </where>
     </select>
 
 

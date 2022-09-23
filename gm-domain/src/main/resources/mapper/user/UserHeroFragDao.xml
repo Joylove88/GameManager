@@ -51,7 +51,53 @@
             GM_HERO_FRAG B ON A.GM_HERO_FRAG_ID = B.GM_HERO_FRAG_ID
                 LEFT JOIN
             GM_HERO_INFO C ON B.GM_HERO_INFO_ID = C.HERO_ID
-        WHERE A.`STATUS` = '1' AND A.GM_USER_ID = #{userId}
-        GROUP BY A.GM_HERO_FRAG_ID,C.HERO_NAME
+        <where>
+            <if test="status != null and status != ''">
+                AND A.`STATUS` = #{status}
+            </if>
+            <if test="gmUserId != null and gmUserId != ''">
+                AND A.GM_USER_ID = #{gmUserId}
+            </if>
+            <if test="heroId != null and heroId != ''">
+                AND C.HERO_ID = #{heroId}
+            </if>
+        </where>
+        GROUP BY B.HERO_FRAG_ICON_URL,C.HERO_NAME
     </select>
+
+    <!--消耗英雄碎片升星-->
+    <update id="depleteHeroFrag" parameterType="map">
+        UPDATE GM_USER_HERO_FRAG
+        <set>
+            `STATUS` = '2',
+            UPDATE_TIME = NOW(),
+            UPDATE_TIME_TS = #{updateTimeTs},
+        </set>
+        WHERE
+        GM_USER_HERO_FRAG_ID IN (
+            SELECT
+            GM_USER_HERO_FRAG_ID
+            FROM
+            (
+            SELECT
+            A.GM_USER_HERO_FRAG_ID
+            FROM
+            GM_USER_HERO_FRAG A
+            LEFT JOIN GM_HERO_FRAG B ON A.GM_HERO_FRAG_ID = B.GM_HERO_FRAG_ID
+            LEFT JOIN GM_HERO_INFO C ON B.GM_HERO_INFO_ID = C.HERO_ID
+            <where>
+                <if test="status != null and status != ''">
+                    AND A.`STATUS` = #{status}
+                </if>
+                <if test="gmUserId != null and gmUserId != ''">
+                    AND A.GM_USER_ID = #{gmUserId}
+                </if>
+                <if test="heroId != null and heroId != ''">
+                    AND C.HERO_ID = #{heroId}
+                </if>
+            </where>
+            LIMIT #{heroFragNum}
+            ) AS TT
+        );
+    </update>
 </mapper>

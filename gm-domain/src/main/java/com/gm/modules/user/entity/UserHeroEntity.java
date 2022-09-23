@@ -101,7 +101,7 @@ public class UserHeroEntity implements Serializable {
 	 * 英雄星级
 	 */
 	@TableField(exist = false)
-	private String gmStarCode;
+	private Long gmStarCode;
 	/**
 	 * 英雄等级编码
 	 */

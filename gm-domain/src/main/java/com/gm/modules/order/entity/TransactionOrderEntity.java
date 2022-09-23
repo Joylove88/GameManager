@@ -57,11 +57,11 @@ public class TransactionOrderEntity implements Serializable {
 	/**
 	 * 消耗金额
 	 */
-	private Double transactionFee;
+	private BigDecimal transactionFee;
 	/**
 	 * GAS费
 	 */
-	private Long transactionGasFee;
+	private BigDecimal transactionGasFee;
 	/**
 	 * 抽奖类型('1':单抽，'2':十连抽)
 	 */

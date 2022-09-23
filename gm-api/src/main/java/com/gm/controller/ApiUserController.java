@@ -20,10 +20,7 @@ import com.gm.common.utils.DateUtils;
 import com.gm.common.utils.ExpUtils;
 import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
-import com.gm.modules.basicconfig.entity.EquipmentInfoEntity;
-import com.gm.modules.basicconfig.entity.HeroEquipmentEntity;
-import com.gm.modules.basicconfig.entity.HeroLevelEntity;
-import com.gm.modules.basicconfig.entity.HeroSkillEntity;
+import com.gm.modules.basicconfig.entity.*;
 import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
 import com.gm.modules.basicconfig.service.*;
 import com.gm.modules.user.entity.*;
@@ -61,6 +58,8 @@ public class ApiUserController {
     @Autowired
     private UserTokenService tokenService;
     @Autowired
+    private StarInfoService starInfoService;
+    @Autowired
     private UserAccountService userAccountService;
     @Autowired
     private UserHeroFragService userHeroFragService;
@@ -88,6 +87,8 @@ public class ApiUserController {
     private GmUserWithdrawService gmUserWithdrawService;
     @Autowired
     private GmUserVipLevelService gmUserVipLevelService;
+    @Autowired
+    private UserExperiencePotionService userExperiencePotionService;
 
     @Login
     @PostMapping("getUserHeroInfo")
@@ -111,24 +112,33 @@ public class ApiUserController {
         userHeroMap.put("gmUserId", user.getUserId());
         List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(userHeroMap);
         int i = 0;
-        while (i < heroList.size()) {
+        while ( i < heroList.size() ) {
             // 获取该英雄已穿戴的装备
-            List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearService.getUserWearEQ(heroList.get(i).getGmUserHeroId());
-            if (wearList.size() > 0) {
+            Map<String, Object> userWearMap = new HashMap<>();
+            userWearMap.put("status", Constant.enable);
+            userWearMap.put("userHeroId", heroList.get(i).getGmUserHeroId());
+            List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearService.getUserWearEQ(userWearMap);
+            if ( wearList.size() > 0 ) {
                 heroList.get(i).setWearEQList(wearList);
             }
             i++;
         }
         map.put("heroList",heroList);
+
         // 获取英雄碎片
-        List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(user.getUserId());
+        Map<String, Object> heroFragMap = new HashMap<>();
+        heroFragMap.put("gmUserId", user.getUserId());
+        heroFragMap.put("status", Constant.enable);
+        List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(heroFragMap);
         map.put("heroFragList",heroFragList);
+
         // 获取装备
         UserEquipmentEntity userEquipment = new UserEquipmentEntity();
         userEquipment.setStatus(Constant.enable);
         userEquipment.setGmUserId(user.getUserId());
         List<UserEquipInfoRsp> equipmentEntities = userEquipmentService.getUserEquip(userEquipment);
         map.put("equipList",equipmentEntities);
+
         // 获取装备碎片
         List<UserEquipmentFragInfoRsp> equipmentFragEntities = userEquipmentFragService.getUserAllEquipFrag(user.getUserId());
         map.put("equipFragList",equipmentFragEntities);
@@ -212,19 +222,23 @@ public class ApiUserController {
         }
         UserHeroInfoRsp rsp = new UserHeroInfoRsp();
         BeanUtils.copyProperties(rsp, userHero);
+
         // 获取英雄等级信息
         HeroLevelEntity heroLevel = heroLevelService.getById(userHero.getGmHeroLevelId());
         if (heroLevel == null){
             throw new RRException(ErrorCode.EXP_GET_FAIL.getDesc());
         }
+
         // 晋级到下一级所需经验值
         rsp.setPromotionExperience(heroLevel.getGmPromotionExperience());
         // 当前等级获取的经验值
         rsp.setCurrentExp(ExpUtils.getCurrentExp(heroLevel.getGmExperienceTotal(), heroLevel.getGmPromotionExperience(), user.getExperienceObtain()));
+
         // 获取系统全部装备
         Map<String, Object> equipMap = new HashMap<>();
         equipMap.put("STATUS", Constant.enable);
         List<EquipmentInfoEntity> equipments = equipmentInfoService.getEquipmentInfos(equipMap);
+
         // 获取英雄装备栏
         Map<String, Object> heroEquipMap = new HashMap<>();
         heroEquipMap.put("status",  Constant.enable);
@@ -236,6 +250,7 @@ public class ApiUserController {
             jsonArray.add(equipmentInfoService.updateEquipJson2(heroEquipment.getGmEquipId(),equipments, rsp));
 
         }
+
         // 获取英雄技能
         Map<String, Object> skillMap = new HashMap<>();
         skillMap.put("status", Constant.enable);
@@ -246,12 +261,41 @@ public class ApiUserController {
         }
         HeroSkillRsp skillRsp = new HeroSkillRsp();
         BeanUtils.copyProperties(skillRsp,heroSkill);
-
         rsp.setHeroSkillRsp(skillRsp);
+
+        // 获取当前星级+1
+        Long starCode = userHero.getGmStarCode();
+        if ( starCode < 5 ) {
+            starCode += 1;
+        }
+        // 获取当前阶段升星所需碎片
+        StarInfoEntity starInfo = starInfoService.getOne(new QueryWrapper<StarInfoEntity>()
+                .eq("GM_STAR_CODE", starCode)
+
+        );
+
+        // 获取玩家背包中的英雄碎片
+        Map<String, Object> heroFragMap = new HashMap<>();
+        heroFragMap.put("gmUserId", user.getUserId());
+        heroFragMap.put("status", Constant.enable);
+        heroFragMap.put("heroId", userHero.getGmHeroId());
+        List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(heroFragMap);
+
+        // 获取英雄等级信息
+        List<HeroLevelEntity> heroLevels = heroLevelService.list();
+
+        // 获取玩家背包中的经验道具
+        UserExperiencePotionEntity exp = new UserExperiencePotionEntity();
+        exp.setGmUserId(user.getUserId());
+        List<UserExpInfoRsp> expList = userExService.getUserEx(exp);
 
         Map<String, Object> map = new HashMap();
         map.put("heroInfo", rsp);
         map.put("equipments", jsonArray);
+        map.put("heroLevels", heroLevels);
+        map.put("expList", expList);
+        map.put("upStarFragNum", starInfo.getUpStarFragNum());
+        map.put("heroFragNum", heroFragList.get(0).getHeroFragNum());
         return R.ok().put("data",map);
     }
 

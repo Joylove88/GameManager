@@ -17,5 +17,12 @@ public interface HeroStarService extends IService<HeroStarEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     List<HeroStarEntity> getHeroStars();
+
+    /**
+     * 获取指定星级范围英雄
+     * @param map
+     * @return
+     */
+    List<HeroStarEntity> getRangeHeroStars(Map<String, Object> map);
 }
 

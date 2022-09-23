@@ -65,4 +65,33 @@
         A.`STATUS` = '1'
         ORDER BY C.HERO_NAME ASC,D.GM_STAR_CODE ASC
     </select>
+
+    <!--获取指定星级范围英雄-->
+    <select id="getRangeHeroStars" resultType="com.gm.modules.basicconfig.entity.HeroStarEntity">
+        SELECT
+            A.*, C.HERO_ICON_URL,
+            C.HERO_NAME,
+            D.GM_STAR_CODE
+        FROM
+            GM_HERO_STAR A
+        LEFT JOIN GM_HERO_INFO C ON A.GM_HERO_ID = C.HERO_ID
+        LEFT JOIN GM_STAR_INFO D ON A.GM_STAR_ID = D.GM_STAR_ID
+        <where>
+            <if test="status != null and status != ''">
+                AND A.`STATUS` = #{status}
+            </if>
+            <if test="heroId != null and heroId != ''">
+                AND A.GM_HERO_ID = #{heroId}
+            </if>
+            <if test="starCodes != null and starCodes != ''">
+                AND D.GM_STAR_CODE IN
+                <foreach collection="starCodes" open="(" separator="," close=")" item="starCode">
+                    #{starCode}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY D.GM_STAR_CODE ASC
+    </select>
+
+
 </mapper>

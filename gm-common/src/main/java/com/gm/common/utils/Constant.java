@@ -8,6 +8,8 @@
 
 package com.gm.common.utils;
 
+import java.math.BigDecimal;
+
 /**
  * 常量
  *
@@ -450,6 +452,26 @@ public class Constant {
         }
 
         public String getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 资金池分配比例
+     */
+    public enum CashPoolScale {
+        _USER(BigDecimal.valueOf(0)), // 用户比例
+        _DUNGEON(BigDecimal.valueOf(0.75)), // 副本比例
+        _REPO(BigDecimal.valueOf(0.2)), //回购比例
+        _TEAM(BigDecimal.valueOf(0.05)); // 团队比例
+
+        private BigDecimal value;
+
+        CashPoolScale(BigDecimal value) {
+            this.value = value;
+        }
+
+        public BigDecimal getValue() {
             return value;
         }
     }

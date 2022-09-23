@@ -4,8 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gm.common.utils.Arith;
+import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
+import com.gm.modules.fundsAccounting.service.FundsAccountingService;
 import com.gm.modules.order.entity.TransactionOrderEntity;
 import com.gm.modules.order.service.TransactionOrderService;
 import com.gm.modules.sys.service.SysConfigService;
@@ -41,6 +44,8 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
     private UserAccountService userAccountService;
     @Autowired
     private UserBalanceDetailService userBalanceDetailService;
+    @Autowired
+    private FundsAccountingService fundsAccountingService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -71,7 +76,7 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
             if (currentUserVipLevel.getVipLevelCode() >= gmUserVipLevel.getVipLevelCode()) {
                 continue;
             }
-            if (gmUserVipLevel.getConsumeMoney() <= totalMoney + order.getTransactionGasFee()) {//客户消费总金额 >= 消费等级要求金额
+            if (gmUserVipLevel.getConsumeMoney() <= totalMoney + order.getTransactionGasFee().doubleValue()) {//客户消费总金额 >= 消费等级要求金额
                 // 给用户升级
                 willVipLevel = gmUserVipLevel;
             } else {
@@ -97,7 +102,7 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
                 if (fatherUserVipLevel.getVipLevelCode() >= gmUserVipLevel.getVipLevelCode()) {
                     continue;
                 }
-                if (gmUserVipLevel.getInviteConsumeMoney() <= sonTotalMoney + order.getTransactionFee()) {//客户父亲的所有儿子的消费总金额 >= 消费等级要求金额
+                if (gmUserVipLevel.getInviteConsumeMoney() <= sonTotalMoney + order.getTransactionFee().doubleValue()) {//客户父亲的所有儿子的消费总金额 >= 消费等级要求金额
                     // 给用户升级
                     fatherWillVipLevel = gmUserVipLevel;
                 } else {
@@ -115,17 +120,18 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
         // ==========================计算返佣开始===============================
         String agentRebateRatio = sysConfigService.getValue("AGENT_REBATE_RATIO");
         JSONObject jsonObject = JSONObject.parseObject(agentRebateRatio);
-        Double f = jsonObject.getDouble("f");
-        Double gf = jsonObject.getDouble("gf");
-        if (user.getFatherId() != null) {// 父亲在
+        String f = jsonObject.getString("f");
+        String gf = jsonObject.getString("gf");
+        BigDecimal fget = BigDecimal.valueOf(0);
+        BigDecimal gfget = BigDecimal.valueOf(0);
+        if (user.getFatherId() != null && user.getFatherId() != 0L) {// 父亲在
             GmUserVipLevelEntity vipLevel = willVipLevel != null ? willVipLevel : currentUserVipLevel;
             Double brokerRatio = totalMoney == 0 ? vipLevel.getFirstBrokerage() : vipLevel.getBrokerage();
-            double broker = order.getTransactionFee() * brokerRatio;
-            double fget = broker * f;//父亲所得
-            double gfget = broker * gf;//爷爷所得
+            BigDecimal broker = Arith.multiply(order.getTransactionFee(), BigDecimal.valueOf(brokerRatio));
+            fget = Arith.multiply(broker, new BigDecimal(f));//父亲所得
             // 更新账户金额
             UserEntity fatherUser = userService.queryByUserId(user.getFatherId());
-            userAccountService.updateAccountAdd(fatherUser.getUserId(), new BigDecimal(fget));
+            userAccountService.updateAccountAdd(fatherUser.getUserId(), fget);
             UserAccountEntity userAccount = userAccountService.queryByUserId(fatherUser.getUserId());
             // 插入父亲账变
             UserBalanceDetailEntity userBalanceDetail = new UserBalanceDetailEntity();
@@ -137,12 +143,15 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
             userBalanceDetail.setUserId(fatherUser.getUserId());
             userBalanceDetail.setUserBalance(userAccount.getBalance());
             userBalanceDetailService.save(userBalanceDetail);
-            if (user.getGrandfatherId() != null) {// 爷爷在
+            if (user.getGrandfatherId() != null && user.getGrandfatherId() != 0L) {// 爷爷在
                 // 查询爷爷
                 UserEntity grandFatherUser = userService.queryByUserId(user.getGrandfatherId());
                 // 更新爷爷账变金额
-                userAccountService.updateAccountAdd(grandFatherUser.getUserId(), new BigDecimal(gfget));
+                userAccountService.updateAccountAdd(grandFatherUser.getUserId(), gfget);
                 UserAccountEntity gfUserAccount = userAccountService.queryByUserId(grandFatherUser.getUserId());
+
+                gfget = Arith.multiply(broker, new BigDecimal(gf));//爷爷所得
+
                 // 插入爷爷账变
                 UserBalanceDetailEntity gfUserBalanceDetail = new UserBalanceDetailEntity();
                 gfUserBalanceDetail.setAmount(gfget);
@@ -153,8 +162,19 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
                 gfUserBalanceDetail.setUserId(grandFatherUser.getUserId());
                 gfUserBalanceDetail.setUserBalance(gfUserAccount.getBalance());
                 userBalanceDetailService.save(gfUserBalanceDetail);
+
             }
         }
         // ==========================计算返佣结束===============================
+        // 用户池入账
+        BigDecimal userFee = Arith.add(fget, gfget);// 获取父亲爷爷相加后的代理返佣金额
+        fundsAccountingService.setCashPoolAdd(Constant.CashPool._USER.getValue(), userFee);
+        // 副本池入账
+        BigDecimal dungeonFee = Arith.multiply(order.getTransactionFee(), Constant.CashPoolScale._DUNGEON.getValue());// 获取该订单金额的75%
+        dungeonFee = Arith.subtract(dungeonFee, userFee);// 副本金额 = 75%金额-代理费用
+        fundsAccountingService.setCashPoolAdd(Constant.CashPool._DUNGEON.getValue(), dungeonFee);
+        // 回购池入账
+        BigDecimal repoFee = Arith.multiply(order.getTransactionFee(), Constant.CashPoolScale._REPO.getValue());// 获取该订单金额的20%
+        fundsAccountingService.setCashPoolAdd(Constant.CashPool._REPO.getValue(), repoFee);
     }
 }

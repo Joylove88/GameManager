@@ -8,6 +8,7 @@ import com.gm.common.utils.LotteryGiftsUtils;
 import com.gm.modules.basicconfig.dao.*;
 import com.gm.modules.basicconfig.entity.*;
 import com.gm.modules.basicconfig.dto.*;
+import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
 import com.gm.modules.order.dao.TransactionOrderDao;
 import com.gm.modules.sys.service.SysConfigService;
 import com.gm.modules.user.dao.*;
@@ -54,9 +55,7 @@ public class DrawGiftService{
     @Autowired
     private UserExperiencePotionDao userExperiencePotionDao;
     @Autowired
-    private TransactionOrderDao transactionOrderDao;
-    @Autowired
-    private SysConfigService sysConfigService;
+    private CombatStatsUtilsService combatStatsUtilsService;
 
     public List<Object> drawStart(UserEntity user, DrawForm form) throws Exception {
         List<Object> gifts = new ArrayList<>();
@@ -172,6 +171,7 @@ public class DrawGiftService{
             Date now = new Date();
             // 判断奖品是否为星级英雄 Dtype=0 为星级英雄, Dtype=1 为英雄碎片
             if(gifts.get(entry.getKey()).getDType() == 0){
+                double scale = gifts.get(entry.getKey()).getScale();
                 UserHeroEntity userHeroEntity = new UserHeroEntity();
                 userHeroEntity.setGmHeroId(gifts.get(entry.getKey()).getGmHeroId());
                 userHeroEntity.setGmHeroStarId(gifts.get(entry.getKey()).getGmHeroStarId());
@@ -181,7 +181,7 @@ public class DrawGiftService{
                 userHeroEntity.setStatePlay(Constant.disabled);// 默认：未上阵
                 userHeroEntity.setMintStatus(Constant.enable);
                 userHeroEntity.setMintHash(drawForm.getTransactionHash());
-                userHeroEntity.setScale(gifts.get(entry.getKey()).getScale());// 插入矿工比例
+                userHeroEntity.setScale(scale);// 插入矿工比例
                 userHeroEntity.setCreateTime(now);
                 userHeroEntity.setCreateTimeTs(now.getTime());
                 // 生成NFT唯一编码
@@ -196,7 +196,7 @@ public class DrawGiftService{
                 long magicResist = gifts.get(entry.getKey()).getGmMagicResist();//初始魔抗
                 long attackDamage = gifts.get(entry.getKey()).getGmAttackDamage();//初始攻击力
                 long gmAttackSpell = gifts.get(entry.getKey()).getGmAttackSpell();//初始法功
-                heroPower = (health * 0.1) + (mana * 0.1) + attackDamage + ((armor + magicResist) * 4.5) + healthRegen * 0.1 + manaRegen * 0.3;
+                heroPower = combatStatsUtilsService.getHeroPower(health, mana, healthRegen, manaRegen, armor, magicResist, attackDamage, gmAttackSpell, scale);
                 userHeroEntity.setHeroPower((long) heroPower);
 
                 userHeroDao.insert(userHeroEntity);

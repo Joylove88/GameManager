@@ -28,6 +28,6 @@ public interface SysDictService extends IService<SysDictEntity> {
 
     List<SysDictEntity> getSysDict(@Param("dictName") String dictName, @Param("dictType") String dictType);
 
-    JSONObject getContractsAddress();
+    JSONObject getContractsAddress(String dictName, String dictType);
 }
 

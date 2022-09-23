@@ -41,4 +41,9 @@ public class HeroStarServiceImpl extends ServiceImpl<HeroStarDao, HeroStarEntity
         return heroStarDao.getHeroStars();
     }
 
+    @Override
+    public List<HeroStarEntity> getRangeHeroStars(Map<String, Object> map) {
+        return heroStarDao.getRangeHeroStars(map);
+    }
+
 }

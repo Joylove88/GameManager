@@ -27,6 +27,7 @@ import com.gm.modules.order.entity.TransactionOrderEntity;
 import com.gm.modules.order.service.TransactionOrderService;
 import com.gm.modules.sys.entity.SysDictEntity;
 import com.gm.modules.sys.service.SysDictService;
+import com.gm.modules.user.entity.UserBalanceDetailEntity;
 import com.gm.modules.user.req.DrawForm;
 import com.gm.modules.user.entity.UserAccountEntity;
 import com.gm.modules.user.entity.UserEntity;
@@ -131,38 +132,49 @@ public class ApiDrawController {
         List gifts = new ArrayList();
 
         // 地址校验
-        if (StringUtils.isNotBlank(user.getUserWalletAddress())){
+        if ( StringUtils.isNotBlank(user.getUserWalletAddress()) ){
             // 获取用户账户余额
             QueryWrapper<UserAccountEntity> wrapper = new QueryWrapper<UserAccountEntity>()
                     .eq("USER_ID",user.getUserId());
             UserAccountEntity userAccount = userAccountService.getOne(wrapper);
-            if (userAccount == null){
+            if ( userAccount == null ){
                 throw new RRException(ErrorCode.USER_ACCOUNT_EXPIRED.getDesc());
             }
 
             // 获取抽奖所需金额
-            List<SysDictEntity> drawType = sysDictService.getSysDict("GM_DRAW_CONFIG","GM_DRAW_TYPE");
-
+            JSONObject drawJson = sysDictService.getContractsAddress("GM_DRAW_CONFIG", "GM_DRAW_TYPE");
+            BigDecimal subMoney = BigDecimal.ONE;
             // 判断单抽或十连抽进行金额匹配 校验用户余额是否足够支付本次抽奖所需费用
-            if (form.getDrawType().equals(drawType.get(0).getCode()) ||
-                    form.getDrawType().equals(drawType.get(1).getCode())){
-
+            if ( form.getDrawType().equals("1") ){
+                subMoney = drawJson.getBigDecimal("ONE");
                 // 单抽金额
-                if (userAccount.getBalance() < Double.valueOf(drawType.get(0).getValue())){
+                if ( userAccount.getBalance() < subMoney.doubleValue() ){
                     throw new RRException(ErrorCode.BALANCE_NOT_ENOUGH.getDesc());
                 }
 
+            } else if ( form.getDrawType().equals("2") ) {
+                subMoney = drawJson.getBigDecimal("TEN");
                 // 十连抽金额
-                if (userAccount.getBalance() < Double.valueOf(drawType.get(1).getValue())){
+                if ( userAccount.getBalance() < subMoney.doubleValue() ){
                     throw new RRException(ErrorCode.BALANCE_NOT_ENOUGH.getDesc());
                 }
-
-                // 校验成功后开始抽奖
-                gifts = drawGiftService.drawStart(user, form);
-
-                // 插入一笔订单,订单状态为成功
-                transactionOrderService.addOrder(user,gifts,form);
             }
+
+            // 更新玩家账户余额
+            boolean effect = userAccountService.updateAccountSub(user.getUserId(), subMoney);
+            if ( !effect ) {
+                throw new RRException("账户金额更新失败!");// 账户金额更新失败
+            }
+
+            // 设置form里的金额
+            form.setFee(subMoney);
+
+            // 插入一笔订单,订单状态为成功
+            transactionOrderService.addOrder(user,gifts,form);
+
+            // 校验成功后开始抽奖
+            gifts = drawGiftService.drawStart(user, form);
+
 
         } else {
 

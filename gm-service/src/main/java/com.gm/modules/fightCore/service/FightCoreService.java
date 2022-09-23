@@ -14,16 +14,19 @@ import com.gm.modules.basicconfig.entity.*;
 import com.gm.modules.basicconfig.rsp.TeamInfoRsp;
 import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
 import com.gm.modules.drawGift.service.DrawGiftService;
+import com.gm.modules.fundsAccounting.service.FundsAccountingService;
 import com.gm.modules.sys.service.SysConfigService;
 import com.gm.modules.user.dao.GmMiningInfoDao;
 import com.gm.modules.user.dao.UserDao;
 import com.gm.modules.user.dao.UserHeroDao;
+import com.gm.modules.user.dao.UserLevelDao;
 import com.gm.modules.user.entity.*;
 import com.gm.modules.user.req.FightInfoReq;
 import com.gm.modules.user.rsp.*;
 import com.gm.modules.user.service.UserAccountService;
 import com.gm.modules.user.service.UserBalanceDetailService;
 import com.gm.modules.user.service.UserDailyOutputIncomeRecordService;
+import com.gm.modules.user.service.UserLevelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -65,6 +68,8 @@ public class FightCoreService {
     @Autowired
     private UserAccountService userAccountService;
     @Autowired
+    private UserLevelDao userLevelDao;
+    @Autowired
     private UserBalanceDetailService userBalanceDetailService;
     @Autowired
     private EquipmentInfoDao equipmentInfoDao;
@@ -74,6 +79,8 @@ public class FightCoreService {
     private DrawGiftService drawGiftService;
     @Autowired
     private UserDailyOutputIncomeRecordService userDailyOutputIncomeRecordService;
+    @Autowired
+    private FundsAccountingService fundsAccountingService;
 
 
     /**
@@ -140,6 +147,7 @@ public class FightCoreService {
         if (!Constant.enable.equals(user.getStatus())) {
             throw new RRException("玩家状态失效");
         }
+
         // 获取队伍中的英雄信息及英雄技能英雄装备信息
         // 获取未战斗的队伍
         GmTeamConfigEntity teamConfig = teamConfigDao.selectOne(new QueryWrapper<GmTeamConfigEntity>()
@@ -194,6 +202,12 @@ public class FightCoreService {
         GmDungeonConfigEntity dungeon = dungeonConfigDao.selectById(req.getDungeonId());
         if (dungeon == null){
             throw new RRException("副本已关闭");
+        }
+
+        // 玩家等级校验
+        UserLevelEntity userLevel = userLevelDao.selectById(user.getUserLevelId());
+        if ( userLevel.getLevelCode() < dungeon.getDungeonLevelMin() ) {
+            throw new RRException("玩家等级不足");
         }
 
         // 玩家体力值校验(小于副本所需体力无法战斗)
@@ -301,16 +315,6 @@ public class FightCoreService {
             // 经济平衡系统初始化方法
             initTradeBalanceParameter();
 
-//            // 获取当前副本奖励分配百分比
-//            CalculateTradeUtil.FundPool = Arith.multiply(CalculateTradeUtil.FundPool, BigDecimal.valueOf(dungeon.getRewardDistribution()));
-//
-//            // 副本资金池余额（最新）
-//            BigDecimal dungeonPoolBal = CalculateTradeUtil.FundPool;
-//            System.out.println("当前副本池子余额: " + dungeonPoolBal);
-//            // 更新系统中保存的副本资金池余额
-//            dungeonPoolBal = Arith.subtract(dungeonPoolBal, CalculateTradeUtil.totalPlayersGold);
-//            sysConfigService.updateValueByKey(Constant.DUNGEON_POOLING_BALANCE, dungeonPoolBal.toString());
-
             // 出售/计算收益
             System.out.println("marketEggs: " + CalculateTradeUtil.marketEggs);
             System.out.println("miners: " + CalculateTradeUtil.miners);
@@ -358,6 +362,12 @@ public class FightCoreService {
             CalculateTradeUtil.totalPlayersGold = Arith.add(CalculateTradeUtil.totalPlayersGold, goldCoins);
             sysConfigService.updateValueByKey(Constant.PLAYERS_EARN_TOTAL_REVENUE, CalculateTradeUtil.totalPlayersGold.toString());
 
+            // 用户池入账
+            fundsAccountingService.setCashPoolAdd(Constant.CashPool._USER.getValue(), goldCoins);// 添加该场战斗获取的收益
+
+            // 副本池出账
+            fundsAccountingService.setCashPoolSub(Constant.CashPool._DUNGEON.getValue(), goldCoins);// 扣除该场战斗获取的收益
+
         }
 
         // 插入战斗记录
@@ -387,6 +397,7 @@ public class FightCoreService {
         combatRecord.setEndTimeTs(end.getTime());
         combatRecordDao.insert(combatRecord);
 
+        // 设置返回信息
         FightInfoRsp rsp = new FightInfoRsp();
         rsp.setTeamId(req.getTeamId());
         rsp.setCombatId(combatRecord.getId());
@@ -402,7 +413,7 @@ public class FightCoreService {
         // 更新队伍战斗状态
         GmTeamConfigEntity upTeam = new GmTeamConfigEntity();
         upTeam.setId(teamConfig.getId());
-        upTeam.setStatus(Constant.BattleState._IN_BATTLE.getValue());// 战斗中===================================
+        upTeam.setStatus(Constant.BattleState._IN_BATTLE.getValue());// 设置战斗中
         upTeam.setStartTime(now);
         upTeam.setStartTimeTs(now.getTime());
         upTeam.setEndTime(end);
@@ -428,18 +439,18 @@ public class FightCoreService {
         CalculateTradeUtil.totalPower = BigDecimal.valueOf(getTotalPower());
         System.out.println("获取系统全部玩家总战力: " + CalculateTradeUtil.totalPower);
 
-        // 获取资金池70%余额
-        String poolBalance = sysConfigService.getValue(Constant.CashPool._MAIN.getValue());
-        CalculateTradeUtil.FundPool = new BigDecimal((Double.parseDouble(poolBalance) * 0.7) + "");
-        System.out.println("获取资金池70%余额: " + CalculateTradeUtil.FundPool);
+        // 获取副本池金额
+        String poolBalance = sysConfigService.getValue(Constant.CashPool._DUNGEON.getValue());
+        CalculateTradeUtil.FundPool = new BigDecimal(poolBalance);
+        System.out.println("获取副本池金额: " + CalculateTradeUtil.FundPool);
 
         // 玩家赚取总收入
         CalculateTradeUtil.totalPlayersGold = new BigDecimal(sysConfigService.getValue(Constant.PLAYERS_EARN_TOTAL_REVENUE));
         System.out.println("获取系统全部玩家赚取总收入: " + CalculateTradeUtil.totalPlayersGold);
 
-        // 获取扣除用户总收益后的资金池余额
-        CalculateTradeUtil.FundPool = Arith.subtract(CalculateTradeUtil.FundPool, CalculateTradeUtil.totalPlayersGold);
-        System.out.println("获取扣除用户总收益后的资金池余额: " + CalculateTradeUtil.FundPool);
+//        // 获取扣除用户总收益后的资金池余额
+//        CalculateTradeUtil.FundPool = Arith.subtract(CalculateTradeUtil.FundPool, CalculateTradeUtil.totalPlayersGold);
+//        System.out.println("获取扣除用户总收益后的资金池余额: " + CalculateTradeUtil.FundPool);
 
     }
 
@@ -1012,7 +1023,7 @@ public class FightCoreService {
 
         // 校验玩家是否已领取奖励
         Map<String, Object> balanceMap = new HashMap<>();
-        balanceMap.put("sourceId", combatRecord.getId());
+        balanceMap.put("sourceId", combatRecord.getId());// 战斗记录ID
         List<UserBalanceDetailEntity> balanceDetails = userBalanceDetailService.getUserBalanceDetail(balanceMap);
         if ( balanceDetails.size() > 0 ){
             throw new RRException("已领取奖励，请刷新页面");
@@ -1025,9 +1036,9 @@ public class FightCoreService {
         team.setId(combatRecord.getTeamId());
         team.setStatus(Constant.BattleState._IDLE.getValue());
         teamConfigDao.updateById(team);
-
         // 战斗胜利为玩家发放奖励
         if (Constant.BattleResult._WIN.getValue().equals(combatRecord.getStatus()) && balanceDetails.size() == 0) {
+
             // 更新玩家账户余额
             boolean effect = userAccountService.updateAccountAdd(user.getUserId(), combatRecord.getGetGoldCoins());
             if (!effect) {
@@ -1038,13 +1049,13 @@ public class FightCoreService {
             rsp.setGetUserExp(combatRecord.getGetUserExp());
 
             // 插入账变明细
-            UserBalanceDetailEntity balanceDetail = new UserBalanceDetailEntity();
-            balanceDetail.setUserId(user.getUserId());
-            balanceDetail.setAmount(combatRecord.getGetGoldCoins().doubleValue());
-            balanceDetail.setTradeType(Constant.TradeType.DUNGEON_REVENUE.getValue());
-            balanceDetail.setTradeDesc("战斗收益");
-            balanceDetail.setSourceId(id);// 战斗记录ID
-            userBalanceDetailService.insertBalanceDetail(balanceDetail);
+            balanceMap.put("userId", user.getUserId());
+            balanceMap.put("amount", combatRecord.getGetGoldCoins());
+            balanceMap.put("tradeType", Constant.TradeType.DUNGEON_REVENUE.getValue());
+            balanceMap.put("tradeDesc", "战斗收益");
+            userBalanceDetailService.insertBalanceDetail(balanceMap);
+
+            // 获取经验==============================
 
             // 插入英雄集合
             rsp.setUserHeroInfoRsps(getTeamHeroInfoList(combatRecord.getTeamId(), null));

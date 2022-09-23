@@ -49,10 +49,10 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictDao, SysDictEntity> i
     }
 
     @Override
-    public JSONObject getContractsAddress() {
+    public JSONObject getContractsAddress(String dictName, String dictType) {
         SysDictEntity sysDict = sysDictDao.selectOne(new QueryWrapper<SysDictEntity>()
-                .eq("name", "CONTRACTS")
-                .eq("type", "ADDRESS")
+                .eq("name", dictName)
+                .eq("type", dictType)
         );
         if ( sysDict == null ) {
             throw new RRException("Could not get address!");

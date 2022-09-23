@@ -24,4 +24,12 @@ public interface UserAccountDao extends BaseMapper<UserAccountEntity> {
      * @return 影响的行数
      */
     Integer updateAccountAdd(@Param("userId") Long userId, @Param("addMoney") BigDecimal addMoney);
+    /**
+     * 更新账户金额
+     *
+     * @param userId 用户ID
+     * @param subMoney   减少的金额
+     * @return 影响的行数
+     */
+    Integer updateAccountSub(@Param("userId") Long userId, @Param("subMoney") BigDecimal subMoney);
 }

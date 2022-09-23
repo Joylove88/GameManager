@@ -13,7 +13,9 @@ import com.gm.modules.basicconfig.dao.EquipmentInfoDao;
 import com.gm.modules.basicconfig.entity.EquipSynthesisItemEntity;
 import com.gm.modules.basicconfig.entity.EquipmentInfoEntity;
 import com.gm.modules.basicconfig.rsp.EquipmentInfoRsp;
+import com.gm.modules.basicconfig.service.EquipSynthesisItemService;
 import com.gm.modules.basicconfig.service.EquipmentInfoService;
+import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
 import com.gm.modules.user.dao.UserEquipmentDao;
 import com.gm.modules.user.dao.UserHeroEquipmentWearDao;
 import com.gm.modules.user.entity.UserEquipmentEntity;
@@ -34,11 +36,13 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
     @Autowired
     private EquipmentInfoDao equipmentInfoDao;
     @Autowired
-    private EquipSynthesisItemDao equipSynthesisItemDao;
+    private EquipSynthesisItemService equipSynthesisItemService;
     @Autowired
     private UserHeroEquipmentWearDao userHeroEquipmentWearDao;
     @Autowired
     private UserEquipmentDao userEquipmentDao;
+    @Autowired
+    private CombatStatsUtilsService combatStatsUtilsService;
 
     /**
      * 父级装备ID
@@ -101,9 +105,12 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
     public JSONObject updateEquipJson2(Long heroEquipId, List<EquipmentInfoEntity> equips, UserHeroInfoRsp rsp) {
         parentEquipChain = "";
         // 获取该英雄已穿戴的装备
-        List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearDao.getUserWearEQ(rsp.getGmUserHeroId());
+        Map<String, Object> userWearMap = new HashMap<>();
+        userWearMap.put("status", Constant.enable);
+        userWearMap.put("userHeroId", rsp.getGmUserHeroId());
+        List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearDao.getUserWearEQ(userWearMap);
         // 获取装备栏中的装备合成公式
-        EquipSynthesisItemEntity eqSIEs = getEquipSyntheticFormula(heroEquipId);
+        EquipSynthesisItemEntity eqSIEs = equipSynthesisItemService.getEquipSyntheticFormula(heroEquipId);
         if ( eqSIEs == null ) {
             System.out.println("获取装备合成配方失败");
         }
@@ -128,6 +135,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
                 jsonObject.put("equipFragNum", fragNum);
                 jsonObject.put("equipFragName", equipName + "卷轴碎片");
                 parentEquipChain = heroEquipId.toString();
+                // 获取已穿戴/激活的装备状态
                 UserEquipmentEntity userEquipment = getActivationState(equipId, wearList, parentEquipChain);
                 jsonObject.put("status", userEquipment.getActivationState());
                 // 如果该装备状态为已激活则获取该装备属性
@@ -178,19 +186,6 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
         }
         return jsonObject;
     }
-    /**
-     * 获取装备合成配方
-     * @param equipId
-     * @return
-     */
-    private EquipSynthesisItemEntity getEquipSyntheticFormula(Long equipId) {
-        // 获取装备合成配方
-        EquipSynthesisItemEntity eqSIEs = equipSynthesisItemDao.selectOne(new QueryWrapper<EquipSynthesisItemEntity>()
-                .eq("STATUS", Constant.enable)
-                .eq("GM_EQUIPMENT_ID", equipId)// 装备ID
-        );
-        return eqSIEs;
-    }
 
     /**
      * 获取已穿戴/激活的装备状态
@@ -233,7 +228,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
     private JSONArray equipItem(EquipSynthesisItemEntity eqSIEs,List<EquipmentInfoEntity> equips, List<UserHeroEquipmentWearRsp> wearList){
         String parentEquipChainID = "";
         // 装备合成项封装
-        List list = getEquipItems(eqSIEs);
+        List list = combatStatsUtilsService.getEquipItems(eqSIEs);
         JSONArray jsonArray = new JSONArray();
         // 如果合成公式不为空则进入
         int i = 0;
@@ -271,7 +266,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
     private JSONArray equipItemChild(EquipSynthesisItemEntity eqSIEs,List<EquipmentInfoEntity> equips, List<UserHeroEquipmentWearRsp> wearList, String parentEquipChainID){
         String parentEquipChainIDC = "";
         // 装备合成项封装
-        List list = getEquipItems(eqSIEs);
+        List list = combatStatsUtilsService.getEquipItems(eqSIEs);
         JSONArray jsonArray = new JSONArray();
         // 如果合成公式不为空则进入
         int i = 0;
@@ -334,7 +329,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
                 if( equipRarecode.equals(Constant.RareCode._GREEN.getValue()) ||
                         equipRarecode.equals(Constant.RareCode._PURPLE.getValue()) ||
                         equipRarecode.equals(Constant.RareCode._ORANGE.getValue()) ){
-                    EquipSynthesisItemEntity eqSIEsChildren = getEquipSyntheticFormula(equipId);
+                    EquipSynthesisItemEntity eqSIEsChildren = equipSynthesisItemService.getEquipSyntheticFormula(equipId);
                     if ( eqSIEsChildren == null ) {
                         break;
                     }
@@ -349,30 +344,6 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
             }
         }
         return jsonObject;
-    }
-    /**
-     * 获取装备合成项
-     * @param eqSIEs
-     * @return
-     */
-    private List getEquipItems(EquipSynthesisItemEntity eqSIEs) {
-        List list = new ArrayList();
-        if ( StringUtils.isNotBlank(eqSIEs.getGmEquipSynthesisItem1())) {
-            list.add(eqSIEs.getGmEquipSynthesisItem1());
-        }
-        if ( StringUtils.isNotBlank(eqSIEs.getGmEquipSynthesisItem2())) {
-            list.add(eqSIEs.getGmEquipSynthesisItem2());
-        }
-        if ( StringUtils.isNotBlank(eqSIEs.getGmEquipSynthesisItem3())) {
-            list.add(eqSIEs.getGmEquipSynthesisItem3());
-        }
-        if ( StringUtils.isNotBlank(eqSIEs.getGmEquipWhite())) {
-            list.add(eqSIEs.getGmEquipWhite());
-        }
-        if ( StringUtils.isNotBlank(eqSIEs.getGmEquipBlue())) {
-            list.add(eqSIEs.getGmEquipBlue());
-        }
-        return list;
     }
 
 }

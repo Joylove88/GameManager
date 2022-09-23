@@ -36,7 +36,7 @@ public class UserBalanceDetailEntity implements Serializable {
 	/**
 	 * 交易金额
 	 */
-	private Double amount;
+	private BigDecimal amount;
 	/**
 	 * 交易时间
 	 */
@@ -54,7 +54,7 @@ public class UserBalanceDetailEntity implements Serializable {
 	 */
 	private Double userBalance;
 	/**
-	 * 交易类型id：提现id,副本产出id,抽奖id,市场交易ID,代理返佣id
+	 * 交易类型id：提现id,副本产出id,抽奖订单id,市场交易ID,代理返佣id
 	 */
 	private Long sourceId;
 

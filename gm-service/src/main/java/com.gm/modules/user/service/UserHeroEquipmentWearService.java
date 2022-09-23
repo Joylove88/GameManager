@@ -24,9 +24,9 @@ public interface UserHeroEquipmentWearService extends IService<UserHeroEquipment
 
     /**
      * 获取玩家英雄穿戴中的装备
-     * @param userHeroId
+     * @param map
      * @return
      */
-    List<UserHeroEquipmentWearRsp> getUserWearEQ(@Param("userHeroId") Long userHeroId);
+    List<UserHeroEquipmentWearRsp> getUserWearEQ(Map<String, Object> map);
 }
 

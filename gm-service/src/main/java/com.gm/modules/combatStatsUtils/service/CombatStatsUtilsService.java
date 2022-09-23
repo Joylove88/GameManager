@@ -11,12 +11,14 @@ import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserEquipmentEntity;
 import com.gm.modules.user.entity.UserHeroEquipmentWearEntity;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -186,32 +188,9 @@ public class CombatStatsUtilsService {
     }
 
 
-    // 获取英雄最新战斗力 (包含已穿戴全部装备属性)
-    public Long getHeroPower(AttributeEntity attribute){
-        double heroPower = 0;
-        long health = attribute.getHp();//初始生命值
-        long mana = attribute.getMp();//初始法力值
-        long healthRegen = attribute.getHpRegen();//初始生命值恢复
-        long manaRegen = attribute.getMpRegen();//初始法力值恢复
-        long armor = attribute.getArmor();//gmArmor
-        long magicResist = attribute.getMagicResist();//初始魔抗
-        long attackDamage = attribute.getAttackDamage();//初始攻击力
-        long gmAttackSpell = attribute.getAttackSpell();//初始法功
-        heroPower = (health * 0.1) + (mana * 0.1) + attackDamage + ((armor + magicResist) * 4.5) + healthRegen * 0.1 + manaRegen * 0.3;
-
-        // 统计装备战力
-        double equipPower = 0;
-        long eqHealth = attribute.getEquipHealth() != null ? attribute.getEquipHealth() : 0;//初始生命值
-        long eqMana = attribute.getEquipMana() != null ? attribute.getEquipMana() : 0;//初始法力值
-        long eqHealthRegen = attribute.getEquipHealthRegen() != null ? attribute.getEquipHealthRegen() : 0;//初始生命值恢复
-        long eqManaRegen = attribute.getEquipManaRegen() != null ? attribute.getEquipManaRegen() : 0;//初始法力值恢复
-        long eqArmor = attribute.getEquipArmor() != null ? attribute.getEquipArmor() : 0;//gmArmor
-        long eqMagicResist = attribute.getEquipMagicResist() != null ? attribute.getEquipMagicResist() : 0;//初始魔抗
-        long eqAttackDamage = attribute.getEquipAttackDamage() != null ? attribute.getEquipAttackDamage() : 0;//初始攻击力
-        long eqAttackSpell = attribute.getEquipAttackSpell() != null ? attribute.getEquipAttackSpell() : 0;//初始法攻
-        equipPower = (eqHealth * 0.1) + (eqMana * 0.1) + eqAttackDamage + eqAttackSpell + ((eqArmor + eqMagicResist) * 4.5) + eqHealthRegen * 0.1 + eqManaRegen * 0.3;
-
-        heroPower = heroPower + equipPower;
+    // 获取英雄战斗力
+    public Long getHeroPower(long health, long mana, long healthRegen, long manaRegen, long armor, long magicResist, long attackDamage, long gmAttackSpell, double scale){
+        double heroPower = ((health * 0.1) + (mana * 0.1) + attackDamage + ((armor + magicResist) * 4.5) + healthRegen * 0.1 + manaRegen * 0.3) * scale;
         return (long) heroPower;
     }
 
@@ -235,6 +214,31 @@ public class CombatStatsUtilsService {
         user.setTotalPower(totalPower);
         userDao.updateById(user);
 
+    }
+
+    /**
+     * 获取装备合成项
+     * @param eqSIEs
+     * @return
+     */
+    public List getEquipItems(EquipSynthesisItemEntity eqSIEs) {
+        List list = new ArrayList();
+        if ( StringUtils.isNotBlank(eqSIEs.getGmEquipSynthesisItem1())) {
+            list.add(eqSIEs.getGmEquipSynthesisItem1());
+        }
+        if ( StringUtils.isNotBlank(eqSIEs.getGmEquipSynthesisItem2())) {
+            list.add(eqSIEs.getGmEquipSynthesisItem2());
+        }
+        if ( StringUtils.isNotBlank(eqSIEs.getGmEquipSynthesisItem3())) {
+            list.add(eqSIEs.getGmEquipSynthesisItem3());
+        }
+        if ( StringUtils.isNotBlank(eqSIEs.getGmEquipWhite())) {
+            list.add(eqSIEs.getGmEquipWhite());
+        }
+        if ( StringUtils.isNotBlank(eqSIEs.getGmEquipBlue())) {
+            list.add(eqSIEs.getGmEquipBlue());
+        }
+        return list;
     }
 
     // 获取除去当前队伍的队伍总战力

@@ -8,9 +8,13 @@ import lombok.Data;
 @Data
 public class UserEquipInfoRsp {
     /**
+	 * 玩家装备id
+	 */
+	private Long gmUserEquipmentId;
+    /**
 	 * 装备id
 	 */
-	private String gmUserEquipmentId;
+	private Long gmEquipmentId;
 	/**
      * 装备名称
 	 */
@@ -19,6 +23,10 @@ public class UserEquipInfoRsp {
      * 装备稀有度(1:白色,2:绿色,3:蓝色,4:紫色,5:橙色)
 	 */
 	private String equipRarecode;
+	/**
+	 * 状态('0':禁用，'1':未激活, '2':已激活)
+	 */
+	private String status;
 	/**
      * 装备等级
 	 */

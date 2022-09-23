@@ -49,8 +49,8 @@ public class UserHeroEquipmentWearServiceImpl extends ServiceImpl<UserHeroEquipm
     }
 
     @Override
-    public List<UserHeroEquipmentWearRsp> getUserWearEQ(Long userHeroId) {
-        return userHeroEquipmentWearDao.getUserWearEQ(userHeroId);
+    public List<UserHeroEquipmentWearRsp> getUserWearEQ(Map<String, Object> map) {
+        return userHeroEquipmentWearDao.getUserWearEQ(map);
     }
 
 }

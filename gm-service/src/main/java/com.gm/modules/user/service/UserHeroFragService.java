@@ -22,10 +22,16 @@ public interface UserHeroFragService extends IService<UserHeroFragEntity> {
 
     /**
      * 获取玩家英雄碎片
-     * @param userId
+     * @param map
      * @return
      */
-    List<UserHeroFragInfoRsp> getUserAllHeroFrag(Long userId);
+    List<UserHeroFragInfoRsp> getUserAllHeroFrag(Map<String, Object> map);
+
+    /**
+     * 消耗英雄碎片升星
+     * @param map
+     */
+    void depleteHeroFrag(Map<String, Object> map);
 
 }
 

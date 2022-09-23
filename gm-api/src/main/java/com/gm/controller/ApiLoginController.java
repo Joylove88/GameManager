@@ -138,7 +138,7 @@ public class ApiLoginController {
                 // 用户不存在则执行自动注册
                 UserEntity userRegister = new UserEntity();
                 userRegister.setSignDate(signDate);
-                userRegister.setUserWalletAddress(signIn.getAddress());
+                userRegister.setUserWalletAddress(signIn.getAddress().toLowerCase());
                 userService.userRegister(userRegister);
                 UserEntity userRe = userService.queryByAddress(signIn.getAddress());
                 map = login(signIn,userRe);
@@ -197,7 +197,7 @@ public class ApiLoginController {
         // 3.保存用户
         UserEntity user = new UserEntity();
         user.setSignDate(new Date());
-        user.setUserWalletAddress(form.getAddress());
+        user.setUserWalletAddress(form.getAddress().toLowerCase());
         user.setFatherId(userInviteEntity.getUserId());
         user.setGrandfatherId(userInviteEntity.getFatherId());
         userService.userRegister(user);

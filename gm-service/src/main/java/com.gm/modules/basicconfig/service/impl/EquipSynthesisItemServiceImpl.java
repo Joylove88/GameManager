@@ -130,4 +130,14 @@ public class EquipSynthesisItemServiceImpl extends ServiceImpl<EquipSynthesisIte
         return equipSynthesisItemDao.selectByMap(map);
     }
 
+    @Override
+    public EquipSynthesisItemEntity getEquipSyntheticFormula(Long equipId) {
+        // 获取装备合成配方
+        EquipSynthesisItemEntity eqSIEs = equipSynthesisItemDao.selectOne(new QueryWrapper<EquipSynthesisItemEntity>()
+                .eq("STATUS", Constant.enable)
+                .eq("GM_EQUIPMENT_ID", equipId)// 装备ID
+        );
+        return eqSIEs;
+    }
+
 }
