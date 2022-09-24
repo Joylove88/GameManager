@@ -49,4 +49,6 @@ public interface UserService extends IService<UserEntity> {
 	 * @return 用户
 	 */
 	UserEntity queryByUserId(Long gmUserId);
+
+	int queryEffectiveUserCount(UserEntity userEntity);
 }

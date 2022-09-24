@@ -141,4 +141,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		return baseMapper.selectById(gmUserId);
 	}
 
+	@Override
+	public int queryEffectiveUserCount(UserEntity userEntity) {
+		return userDao.queryEffectiveUserCount(userEntity.getUserId());
+	}
+
 }

@@ -25,6 +25,19 @@
         <result property="fatherId" column="FATHER_ID"/>
         <result property="grandFatherId" column="GRANDFATHER_ID"/>
         <result property="vipLevelId" column="VIP_LEVEL_ID"/>
+        <result property="expandCodeViewTimes" column="EXPAND_CODE_VIEW_TIMES"/>
     </resultMap>
+
+    <select id="queryEffectiveUserCount" resultType="int">
+SELECT
+	COUNT( DISTINCT A.GM_USER_ID )
+FROM
+	gm_transaction_order A
+	LEFT JOIN gm_user B ON A.GM_USER_ID = B.USER_ID
+WHERE
+	B.FATHER_ID = #{userId}
+	AND A.`STATUS` = '1'
+	AND A.CURRENCY_TYPE = '1'
+    </select>
 
 </mapper>

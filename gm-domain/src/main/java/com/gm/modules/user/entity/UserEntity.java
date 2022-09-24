@@ -133,6 +133,10 @@ public class UserEntity implements Serializable {
 	 * 用户消费等级
 	 */
 	private Long vipLevelId;
+	/**
+	 * 该邀请码访问次数
+	 */
+	private Integer expandCodeViewTimes;
 
 
 }

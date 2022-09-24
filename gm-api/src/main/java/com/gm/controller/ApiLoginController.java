@@ -9,11 +9,15 @@
 package com.gm.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
 import com.gm.common.utils.*;
 import com.gm.common.validator.ValidatorUtils;
 import com.gm.annotation.Login;
+import com.gm.modules.sys.service.SysConfigService;
+import com.gm.modules.user.req.InviteDataForm;
 import com.gm.modules.user.req.InviteForm;
 import com.gm.modules.user.req.SignIn;
 import com.gm.modules.user.entity.UserEntity;
@@ -53,6 +57,8 @@ public class ApiLoginController {
     private UserTokenService tokenService;
     @Autowired
     private UserLoginLogService userLoginLogService;
+    @Autowired
+    private SysConfigService sysConfigService;
 
     @PostMapping("signIn")
     @ApiOperation("签名验证")
@@ -173,13 +179,27 @@ public class ApiLoginController {
     /**
      * 重定向邀请链接
      */
-    @RequestMapping("redirect/{expandCode:[a-zA-Z0-9]+}")
-    public void invite(@PathVariable String expandCode, HttpServletResponse response) throws IOException {
+    @RequestMapping("{expandCode:[a-zA-Z0-9]+}")
+    public void inviteRedirect(@PathVariable String expandCode, HttpServletResponse response) throws IOException {
         UserEntity userEntity = userService.queryByExpandCode(expandCode);
-        response.sendRedirect("http://abest.com?invite="+userEntity.getUserWalletAddress());
+        //查询首页地址
+        String index_page = sysConfigService.getValue("INDEX_PAGE");
+        if (userEntity == null){
+            response.sendRedirect(index_page);
+        }else {
+            // 更新该邀请码访问次数
+            UserEntity newUser = new UserEntity();
+            newUser.setUserId(userEntity.getUserId());
+            newUser.setExpandCodeViewTimes(userEntity.getExpandCodeViewTimes()+1);
+            userService.updateById(newUser);
+            response.sendRedirect(index_page+"?invite="+userEntity.getUserWalletAddress());
+        }
     }
 
 
+    /**
+     * 邀请注册
+     */
     @PostMapping("invite")
     @ApiOperation("邀请注册")
     public R invite(@RequestBody InviteForm form) {
@@ -202,6 +222,35 @@ public class ApiLoginController {
         user.setGrandfatherId(userInviteEntity.getFatherId());
         userService.userRegister(user);
         return R.ok();
+    }
+
+    /**
+     * 获取邀请链接数据
+     * 代理那边需要增加3个统计数据
+     邀请链接访问人数
+     邀请链接注册人数
+     邀请链接消费人数
+     */
+    @PostMapping("inviteData")
+    @ApiOperation("邀请链接数据")
+    public R inviteData(@RequestBody InviteDataForm form) {
+        // 1.表单校验
+        ValidatorUtils.validateEntity(form);
+        // 2.查询该邀请码数据
+        Map<String,Object> map = new HashMap<>();
+        // 查询访问次数
+        UserEntity userEntity = userService.queryByExpandCode(form.getExpandCode());
+        if (userEntity == null){
+            throw new RRException("邀请码不存在！");
+        }
+        map.put("viewTimes",userEntity.getExpandCodeViewTimes());
+        // 查询注册人数
+        int count = userService.count(new QueryWrapper<UserEntity>().eq("FATHER_ID",userEntity.getUserId()));
+        map.put("register",count);
+        // 查询消费人数
+        int effectiveCount = userService.queryEffectiveUserCount(userEntity);
+        map.put("consumer",effectiveCount);
+        return R.ok(map);
     }
 
     public static void main(String[] args) {
