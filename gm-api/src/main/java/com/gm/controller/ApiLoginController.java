@@ -11,6 +11,7 @@ package com.gm.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.gm.annotation.LoginUser;
 import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
 import com.gm.common.utils.*;
@@ -176,26 +177,6 @@ public class ApiLoginController {
         return R.ok();
     }
 
-    /**
-     * 重定向邀请链接
-     */
-    @RequestMapping("{expandCode:[a-zA-Z0-9]+}")
-    public void inviteRedirect(@PathVariable String expandCode, HttpServletResponse response) throws IOException {
-        UserEntity userEntity = userService.queryByExpandCode(expandCode);
-        //查询首页地址
-        String index_page = sysConfigService.getValue("INDEX_PAGE");
-        if (userEntity == null){
-            response.sendRedirect(index_page);
-        }else {
-            // 更新该邀请码访问次数
-            UserEntity newUser = new UserEntity();
-            newUser.setUserId(userEntity.getUserId());
-            newUser.setExpandCodeViewTimes(userEntity.getExpandCodeViewTimes()+1);
-            userService.updateById(newUser);
-            response.sendRedirect(index_page+"?invite="+userEntity.getUserWalletAddress());
-        }
-    }
-
 
     /**
      * 邀请注册
@@ -227,29 +208,30 @@ public class ApiLoginController {
     /**
      * 获取邀请链接数据
      * 代理那边需要增加3个统计数据
-     邀请链接访问人数
-     邀请链接注册人数
-     邀请链接消费人数
+     * 邀请链接访问人数
+     * 邀请链接注册人数
+     * 邀请链接消费人数
      */
+    @Login
     @PostMapping("inviteData")
     @ApiOperation("邀请链接数据")
-    public R inviteData(@RequestBody InviteDataForm form) {
-        // 1.表单校验
-        ValidatorUtils.validateEntity(form);
-        // 2.查询该邀请码数据
-        Map<String,Object> map = new HashMap<>();
-        // 查询访问次数
-        UserEntity userEntity = userService.queryByExpandCode(form.getExpandCode());
-        if (userEntity == null){
-            throw new RRException("邀请码不存在！");
-        }
-        map.put("viewTimes",userEntity.getExpandCodeViewTimes());
+    public R inviteData(@LoginUser UserEntity userEntity) {
+//         1.表单校验
+//        ValidatorUtils.validateEntity(form);
+//        // 2.查询该邀请码数据
+        Map<String, Object> map = new HashMap<>();
+//        // 查询访问次数
+//        UserEntity userEntity = userService.queryByExpandCode(form.getExpandCode());
+//        if (userEntity == null) {
+//            throw new RRException("邀请码不存在！");
+//        }
+        map.put("viewTimes", userEntity.getExpandCodeViewTimes());
         // 查询注册人数
-        int count = userService.count(new QueryWrapper<UserEntity>().eq("FATHER_ID",userEntity.getUserId()));
-        map.put("register",count);
+        int count = userService.count(new QueryWrapper<UserEntity>().eq("FATHER_ID", userEntity.getUserId()));
+        map.put("register", count);
         // 查询消费人数
         int effectiveCount = userService.queryEffectiveUserCount(userEntity);
-        map.put("consumer",effectiveCount);
+        map.put("consumer", effectiveCount);
         return R.ok(map);
     }
 
