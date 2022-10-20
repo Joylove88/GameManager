@@ -64,6 +64,7 @@
         A.GM_HERO_STAR_ID,
         A.EXPERIENCE_OBTAIN,
         A.HERO_POWER,
+        A.MINTER,
         C.HERO_NAME,
         C.HERO_IMG_URL,
         C.HERO_ICON_URL,

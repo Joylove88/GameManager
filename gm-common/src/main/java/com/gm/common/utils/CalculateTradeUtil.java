@@ -28,38 +28,23 @@ public class CalculateTradeUtil {
 
     public static BigDecimal time = Arith.divide(BigDecimal.valueOf(System.currentTimeMillis()),BigDecimal.valueOf(1000));
 
-    public static BigDecimal userpower =  BigDecimal.valueOf(0); // 用户战力
-    public static BigDecimal totalPower = BigDecimal.valueOf(0); // 总战力
-
-    // 只有战力变动时触发
-    public static void updatePower() {
-//
-//        // 玩家鸡蛋数量
-//        claimedEggs = BigDecimal.valueOf(0);
-//        // 获取用户战力
-//        userpower = Arith.divide(BigDecimal.valueOf(teamPower),BigDecimal.valueOf(100));
-//        // 购买鸡蛋/更新矿工
-//        CalculateTradeUtil.updateMiner();
-//        System.out.println("marketEggs:" + CalculateTradeUtil.marketEggs);
-    }
-
     /// @dev 奖励复投
-    private static void hatchEggs(BigDecimal changePower) {
+    private static BigDecimal hatchEggs(BigDecimal changePower) {
         // 获取我的鸡蛋
         BigDecimal eggsUsed = eggsBought;
         // 计算新的矿工数量
         BigDecimal newMiners= Arith.divide(eggsUsed,CalculateTradeUtil.EGGS_TO_HATCH_1MINERS30);
-        if (changePower.compareTo(BigDecimal.valueOf(0)) == 1) {
+        if (changePower.compareTo(BigDecimal.ZERO) == 1) {
             miners = Arith.add(miners, newMiners);
             // 消弱矿工囤积
             marketEggs = Arith.add(marketEggs, Arith.divide(eggsUsed, BigDecimal.valueOf(5)));
-        } else if (changePower.compareTo(BigDecimal.valueOf(0)) == -1) {
+        } else if (changePower.compareTo(BigDecimal.ZERO) == -1) {
             miners = Arith.subtract(miners, newMiners);
             // 消弱矿工囤积
             marketEggs = Arith.add(marketEggs, eggsUsed);
         }
 
-
+        return miners;
     }
     /// @dev 计算可产出收益
     public static void sellEggs() {
@@ -73,7 +58,6 @@ public class CalculateTradeUtil {
         FundPool = Arith.subtract(FundPool,userGetGold);
         System.out.println("玩家一天的最大可产出收益: " + userGetGold);
         System.out.println("资金池剩余: " + FundPool);
-        totalPower = Arith.subtract(totalPower , eggValue);
         System.out.println("eggValue: " + eggValue);
         marketEggs = Arith.add(marketEggs, hasEggs);
     }
@@ -88,19 +72,17 @@ public class CalculateTradeUtil {
 
 
     // 更新矿工
-    public static void updateMiner(BigDecimal changePower) {
+    public static BigDecimal updateMiner(BigDecimal changePower) {
         // 如果改变的值为0 则跳出
-        if (changePower.compareTo(BigDecimal.valueOf(0)) == 0) return;
-
+        if (changePower.compareTo(BigDecimal.valueOf(0)) == 0) return BigDecimal.valueOf(0);
         eggsBought = calculateEggBuy(changePower.abs(), FundPool);
-        hatchEggs(changePower);
+        return hatchEggs(changePower);
     }
 
-    // 战力兑换矿工数
-    public static BigDecimal calculateEggBuySimple(BigDecimal userPower) {
-        BigDecimal eggsBought = calculateEggBuy(userpower, Arith.add(Arith.subtract(totalPower , userpower), FundPool));
-        BigDecimal miners = Arith.divide(eggsBought, CalculateTradeUtil.EGGS_TO_HATCH_1MINERS30);
-        return miners;
+    // 矿工兑换数量比例
+    public static BigDecimal calculateRateOfMinter(BigDecimal userPower) {
+        BigDecimal eggsBought = calculateEggBuy(userPower, FundPool);
+        return Arith.divide(eggsBought,CalculateTradeUtil.EGGS_TO_HATCH_1MINERS30);
     }
 
     private static BigDecimal calculateEggBuy(BigDecimal userPower, BigDecimal totalPowerAndFundPool) {
@@ -138,5 +120,17 @@ public class CalculateTradeUtil {
     public static BigDecimal min(BigDecimal a, BigDecimal b) {
         int flag = a.compareTo(b);
         return flag == -1 ? a : b;
+    }
+
+    public static void main(String[] args) {
+        BigDecimal rate = BigDecimal.valueOf(1);
+        BigDecimal power = BigDecimal.valueOf(355);
+        marketEggs = new BigDecimal("1803875022.049365");
+        System.out.println("marketEggs:"+marketEggs);
+        FundPool = BigDecimal.valueOf(9999.646475);
+        System.out.println("FundPool:"+FundPool);
+        System.out.println("oracle:"+calculateRateOfMinter(rate));
+        System.out.println("minter:"+updateMiner(power));
+        System.out.println("minter1:"+calculateRateOfMinter(rate));
     }
 }

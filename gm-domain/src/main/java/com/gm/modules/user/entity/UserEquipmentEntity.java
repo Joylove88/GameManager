@@ -39,6 +39,14 @@ public class UserEquipmentEntity implements Serializable {
 	 */
 	private BigDecimal nftId;
 	/**
+	 * 矿工数
+	 */
+	private BigDecimal minter;
+	/**
+	 * 神谕值
+	 */
+	private BigDecimal oracle;
+	/**
 	 * 矿工兑换比例（增幅,削减）
 	 */
 	private Double scale;

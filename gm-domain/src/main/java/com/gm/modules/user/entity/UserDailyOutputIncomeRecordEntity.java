@@ -34,6 +34,10 @@ public class UserDailyOutputIncomeRecordEntity implements Serializable {
 	 */
 	private Date firstTime;
 	/**
+	 * 战斗时的用户矿工数量
+	 */
+	private BigDecimal miners;
+	/**
 	 * 当日可产出最大金币数
 	 */
 	private BigDecimal maxGoldCoins;

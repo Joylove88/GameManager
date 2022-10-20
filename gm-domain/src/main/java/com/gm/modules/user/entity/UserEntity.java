@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -45,6 +46,10 @@ public class UserEntity implements Serializable {
 	 * 总战力
 	 */
 	private Long totalPower;
+	/**
+	 * 总矿工数
+	 */
+	private BigDecimal totalMinter;
 	/**
 	 * 体力值
 	 */

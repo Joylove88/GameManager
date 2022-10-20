@@ -194,28 +194,6 @@ public class CombatStatsUtilsService {
         return (long) heroPower;
     }
 
-    // 更新玩家总战力（3个队伍的英雄战力总和），每个提升战力方法都将调用该函数
-    public void setTotalPower(Long userId){
-        long totalPower = 0;
-
-        Map<String,Object> teamMap = new HashMap<>();
-        teamMap.put("USER_ID", userId);
-        List<GmTeamConfigEntity> teams = teamConfigDao.selectByMap(teamMap);
-        if (teams == null) {
-            throw new RRException("获取玩家队伍信息异常");
-        }
-        for(GmTeamConfigEntity teamConfig : teams){
-            totalPower = totalPower + teamConfig.getTeamPower();
-        }
-
-        // 更新玩家总战力
-        UserEntity user = new UserEntity();
-        user.setUserId(userId);
-        user.setTotalPower(totalPower);
-        userDao.updateById(user);
-
-    }
-
     /**
      * 获取装备合成项
      * @param eqSIEs
@@ -241,13 +219,5 @@ public class CombatStatsUtilsService {
         return list;
     }
 
-    // 获取除去当前队伍的队伍总战力
-    public Long getOtherTeamTotalPower(Long userId, Long id){
-//        Map<String,Object> teamMap = new HashMap<>();
-//        teamMap.put("userId", userId);
-//        teamMap.put("id", id);
-//        return teamConfigDao.getOtherTeamTotalPower(teamMap);
-        return null;
-    }
 }
 

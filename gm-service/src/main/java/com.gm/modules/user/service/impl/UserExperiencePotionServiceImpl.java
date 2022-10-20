@@ -65,7 +65,7 @@ public class UserExperiencePotionServiceImpl extends ServiceImpl<UserExperienceP
         // 玩家对已拥有的英雄使用经验药水
 
         // 获取玩家英雄ID
-        String userHeroId = useExpReq.getGmUserHeroId();
+        Long userHeroId = useExpReq.getGmUserHeroId();
         // 如果获取不到玩家使用的药水稀有度 默认给个1
         String rareCode = "";
         if ( StringUtils.isNotBlank(useExpReq.getExpRare()) ) {

@@ -103,6 +103,7 @@
             USER_HERO4_ID = #{userHero4Id},
             USER_HERO5_ID = #{userHero5Id},
             TEAM_POWER = #{teamPower},
+            TEAM_MINTER = #{teamMinter},
             UPDATE_USER = #{updateUser},
             UPDATE_TIME = #{updateTime},
             UPDATE_TIME_TS = #{updateTimeTs},

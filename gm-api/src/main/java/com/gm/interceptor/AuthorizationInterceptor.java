@@ -9,17 +9,15 @@
 package com.gm.interceptor;
 
 
-import com.gm.common.exception.RRException;
 import com.gm.annotation.Login;
+import com.gm.common.exception.RRException;
 import com.gm.common.utils.Constant;
-import com.gm.modules.user.entity.UserDailyOutputIncomeRecordEntity;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserTokenEntity;
 import com.gm.modules.user.service.UserDailyOutputIncomeRecordService;
 import com.gm.modules.user.service.UserService;
 import com.gm.modules.user.service.UserTokenService;
 import org.apache.commons.lang.StringUtils;
-import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;

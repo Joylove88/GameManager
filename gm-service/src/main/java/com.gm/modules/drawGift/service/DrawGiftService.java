@@ -3,12 +3,14 @@ package com.gm.modules.drawGift.service;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gm.common.utils.Arith;
+import com.gm.common.utils.CalculateTradeUtil;
 import com.gm.common.utils.Constant;
 import com.gm.common.utils.LotteryGiftsUtils;
 import com.gm.modules.basicconfig.dao.*;
 import com.gm.modules.basicconfig.entity.*;
 import com.gm.modules.basicconfig.dto.*;
 import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
+import com.gm.modules.fightCore.service.FightCoreService;
 import com.gm.modules.order.dao.TransactionOrderDao;
 import com.gm.modules.sys.service.SysConfigService;
 import com.gm.modules.user.dao.*;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -43,6 +46,8 @@ public class DrawGiftService{
     @Autowired
     private ProbabilityDao probabilityDao;
     @Autowired
+    private SysConfigService sysConfigService;
+    @Autowired
     private EquipmentInfoDao equipmentInfoDao;
     @Autowired
     private EquipmentFragDao equinpmentFragDao;
@@ -56,10 +61,11 @@ public class DrawGiftService{
     private UserExperiencePotionDao userExperiencePotionDao;
     @Autowired
     private CombatStatsUtilsService combatStatsUtilsService;
+    @Autowired
+    private FightCoreService fightCoreService;
 
     public List<Object> drawStart(UserEntity user, DrawForm form) throws Exception {
         List<Object> gifts = new ArrayList<>();
-
         if (Constant.ItemType.HERO.getValue().equals(form.getItemType())){
             // 英雄抽奖
             gifts = heroDrawStart(user,form);
@@ -198,6 +204,14 @@ public class DrawGiftService{
                 long gmAttackSpell = gifts.get(entry.getKey()).getGmAttackSpell();//初始法功
                 heroPower = combatStatsUtilsService.getHeroPower(health, mana, healthRegen, manaRegen, armor, magicResist, attackDamage, gmAttackSpell, scale);
                 userHeroEntity.setHeroPower((long) heroPower);
+                // 初始GAIA系统
+                fightCoreService.initTradeBalanceParameter();
+                // 计算矿工数
+                BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(userHeroEntity.getHeroPower()));
+                userHeroEntity.setMinter(minter);// 矿工数
+                userHeroEntity.setOracle(CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1)));// 神谕值
+                // 更新系统中保存的市场总鸡蛋
+                sysConfigService.updateValueByKey(Constant.MARKET_EGGS, CalculateTradeUtil.marketEggs.toString());
 
                 userHeroDao.insert(userHeroEntity);
             } else if (gifts.get(entry.getKey()).getDType() == 1){
@@ -533,6 +547,12 @@ public class DrawGiftService{
                 // 更新装备战力
                 double equipPower = (health * 0.1) + (mana * 0.1) + attackDamage + attackSpell + ((armor + magicResist) * 4.5) + healthRegen * 0.1 + manaRegen * 0.3;
                 userEquip.setEquipPower((long) equipPower);
+                // 计算矿工数
+                BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(userEquip.getEquipPower()));
+                userEquip.setMinter(minter);// 矿工数
+                userEquip.setOracle(CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1)));// 神谕值
+                // 更新系统中保存的市场总鸡蛋
+                sysConfigService.updateValueByKey(Constant.MARKET_EGGS, CalculateTradeUtil.marketEggs.toString());
 
                 userEquipmentDao.insert(userEquip);
 
@@ -777,7 +797,7 @@ public class DrawGiftService{
         // statistics
         Map<Integer, Integer> count = new HashMap<Integer, Integer>();
         //抽奖次数
-        double num = Constant.DrawNum.DRAW1.getValue();
+        double num = 20000;
         for (int i = 0; i < num; i++) {
             int orignalIndex = LotteryGiftsUtils.lottery(orignalRates);
 

@@ -32,7 +32,7 @@ public class GmMiningInfoEntity implements Serializable {
 	/**
 	 * 用户矿工数量
 	 */
-	private String miners;
+	private BigDecimal miners;
 	/**
 	 * 用户鸡蛋数量
 	 */

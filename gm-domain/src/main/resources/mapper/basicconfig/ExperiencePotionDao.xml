@@ -19,5 +19,16 @@
         <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
     </resultMap>
 
-
+    <select id="getExpInfos" resultType="com.gm.modules.basicconfig.entity.ExperiencePotionEntity">
+        SELECT
+        A.*
+        FROM
+        GM_EXPERIENCE_POTION A
+        <where>
+            <if test="status != null and status != ''">
+                AND A.`STATUS` = #{status}
+            </if>
+        </where>
+        ORDER BY A.EX_POTION_RARE_CODE
+    </select>
 </mapper>

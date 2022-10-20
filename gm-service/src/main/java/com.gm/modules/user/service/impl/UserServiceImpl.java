@@ -28,6 +28,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,6 +80,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		userRegister.setFtg(Constant.FTG);
 		userRegister.setScale(1D);
 		userRegister.setTotalPower(Constant.ZERO);
+		userRegister.setTotalMinter(BigDecimal.ZERO);
 		userRegister.setExperienceObtain(Constant.ZERO);
 		userRegister.setUserType(Constant.ZERO_);
 		userRegister.setStatus(Constant.enable);
@@ -103,7 +105,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		// 用户注册完成后自动添加一条矿工数据
 		GmMiningInfoEntity miningInfoEntity = new GmMiningInfoEntity();
 		miningInfoEntity.setUserId(userRegister.getUserId());
-		miningInfoEntity.setMiners(Constant.ZERO_);
+		miningInfoEntity.setMiners(BigDecimal.ZERO);
 		miningInfoEntity.setClaimedEggs(Constant.ZERO_);
 		miningInfoEntity.setLastHatch(Constant.ZERO_);
 		miningInfoEntity.setStatus(Constant.enable);

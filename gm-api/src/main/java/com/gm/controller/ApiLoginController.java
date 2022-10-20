@@ -109,8 +109,6 @@ public class ApiLoginController {
                 // 获得两个时间的毫秒时间差异
                 long isDate = userEntity.getSignDate().getTime() - Constant.HOUR12;
 
-                // 赋值接收的日期
-                userEntity.setSignDate(signDate);
 
                 // 获取用户最后登陆的12小时内的日志数据
                 UserLoginLogEntity log = new UserLoginLogEntity();
@@ -118,6 +116,8 @@ public class ApiLoginController {
                 log.setGtTime(userEntity.getSignDate().getTime());
                 log.setLtTime(isDate);
                 List<UserLoginLogEntity> login12Hs = userLoginLogService.getLogin12H(log);
+                // 赋值接收的日期
+                userEntity.setSignDate(signDate);
                 // 获取到的日志数据必须非空
                 if (login12Hs.size() > 0){
                     // 如果接收到的时间大于最新的登陆日志时间说明正常 则进行验签

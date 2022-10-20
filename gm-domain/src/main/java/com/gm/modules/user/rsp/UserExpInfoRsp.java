@@ -10,30 +10,26 @@ public class UserExpInfoRsp {
 	/**
 	 * 经验药水数量
 	 */
-	private Long userExNum;
-	/**
-	 * 状态('0':禁用，'1':未使用，'2':已使用)
-	 */
-	private String status;
+	private Long expNum;
 	/**
 	 * 经验药水名称
 	 */
-	private String exPotionName;
+	private String expName;
 	/**
 	 * 经验值
 	 */
-	private Long exValue;
+	private Long expValue;
 	/**
 	 * 药水稀有度(1:白色,2:绿色,3:蓝色,4:紫色)
 	 */
-	private String exPotionRareCode;
+	private String expRare;
 	/**
 	 * 经验图标地址
 	 */
-	private String exIconUrl;
+	private String expIconUrl;
 	/**
 	 * 药水描述
 	 */
-	private String exDescription;
+	private String expDescription;
 
 }

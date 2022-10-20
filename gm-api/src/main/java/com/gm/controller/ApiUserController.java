@@ -26,6 +26,7 @@ import com.gm.modules.basicconfig.service.*;
 import com.gm.modules.user.entity.*;
 import com.gm.modules.user.req.UseWithdrawReq;
 import com.gm.modules.user.req.UserHeroInfoReq;
+import com.gm.modules.user.req.UserInfoReq;
 import com.gm.modules.user.rsp.*;
 import com.gm.modules.user.service.*;
 import io.swagger.annotations.Api;
@@ -193,6 +194,36 @@ public class ApiUserController {
         }
         BeanUtils.copyProperties(rsp,user);
 
+        // 获取用户账户余额
+        UserAccountEntity userAccount = getUserAccount(user);
+        if (userAccount == null){
+            throw new RRException(ErrorCode.USER_GET_BAL_FAIL.getDesc());
+        }
+        rsp.setPromotionExperience(userLevel.getPromotionExperience());
+        rsp.setLevelCode(userLevel.getLevelCode());
+        rsp.setFtgMax(Constant.FTG);
+        rsp.setTotalAmount(userAccount.getTotalAmount());
+        rsp.setCurrentExp(ExpUtils.getCurrentExp(userLevel.getExperienceTotal(), userLevel.getPromotionExperience(), user.getExperienceObtain()));
+        return R.ok().put("userInfo",rsp);
+    }
+
+    @PostMapping("getPayerInfoSimple")
+    @ApiOperation("获取玩家信息")
+    public R getPayerInfoSimple(UserInfoReq req) throws InvocationTargetException, IllegalAccessException {
+        // 表单校验
+        ValidatorUtils.validateEntity(req);
+        UserInfoRsp rsp = new UserInfoRsp();
+        // 通过地址获取玩家信息
+        UserEntity user = userService.queryByAddress(req.getAddress());
+        if ( user == null ) {
+            throw new RRException(ErrorCode.USER_NOT_EXIST.getDesc());
+        }
+        // 获取玩家等级信息
+        UserLevelEntity userLevel = userLevelService.getById(user.getUserLevelId());
+        if (userLevel == null){
+            throw new RRException(ErrorCode.EXP_GET_FAIL.getDesc());
+        }
+        BeanUtils.copyProperties(rsp,user);
         // 获取用户账户余额
         UserAccountEntity userAccount = getUserAccount(user);
         if (userAccount == null){

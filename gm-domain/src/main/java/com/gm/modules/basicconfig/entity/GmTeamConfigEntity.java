@@ -71,6 +71,10 @@ public class GmTeamConfigEntity implements Serializable {
 	 */
 	private Long teamPower;
 	/**
+	 * 队伍矿工数
+	 */
+	private BigDecimal teamMinter;
+	/**
 	 * 战斗状态（0：未战斗，1：战斗中，2：战斗结束）
 	 */
 	private String status;

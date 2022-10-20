@@ -15,6 +15,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gm.annotation.Login;
 import com.gm.annotation.LoginUser;
 import com.gm.common.exception.RRException;
+import com.gm.common.utils.Arith;
 import com.gm.common.utils.Constant;
 import com.gm.common.utils.R;
 import com.gm.modules.basicconfig.entity.*;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -325,115 +327,119 @@ public class ApiFightController {
     /**
      * 校验英雄是否已在其他队伍上阵
      * @param teamInfoRsps
-     * @param req
+     * @param heroIdMap
+     * @param teamId
      */
-    private void theHeroIsExistedOtherTeam(List<TeamInfoRsp> teamInfoRsps, FightInfoReq req) {
+    private void theHeroIsExistedOtherTeam(List<TeamInfoRsp> teamInfoRsps, Map<String, Object> heroIdMap, Long teamId) {
         // 创建校验校验英雄是否已在其他队伍上阵
         Map<String, Object> isExistedMap = new HashMap<>();
         int i = 0;
-        while ( i < teamInfoRsps.size() ) {
+        while (i < teamInfoRsps.size()) {
             // 跳过当前队伍，校验其他队伍
-            if ( !teamInfoRsps.get(i).getId().equals(req.getTeamId()) ) {
-                if ( teamInfoRsps.get(i).getUserHero1Id() != null && teamInfoRsps.get(i).getUserHero1Id() != 0 ) {
-                    isExistedMap.put("hero1Id" + i, teamInfoRsps.get(i).getUserHero1Id());
-                }
-
-                if ( teamInfoRsps.get(i).getUserHero2Id() != null && teamInfoRsps.get(i).getUserHero2Id() != 0 ) {
-                    isExistedMap.put("hero2Id" + i, teamInfoRsps.get(i).getUserHero2Id());
-                }
-
-                if ( teamInfoRsps.get(i).getUserHero3Id() != null && teamInfoRsps.get(i).getUserHero3Id() != 0 ) {
-                    isExistedMap.put("hero3Id" + i, teamInfoRsps.get(i).getUserHero3Id());
-                }
-
-                if ( teamInfoRsps.get(i).getUserHero4Id() != null && teamInfoRsps.get(i).getUserHero4Id() != 0 ) {
-                    isExistedMap.put("hero4Id" + i, teamInfoRsps.get(i).getUserHero4Id());
-                }
-
-                if( teamInfoRsps.get(i).getUserHero5Id() != null && teamInfoRsps.get(i).getUserHero5Id() != 0 ) {
-                    isExistedMap.put("hero5Id" + i, teamInfoRsps.get(i).getUserHero5Id());
-                }
-                // 开始校验
-                if ( isExistedMap.containsValue(req.getUserHero1Id()) ||
-                        isExistedMap.containsValue(req.getUserHero2Id()) ||
-                        isExistedMap.containsValue(req.getUserHero3Id()) ||
-                        isExistedMap.containsValue(req.getUserHero4Id()) ||
-                        isExistedMap.containsValue(req.getUserHero5Id()) ) {
-                    throw new RRException("英雄已在其他队伍上阵!");
+            if (!teamInfoRsps.get(i).getId().equals(teamId)) {
+                // 封装其他队伍中的英雄ID
+                Map<String, Object> teamHeroIdMap = new LinkedHashMap<>();
+                teamHeroIdMap.put("userHero0", teamInfoRsps.get(i).getUserHero1Id());
+                teamHeroIdMap.put("userHero1", teamInfoRsps.get(i).getUserHero2Id());
+                teamHeroIdMap.put("userHero2", teamInfoRsps.get(i).getUserHero3Id());
+                teamHeroIdMap.put("userHero3", teamInfoRsps.get(i).getUserHero4Id());
+                teamHeroIdMap.put("userHero4", teamInfoRsps.get(i).getUserHero5Id());
+                int teamHeroI = 0;
+                while (teamHeroI < teamHeroIdMap.size()){
+                    // 获取玩家英雄ID
+                    Long userHeroId = Long.valueOf(null == teamHeroIdMap.get("userHero" + teamHeroI) ? Constant.ZERO_ : teamHeroIdMap.get("userHero" + teamHeroI).toString());
+                    if (userHeroId != null && !userHeroId.equals(Constant.ZERO)) {
+                        isExistedMap.put("userHeroId" + teamHeroI, userHeroId);
+                    }
+                    teamHeroI++;
                 }
             }
             i++;
         }
+
+        int newI = 0;
+        while (newI < heroIdMap.size()){
+            // 获取玩家英雄ID
+            Long userHeroId = Long.valueOf(null == heroIdMap.get("userHero" + newI) ? Constant.ZERO_ : heroIdMap.get("userHero" + newI).toString());
+            // 开始校验
+            if (isExistedMap.containsValue(userHeroId)) {
+                throw new RRException("英雄已在其他队伍上阵!");
+            }
+            newI++;
+        }
     }
 
     /**
-     * 校验当前队伍是否存英雄重复上阵
-     * @param req
+     * 校验当前队伍是否存英雄重复上阵，校验玩家英雄合法性
+     * @param heroIdMap
+     * @param userId
+     * @return
      */
-    private void theHeroIsRepeat(FightInfoReq req) {
+    private List<UserHeroInfoRsp> theHeroIsRepeat(Map<String, Object> heroIdMap, Long userId) {
         Set set = new HashSet();
         List list = new ArrayList();
-        if ( req.getUserHero1Id() != null && req.getUserHero1Id() != 0 ) {
-            set.add(req.getUserHero1Id());
-            list.add(req.getUserHero1Id());
+        // 获取该玩家全部英雄
+        Map<String, Object> userHeroMap = new HashMap<>();
+        userHeroMap.put("status", Constant.enable);
+        userHeroMap.put("gmUserId", userId);
+        List<UserHeroInfoRsp> userHeros = userHeroService.getUserAllHero(userHeroMap);
+
+        int i = 0;
+        while (i < heroIdMap.size()){
+            // 获取玩家英雄ID
+            Long userHeroId = Long.valueOf(null == heroIdMap.get("userHero" + i) ? Constant.ZERO_ : heroIdMap.get("userHero" + i).toString());
+            if (userHeroId != null && !userHeroId.equals(Constant.ZERO)) {
+                // 校验玩家英雄合法性
+                boolean bl = userHeros.stream().anyMatch(a -> a.getGmUserHeroId().equals(userHeroId));
+                if (!bl){
+                    throw new RRException("您不是此英雄的归属者!英雄编码：" + userHeroId);
+                }
+                set.add(userHeroId);
+                list.add(userHeroId);
+            }
+            i++;
         }
-
-        if ( req.getUserHero2Id() != null && req.getUserHero2Id() != 0 ) {
-            set.add(req.getUserHero2Id());
-            list.add(req.getUserHero2Id());
-        }
-
-        if ( req.getUserHero3Id() != null && req.getUserHero3Id() != 0 ) {
-            set.add(req.getUserHero3Id());
-            list.add(req.getUserHero3Id());
-        }
-
-        if ( req.getUserHero4Id() != null && req.getUserHero4Id() != 0 ) {
-            set.add(req.getUserHero4Id());
-            list.add(req.getUserHero4Id());
-        }
-
-        if( req.getUserHero5Id() != null && req.getUserHero5Id() != 0 ) {
-            set.add(req.getUserHero5Id());
-            list.add(req.getUserHero5Id());
-        }
-
-
         // 开始校验
         if ( set.size() != list.size() ) {
             throw new RRException("英雄重复上阵!");
         }
+        return userHeros;
     }
 
     /**
-     * 获取英雄战力并校验该英雄是否属于当前玩家
-     * @param userHero
+     * 存储队伍中的英雄ID
+     * @param team
+     * @param userHeroId
+     * @param i
      * @return
      */
-    private Long getHeroPowerAndVerifyBelongs(UserHeroEntity userHero) {
-        Map<String, Object> userHeroMap = new HashMap<>();
-        userHeroMap.put("status", Constant.enable);
-        userHeroMap.put("gmUserId", userHero.getGmUserId());
-        userHeroMap.put("gmUserHeroId", userHero.getGmUserHeroId());
-        UserHeroEntity userHeroEntity = userHeroService.getUserHeroById(userHeroMap);
-        // 开始校验
-        if ( userHeroEntity == null ) {
-            throw new RRException("您不是此英雄的归属者!英雄编码："+userHero.getGmUserHeroId());
+    private GmTeamConfigEntity setTeamUserHeroId(GmTeamConfigEntity team, Long userHeroId, int i){
+        if (i == 0) {
+            team.setUserHero1Id(userHeroId);
+        } else if (i == 1){
+            team.setUserHero2Id(userHeroId);
+        } else if (i == 2){
+            team.setUserHero3Id(userHeroId);
+        } else if (i == 3){
+            team.setUserHero4Id(userHeroId);
+        } else if (i == 4){
+            team.setUserHero5Id(userHeroId);
         }
-        return userHeroEntity.getHeroPower();
+        return team;
     }
 
     /**
-     * 更新玩家英雄上下阵状态
-     * @param gmUserHeroId
-     * @param type
+     * 存储玩家英雄上下阵状态
+     * @param userHeroId
+     * @param state
+     * @return
      */
-    private void setUserHeroStatePlay(Long gmUserHeroId, String type) {
+    private UserHeroEntity setUserHeroState(Long userHeroId, String state){
         // 实例化玩家英雄类 (用于更新玩家英雄上下阵状态)
         UserHeroEntity userHero = new UserHeroEntity();
-        userHero.setGmUserHeroId(gmUserHeroId);
-        userHero.setStatePlay(type);// 0下阵，1上阵
-        userHeroService.updateById(userHero);
+        userHero.setGmUserHeroId(userHeroId);
+        userHero.setStatePlay(state);// 0下阵，1上阵
+        return userHero;
     }
 
     /**
@@ -443,20 +449,26 @@ public class ApiFightController {
      * @return
      */
     private void setTeamHero(UserEntity user, FightInfoReq req) {
-        // 校验当前队伍是否存英雄重复上阵
-        theHeroIsRepeat(req);
+        // 获取请求的英雄ID
+        Map<String, Object> heroIdMap = new LinkedHashMap<>();
+        heroIdMap.put("userHero0", req.getUserHero1Id());
+        heroIdMap.put("userHero1", req.getUserHero2Id());
+        heroIdMap.put("userHero2", req.getUserHero3Id());
+        heroIdMap.put("userHero3", req.getUserHero4Id());
+        heroIdMap.put("userHero4", req.getUserHero5Id());
 
-        // 获取全部队伍
+        // 校验当前队伍是否存英雄重复上阵，校验玩家英雄合法性
+        List<UserHeroInfoRsp> userHeroInfoRsps = theHeroIsRepeat(heroIdMap, user.getUserId());
+
+        // 获取当前玩家的全部队伍
         Map<String, Object> params = new HashMap<>();
         params.put("userId", user.getUserId());
         List<TeamInfoRsp> teamInfos = teamConfigService.getTeamInfoList(params);
         if (teamInfos.size() == 0 ) {
             throw new RRException("英雄上下阵时获取队伍信息失败!");
         }
-
         // 校验英雄是否已在其他队伍上阵
-        theHeroIsExistedOtherTeam(teamInfos, req);
-
+        theHeroIsExistedOtherTeam(teamInfos, heroIdMap, req.getTeamId());
         // 获取当前队伍
         TeamInfoRsp teamInfo = new TeamInfoRsp();
         int i =0;
@@ -467,231 +479,118 @@ public class ApiFightController {
             i++;
         }
 
+        // 实例化需要重置状态的玩家英雄集合
+        List<UserHeroEntity> userHeros = new ArrayList<>();
+
+        // ======初始化时重置上一次队伍中英雄的上下阵状态START======
+        // 获取旧队伍英雄ID
+        Map<String, Object> teamHeroIdMap = new LinkedHashMap<>();
+        teamHeroIdMap.put("userHero0", teamInfo.getUserHero1Id());
+        teamHeroIdMap.put("userHero1", teamInfo.getUserHero2Id());
+        teamHeroIdMap.put("userHero2", teamInfo.getUserHero3Id());
+        teamHeroIdMap.put("userHero3", teamInfo.getUserHero4Id());
+        teamHeroIdMap.put("userHero4", teamInfo.getUserHero5Id());
+        int oldI = 0;
+        while (oldI < teamHeroIdMap.size()){
+            // 获取玩家英雄ID
+            Long userHeroId = Long.valueOf(null == teamHeroIdMap.get("userHero" + oldI) ? Constant.ZERO_ : teamHeroIdMap.get("userHero" + oldI).toString());
+            if (userHeroId != null && !userHeroId.equals(Constant.ZERO)) {
+                userHeros.add(setUserHeroState(userHeroId, Constant.disabled));
+            }
+            oldI++;
+        }
+        // 重置玩家英雄上下阵状态（一次性批量操作）
+        if (userHeros.size() > 0) {
+            userHeroService.updateBatchById(userHeros);
+        }
+        // ======初始化时重置上一次队伍中英雄的上下阵状态END======
+
+
+        // 实例化需要重置状态的玩家英雄集合
+        userHeros = new ArrayList<>();
+        // 实例化队伍信息类
+        GmTeamConfigEntity team = new GmTeamConfigEntity();
         // 旧战力
         long oldPower = 0;
         // 新战力
         long newPower = 0;
-        // 变化的战力
+        // 改变的战力
         long changePower = 0;
-
+        // 旧的矿工数
+        BigDecimal oldMinter = BigDecimal.ZERO;
+        // 队伍矿工数
+        BigDecimal newMinter = BigDecimal.ZERO;
+        // 改变的矿工数
+        BigDecimal changeMinter = BigDecimal.ZERO;
+        // 队伍中英雄上下阵操作识别 大于0为已操作
         int num = 0;
-
-        // 实例化队伍信息类
-        GmTeamConfigEntity team = new GmTeamConfigEntity();
-        // 实例化玩家英雄类
-        UserHeroEntity userHero = new UserHeroEntity();
-        userHero.setStatus(Constant.enable);
-        userHero.setGmUserId(user.getUserId());
-        // 获取该英雄战力
-        long heroPower = 0;
-        // 初始化时重置上一次队伍中英雄的上下阵状态
-        if ( teamInfo.getUserHero1Id() != null && !teamInfo.getUserHero1Id().equals(0L) ) {
-            setUserHeroStatePlay(teamInfo.getUserHero1Id(), Constant.disabled);
-        }
-        if ( teamInfo.getUserHero2Id() != null && !teamInfo.getUserHero2Id().equals(0L) ) {
-            setUserHeroStatePlay(teamInfo.getUserHero2Id(), Constant.disabled);
-        }
-        if ( teamInfo.getUserHero3Id() != null && !teamInfo.getUserHero3Id().equals(0L) ) {
-            setUserHeroStatePlay(teamInfo.getUserHero3Id(), Constant.disabled);
-        }
-        if ( teamInfo.getUserHero4Id() != null && !teamInfo.getUserHero4Id().equals(0L)  ) {
-            setUserHeroStatePlay(teamInfo.getUserHero4Id(), Constant.disabled);
-        }
-        if ( teamInfo.getUserHero5Id() != null && !teamInfo.getUserHero5Id().equals(0L)  ) {
-            setUserHeroStatePlay(teamInfo.getUserHero5Id(), Constant.disabled);
-        }
-
-        // 玩家英雄1
-        if (req.getUserHero1Id() != null) {
-            team.setUserHero1Id(req.getUserHero1Id());
-
-            // 判断玩家是否有上下阵操作
-            if (!req.getUserHero1Id().equals(teamInfo.getUserHero1Id())) {
-
-                num++;
-
-                // 上阵操作
-                if (!req.getUserHero1Id().equals(0L)) {
-                    userHero.setGmUserHeroId(req.getUserHero1Id());
-                    // 获取玩家英雄战力并校验该英雄归属是否当前玩家
-                    heroPower = getHeroPowerAndVerifyBelongs(userHero);
-                    newPower = newPower + heroPower;
-
-                    // 更新玩家英雄1上阵状态
-                    setUserHeroStatePlay(req.getUserHero1Id(), Constant.enable);
-
-                } else { // 下阵操作
-                    // 因为英雄下阵和无英雄传递过来的值都是0 需要校验数据库中该队伍是否已配置英雄，如已存在配置英雄说明为下阵操作否则为未操作。
-                    if (teamInfo.getUserHero1Id() != null) {
-                        team.setUserHero1Id(null);
-                    } else {
-                        num--;
+        int newI = 0;
+        while (newI < heroIdMap.size()){
+            // 获取队伍中的英雄ID
+            Long teamHeroId = Long.valueOf(null == teamHeroIdMap.get("userHero" + newI) ? Constant.ZERO_ : teamHeroIdMap.get("userHero" + newI).toString());
+            // 获取玩家英雄ID
+            Long userHeroId = Long.valueOf(null == heroIdMap.get("userHero" + newI) ? Constant.ZERO_ : heroIdMap.get("userHero" + newI).toString());
+            // 当请求的英雄ID不为空时进入
+            if (userHeroId != null) {
+                // 存储队伍中的英雄ID
+                setTeamUserHeroId(team, userHeroId, newI);
+                // 判断玩家是否有上下阵操作
+                if (!userHeroId.equals(teamHeroId)) {
+                    num++;// 标记为已操作
+                    // 上阵操作
+                    if (!userHeroId.equals(Constant.ZERO)) {
+                        // 获取英雄战力
+                        for(UserHeroInfoRsp hero : userHeroInfoRsps){
+                            if (hero.getGmUserHeroId().equals(userHeroId)) {
+                                newPower = newPower + hero.getHeroPower();
+                                newMinter = Arith.add(newMinter, hero.getMinter());
+                            }
+                        }
+                        // 存储玩家英雄上阵状态
+                        userHeros.add(setUserHeroState(userHeroId, Constant.enable));
+                    } else { // 下阵操作
+                        // 因为英雄下阵和无英雄传递过来的值都是0 需要校验数据库中该队伍是否已配置英雄，如已存在配置英雄说明为下阵操作否则为未操作。
+                        if (teamHeroId != null) {
+                            // 存储队伍中的英雄ID
+                            setTeamUserHeroId(team, null, newI);
+                        } else {
+                            num--;
+                        }
+                    }
+                } else { // 无上下阵操作
+                    if (!userHeroId.equals(0L)) {
+                        // 获取英雄战力
+                        for(UserHeroInfoRsp hero : userHeroInfoRsps){
+                            if (hero.getGmUserHeroId().equals(userHeroId)) {
+                                newPower = newPower + hero.getHeroPower();
+                                newMinter = Arith.add(newMinter, hero.getMinter());
+                            }
+                        }
+                        // 存储玩家英雄上阵状态
+                        userHeros.add(setUserHeroState(userHeroId, Constant.enable));
                     }
                 }
-
-            } else { // 无上下阵操作
-                if (!req.getUserHero1Id().equals(0L)) {
-                    userHero.setGmUserHeroId(req.getUserHero1Id());
-                    heroPower = getHeroPowerAndVerifyBelongs(userHero);
-                    newPower = newPower + heroPower;
-                    // 更新玩家英雄1上阵状态
-                    setUserHeroStatePlay(req.getUserHero1Id(), Constant.enable);
-                }
             }
+            newI++;
         }
 
-        // 玩家英雄2
-        if (req.getUserHero2Id() != null) {
-            team.setUserHero2Id(req.getUserHero2Id());
-            // 判断玩家是否有上下阵操作
-            if ( !req.getUserHero2Id().equals(teamInfo.getUserHero2Id()) ) {
-
-                num++;
-
-                // 上阵操作
-                if (!req.getUserHero2Id().equals(0L)) {
-                    userHero.setGmUserHeroId(req.getUserHero2Id());
-                    heroPower = getHeroPowerAndVerifyBelongs(userHero);
-                    newPower = newPower + heroPower;
-
-                    // 更新玩家英雄2上阵状态
-                    setUserHeroStatePlay(req.getUserHero2Id(), Constant.enable);
-
-                } else { // 下阵操作
-                    // 因为英雄下阵和无英雄传递过来的值都是0 需要校验数据库中该队伍是否已配置英雄，如已存在配置英雄说明为下阵操作否则为未操作。
-                    if (teamInfo.getUserHero2Id() != null) {
-                        team.setUserHero2Id(null);
-                    } else {
-                        num--;
-                    }
-                }
-            } else { // 无上下阵操作
-                if (!req.getUserHero2Id().equals(0L)) {
-                    userHero.setGmUserHeroId(req.getUserHero2Id());
-                    heroPower = getHeroPowerAndVerifyBelongs(userHero);
-                    newPower = newPower + heroPower;
-                    // 更新玩家英雄1上阵状态
-                    setUserHeroStatePlay(req.getUserHero2Id(), Constant.enable);
-                }
-            }
+        // 更新玩家英雄上阵状态
+        if (userHeros.size() > 0){
+            userHeroService.updateBatchById(userHeros);
         }
-
-        // 玩家英雄3
-        if (req.getUserHero3Id() != null) {
-            team.setUserHero3Id(req.getUserHero3Id());
-            // 判断玩家是否有上下阵操作
-            if ( !req.getUserHero3Id().equals(teamInfo.getUserHero3Id()) ) {
-
-                num++;
-
-                // 上阵操作
-                if (!req.getUserHero3Id().equals(0L)) {
-                    userHero.setGmUserHeroId(req.getUserHero3Id());
-                    heroPower = getHeroPowerAndVerifyBelongs(userHero);
-                    newPower = newPower + heroPower;
-
-                    // 更新玩家英雄3上阵状态
-                    setUserHeroStatePlay(req.getUserHero3Id(), Constant.enable);
-
-                } else { // 下阵操作
-                    // 因为英雄下阵和无英雄传递过来的值都是0 需要校验数据库中该队伍是否已配置英雄，如已存在配置英雄说明为下阵操作否则为未操作。
-                    if (teamInfo.getUserHero3Id() != null) {
-                        team.setUserHero3Id(null);
-                    } else {
-                        num--;
-                    }
-                }
-            } else { // 无上下阵操作
-                if (!req.getUserHero3Id().equals(0L)) {
-                    userHero.setGmUserHeroId(req.getUserHero3Id());
-                    heroPower = getHeroPowerAndVerifyBelongs(userHero);
-                    newPower = newPower + heroPower;
-                    // 更新玩家英雄1上阵状态
-                    setUserHeroStatePlay(req.getUserHero3Id(), Constant.enable);
-                }
-            }
-        }
-
-        // 玩家英雄4
-        if (req.getUserHero4Id() != null) {
-            team.setUserHero4Id(req.getUserHero4Id());
-            // 判断玩家是否有上下阵操作
-            if ( !req.getUserHero4Id().equals(teamInfo.getUserHero4Id()) ) {
-
-                num++;
-                // 上阵操作
-                if (!req.getUserHero4Id().equals(0L)) {
-                    userHero.setGmUserHeroId(req.getUserHero4Id());
-                    heroPower = getHeroPowerAndVerifyBelongs(userHero);
-                    newPower = newPower + heroPower;
-
-                    // 更新玩家英雄4上阵状态
-                    setUserHeroStatePlay(req.getUserHero4Id(), Constant.enable);
-
-                } else { // 下阵操作
-                    // 因为英雄下阵和无英雄传递过来的值都是0 需要校验数据库中该队伍是否已配置英雄，如已存在配置英雄说明为下阵操作否则为未操作。
-                    if (teamInfo.getUserHero4Id() != null) {
-                        team.setUserHero4Id(null);
-                    } else {
-                        num--;
-                    }
-                }
-            } else { // 无上下阵操作
-                if (!req.getUserHero3Id().equals(0L)) {
-                    userHero.setGmUserHeroId(req.getUserHero3Id());
-                    heroPower = getHeroPowerAndVerifyBelongs(userHero);
-                    newPower = newPower + heroPower;
-                    // 更新玩家英雄1上阵状态
-                    setUserHeroStatePlay(req.getUserHero4Id(), Constant.enable);
-                }
-            }
-        }
-
-        // 玩家英雄5
-        if (req.getUserHero5Id() != null) {
-            team.setUserHero5Id(req.getUserHero5Id());
-            // 判断玩家是否有上下阵操作
-            if ( !req.getUserHero5Id().equals(teamInfo.getUserHero4Id()) ) {
-
-                num++;
-                // 上阵操作
-                if (!req.getUserHero5Id().equals(0L)) {
-                    userHero.setGmUserHeroId(req.getUserHero5Id());
-                    heroPower = getHeroPowerAndVerifyBelongs(userHero);
-                    newPower = newPower + heroPower;
-
-                    // 更新玩家英雄5上阵状态
-                    setUserHeroStatePlay(req.getUserHero5Id(), Constant.enable);
-
-                } else { // 下阵操作
-                    // 因为英雄下阵和无英雄传递过来的值都是0 需要校验数据库中该队伍是否已配置英雄，如已存在配置英雄说明为下阵操作否则为未操作。
-                    if (teamInfo.getUserHero5Id() != null) {
-                        team.setUserHero5Id(null);
-                    } else {
-                        num--;
-                    }
-                }
-            } else { // 无上下阵操作
-                if (!req.getUserHero3Id().equals(0L)) {
-                    userHero.setGmUserHeroId(req.getUserHero3Id());
-                    heroPower = getHeroPowerAndVerifyBelongs(userHero);
-                    newPower = newPower + heroPower;
-                    // 更新玩家英雄1上阵状态
-                    setUserHeroStatePlay(req.getUserHero5Id(), Constant.enable);
-                }
-            }
-        }
-
         // 说明玩家有上下阵操作
         if (num != 0){
             // 获取本次操作之前的战力值
             oldPower = teamInfo.getTeamPower() == null ? 0L : teamInfo.getTeamPower();
             // 获取本次操作改变的战力值
             changePower = newPower - oldPower;
+            // 获取本次操作之前的矿工数
+            oldMinter = teamInfo.getTeamMinter() == null ? BigDecimal.ZERO : teamInfo.getTeamMinter();
+            // 获取本次操作改变的矿工数
+            changeMinter = Arith.subtract(newMinter, oldMinter);
             team.setId(req.getTeamId());
             // 更新玩家战力，队伍战力，矿工
-            fightCoreService.updateCombat(changePower, oldPower, newPower, user, team);
-
+            fightCoreService.updateCombat(changePower, oldPower, newPower, user, team, changeMinter, oldMinter, newMinter);
         }
     }
 

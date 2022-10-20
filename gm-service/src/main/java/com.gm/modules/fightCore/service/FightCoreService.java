@@ -27,6 +27,7 @@ import com.gm.modules.user.service.UserAccountService;
 import com.gm.modules.user.service.UserBalanceDetailService;
 import com.gm.modules.user.service.UserDailyOutputIncomeRecordService;
 import com.gm.modules.user.service.UserLevelService;
+import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -297,66 +298,20 @@ public class FightCoreService {
             }
         }
 
+        // 获取一天最大战斗场次
+        Long fightNum = Constant.FTG / dungeon.getRequiresStamina();
         // 获取玩家矿工数量
-        getMiners(user.getUserId());
+        CalculateTradeUtil.miners = user.getTotalMinter();
+        System.out.println("获取当前玩家矿工数量: " +CalculateTradeUtil.miners);
+        // 获取当日可产出金币数
+        BigDecimal goldCoins = getCoinGold();
 
-        // 获取剩余可战斗场次
-        Long fightNum = user.getFtg() / dungeon.getRequiresStamina();
-
-        // 首先获取玩家每日可产出收益记录表是否24小时内该队伍存在数据 3个队伍当日最多存在一条记录
-        List<UserDailyOutputIncomeRecordEntity> uDOIRList = userDailyOutputIncomeRecordService.getDataFrom24Hr(user.getUserId());
-
-        // 说明24小时内不存在战斗， 生成首次战斗数据，该场战斗属于第N次战斗 (无需更新 24小时候重新计算)需要按照综合指数更新当日可产出最大金币数, 当日剩余奖励金币数
-        if (uDOIRList.size() < 1) {
-            // 开始计算玩家收益
-
-            // 玩家收益参数
-            BigDecimal addMoney;
-            // 经济平衡系统初始化方法
-            initTradeBalanceParameter();
-
-            // 出售/计算收益
-            System.out.println("marketEggs: " + CalculateTradeUtil.marketEggs);
-            System.out.println("miners: " + CalculateTradeUtil.miners);
-
-            CalculateTradeUtil.sellEggs();
-            System.out.println("totalPower: "+CalculateTradeUtil.totalPower);
-
-            // 可产出的金币
-            addMoney = CalculateTradeUtil.userGetGold;
-
-            // 更新系统中保存的市场总鸡蛋
-            sysConfigService.updateValueByKey(Constant.MARKET_EGGS, CalculateTradeUtil.marketEggs.toString());
-
-            // 24小时内无战斗，插入首次记录
-            UserDailyOutputIncomeRecordEntity uDOIR = new UserDailyOutputIncomeRecordEntity();
-            uDOIR.setFirstTime(now);
-            uDOIR.setMaxGoldCoins(addMoney); // 当日可产出最大金币数
-            uDOIR.setRemainingGoldCoins(addMoney); // 当日剩余奖励金币数
-            uDOIR.setMaxFight(fightNum); // 可战斗场次
-            uDOIR.setUserId(user.getUserId());
-            uDOIR.setStatus(Constant.enable);
-            uDOIR.setCreateTime(now); // 创建时间
-            uDOIR.setCreateTimeTs(now.getTime());// 创建时间戳
-            userDailyOutputIncomeRecordService.save(uDOIR);
-            uDOIRList.add(uDOIR);
-        }
-
-        // 该场战斗可得金币
-        BigDecimal goldCoins = BigDecimal.valueOf(0);
         // 怪物全部击杀 战斗胜利 获取奖励结算信息
-        if ( combatStatus == 2){
+        if (combatStatus == 2){
             // 获取当前副本奖励分配百分比
-            goldCoins = Arith.multiply(uDOIRList.get(0).getRemainingGoldCoins(), BigDecimal.valueOf(dungeon.getRewardDistribution()));
+            goldCoins = Arith.multiply(goldCoins, BigDecimal.valueOf(dungeon.getRewardDistribution()));
             // 该场战斗可得金币
             goldCoins = Arith.divide(goldCoins, BigDecimal.valueOf(fightNum));
-            // 更新当日剩余奖励金币数
-            UserDailyOutputIncomeRecordEntity uDOIR = new UserDailyOutputIncomeRecordEntity();
-            uDOIR.setId(uDOIRList.get(0).getId());
-            uDOIR.setRemainingGoldCoins(Arith.subtract(uDOIRList.get(0).getRemainingGoldCoins(), goldCoins));
-            uDOIR.setUpdateTime(now); // 更新时间
-            uDOIR.setUpdateTimeTs(now.getTime()); // 更新时间戳
-            userDailyOutputIncomeRecordService.updateById(uDOIR);
 
             // 更新系统中保存的玩家赚取总收入
             CalculateTradeUtil.totalPlayersGold = Arith.add(CalculateTradeUtil.totalPlayersGold, goldCoins);
@@ -425,6 +380,29 @@ public class FightCoreService {
     }
 
     /**
+     * 计算一天可产出的最大收益
+     * @return
+     */
+    private BigDecimal getCoinGold() {
+        // 开始计算玩家收益
+        // 玩家收益参数
+        BigDecimal addMoney;
+        // 经济平衡系统初始化方法
+        initTradeBalanceParameter();
+        // 出售/计算收益
+        System.out.println("marketEggs: " + CalculateTradeUtil.marketEggs);
+        System.out.println("miners: " + CalculateTradeUtil.miners);
+        CalculateTradeUtil.sellEggs();
+
+        // 可产出的金币
+        addMoney = CalculateTradeUtil.userGetGold;
+        // 更新系统中保存的市场总鸡蛋
+        sysConfigService.updateValueByKey(Constant.MARKET_EGGS, CalculateTradeUtil.marketEggs.toString());
+
+        return addMoney;
+    }
+
+    /**
      * 初始化经济平衡系统参数
      */
     public void initTradeBalanceParameter(){
@@ -435,10 +413,6 @@ public class FightCoreService {
         System.out.println("获取市场总鸡蛋数量: "+totalEggs);
         CalculateTradeUtil.marketEggs = new BigDecimal(totalEggs);
 
-        // 获取系统全部玩家总战力
-        CalculateTradeUtil.totalPower = BigDecimal.valueOf(getTotalPower());
-        System.out.println("获取系统全部玩家总战力: " + CalculateTradeUtil.totalPower);
-
         // 获取副本池金额
         String poolBalance = sysConfigService.getValue(Constant.CashPool._DUNGEON.getValue());
         CalculateTradeUtil.FundPool = new BigDecimal(poolBalance);
@@ -448,31 +422,8 @@ public class FightCoreService {
         CalculateTradeUtil.totalPlayersGold = new BigDecimal(sysConfigService.getValue(Constant.PLAYERS_EARN_TOTAL_REVENUE));
         System.out.println("获取系统全部玩家赚取总收入: " + CalculateTradeUtil.totalPlayersGold);
 
-//        // 获取扣除用户总收益后的资金池余额
-//        CalculateTradeUtil.FundPool = Arith.subtract(CalculateTradeUtil.FundPool, CalculateTradeUtil.totalPlayersGold);
-//        System.out.println("获取扣除用户总收益后的资金池余额: " + CalculateTradeUtil.FundPool);
-
-    }
-
-    /**
-     * 获取玩家矿工数量
-     * @param userId
-     * @return
-     */
-    public Long getMiners(Long userId){
-        // 获取玩家矿工信息
-        GmMiningInfoEntity miningInfo = miningInfoDao.selectOne(new QueryWrapper<GmMiningInfoEntity>()
-                .eq("STATUS", Constant.enable)
-                .eq("USER_ID", userId)// 玩家ID
-        );
-        if (miningInfo == null) {
-            throw new RRException("玩家矿工获取失败");
-        }
-
-        // 玩家矿工数量
-        CalculateTradeUtil.miners = new BigDecimal(miningInfo.getMiners());
-        System.out.println("获取当前玩家矿工数量: " +CalculateTradeUtil.miners);
-        return miningInfo.getId();
+        // 重置矿工数
+        CalculateTradeUtil.miners = BigDecimal.ZERO;
     }
 
     /**
@@ -1093,50 +1044,37 @@ public class FightCoreService {
     }
 
     /**
-     * 更新玩家战力，队伍战力，矿工
+     * 更新玩家战力，玩家矿工，队伍战力，矿工
      * @param changePower
      * @param user
      * @param team
      */
-    public void updateCombat(long changePower, long oldPower, long newPower, UserEntity user, GmTeamConfigEntity team){
+    public void updateCombat(long changePower, long oldPower, long newPower, UserEntity user, GmTeamConfigEntity team, BigDecimal changeMinter, BigDecimal oldMinter, BigDecimal newMinter){
         Date now = new Date();
-        // 如果更新战力为0 则无需更新矿工 （针对不同顺序）
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUserId(user.getUserId());
+        userEntity.setUpdateTime(now);
+        userEntity.setUpdateTimeTs(now.getTime());
+        // 如果改变的战力为0 则无需更新
         if (changePower != 0) {
-
-            // 获取玩家矿工数量
-            Long minId = getMiners(user.getUserId());
-
-            // 初始化经济平衡方法
-            initTradeBalanceParameter();
-
-            // 通过经济平衡系统更新玩家矿工
-            CalculateTradeUtil.updateMiner(BigDecimal.valueOf(changePower));
-
-            // 更新系统中保存的市场总鸡蛋
-            sysConfigService.updateValueByKey(Constant.MARKET_EGGS, CalculateTradeUtil.marketEggs.toString());
-
-            // 更新玩家矿工数据
-            GmMiningInfoEntity mini = new GmMiningInfoEntity();
-            mini.setId(minId);
-            mini.setMiners(CalculateTradeUtil.miners.toString());
-            mini.setUpdateTime(now);
-            mini.setUpdateTimeTs(now.getTime());
-            miningInfoDao.updateById(mini);
-
-            // 更新玩家战力
-            UserEntity userEntity = new UserEntity();
-            userEntity.setUserId(user.getUserId());
+            // 更新玩家战力,矿工数
             Long totalPower = (user.getTotalPower() - oldPower) + newPower;// 获取最新用户战力
             userEntity.setTotalPower(totalPower);
-            userEntity.setUpdateTime(now);
-            userEntity.setUpdateTimeTs(now.getTime());
+        }
+
+        // 如果改变的矿工为0 则无需更新
+        if (changeMinter.compareTo(BigDecimal.ZERO) != 0) {
+            BigDecimal totalMinter = Arith.add((Arith.subtract(user.getTotalMinter(), oldMinter)), newMinter);// 获取最新用户矿工数
+            userEntity.setTotalMinter(totalMinter);
+        }
+        // 战力或者矿工其中之一改变的数值不等于0 则执行更新方法
+        if (changePower != 0 || changeMinter.compareTo(BigDecimal.ZERO) != 0) {
             userDao.updateById(userEntity);
         }
 
-        // 队伍战力
-        team.setTeamPower(newPower);
-        // 更新队伍
         team.setId(team.getId());
+        team.setTeamPower(newPower);// 队伍战力
+        team.setTeamMinter(newMinter);// 队伍矿工
         team.setUpdateUser(user.getUserId());
         team.setUpdateTime(now);
         team.setUpdateTimeTs(now.getTime());
