@@ -11,6 +11,7 @@ package com.gm.modules.user.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.user.entity.UserEntity;
+import com.gm.modules.user.rsp.UserInfoRsp;
 
 import java.util.Map;
 
@@ -51,4 +52,11 @@ public interface UserService extends IService<UserEntity> {
 	UserEntity queryByUserId(Long gmUserId);
 
 	int queryEffectiveUserCount(UserEntity userEntity);
+
+	/**
+	 * 获取玩家信息
+	 * @param map
+	 * @return
+	 */
+	UserInfoRsp getPlayerInfo(Map<String, Object> map);
 }

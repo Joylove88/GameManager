@@ -22,6 +22,7 @@ import com.gm.modules.user.entity.GmMiningInfoEntity;
 import com.gm.modules.user.entity.UserAccountEntity;
 import com.gm.modules.user.entity.UserTokenEntity;
 import com.gm.modules.user.entity.UserEntity;
+import com.gm.modules.user.rsp.UserInfoRsp;
 import com.gm.modules.user.service.UserTokenService;
 import com.gm.modules.user.service.UserService;
 import org.apache.commons.lang.RandomStringUtils;
@@ -146,6 +147,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 	@Override
 	public int queryEffectiveUserCount(UserEntity userEntity) {
 		return userDao.queryEffectiveUserCount(userEntity.getUserId());
+	}
+
+	@Override
+	public UserInfoRsp getPlayerInfo(Map<String, Object> map) {
+		return userDao.getPlayerInfo(map);
 	}
 
 }

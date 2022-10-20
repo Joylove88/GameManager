@@ -10,7 +10,10 @@ package com.gm.modules.user.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gm.modules.user.entity.UserEntity;
+import com.gm.modules.user.rsp.UserInfoRsp;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.Map;
 
 /**
  * 用户
@@ -21,4 +24,11 @@ import org.apache.ibatis.annotations.Mapper;
 public interface UserDao extends BaseMapper<UserEntity> {
 
     int queryEffectiveUserCount(Long userId);
+
+    /**
+     * 获取玩家信息
+     * @param map
+     * @return
+     */
+    UserInfoRsp getPlayerInfo(Map<String, Object> map);
 }
