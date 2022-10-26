@@ -30,7 +30,7 @@ public class UserBalanceDetailEntity implements Serializable {
 	 */
 	private Long userId;
 	/**
-	 * 交易类型：00提现,01副本产出,02英雄抽奖,03装备抽奖,04经验抽奖,11返点，12提现手续费，15后台取款,16提现冻结,17提现解冻,18后台取款冻结,19,后台取款解冻
+	 * 交易类型：00提现,01副本产出,02英雄召唤,03装备召唤,04经验召唤,11返点，12提现手续费，15后台取款,16提现冻结,17提现解冻,18后台取款冻结,19,后台取款解冻
 	 */
 	private String tradeType;
 	/**
@@ -54,7 +54,7 @@ public class UserBalanceDetailEntity implements Serializable {
 	 */
 	private Double userBalance;
 	/**
-	 * 交易类型id：提现id,副本产出id,抽奖订单id,市场交易ID,代理返佣id
+	 * 交易类型id：提现id,副本产出id,召唤订单id,市场交易ID,代理返佣id
 	 */
 	private Long sourceId;
 

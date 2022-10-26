@@ -47,7 +47,7 @@ public class UserEquipmentFragEntity implements Serializable {
 	 */
 	private String mintStatus;
 	/**
-	 * 获取类型（0：副本，1：抽奖）
+	 * 获取类型（0：副本，1：召唤）
 	 */
 	private String fromType;
 	/**

@@ -48,7 +48,7 @@ public class Constant {
     public static final Double eqAttMax = 1.01;
    // 装备属性随机最小百分比
     public static final Double eqAttMin = 0.5;
-   // 装备属性随机最小百分比(抽奖)
+   // 装备属性随机最小百分比(召唤)
     public static final Double eqAttCryptoMin = 0.5;
     /**
      * 合约事件名称
@@ -246,9 +246,9 @@ public class Constant {
     public enum TradeType {
         WITHDRAW("00"),//提现
         DUNGEON_REVENUE("01"),//副本产出
-        DRAW_HERO("02"),//英雄抽奖
-        DRAW_EQUIP("03"),//装备抽奖
-        DRAW_EXP("04"),//经验抽奖
+        DRAW_HERO("02"),//英雄召唤
+        DRAW_EQUIP("03"),//装备召唤
+        DRAW_EXP("04"),//经验召唤
         WITHDRAW_SERVICE("12"),//提现手续费
         WITHDRAW_FREEZE("16"),//后台提现冻结
         WITHDRAW_THAW("19"),//后台提现解冻

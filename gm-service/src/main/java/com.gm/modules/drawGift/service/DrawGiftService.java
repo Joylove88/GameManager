@@ -81,6 +81,13 @@ public class DrawGiftService{
      */
     private static List<GiftBoxHeroRsp> giftBoxHeroRsps = new ArrayList<>();
 
+    /**
+     * 进入召唤
+     * @param user
+     * @param form
+     * @return
+     * @throws Exception
+     */
     public List<Object> startSummon(UserEntity user, DrawForm form) throws Exception {
         List<Object> gifts = new ArrayList<>();
         now = new Date();
@@ -323,7 +330,7 @@ public class DrawGiftService{
             orignalRates.add(gift.getPr());
         }
 
-        // 如果类型为1单抽模式.类型为2十连抽模式
+        // 抽奖次数
         Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates, drawForm.getSummonNum());
 
         // 奖品集合

@@ -5,13 +5,13 @@ $(function () {
         colModel: [			
 			{ label: 'userBalanceDetailId', name: 'userBalanceDetailId', index: 'USER_BALANCE_DETAIL_ID', width: 50, key: true },
 			{ label: '用户id', name: 'userId', index: 'USER_ID', width: 80 }, 			
-			{ label: '交易类型：00提现,01副本产出,02英雄抽奖,03装备抽奖,04经验抽奖,11返点，12提现手续费，15后台取款,16提现冻结,17提现解冻,18后台取款冻结,19,后台取款解冻', name: 'tradeType', index: 'TRADE_TYPE', width: 80 }, 			
+			{ label: '交易类型：00提现,01副本产出,02英雄召唤,03装备召唤,04经验召唤,11返点，12提现手续费，15后台取款,16提现冻结,17提现解冻,18后台取款冻结,19,后台取款解冻', name: 'tradeType', index: 'TRADE_TYPE', width: 80 },
 			{ label: '交易金额', name: 'amount', index: 'AMOUNT', width: 80 }, 			
 			{ label: '交易时间', name: 'tradeTime', index: 'TRADE_TIME', width: 80 }, 			
 			{ label: '交易时间', name: 'tradeTimeTs', index: 'TRADE_TIME_TS', width: 80 }, 			
 			{ label: '交易描述', name: 'tradeDesc', index: 'TRADE_DESC', width: 80 }, 			
 			{ label: '交易后的余额', name: 'userBalance', index: 'USER_BALANCE', width: 80 }, 			
-			{ label: '交易类型id：提现id,副本产出id,抽奖id,市场交易ID,代理返佣id', name: 'sourceId', index: 'SOURCE_ID', width: 80 }			
+			{ label: '交易类型id：提现id,副本产出id,召唤id,市场交易ID,代理返佣id', name: 'sourceId', index: 'SOURCE_ID', width: 80 }
         ],
 		viewrecords: true,
         height: 385,

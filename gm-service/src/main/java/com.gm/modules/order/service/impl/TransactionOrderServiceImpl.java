@@ -69,7 +69,7 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
             order.setStatus(Constant.enable);// 订单状态：1：成功
             order.setUserId(user.getUserId());
             // 用户池出账
-            fundsAccountingService.setCashPoolSub(Constant.CashPool._USER.getValue(), order.getTransactionFee());// 扣除本次抽奖金币数量
+            fundsAccountingService.setCashPoolSub(Constant.CashPool._USER.getValue(), order.getTransactionFee());// 扣除本次召唤金币数量
             // 副本池入账
             BigDecimal dungeonFee = Arith.multiply(order.getTransactionFee(), Constant.CashPoolScale._DUNGEON.getValue());// 获取该订单金额的75%
             fundsAccountingService.setCashPoolAdd(Constant.CashPool._DUNGEON.getValue(), dungeonFee);
@@ -87,7 +87,7 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
         order.setCreateTimeTs(date.getTime());
         transactionOrderDao.insert(order);
 
-        // 金币抽奖时插入账变明细
+        // 金币召唤时插入账变明细
         if (Constant.CurrencyType._GOLD_COINS.getValue().equals(form.getCurType())) {
             String tradeType = "";
             if (form.getSummonType().equals(Constant.SummonType.HERO.getValue())) {
@@ -101,8 +101,8 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
             balanceMap.put("userId", user.getUserId());
             balanceMap.put("amount", order.getTransactionFee());
             balanceMap.put("tradeType", tradeType);
-            balanceMap.put("tradeDesc", "抽奖");
-            balanceMap.put("sourceId", order.getTransactionOrderId());// 抽奖订单ID
+            balanceMap.put("tradeDesc", "召唤");
+            balanceMap.put("sourceId", order.getTransactionOrderId());// 召唤订单ID
             userBalanceDetailService.insertBalanceDetail(balanceMap);
         }
 
@@ -138,7 +138,7 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
                 .eq("TRANSACTION_HASH",transactionHash);
         transactionOrderDao.update(order, wrapper);
 
-        // 如果抽奖成功，则升级用户消费等级
+        // 如果召唤成功，则升级用户消费等级
         if (Constant.enable.equals(order.getStatus())){
             gmUserVipLevelService.updateUserVipLevel(order);
         }

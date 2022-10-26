@@ -29,7 +29,7 @@ $(function () {
                     if (value == '0') {
                         return '<span class="label badge-info" style="background-color: #ed5565;">副本</span>';
                     } else if (value == '1') {
-                        return '<span class="label label-info">抽奖</span>';
+                        return '<span class="label label-info">召唤</span>';
                     }
                 }
             },

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.gm.modules.order.dao.TransactionOrderDao">
-    <select id="selectPage" resultType="com.gm.modules.basicconfig.entity.ProbabilityEntity">
+    <select id="selectPage" resultType="com.gm.modules.order.entity.TransactionOrderEntity">
         SELECT
         A.*
         FROM
