@@ -1,6 +1,7 @@
 package com.gm.modules.user.service.impl;
 
 import com.gm.common.exception.RRException;
+import com.gm.modules.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +62,11 @@ public class UserBalanceDetailServiceImpl extends ServiceImpl<UserBalanceDetailD
     @Override
     public List<UserBalanceDetailEntity> getUserBalanceDetail(Map<String, Object> map) {
         return userBalanceDetailDao.getUserBalanceDetail(map);
+    }
+
+    @Override
+    public String queryAgentRebate(UserEntity userEntity) {
+        return userBalanceDetailDao.queryAgentRebate(userEntity.getUserId());
     }
 
 }

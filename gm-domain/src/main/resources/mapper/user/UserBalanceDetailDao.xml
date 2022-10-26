@@ -28,4 +28,14 @@
         </where>
     </select>
 
+    <select id="queryAgentRebate" resultType="string">
+        SELECT
+            IFNULL(sum( AMOUNT ),0)
+        FROM
+            gm_user_balance_detail
+        WHERE
+            TRADE_TYPE = '11'
+            AND USER_ID = #{userId}
+    </select>
+
 </mapper>

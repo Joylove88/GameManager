@@ -22,4 +22,6 @@ public interface UserBalanceDetailDao extends BaseMapper<UserBalanceDetailEntity
      * @return
      */
 	List<UserBalanceDetailEntity> getUserBalanceDetail(Map<String, Object> map);
+
+    String queryAgentRebate(Long userId);
 }

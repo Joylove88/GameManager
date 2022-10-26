@@ -23,6 +23,7 @@ import com.gm.modules.user.req.InviteForm;
 import com.gm.modules.user.req.SignIn;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserLoginLogEntity;
+import com.gm.modules.user.service.UserBalanceDetailService;
 import com.gm.modules.user.service.UserTokenService;
 import com.gm.modules.user.service.UserLoginLogService;
 import com.gm.modules.user.service.UserService;
@@ -38,6 +39,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,6 +62,8 @@ public class ApiLoginController {
     private UserLoginLogService userLoginLogService;
     @Autowired
     private SysConfigService sysConfigService;
+    @Autowired
+    private UserBalanceDetailService userBalanceDetailService;
 
     @PostMapping("signIn")
     @ApiOperation("签名验证")
@@ -211,27 +215,32 @@ public class ApiLoginController {
      * 邀请链接访问人数
      * 邀请链接注册人数
      * 邀请链接消费人数
+     *
+     * 请求链接
+     * 访问人数
+     * 下级人数
+     * 消费人数
+     * 邀请奖励
      */
     @Login
     @PostMapping("inviteData")
     @ApiOperation("邀请链接数据")
     public R inviteData(@LoginUser UserEntity userEntity) {
-//         1.表单校验
-//        ValidatorUtils.validateEntity(form);
-//        // 2.查询该邀请码数据
+        // 查询该邀请码数据
         Map<String, Object> map = new HashMap<>();
-//        // 查询访问次数
-//        UserEntity userEntity = userService.queryByExpandCode(form.getExpandCode());
-//        if (userEntity == null) {
-//            throw new RRException("邀请码不存在！");
-//        }
-        map.put("viewTimes", userEntity.getExpandCodeViewTimes());
+        // 查询首页地址
+        String index_page = sysConfigService.getValue("INDEX_PAGE");
+        map.put("inviteLink",index_page+"/invite/"+userEntity.getExpandCode());//请求链接
+        map.put("viewTimes", userEntity.getExpandCodeViewTimes());//访问人数
         // 查询注册人数
         int count = userService.count(new QueryWrapper<UserEntity>().eq("FATHER_ID", userEntity.getUserId()));
         map.put("register", count);
         // 查询消费人数
         int effectiveCount = userService.queryEffectiveUserCount(userEntity);
         map.put("consumer", effectiveCount);
+        // 查询邀请奖励
+        String userAgentRebate = userBalanceDetailService.queryAgentRebate(userEntity);
+        map.put("userAgentRebate",userAgentRebate);
         return R.ok(map);
     }
 
