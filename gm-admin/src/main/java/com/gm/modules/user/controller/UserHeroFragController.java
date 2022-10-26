@@ -4,9 +4,9 @@ import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
 import com.gm.modules.drawGift.service.DrawGiftService;
-import com.gm.modules.user.req.DrawForm;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroFragEntity;
+import com.gm.modules.user.req.DrawForm;
 import com.gm.modules.user.service.UserHeroFragService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,10 +47,10 @@ public class UserHeroFragController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmUserHeroFragId}")
+    @RequestMapping("/info/{userHeroFragId}")
     @RequiresPermissions("user:userherofrag:info")
-    public R info(@PathVariable("gmUserHeroFragId") Long gmUserHeroFragId){
-        UserHeroFragEntity userHeroFrag = userHeroFragService.getById(gmUserHeroFragId);
+    public R info(@PathVariable("userHeroFragId") Long userHeroFragId){
+        UserHeroFragEntity userHeroFrag = userHeroFragService.getById(userHeroFragId);
 
         return R.ok().put("userHeroFrag", userHeroFrag);
     }
@@ -83,8 +83,8 @@ public class UserHeroFragController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("user:userherofrag:delete")
-    public R delete(@RequestBody Long[] gmUserHeroFragIds){
-        userHeroFragService.removeByIds(Arrays.asList(gmUserHeroFragIds));
+    public R delete(@RequestBody Long[] userHeroFragIds){
+        userHeroFragService.removeByIds(Arrays.asList(userHeroFragIds));
 
         return R.ok();
     }
@@ -93,15 +93,15 @@ public class UserHeroFragController {
      * 英雄模拟抽奖
      */
     @RequestMapping("/testDrawStart")
-    public R testDrawStart(@RequestBody Long drawType) throws Exception {
+    public R testDrawStart(@RequestBody Integer summonNum) throws Exception {
         //开始抽奖
         UserEntity userEntity = new UserEntity();
         userEntity.setUserId(1508401841157644289L);
         DrawForm drawForm = new DrawForm();
         drawForm.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
-        drawForm.setDrawType(drawType.toString());
-        drawForm.setItemType("1");
-        List s = drawGiftService.heroDrawStart(userEntity, drawForm);
+        drawForm.setSummonNum(summonNum);
+        drawForm.setSummonType("1");
+        List s = drawGiftService.startSummon(userEntity, drawForm);
         return R.ok().put("s",s);
     }
 
@@ -109,14 +109,14 @@ public class UserHeroFragController {
      * 装备模拟抽奖
      */
     @RequestMapping("/testEQDrawStart")
-    public R testEQDrawStart(@RequestBody Long drawType)throws Exception{
+    public R testEQDrawStart(@RequestBody Integer summonNum)throws Exception{
         //开始抽奖
         UserEntity userEntity = new UserEntity();
         userEntity.setUserId(1508401841157644289L);
         DrawForm drawForm = new DrawForm();
         drawForm.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
-        drawForm.setDrawType(drawType.toString());
-        List s = drawGiftService.equipDrawStart(userEntity,drawForm);
+        drawForm.setSummonNum(summonNum);
+        List s = drawGiftService.startSummon(userEntity,drawForm);
         return R.ok().put("s",s);
     }
 
@@ -124,14 +124,14 @@ public class UserHeroFragController {
      * 经验药水模拟抽奖
      */
     @RequestMapping("/testEXDrawStart")
-    public R testEXDrawStart(@RequestBody Long drawType){
+    public R testEXDrawStart(@RequestBody Integer summonNum) throws Exception {
         //开始抽奖
         UserEntity userEntity = new UserEntity();
         userEntity.setUserId(1508401841157644289L);
         DrawForm drawForm = new DrawForm();
         drawForm.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
-        drawForm.setDrawType(drawType.toString());
-        List s = drawGiftService.exDrawStart(userEntity,drawForm);
+        drawForm.setSummonNum(summonNum);
+        List s = drawGiftService.startSummon(userEntity,drawForm);
         return R.ok().put("s",s);
     }
 

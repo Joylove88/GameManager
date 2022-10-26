@@ -60,7 +60,7 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
     @Override
     public void updateUserVipLevel(TransactionOrderEntity order) {// 消费来了
         // 查询用户
-        UserEntity user = userService.queryByUserId(order.getGmUserId());
+        UserEntity user = userService.queryByUserId(order.getUserId());
         // 查询该用户消费等级
         GmUserVipLevelEntity currentUserVipLevel = baseMapper.selectById(user.getVipLevelId());
         // 查询所有消费等级
@@ -71,7 +71,7 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
         // 该用户即将消费等级
         GmUserVipLevelEntity willVipLevel = null;
         // 条件1.查询该用户累计消费金额,决定是否给该用户升级
-        Double totalMoney = transactionOrderService.queryTotalMoneyByUserId(order.getGmUserId());
+        Double totalMoney = transactionOrderService.queryTotalMoneyByUserId(order.getUserId());
         for (GmUserVipLevelEntity gmUserVipLevel : userVipLevelEntityList) {
             if (currentUserVipLevel.getVipLevelCode() >= gmUserVipLevel.getVipLevelCode()) {
                 continue;
@@ -136,7 +136,7 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
             // 插入父亲账变
             UserBalanceDetailEntity userBalanceDetail = new UserBalanceDetailEntity();
             userBalanceDetail.setAmount(fget);
-            userBalanceDetail.setSourceId(order.getGmTransactionOrderId());
+            userBalanceDetail.setSourceId(order.getTransactionOrderId());
             userBalanceDetail.setTradeTime(new Date());
             userBalanceDetail.setTradeTimeTs(System.currentTimeMillis());
             userBalanceDetail.setTradeType("11");
@@ -155,7 +155,7 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
                 // 插入爷爷账变
                 UserBalanceDetailEntity gfUserBalanceDetail = new UserBalanceDetailEntity();
                 gfUserBalanceDetail.setAmount(gfget);
-                gfUserBalanceDetail.setSourceId(order.getGmTransactionOrderId());
+                gfUserBalanceDetail.setSourceId(order.getTransactionOrderId());
                 gfUserBalanceDetail.setTradeTime(new Date());
                 gfUserBalanceDetail.setTradeTimeTs(System.currentTimeMillis());
                 gfUserBalanceDetail.setTradeType("11");

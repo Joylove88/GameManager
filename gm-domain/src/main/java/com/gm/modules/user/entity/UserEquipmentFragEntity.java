@@ -25,19 +25,19 @@ public class UserEquipmentFragEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Long gmUserEquipmentFragId;
+	private Long userEquipmentFragId;
 	/**
 	 * 装备碎片ID
 	 */
-	private Long gmEquipmentFragId;
+	private Long equipmentFragId;
 	/**
 	 * 用户ID
 	 */
-	private Long gmUserId;
+	private Long userId;
 	/**
 	 * 玩家获得碎片数量
 	 */
-	private Long gmUserEquipFragNum;
+	private Long userEquipFragNum;
 	/**
 	 * 铸造HASH
 	 */

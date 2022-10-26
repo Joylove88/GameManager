@@ -25,11 +25,11 @@ public class HeroSkillEntity implements Serializable {
 	 * ID
 	 */
 	@TableId
-	private Long gmHeroSkillId;
+	private Long heroSkillId;
 	/**
 	 * 英雄ID
 	 */
-	private Long gmHeroStarId;
+	private Long heroId;
 	/**
 	 * 技能名称
 	 */
@@ -37,7 +37,7 @@ public class HeroSkillEntity implements Serializable {
 	/**
 	 * 伤害星级
 	 */
-	private Long skillStarLevel;
+	private Long skillStarCode;
 	/**
 	 * 魔法值消耗
 	 */
@@ -97,7 +97,5 @@ public class HeroSkillEntity implements Serializable {
 
 	@TableField(exist = false)
 	private String heroName;
-	@TableField(exist = false)
-	private String gmStarCode;
 
 }

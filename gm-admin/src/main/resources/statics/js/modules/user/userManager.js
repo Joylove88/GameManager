@@ -5,7 +5,7 @@ $(function () {
         colModel: [			
 			{ label: 'userId', name: 'userId', index: 'USER_ID', width: 50, key: true },
 			{ label: '用户游戏名', name: 'userName', index: 'USER_NAME', width: 80 }, 			
-			{ label: '用户钱包地址', name: 'userWalletAddress', index: 'USER_WALLET_ADDRESS', width: 80 }, 			
+			{ label: '用户钱包地址', name: 'address', index: 'ADDRESS', width: 80 },
 			{ label: '用户级别', name: 'userLevelId', index: 'USER_LEVEL_ID', width: 80 },
 			{ label: '累计获得的经验', name: 'experienceObtain', index: 'EXPERIENCE_OBTAIN', width: 80 },
 			{ label: '用户类型', name: 'userType', index: 'USER_TYPE', width: 80 },

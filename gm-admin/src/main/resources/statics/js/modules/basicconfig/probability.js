@@ -3,10 +3,11 @@ $(function () {
         url: baseURL + 'basicconfig/probability/list',
         datatype: "json",
         colModel: [			
-			{ label: 'gmProbabilityId', name: 'gmProbabilityId', index: 'GM_PROBABILITY_ID', width: 50, key: true },
-			{ label: '概率', name: 'gmPron', index: 'GM_PRON', width: 80 }, 			
-			{ label: '概率等级', name: 'gmPronLv', index: 'GM_PRON_LV', width: 80 },
-			{ label: '类型', name: 'gmType', index: 'GM_TYPE', width: 80 , formatter: function (value, options, row) {
+			{ label: 'probabilityId', name: 'probabilityId', index: 'PROBABILITY_ID', width: 50, key: true },
+			{ label: '概率', name: 'pr', index: 'PR', width: 80 },
+			{ label: '概率等级', name: 'prLv', index: 'PR_LV', width: 80 },
+			{ label: '说明', name: 'explanation', width: 80 },
+			{ label: '类型', name: 'prType', index: 'PR_TYPE', width: 80 , formatter: function (value, options, row) {
                 if (value == '1') {
                     return '<span class="label label-info">英雄</span>';//英雄
                 } else if (value == '2') {
@@ -24,7 +25,7 @@ $(function () {
                 }
             }
             },
-			{ label: '创建人', name: 'createUser', index: 'CREATE_USER', width: 80 }, 			
+			{ label: '创建人', name: 'createUser', index: 'CREATE_USER', width: 80 },
 			{ label: '创建时间', name: 'createTime', index: 'CREATE_TIME', width: 80 }, 			
 			{ label: '修改人', name: 'updateUser', index: 'UPDATE_USER', width: 80 },
 			{ label: '修改时间', name: 'updateTime', index: 'UPDATE_TIME', width: 80 }, 			
@@ -61,6 +62,9 @@ var vm = new Vue({
 	data:{
 		showList: true,
 		title: null,
+        q: {
+            prType: ''
+        },
 		probability: {}
 	},
 	methods: {
@@ -70,21 +74,21 @@ var vm = new Vue({
 		add: function(){
 			vm.showList = false;
 			vm.title = "新增";
-			vm.probability = {gmPronLv : 0, gmPron : 0, status: '1', gmType : 1};
+			vm.probability = {prLv : 0, pr : 0, status: '1', prType : 1};
 		},
 		update: function (event) {
-			var gmProbabilityId = getSelectedRow();
-			if(gmProbabilityId == null){
+			var probabilityId = getSelectedRow();
+			if(probabilityId == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmProbabilityId)
+            vm.getInfo(probabilityId)
 		},
 		saveOrUpdate: function (event) {
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.probability.gmProbabilityId == null ? "basicconfig/probability/save" : "basicconfig/probability/update";
+                var url = vm.probability.probabilityId == null ? "basicconfig/probability/save" : "basicconfig/probability/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
@@ -106,8 +110,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmProbabilityIds = getSelectedRows();
-			if(gmProbabilityIds == null){
+			var probabilityIds = getSelectedRows();
+			if(probabilityIds == null){
 				return ;
 			}
 			var lock = false;
@@ -120,7 +124,7 @@ var vm = new Vue({
                         type: "POST",
                         url: baseURL + "basicconfig/probability/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmProbabilityIds),
+                        data: JSON.stringify(probabilityIds),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -134,15 +138,16 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmProbabilityId){
-			$.get(baseURL + "basicconfig/probability/info/"+gmProbabilityId, function(r){
+		getInfo: function(probabilityId){
+			$.get(baseURL + "basicconfig/probability/info/"+probabilityId, function(r){
                 vm.probability = r.probability;
             });
 		},
 		reload: function (event) {
 			vm.showList = true;
 			var page = $("#jqGrid").jqGrid('getGridParam','page');
-			$("#jqGrid").jqGrid('setGridParam',{ 
+			$("#jqGrid").jqGrid('setGridParam',{
+			    postData:{'prType': vm.q.prType},
                 page:page
             }).trigger("reloadGrid");
 		}

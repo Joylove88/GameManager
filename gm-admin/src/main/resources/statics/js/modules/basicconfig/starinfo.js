@@ -3,9 +3,9 @@ $(function () {
         url: baseURL + 'basicconfig/starinfo/list',
         datatype: "json",
         colModel: [			
-			{ label: 'gmStarId', name: 'gmStarId', index: 'GM_STAR_ID', width: 50, key: true },
-			{ label: '星级级别', name: 'gmStarCode', index: 'GM_STAR_CODE', width: 80 }, 			
-			{ label: '星级属性加成', name: 'gmStarAttributes', index: 'GM_STAR_ATTRIBUTES', width: 80 }, 			
+			{ label: 'starId', name: 'starId', index: 'STAR_ID', width: 50, key: true },
+			{ label: '星级级别', name: 'starCode', index: 'STAR_CODE', width: 80 },
+			{ label: '星级属性加成', name: 'starBuff', index: 'STAR_BUFF', width: 80 },
 			{ label: '创建人', name: 'createUser', index: 'CREATE_USER', width: 80 }, 			
 			{ label: '创建时间', name: 'createTime', index: 'CREATE_TIME', width: 80 }, 			
 			{ label: '修改人', name: 'updateUser', index: 'UPDATE_USER', width: 80 },
@@ -52,29 +52,29 @@ var vm = new Vue({
 		add: function(){
 			vm.showList = false;
 			vm.title = "新增";
-			vm.starInfo = {gmStarCode:0,gmStarAttributes:0};
+			vm.starInfo = {starCode:0,starBuff:0};
 		},
 		update: function (event) {
-			var gmStarId = getSelectedRow();
-			if(gmStarId == null){
+			var starId = getSelectedRow();
+			if(starId == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmStarId)
+            vm.getInfo(starId)
 		},
 		saveOrUpdate: function (event) {
-            if(vm.starInfo.gmStarCode == ''){
+            if(vm.starInfo.starCode == ''){
                 layer.msg("请输入星级级别");
                 return;
             }
-            if(vm.starInfo.gmStarAttributes == ''){
+            if(vm.starInfo.starBuff == ''){
                 layer.msg("请输入星级属性加成");
                 return;
             }
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.starInfo.gmStarId == null ? "basicconfig/starinfo/save" : "basicconfig/starinfo/update";
+                var url = vm.starInfo.starId == null ? "basicconfig/starinfo/save" : "basicconfig/starinfo/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
@@ -96,8 +96,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmStarIds = getSelectedRows();
-			if(gmStarIds == null){
+			var starIds = getSelectedRows();
+			if(starIds == null){
 				return ;
 			}
 			var lock = false;
@@ -110,7 +110,7 @@ var vm = new Vue({
                         type: "POST",
                         url: baseURL + "basicconfig/starinfo/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmStarIds),
+                        data: JSON.stringify(starIds),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -124,8 +124,8 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmStarId){
-			$.get(baseURL + "basicconfig/starinfo/info/"+gmStarId, function(r){
+		getInfo: function(starId){
+			$.get(baseURL + "basicconfig/starinfo/info/"+starId, function(r){
                 vm.starInfo = r.starInfo;
             });
 		},

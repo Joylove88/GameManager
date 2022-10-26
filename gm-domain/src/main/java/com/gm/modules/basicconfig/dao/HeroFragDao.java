@@ -18,5 +18,10 @@ import java.util.Map;
 @Mapper
 public interface HeroFragDao extends BaseMapper<HeroFragEntity> {
     List<HeroFragEntity> queryList(Page pagination, Map<String, Object> map);
+
+    /**
+     * 获取英雄碎片信息
+     * @return
+     */
     List<HeroFragEntity> getHeroFragPro();
 }

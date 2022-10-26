@@ -37,7 +37,7 @@ public class UserLoginLogServiceImpl extends ServiceImpl<UserLoginLogDao, UserLo
     public void saveLoginLog(UserEntity user, String userAgent, String clientIp, String code, String msg) {
         UserLoginLogEntity userLoginLog = new UserLoginLogEntity();
         userLoginLog.setUserId(user.getUserId());
-        userLoginLog.setUserCode(user.getUserWalletAddress());
+        userLoginLog.setUserCode(user.getAddress());
         userLoginLog.setLoginTime(user.getSignDate());
         userLoginLog.setLoginTimeTs(user.getSignDate().getTime());
         userLoginLog.setLoginIp(clientIp);

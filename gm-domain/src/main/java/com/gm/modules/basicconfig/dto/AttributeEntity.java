@@ -18,7 +18,7 @@ public class AttributeEntity {
     /**
      * 英雄星级
      */
-    private Long heroStar;
+    private Integer heroStar;
     /**
      * 技能名称
      */

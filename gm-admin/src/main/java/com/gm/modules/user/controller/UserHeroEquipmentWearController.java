@@ -47,10 +47,10 @@ public class UserHeroEquipmentWearController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmUserHeroEquipmentWearId}")
+    @RequestMapping("/info/{userHeroEquipmentWearId}")
     @RequiresPermissions("user:userheroequipmentwear:info")
-    public R info(@PathVariable("gmUserHeroEquipmentWearId") Long gmUserHeroEquipmentWearId){
-        UserHeroEquipmentWearEntity userHeroEquipmentWear = userHeroEquipmentWearService.getById(gmUserHeroEquipmentWearId);
+    public R info(@PathVariable("userHeroEquipmentWearId") Long userHeroEquipmentWearId){
+        UserHeroEquipmentWearEntity userHeroEquipmentWear = userHeroEquipmentWearService.getById(userHeroEquipmentWearId);
 
         return R.ok().put("userHeroEquipmentWear", userHeroEquipmentWear);
     }
@@ -83,8 +83,8 @@ public class UserHeroEquipmentWearController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("user:userheroequipmentwear:delete")
-    public R delete(@RequestBody Long[] gmUserHeroEquipmentWearIds){
-        userHeroEquipmentWearService.removeByIds(Arrays.asList(gmUserHeroEquipmentWearIds));
+    public R delete(@RequestBody Long[] userHeroEquipmentWearIds){
+        userHeroEquipmentWearService.removeByIds(Arrays.asList(userHeroEquipmentWearIds));
 
         return R.ok();
     }

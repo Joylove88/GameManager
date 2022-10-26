@@ -55,8 +55,8 @@ public class HeroStarController extends AbstractController {
      */
     @RequestMapping("/info/{gmHeroStarId}")
     @RequiresPermissions("basicconfig:herostar:info")
-    public R info(@PathVariable("gmHeroStarId") Long gmHeroStarId){
-        HeroStarEntity heroStar = heroStarService.getById(gmHeroStarId);
+    public R info(@PathVariable("gmHeroStarId") Long heroStarId){
+        HeroStarEntity heroStar = heroStarService.getById(heroStarId);
 
         return R.ok().put("heroStar", heroStar);
     }
@@ -75,28 +75,28 @@ public class HeroStarController extends AbstractController {
                 HeroStarEntity heroStarS = new HeroStarEntity();
                 Date now = new Date();
                 heroStarS.setGmHeroId(heroStar.getGmHeroId());
-                heroStarS.setGmStarId(starInfoEntityList.get(i).getGmStarId());
-                heroStarS.setGmProbabilityId(starInfoEntityList.get(i).getGmStarCode());
+                heroStarS.setGmStarId(starInfoEntityList.get(i).getStarId());
+                heroStarS.setGmProbabilityId(Long.valueOf(starInfoEntityList.get(i).getStarCode()));
                 heroStarS.setStatus(heroStar.getStatus());
                 heroStarS.setScale(heroStar.getScale());
                 heroStarS.setCreateUser(getUserCode());
                 heroStarS.setCreateTime(now);
                 heroStarS.setCreateTimeTs(now.getTime());
-                Long starAtt = starInfoEntityList.get(i).getGmStarAttributes();
-                heroStarS.setGmHealth(heroStar.getGmHealth() * starAtt);
-                heroStarS.setGmGrowHealth(heroStar.getGmGrowHealth());
-                heroStarS.setGmHealthRegen(heroStar.getGmHealthRegen() * starAtt);
-                heroStarS.setGmGrowHealthRegen(heroStar.getGmGrowHealthRegen());
-                heroStarS.setGmMana(heroStar.getGmMana() * starAtt);
-                heroStarS.setGmGrowMana(heroStar.getGmGrowMana());
-                heroStarS.setGmManaRegen(heroStar.getGmManaRegen() * starAtt);
-                heroStarS.setGmGrowManaRegen(heroStar.getGmGrowManaRegen());
-                heroStarS.setGmArmor(heroStar.getGmArmor() * starAtt);
-                heroStarS.setGmGrowArmor(heroStar.getGmGrowArmor());
-                heroStarS.setGmMagicResist(heroStar.getGmMagicResist() * starAtt);
-                heroStarS.setGmGrowMagicResist(heroStar.getGmGrowMagicResist());
-                heroStarS.setGmAttackDamage(heroStar.getGmAttackDamage() * starAtt);
-                heroStarS.setGmGrowAttackDamage(heroStar.getGmGrowAttackDamage());
+//                Long starAtt = starInfoEntityList.get(i).getGmStarAttributes();
+//                heroStarS.setGmHealth(heroStar.getGmHealth() * starAtt);
+//                heroStarS.setGmGrowHealth(heroStar.getGmGrowHealth());
+//                heroStarS.setGmHealthRegen(heroStar.getGmHealthRegen() * starAtt);
+//                heroStarS.setGmGrowHealthRegen(heroStar.getGmGrowHealthRegen());
+//                heroStarS.setGmMana(heroStar.getGmMana() * starAtt);
+//                heroStarS.setGmGrowMana(heroStar.getGmGrowMana());
+//                heroStarS.setGmManaRegen(heroStar.getGmManaRegen() * starAtt);
+//                heroStarS.setGmGrowManaRegen(heroStar.getGmGrowManaRegen());
+//                heroStarS.setGmArmor(heroStar.getGmArmor() * starAtt);
+//                heroStarS.setGmGrowArmor(heroStar.getGmGrowArmor());
+//                heroStarS.setGmMagicResist(heroStar.getGmMagicResist() * starAtt);
+//                heroStarS.setGmGrowMagicResist(heroStar.getGmGrowMagicResist());
+//                heroStarS.setGmAttackDamage(heroStar.getGmAttackDamage() * starAtt);
+//                heroStarS.setGmGrowAttackDamage(heroStar.getGmGrowAttackDamage());
                 heroStarService.save(heroStarS);
             }
         } else {
@@ -133,8 +133,8 @@ public class HeroStarController extends AbstractController {
     @SysLog("删除奖池英雄")
     @RequestMapping("/delete")
     @RequiresPermissions("basicconfig:herostar:delete")
-    public R delete(@RequestBody Long[] gmHeroStarIds){
-        heroStarService.removeByIds(Arrays.asList(gmHeroStarIds));
+    public R delete(@RequestBody Long[] heroStarIds){
+        heroStarService.removeByIds(Arrays.asList(heroStarIds));
 
         return R.ok();
     }

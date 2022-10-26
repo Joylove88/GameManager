@@ -24,7 +24,7 @@ public class ExperiencePotionEntity implements Serializable {
 	 * ID
 	 */
 	@TableId
-	private Long gmExPotionId;
+	private Long exPotionId;
 	/**
 	 * 经验药水名称
 	 */

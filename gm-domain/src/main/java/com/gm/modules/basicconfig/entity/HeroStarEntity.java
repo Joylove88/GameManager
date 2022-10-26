@@ -143,6 +143,6 @@ public class HeroStarEntity implements Serializable {
 	@TableField(exist = false)
 	private String heroIconUrl;
 	@TableField(exist = false)
-	private Long gmStarCode;
+	private Integer gmStarCode;
 
 }

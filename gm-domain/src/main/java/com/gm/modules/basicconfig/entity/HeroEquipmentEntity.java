@@ -26,21 +26,21 @@ public class HeroEquipmentEntity implements Serializable {
 	 * ID
 	 */
 	@TableId
-	private Long gmHeroEquipmentId;
+	private Long heroEquipmentId;
 	/**
 	 * 英雄ID
 	 */
 	@NotNull(message = "Please choose a hero!")
-	private Long gmHeroId;
+	private Long heroId;
 	/**
 	 * 装备ID
 	 */
 	@NotNull(message = "Please select equipment!")
-	private Long gmEquipId;
+	private Long equipId;
 	/**
 	 * 装备位置
 	 */
-	private int gmEquipSolt;
+	private int equipSolt;
 	/**
 	 * 状态('0':禁用，'1':启用)
 	 */

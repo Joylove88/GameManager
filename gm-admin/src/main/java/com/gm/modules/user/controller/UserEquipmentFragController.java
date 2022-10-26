@@ -47,10 +47,10 @@ public class UserEquipmentFragController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmUserEquipmentFragId}")
+    @RequestMapping("/info/{userEquipmentFragId}")
     @RequiresPermissions("user:userequipmentfrag:info")
-    public R info(@PathVariable("gmUserEquipmentFragId") Long gmUserEquipmentFragId){
-        UserEquipmentFragEntity userEquipmentFrag = userEquipmentFragService.getById(gmUserEquipmentFragId);
+    public R info(@PathVariable("userEquipmentFragId") Long userEquipmentFragId){
+        UserEquipmentFragEntity userEquipmentFrag = userEquipmentFragService.getById(userEquipmentFragId);
 
         return R.ok().put("userEquipmentFrag", userEquipmentFrag);
     }
@@ -83,8 +83,8 @@ public class UserEquipmentFragController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("user:userequipmentfrag:delete")
-    public R delete(@RequestBody Long[] gmUserEquipmentFragIds){
-        userEquipmentFragService.removeByIds(Arrays.asList(gmUserEquipmentFragIds));
+    public R delete(@RequestBody Long[] userEquipmentFragIds){
+        userEquipmentFragService.removeByIds(Arrays.asList(userEquipmentFragIds));
 
         return R.ok();
     }

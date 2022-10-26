@@ -3,7 +3,7 @@ $(function () {
         url: baseURL + 'user/userequipment/list',
         datatype: "json",
         colModel: [
-            { label: 'gmUserEquipmentId', name: 'gmUserEquipmentId', index: 'GM_USER_EQUIPMENT_ID', width: 50, key: true },
+            { label: 'userEquipmentId', name: 'userEquipmentId', index: 'USER_EQUIPMENT_ID', width: 50, key: true },
             { label: '会员名称', name: 'userName', width: 80 },
             { label: '装备名称', name: 'equipName', width: 80 },
             { label: '装备战力', name: 'equipPower', width: 80 },
@@ -110,18 +110,18 @@ var vm = new Vue({
 			vm.userEquipment = {};
 		},
 		update: function (event) {
-			var gmUserEquipmentId = getSelectedRow();
-			if(gmUserEquipmentId == null){
+			var userEquipmentId = getSelectedRow();
+			if(userEquipmentId == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmUserEquipmentId)
+            vm.getInfo(userEquipmentId)
 		},
 		saveOrUpdate: function (event) {
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.userEquipment.gmUserEquipmentId == null ? "user/userequipment/save" : "user/userequipment/update";
+                var url = vm.userEquipment.userEquipmentId == null ? "user/userequipment/save" : "user/userequipment/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
@@ -143,8 +143,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmUserEquipmentIds = getSelectedRows();
-			if(gmUserEquipmentIds == null){
+			var userEquipmentIds = getSelectedRows();
+			if(userEquipmentIds == null){
 				return ;
 			}
 			var lock = false;
@@ -157,7 +157,7 @@ var vm = new Vue({
                         type: "POST",
                         url: baseURL + "user/userequipment/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmUserEquipmentIds),
+                        data: JSON.stringify(userEquipmentIds),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -171,8 +171,8 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmUserEquipmentId){
-			$.get(baseURL + "user/userequipment/info/"+gmUserEquipmentId, function(r){
+		getInfo: function(userEquipmentId){
+			$.get(baseURL + "user/userequipment/info/"+userEquipmentId, function(r){
                 vm.userEquipment = r.userEquipment;
             });
 		},

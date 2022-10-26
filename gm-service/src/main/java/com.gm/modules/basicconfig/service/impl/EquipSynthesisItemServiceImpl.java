@@ -45,13 +45,13 @@ public class EquipSynthesisItemServiceImpl extends ServiceImpl<EquipSynthesisIte
         //封装装备层级
         for(int i = 0; i < page.getRecords().size(); i++){
             JSONObject jsonObject = new JSONObject();
-            long fragNum =page.getRecords().get(i).getGmEquipFragNum();
+            long fragNum =page.getRecords().get(i).getEquipFragNum();
             for (EquipmentInfoEntity equip1 : equips) {
                 long equipId = equip1.getEquipId();
                 String equipName = equip1.getEquipName();
                 String equipRarecode = equip1.getEquipRarecode();
                 // 装备名称封装
-                if (page.getRecords().get(i).getGmEquipmentId().equals(equipId)) {
+                if (page.getRecords().get(i).getEquipmentId().equals(equipId)) {
                     page.getRecords().get(i).setEquipName(equipName);
                     page.getRecords().get(i).setEquipRare(equip1.getEquipRarecode());
                     jsonObject.put("eqId",equipId);
@@ -59,7 +59,7 @@ public class EquipSynthesisItemServiceImpl extends ServiceImpl<EquipSynthesisIte
                     jsonObject.put("eqRareCode",equipRarecode);
                 }
                 // 装备碎片名称封装
-                if (page.getRecords().get(i).getGmEquipmentFragId().equals(equipId)) {
+                if (page.getRecords().get(i).getEquipmentFragId().equals(equipId)) {
                     jsonObject.put("eqFragId",equipId);
                     jsonObject.put("eqFragNum",fragNum);
                     jsonObject.put("eqFragName",equipName + "卷轴碎片");
@@ -69,7 +69,7 @@ public class EquipSynthesisItemServiceImpl extends ServiceImpl<EquipSynthesisIte
             jsonArray.add(jsonObject);
 
             // 装备合成项1封装
-            String equipItem1 = page.getRecords().get(i).getGmEquipSynthesisItem1();
+            String equipItem1 = page.getRecords().get(i).getEquipSynthesisItem1();
             if(StringUtils.isNotBlank(equipItem1)){
                 boolean b = equipItem1.contains(",");
                 JSONArray jsonArray2 = new JSONArray();
@@ -135,7 +135,7 @@ public class EquipSynthesisItemServiceImpl extends ServiceImpl<EquipSynthesisIte
         // 获取装备合成配方
         EquipSynthesisItemEntity eqSIEs = equipSynthesisItemDao.selectOne(new QueryWrapper<EquipSynthesisItemEntity>()
                 .eq("STATUS", Constant.enable)
-                .eq("GM_EQUIPMENT_ID", equipId)// 装备ID
+                .eq("EQUIPMENT_ID", equipId)// 装备ID
         );
         return eqSIEs;
     }

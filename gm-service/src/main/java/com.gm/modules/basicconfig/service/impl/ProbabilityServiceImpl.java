@@ -8,6 +8,7 @@ import com.gm.common.utils.Query;
 import com.gm.modules.basicconfig.dao.ProbabilityDao;
 import com.gm.modules.basicconfig.entity.ProbabilityEntity;
 import com.gm.modules.basicconfig.service.ProbabilityService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 
@@ -17,11 +18,12 @@ public class ProbabilityServiceImpl extends ServiceImpl<ProbabilityDao, Probabil
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        String prType = (String) params.get("prType");
         IPage<ProbabilityEntity> page = this.page(
                 new Query<ProbabilityEntity>().getPage(params),
                 new QueryWrapper<ProbabilityEntity>()
+                        .eq(StringUtils.isNotBlank(prType), "A.PR_TYPE", prType)
         );
-
         return new PageUtils(page);
     }
 

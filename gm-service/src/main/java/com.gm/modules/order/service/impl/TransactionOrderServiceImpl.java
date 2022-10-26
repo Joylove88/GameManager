@@ -38,9 +38,17 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
     private UserBalanceDetailService userBalanceDetailService;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        String txHash = (String) params.get("txHash");
+        String summonType = (String) params.get("summonType");
+        String summonNum = (String) params.get("summonNum");
+        String currencyType = (String) params.get("currencyType");
         IPage<TransactionOrderEntity> page = this.page(
                 new Query<TransactionOrderEntity>().getPage(params),
                 new QueryWrapper<TransactionOrderEntity>()
+                        .eq(StringUtils.isNotBlank(txHash), "A.TRANSACTION_HASH", txHash)
+                        .eq(StringUtils.isNotBlank(txHash), "A.SUMMON_TYPE", summonType)
+                        .eq(StringUtils.isNotBlank(txHash), "A.SUMMON_NUM", summonNum)
+                        .eq(StringUtils.isNotBlank(txHash), "A.CURRENCY_TYPE", currencyType)
         );
 
         return new PageUtils(page);
@@ -59,7 +67,7 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
             order.setTransactionFee(form.getFee());
             order.setItemData(jsonArray.toString());
             order.setStatus(Constant.enable);// 订单状态：1：成功
-            order.setGmUserId(user.getUserId());
+            order.setUserId(user.getUserId());
             // 用户池出账
             fundsAccountingService.setCashPoolSub(Constant.CashPool._USER.getValue(), order.getTransactionFee());// 扣除本次抽奖金币数量
             // 副本池入账
@@ -72,21 +80,21 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
             BigDecimal teamFee = Arith.multiply(order.getTransactionFee(), Constant.CashPoolScale._TEAM.getValue());// 获取该订单金额的5%
             fundsAccountingService.setCashPoolAdd(Constant.CashPool._TEAM.getValue(), teamFee);
         }
-        order.setCurrencyType(form.getCurType());
-        order.setLottyType(form.getDrawType());
-        order.setItemType(form.getItemType());// 物品类型('1':英雄，'2':装备，'3':药水)
+        order.setCurrencyType(form.getCurType());// 货币类型('0':金币，'1':加密货币)
+        order.setSummonType(form.getSummonType());// 召唤类型('1':英雄，'2':装备，'3':药水)
+        order.setSummonNum(form.getSummonNum());// 召唤次数
         order.setCreateTime(date);
         order.setCreateTimeTs(date.getTime());
         transactionOrderDao.insert(order);
 
         // 金币抽奖时插入账变明细
-        if ( Constant.CurrencyType._GOLD_COINS.getValue().equals(form.getCurType()) ) {
+        if (Constant.CurrencyType._GOLD_COINS.getValue().equals(form.getCurType())) {
             String tradeType = "";
-            if ( form.getItemType().equals(Constant.ItemType.HERO.getValue()) ) {
+            if (form.getSummonType().equals(Constant.SummonType.HERO.getValue())) {
                 tradeType = Constant.TradeType.DRAW_HERO.getValue();
-            } else  if ( form.getItemType().equals(Constant.ItemType.EQUIPMENT.getValue()) ) {
+            } else if (form.getSummonType().equals(Constant.SummonType.EQUIPMENT.getValue())) {
                 tradeType = Constant.TradeType.DRAW_EQUIP.getValue();
-            } else  if ( form.getItemType().equals(Constant.ItemType.EXPERIENCE.getValue()) ) {
+            } else if (form.getSummonType().equals(Constant.SummonType.EXPERIENCE.getValue())) {
                 tradeType = Constant.TradeType.DRAW_EXP.getValue();
             }
             Map<String, Object> balanceMap = new HashMap<>();
@@ -94,7 +102,7 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
             balanceMap.put("amount", order.getTransactionFee());
             balanceMap.put("tradeType", tradeType);
             balanceMap.put("tradeDesc", "抽奖");
-            balanceMap.put("sourceId", order.getGmTransactionOrderId());// 抽奖订单ID
+            balanceMap.put("sourceId", order.getTransactionOrderId());// 抽奖订单ID
             userBalanceDetailService.insertBalanceDetail(balanceMap);
         }
 
@@ -121,7 +129,7 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
             order.setStatus(status);
             order.setBlockNumber(blockNumber);
             order.setTransactionGasFee(gasUsed);
-            order.setGmUserId(userId);
+            order.setUserId(userId);
             order.setTransactionFee(fee);
         }
 
@@ -147,13 +155,13 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
     }
 
     @Override
-    public Double queryTotalMoneyByUserId(Long gmUserId) {
-        return transactionOrderDao.queryTotalMoneyByUserId(gmUserId);
+    public Double queryTotalMoneyByUserId(Long userId) {
+        return transactionOrderDao.queryTotalMoneyByUserId(userId);
     }
 
     @Override
-    public Double querySonTotalMoneyByFatherId(Long gmUserId) {
-        return transactionOrderDao.querySonTotalMoneyByFatherId(gmUserId);
+    public Double querySonTotalMoneyByFatherId(Long userId) {
+        return transactionOrderDao.querySonTotalMoneyByFatherId(userId);
     }
 
 

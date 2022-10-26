@@ -18,6 +18,7 @@
                     <option value="1">启用</option>
                 </select>
             </div>
+            <a class="btn btn-default" @click="query">查询</a>
 			<#if shiro.hasPermission("basicconfig:heroskill:save")>
             <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
 			</#if>
@@ -38,9 +39,9 @@
             <div class="form-group">
                 <div class="col-sm-2 control-label">英雄</div>
                 <div class="col-sm-10">
-                    <select class="form-control" v-model="heroSkill.gmHeroStarId">
+                    <select class="form-control" v-model="heroSkill.heroStarId">
                         <option value="">请选择</option>
-                        <option v-for="heroInfo in heroInfoList" :value="heroInfo.gmHeroStarId">{{heroInfo.heroName}}[{{heroInfo.gmStarCode}}★]</option>
+                        <option v-for="heroInfo in heroInfoList" :value="heroInfo.heroStarId">{{heroInfo.heroName}}</option>
                     </select>
                 </div>
             </div>

@@ -47,10 +47,10 @@ public class UserExperiencePotionController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmUserExPotionId}")
+    @RequestMapping("/info/{userExPotionId}")
     @RequiresPermissions("user:userexperiencepotion:info")
-    public R info(@PathVariable("gmUserExPotionId") Long gmUserExPotionId){
-        UserExperiencePotionEntity userExperiencePotion = userExperiencePotionService.getById(gmUserExPotionId);
+    public R info(@PathVariable("userExPotionId") Long userExPotionId){
+        UserExperiencePotionEntity userExperiencePotion = userExperiencePotionService.getById(userExPotionId);
 
         return R.ok().put("userExperiencePotion", userExperiencePotion);
     }
@@ -83,8 +83,8 @@ public class UserExperiencePotionController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("user:userexperiencepotion:delete")
-    public R delete(@RequestBody Long[] gmUserExPotionIds){
-        userExperiencePotionService.removeByIds(Arrays.asList(gmUserExPotionIds));
+    public R delete(@RequestBody Long[] userExPotionIds){
+        userExperiencePotionService.removeByIds(Arrays.asList(userExPotionIds));
 
         return R.ok();
     }

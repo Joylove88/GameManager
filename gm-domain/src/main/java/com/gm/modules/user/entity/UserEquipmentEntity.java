@@ -25,15 +25,15 @@ public class UserEquipmentEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Long gmUserEquipmentId;
+	private Long userEquipmentId;
 	/**
 	 * 装备ID
 	 */
-	private Long gmEquipmentId;
+	private Long equipmentId;
 	/**
 	 * 用户ID
 	 */
-	private Long gmUserId;
+	private Long userId;
 	/**
 	 * NFTID
 	 */

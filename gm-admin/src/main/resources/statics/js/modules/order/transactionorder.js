@@ -3,15 +3,15 @@ $(function () {
         url: baseURL + 'order/transactionorder/list',
         datatype: "json",
         colModel: [			
-			{ label: 'gmTransactionOrderId', name: 'gmTransactionOrderId', index: 'GM_TRANSACTION_ORDER_ID', width: 50, key: true },
-			{ label: '用户ID', name: 'gmUserId', index: 'GM_USER_ID', width: 80 }, 			
-			{ label: '物品类型', name: 'itemType', index: 'ITEM_TYPE', width: 80 },
-			{ label: '链上交易HASH', name: 'transactionHash', index: 'TRANSACTION_HASH', width: 80 }, 			
-			{ label: '抽到的物品信息', name: 'itemData', index: 'ITEM_DATA', width: 80 }, 			
-			{ label: '状态', name: 'status', index: 'STATUS', width: 80 },
-			{ label: '消耗金额', name: 'transactionFee', index: 'TRANSACTION_FEE', width: 80 }, 			
-			{ label: 'GAS费', name: 'transactionGasFee', index: 'TRANSACTION_GAS_FEE', width: 80 }, 			
-			{ label: '抽奖类型', name: 'lottyType', index: 'LOTTY_TYPE', width: 80 },
+			{ label: 'transactionOrderId', name: 'transactionOrderId', index: 'TRANSACTION_ORDER_ID', width: 50, key: true },
+			{ label: '用户ID', name: 'userId', index: 'USER_ID', width: 80 },
+			{ label: '召唤类型', name: 'summonType', index: 'SUMMON_TYPE', width: 80 },
+            { label: '召唤次数', name: 'summonNum', index: 'SUMMON_NUM', width: 80 },
+            { label: '链上交易HASH', name: 'transactionHash', index: 'TRANSACTION_HASH', width: 80 },
+            { label: '抽到的物品信息', name: 'itemData', index: 'ITEM_DATA', width: 80 },
+            { label: '状态', name: 'status', index: 'STATUS', width: 80 },
+            { label: '消耗金额', name: 'transactionFee', index: 'TRANSACTION_FEE', width: 80 },
+            { label: 'GAS费', name: 'transactionGasFee', index: 'TRANSACTION_GAS_FEE', width: 80 },
 			{ label: '创建时间', name: 'createTime', index: 'CREATE_TIME', width: 80 },
 			{ label: '创建时间', name: 'createTimeTs', index: 'CREATE_TIME_TS', width: 80 }, 			
 			{ label: '修改时间', name: 'updateTime', index: 'UPDATE_TIME', width: 80 }, 			
@@ -49,6 +49,13 @@ var vm = new Vue({
 	data:{
 		showList: true,
 		title: null,
+        q: {
+            txHash: '',
+            status: '',
+            summonType: '',
+            summonNum: '',
+            currencyType: ''
+        },
 		transactionOrder: {}
 	},
 	methods: {
@@ -61,18 +68,18 @@ var vm = new Vue({
 			vm.transactionOrder = {};
 		},
 		update: function (event) {
-			var gmTransactionOrderId = getSelectedRow();
-			if(gmTransactionOrderId == null){
+			var transactionOrderId = getSelectedRow();
+			if(transactionOrderId == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmTransactionOrderId)
+            vm.getInfo(transactionOrderId)
 		},
 		saveOrUpdate: function (event) {
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.transactionOrder.gmTransactionOrderId == null ? "order/transactionorder/save" : "order/transactionorder/update";
+                var url = vm.transactionOrder.transactionOrderId == null ? "order/transactionorder/save" : "order/transactionorder/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
@@ -94,8 +101,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmTransactionOrderIds = getSelectedRows();
-			if(gmTransactionOrderIds == null){
+			var transactionOrderIds = getSelectedRows();
+			if(transactionOrderIds == null){
 				return ;
 			}
 			var lock = false;
@@ -108,7 +115,7 @@ var vm = new Vue({
                         type: "POST",
                         url: baseURL + "order/transactionorder/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmTransactionOrderIds),
+                        data: JSON.stringify(transactionOrderIds),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -122,15 +129,16 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmTransactionOrderId){
-			$.get(baseURL + "order/transactionorder/info/"+gmTransactionOrderId, function(r){
+		getInfo: function(transactionOrderId){
+			$.get(baseURL + "order/transactionorder/info/"+transactionOrderId, function(r){
                 vm.transactionOrder = r.transactionOrder;
             });
 		},
 		reload: function (event) {
 			vm.showList = true;
 			var page = $("#jqGrid").jqGrid('getGridParam','page');
-			$("#jqGrid").jqGrid('setGridParam',{ 
+			$("#jqGrid").jqGrid('setGridParam',{
+			    postData:{'txHash': vm.q.txHash, 'summonType': vm.q.summonType, 'summonNum': vm.q.summonNum, 'currencyType': vm.q.currencyType},
                 page:page
             }).trigger("reloadGrid");
 		}

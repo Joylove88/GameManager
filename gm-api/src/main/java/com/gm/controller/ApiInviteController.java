@@ -51,7 +51,7 @@ public class ApiInviteController {
             newUser.setUserId(userEntity.getUserId());
             newUser.setExpandCodeViewTimes(userEntity.getExpandCodeViewTimes() + 1);
             userService.updateById(newUser);
-            response.sendRedirect(index_page + "?invite=" + userEntity.getUserWalletAddress());
+            response.sendRedirect(index_page + "?invite=" + userEntity.getAddress());
         }
     }
 

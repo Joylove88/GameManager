@@ -270,7 +270,7 @@ public class FightCoreService {
             }
             orignalRates.add(probabilityN);
         }
-        Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates, Constant.DrawNum.DRAW1.getValue());
+        Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates, Constant.SummonNum.NUM1.getValue());
         // 随机的事件
         for (Map.Entry<Integer, Integer> entry : count.entrySet()) {
 
@@ -884,21 +884,21 @@ public class FightCoreService {
 
         UserHeroEntity userHero = userHeroDao.selectOne(new QueryWrapper<UserHeroEntity>()
                 .eq("STATUS", Constant.enable)
-                .eq("GM_USER_HERO_ID", id)// 玩家英雄ID
+                .eq("USER_HERO_ID", id)// 玩家英雄ID
         );
         if(userHero == null){
             throw new RRException("英雄已销毁或已售出");
         }
 
         Map<String,Object> map = new HashMap<>();
-        map.put("heroStarId",userHero.getGmHeroStarId());
-        map.put("heroLevelId",userHero.getGmHeroLevelId());
-        map.put("userHeroId",userHero.getGmUserHeroId());
+        map.put("heroStarId",userHero.getHeroStarId());
+        map.put("heroLevelId",userHero.getHeroLevelId());
+        map.put("userHeroId",userHero.getUserHeroId());
 
         // 通过玩家英雄的等级、星级、装备获取该英雄的全部属性
         attribute = combatStatsUtilsService.getHeroBasicStats(map);
         if(attribute == null){
-            throw new RRException("获取英雄属性失败" + userHero.getGmHeroId());
+            throw new RRException("获取英雄属性失败" + userHero.getHeroId());
         }
 
         return attribute;
@@ -906,7 +906,7 @@ public class FightCoreService {
 
     private UserHeroInfoRsp getUserHeroInfo(long id){
         Map<String, Object> userHeroMap = new HashMap<>();
-        userHeroMap.put("gmUserHeroId", id);
+        userHeroMap.put("userHeroId", id);
         UserHeroInfoRsp userHero = userHeroDao.getUserHeroByIdRsp(userHeroMap);
         if ( userHero == null ) {
             System.out.println("英雄获取失败getUserHeroInfo");

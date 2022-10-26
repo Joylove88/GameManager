@@ -49,10 +49,10 @@ public class ProbabilityController extends AbstractController{
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmProbabilityId}")
+    @RequestMapping("/info/{probabilityId}")
     @RequiresPermissions("basicconfig:probability:info")
-    public R info(@PathVariable("gmProbabilityId") Long gmProbabilityId){
-        ProbabilityEntity probability = probabilityService.getById(gmProbabilityId);
+    public R info(@PathVariable("probabilityId") Long probabilityId){
+        ProbabilityEntity probability = probabilityService.getById(probabilityId);
 
         return R.ok().put("probability", probability);
     }
@@ -93,8 +93,8 @@ public class ProbabilityController extends AbstractController{
      */
     @RequestMapping("/delete")
     @RequiresPermissions("basicconfig:probability:delete")
-    public R delete(@RequestBody Long[] gmProbabilityIds){
-        probabilityService.removeByIds(Arrays.asList(gmProbabilityIds));
+    public R delete(@RequestBody Long[] probabilityIds){
+        probabilityService.removeByIds(Arrays.asList(probabilityIds));
 
         return R.ok();
     }

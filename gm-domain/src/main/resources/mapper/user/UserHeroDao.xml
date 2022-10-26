@@ -5,11 +5,11 @@
 
 	<!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.gm.modules.user.entity.UserHeroEntity" id="userHeroMap">
-        <result property="gmUserHeroId" column="GM_USER_HERO_ID"/>
-        <result property="gmUserId" column="GM_USER_ID"/>
-        <result property="gmHeroStarId" column="GM_HERO_STAR_ID"/>
+        <result property="userHeroId" column="USER_HERO_ID"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="heroStarId" column="HERO_STAR_ID"/>
         <result property="status" column="STATUS"/>
-        <result property="gmHeroLevelId" column="GM_HERO_LEVEL_ID"/>
+        <result property="heroLevelId" column="HERO_LEVEL_ID"/>
         <result property="createTime" column="CREATE_TIME"/>
         <result property="createTimeTs" column="CREATE_TIME_TS"/>
         <result property="updateTime" column="UPDATE_TIME"/>
@@ -19,22 +19,17 @@
     <select id="selectPage" resultType="com.gm.modules.user.entity.UserHeroEntity">
         SELECT
             A.*,
-            C.HERO_NAME,
-            D.GM_STAR_CODE,
+            B.HERO_NAME,
             E.USER_NAME,
-            F.GM_LEVEL_NAME
+            F.LEVEL_NAME
         FROM
             GM_USER_HERO A
                 LEFT JOIN
-            GM_HERO_STAR B ON A.GM_HERO_STAR_ID = B.GM_HERO_STAR_ID
+            GM_HERO_INFO B ON A.HERO_ID = B.HERO_ID
                 LEFT JOIN
-            GM_HERO_INFO C ON B.GM_HERO_ID = C.HERO_ID
+            GM_USER E ON A.USER_ID = E.USER_ID
                 LEFT JOIN
-            GM_STAR_INFO D ON B.GM_STAR_ID = D.GM_STAR_ID
-                LEFT JOIN
-            GM_USER E ON A.GM_USER_ID = E.USER_ID
-                LEFT JOIN
-            GM_HERO_LEVEL F ON A.GM_HERO_LEVEL_ID = F.GM_HERO_LEVE_ID
+            GM_HERO_LEVEL F ON A.HERO_LEVEL_ID = F.HERO_LEVE_ID
 
         ${ew.customSqlSegment}
 
@@ -44,50 +39,39 @@
     <select id="getUserHeroHash" resultType="com.gm.modules.user.entity.UserHeroEntity">
         SELECT
             A.*,
-            C.HERO_NAME,
-            D.GM_STAR_CODE
+            B.HERO_NAME
         FROM
             GM_USER_HERO A
                 LEFT JOIN
-            GM_HERO_STAR B ON A.GM_HERO_STAR_ID = B.GM_HERO_STAR_ID
-                LEFT JOIN
-            GM_HERO_INFO C ON B.GM_HERO_ID = C.HERO_ID
-                LEFT JOIN
-            GM_STAR_INFO D ON B.GM_STAR_ID = D.GM_STAR_ID
+            GM_HERO_INFO B ON A.HERO_ID = B.HERO_ID
         WHERE A.`STATUS` = '1' AND A.MINT_HASH = #{mintHash}
     </select>
 
     <!--获取玩家全部英雄-->
     <select id="getUserAllHero" resultType="com.gm.modules.user.rsp.UserHeroInfoRsp">
         SELECT
-        A.GM_USER_HERO_ID,
-        A.GM_HERO_STAR_ID,
+        A.USER_HERO_ID,
         A.EXPERIENCE_OBTAIN,
         A.HERO_POWER,
         A.MINTER,
-        C.HERO_NAME,
-        C.HERO_IMG_URL,
-        C.HERO_ICON_URL,
-        C.HERO_KEEL_URL,
-        C.HERO_DESCRIPTION,
-        F.GM_LEVEL_CODE,
-        D.GM_STAR_CODE
+        B.HERO_NAME,
+        B.HERO_IMG_URL,
+        B.HERO_ICON_URL,
+        B.HERO_KEEL_URL,
+        B.HERO_DESCRIPTION,
+        F.LEVEL_CODE
         FROM
         GM_USER_HERO A
         LEFT JOIN
-        GM_HERO_STAR B ON A.GM_HERO_STAR_ID = B.GM_HERO_STAR_ID
+        GM_HERO_INFO B ON A.HERO_ID = B.HERO_ID
         LEFT JOIN
-        GM_HERO_INFO C ON B.GM_HERO_ID = C.HERO_ID
-        LEFT JOIN
-        GM_STAR_INFO D ON B.GM_STAR_ID = D.GM_STAR_ID
-        LEFT JOIN
-        GM_HERO_LEVEL F ON A.GM_HERO_LEVEL_ID = F.GM_HERO_LEVE_ID
+        GM_HERO_LEVEL F ON A.HERO_LEVEL_ID = F.HERO_LEVE_ID
         <where>
             <if test="status != null and status != ''">
                 AND A.`STATUS` = #{status}
             </if>
-            <if test="gmUserId != null and gmUserId != ''">
-                AND A.GM_USER_ID = #{gmUserId}
+            <if test="userId != null and userId != ''">
+                AND A.USER_ID = #{userId}
             </if>
             <if test="statePlay != null and statePlay != ''">
                 AND A.STATE_PLAY = #{statePlay}
@@ -98,32 +82,27 @@
     <select id="getUserHeroById" resultType="com.gm.modules.user.entity.UserHeroEntity">
         SELECT
         A.*,
-        C.HERO_NAME,
-        C.HERO_IMG_URL,
-        C.HERO_ICON_URL,
-        C.HERO_KEEL_URL,
-        C.HERO_DESCRIPTION,
-        F.GM_LEVEL_CODE,
-        D.GM_STAR_CODE
+        B.HERO_NAME,
+        B.HERO_IMG_URL,
+        B.HERO_ICON_URL,
+        B.HERO_KEEL_URL,
+        B.HERO_DESCRIPTION,
+        F.LEVEL_CODE
         FROM
         GM_USER_HERO A
         LEFT JOIN
-        GM_HERO_STAR B ON A.GM_HERO_STAR_ID = B.GM_HERO_STAR_ID
+        GM_HERO_INFO B ON B.HERO_ID = A.HERO_ID
         LEFT JOIN
-        GM_HERO_INFO C ON B.GM_HERO_ID = C.HERO_ID
-        LEFT JOIN
-        GM_STAR_INFO D ON B.GM_STAR_ID = D.GM_STAR_ID
-        LEFT JOIN
-        GM_HERO_LEVEL F ON A.GM_HERO_LEVEL_ID = F.GM_HERO_LEVE_ID
+        GM_HERO_LEVEL F ON A.HERO_LEVEL_ID = F.HERO_LEVE_ID
         <where>
             <if test="status != null and status != ''">
                 AND A.`STATUS` = #{status}
             </if>
-            <if test="gmUserId != null and gmUserId != ''">
-                AND A.GM_USER_ID = #{gmUserId}
+            <if test="userId != null and userId != ''">
+                AND A.USER_ID = #{userId}
             </if>
-            <if test="gmUserHeroId != null and gmUserHeroId != ''">
-                AND A.GM_USER_HERO_ID = #{gmUserHeroId}
+            <if test="userHeroId != null and userHeroId != ''">
+                AND A.USER_HERO_ID = #{userHeroId}
             </if>
         </where>
     </select>
@@ -131,32 +110,27 @@
     <select id="getUserHeroByIdRsp" resultType="com.gm.modules.user.rsp.UserHeroInfoRsp">
         SELECT
         A.*,
-        C.HERO_NAME,
-        C.HERO_IMG_URL,
-        C.HERO_ICON_URL,
-        C.HERO_KEEL_URL,
-        C.HERO_DESCRIPTION,
-        F.GM_LEVEL_CODE,
-        D.GM_STAR_CODE
+        B.HERO_NAME,
+        B.HERO_IMG_URL,
+        B.HERO_ICON_URL,
+        B.HERO_KEEL_URL,
+        B.HERO_DESCRIPTION,
+        F.LEVEL_CODE
         FROM
         GM_USER_HERO A
         LEFT JOIN
-        GM_HERO_STAR B ON A.GM_HERO_STAR_ID = B.GM_HERO_STAR_ID
+        GM_HERO_INFO B ON B.HERO_ID = A.HERO_ID
         LEFT JOIN
-        GM_HERO_INFO C ON B.GM_HERO_ID = C.HERO_ID
-        LEFT JOIN
-        GM_STAR_INFO D ON B.GM_STAR_ID = D.GM_STAR_ID
-        LEFT JOIN
-        GM_HERO_LEVEL F ON A.GM_HERO_LEVEL_ID = F.GM_HERO_LEVE_ID
+        GM_HERO_LEVEL F ON A.HERO_LEVEL_ID = F.HERO_LEVE_ID
         <where>
             <if test="status != null and status != ''">
                 AND A.`STATUS` = #{status}
             </if>
-            <if test="gmUserId != null and gmUserId != ''">
-                AND A.GM_USER_ID = #{gmUserId}
+            <if test="userId != null and userId != ''">
+                AND A.USER_ID = #{userId}
             </if>
-            <if test="gmUserHeroId != null and gmUserHeroId != ''">
-                AND A.GM_USER_HERO_ID = #{gmUserHeroId}
+            <if test="userHeroId != null and userHeroId != ''">
+                AND A.USER_HERO_ID = #{userHeroId}
             </if>
         </where>
     </select>

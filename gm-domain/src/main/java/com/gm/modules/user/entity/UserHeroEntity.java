@@ -25,11 +25,11 @@ public class UserHeroEntity implements Serializable {
 	 * ID
 	 */
 	@TableId
-	private Long gmUserHeroId;
+	private Long userHeroId;
 	/**
 	 * 用户ID
 	 */
-	private Long gmUserId;
+	private Long userId;
 	/**
 	 * NFTID
 	 */
@@ -37,11 +37,15 @@ public class UserHeroEntity implements Serializable {
 	/**
 	 * 用户获得的英雄ID
 	 */
-	private Long gmHeroStarId;
+	private Long heroStarId;
 	/**
 	 * 用户获得的英雄ID
 	 */
-	private Long gmHeroId;
+	private Long heroId;
+	/**
+	 * 星级
+	 */
+	private Integer starCode;
 	/**
 	 * 矿工数
 	 */
@@ -55,6 +59,10 @@ public class UserHeroEntity implements Serializable {
 	 */
 	private Double scale;
 	/**
+	 * 皮肤类型0普通1黄金...
+	 */
+	private Integer skinType;
+	/**
 	 * 英雄战力
 	 */
 	private Long heroPower;
@@ -66,6 +74,38 @@ public class UserHeroEntity implements Serializable {
 	 * 铸造HASH
 	 */
 	private String mintHash;
+	/**
+	 * 初始生命值
+	 */
+	private Long health;
+	/**
+	 * 初始法力值
+	 */
+	private Long mana;
+	/**
+	 * 初始生命值恢复
+	 */
+	private Double healthRegen;
+	/**
+	 * 初始法力值恢复
+	 */
+	private Double manaRegen;
+	/**
+	 * 初始护甲
+	 */
+	private Long armor;
+	/**
+	 * 初始魔抗
+	 */
+	private Long magicResist;
+	/**
+	 * 初始攻击力
+	 */
+	private Long attackDamage;
+	/**
+	 * 初始法攻
+	 */
+	private Long attackSpell;
 	/**
 	 * 铸造状态('0':铸造中，'1':铸造成功，'2':铸造失败)
 	 */
@@ -81,7 +121,7 @@ public class UserHeroEntity implements Serializable {
 	/**
 	 * 英雄等级ID
 	 */
-	private Long gmHeroLevelId;
+	private Long heroLevelId;
 	/**
 	 * 创建时间
 	 */
@@ -98,23 +138,26 @@ public class UserHeroEntity implements Serializable {
 	 * 修改时间
 	 */
 	private Long updateTimeTs;
-
-	@TableField(exist = false)
-	private String heroName;
-	@TableField(exist = false)
-	private String userName;
-	@TableField(exist = false)
-	private String gmLevelName;
 	/**
-	 * 英雄星级
+	 * 英雄名称
 	 */
 	@TableField(exist = false)
-	private Long gmStarCode;
+	private String heroName;
+	/**
+	 * 玩家名称
+	 */
+	@TableField(exist = false)
+	private String userName;
+	/**
+	 * 等级名称
+	 */
+	@TableField(exist = false)
+	private String levelName;
 	/**
 	 * 英雄等级编码
 	 */
 	@TableField(exist = false)
-	private String gmLevelCode;
+	private String levelCode;
 	/**
 	 * 英雄图片地址
 	 */

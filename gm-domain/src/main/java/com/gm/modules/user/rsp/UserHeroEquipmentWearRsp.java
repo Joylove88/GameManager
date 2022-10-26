@@ -22,15 +22,15 @@ public class UserHeroEquipmentWearRsp implements Serializable {
 	/**
 	 * ID
 	 */
-	private Long gmUserHeroEquipmentWearId;
+	private Long userHeroEquipmentWearId;
 	/**
 	 * 玩家装备ID
 	 */
-	private Long gmUserEquipId;
+	private Long userEquipId;
 	/**
 	 * 装备ID
 	 */
-	private Long gmEquipmentId;
+	private Long equipmentId;
 	/**
 	 * 父级装备链
 	 */

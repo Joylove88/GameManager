@@ -3,10 +3,10 @@ $(function () {
         url: baseURL + 'user/userherofrag/list',
         datatype: "json",
         colModel: [			
-			{ label: 'gmUserHeroFragId', name: 'gmUserHeroFragId', index: 'GM_USER_HERO_FRAG_ID', width: 50, key: true, hidden: true },
+			{ label: 'userHeroFragId', name: 'userHeroFragId', index: 'USER_HERO_FRAG_ID', width: 50, key: true, hidden: true },
             { label: '会员名称', name: 'userName', width: 80 },
             { label: '英雄名称', name: 'heroName', width: 80 },
-			{ label: '获得的碎片数量', name: 'gmUserHeroFragNum', index: 'GM_USER_HERO_FRAG_NUM', width: 80 },
+			{ label: '获得的碎片数量', name: 'userHeroFragNum', index: 'USER_HERO_FRAG_NUM', width: 80 },
 			{ label: '状态', name: 'status', index: 'STATUS', width: 80 , formatter: function (value, options, row) {
                 if (value == '0') {
                     return '<span class="label badge-danger" style="background-color: #ed5565;">禁用</span>';//禁用
@@ -77,14 +77,14 @@ var vm = new Vue({
 			vm.title = "模拟抽奖";
 		},
 		update: function (event) {
-			var gmUserHeroFragId = getSelectedRow();
-			if(gmUserHeroFragId == null){
+			var userHeroFragId = getSelectedRow();
+			if(userHeroFragId == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmUserHeroFragId)
+            vm.getInfo(userHeroFragId)
 		},
         testDrawStart: function (type) {
             if(type == 1){
@@ -156,7 +156,7 @@ var vm = new Vue({
         },
 		saveOrUpdate: function (event) {
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.userHeroFrag.gmUserHeroFragId == null ? "user/userherofrag/save" : "user/userherofrag/update";
+                var url = vm.userHeroFrag.userHeroFragId == null ? "user/userherofrag/save" : "user/userherofrag/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
@@ -178,8 +178,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmUserHeroFragIds = getSelectedRows();
-			if(gmUserHeroFragIds == null){
+			var userHeroFragIds = getSelectedRows();
+			if(userHeroFragIds == null){
 				return ;
 			}
 			var lock = false;
@@ -192,7 +192,7 @@ var vm = new Vue({
                         type: "POST",
                         url: baseURL + "user/userherofrag/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmUserHeroFragIds),
+                        data: JSON.stringify(userHeroFragIds),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -206,8 +206,8 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmUserHeroFragId){
-			$.get(baseURL + "user/userherofrag/info/"+gmUserHeroFragId, function(r){
+		getInfo: function(userHeroFragId){
+			$.get(baseURL + "user/userherofrag/info/"+userHeroFragId, function(r){
                 vm.userHeroFrag = r.userHeroFrag;
             });
 		},

@@ -65,7 +65,7 @@ public class UserExperiencePotionServiceImpl extends ServiceImpl<UserExperienceP
         // 玩家对已拥有的英雄使用经验药水
 
         // 获取玩家英雄ID
-        Long userHeroId = useExpReq.getGmUserHeroId();
+        Long userHeroId = useExpReq.getUserHeroId();
         // 如果获取不到玩家使用的药水稀有度 默认给个1
         String rareCode = "";
         if ( StringUtils.isNotBlank(useExpReq.getExpRare()) ) {
@@ -96,10 +96,10 @@ public class UserExperiencePotionServiceImpl extends ServiceImpl<UserExperienceP
                     // 玩家使用药水后减少已拥有的该稀有度药水数量
                     UserExperiencePotionEntity userExPoE = new UserExperiencePotionEntity();
                     userExPoE.setExPotionRareCode(rareCode);
-                    userExPoE.setGmUserId(user.getUserId());
+                    userExPoE.setUserId(user.getUserId());
                     List<UserExperiencePotionEntity> userExPs = userExperiencePotionDao.getUserNotUseEx(userExPoE);
                     UserExperiencePotionEntity userExPoUp = new UserExperiencePotionEntity();
-                    userExPoUp.setGmUserExPotionId(userExPs.get(0).getGmUserExPotionId());
+                    userExPoUp.setUserExPotionId(userExPs.get(0).getUserExPotionId());
                     userExPoUp.setStatus(Constant.used);//将玩家经验药水状态修改为已使用
                     userExPoUp.setUpdateTime(now);
                     userExPoUp.setUpdateTimeTs(now.getTime());
@@ -107,22 +107,22 @@ public class UserExperiencePotionServiceImpl extends ServiceImpl<UserExperienceP
                 }
                 // 将累加后的经验值更新到玩家英雄表里
                 UserHeroEntity userHeroEntity = new UserHeroEntity();
-                userHeroEntity.setGmUserHeroId(Long.valueOf(userHeroId));
+                userHeroEntity.setUserHeroId(Long.valueOf(userHeroId));
                 userHeroEntity.setExperienceObtain(userHero.getExperienceObtain() + exValue);
                 userHeroDao.updateById(userHeroEntity);
                 // 通过玩家英雄经验值匹配英雄等级信息
                 HeroLevelEntity heroLevelEntity = new HeroLevelEntity();
-                heroLevelEntity.setGmExperienceTotal(userHeroEntity.getExperienceObtain());
+                heroLevelEntity.setExperienceTotal(userHeroEntity.getExperienceObtain());
                 List<HeroLevelEntity> levels = heroLevelDao.getHeroLevel(heroLevelEntity);
                 // 获取到玩家本次使用的经验药水总值后判断该英雄是否满足升级条件
                 if ( levels.size() > 0 ){
                     // 如果玩家经验值满足升级条件 则进行升级操作，否则跳过
                     // 如果英雄里的等级编码和新获取到的等级编码不同则更新
-                    if ( !userHero.getGmHeroLevelId().equals(levels.get(0).getGmHeroLeveId()) ){
+                    if ( !userHero.getHeroLevelId().equals(levels.get(0).getHeroLeveId()) ){
                         // 将新等级更新到玩家英雄表里
                         UserHeroEntity uhe = new UserHeroEntity();
-                        uhe.setGmUserHeroId(Long.valueOf(userHeroId));
-                        uhe.setGmHeroLevelId(levels.get(0).getGmHeroLeveId());
+                        uhe.setUserHeroId(Long.valueOf(userHeroId));
+                        uhe.setHeroLevelId(levels.get(0).getHeroLeveId());
                         uhe.setUpdateTime(now);
                         uhe.setUpdateTimeTs(now.getTime());
                         userHeroDao.updateById(uhe);

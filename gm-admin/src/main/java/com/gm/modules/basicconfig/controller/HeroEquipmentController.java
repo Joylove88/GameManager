@@ -49,10 +49,10 @@ public class HeroEquipmentController extends AbstractController{
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmHeroEquipmentId}")
+    @RequestMapping("/info/{heroEquipmentId}")
     @RequiresPermissions("basicconfig:heroequipment:info")
-    public R info(@PathVariable("gmHeroEquipmentId") Long gmHeroEquipmentId){
-        HeroEquipmentEntity heroEquipment = heroEquipmentService.getById(gmHeroEquipmentId);
+    public R info(@PathVariable("heroEquipmentId") Long heroEquipmentId){
+        HeroEquipmentEntity heroEquipment = heroEquipmentService.getById(heroEquipmentId);
 
         return R.ok().put("heroEquipment", heroEquipment);
     }
@@ -94,8 +94,8 @@ public class HeroEquipmentController extends AbstractController{
      */
     @RequestMapping("/delete")
     @RequiresPermissions("basicconfig:heroequipment:delete")
-    public R delete(@RequestBody Long[] gmHeroEquipmentIds){
-        heroEquipmentService.removeByIds(Arrays.asList(gmHeroEquipmentIds));
+    public R delete(@RequestBody Long[] heroEquipmentIds){
+        heroEquipmentService.removeByIds(Arrays.asList(heroEquipmentIds));
 
         return R.ok();
     }

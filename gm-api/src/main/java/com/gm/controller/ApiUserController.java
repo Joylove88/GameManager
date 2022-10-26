@@ -31,7 +31,9 @@ import com.gm.modules.user.rsp.*;
 import com.gm.modules.user.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import jnr.a64asm.CONDITION;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,6 +64,8 @@ public class ApiUserController {
     private StarInfoService starInfoService;
     @Autowired
     private UserAccountService userAccountService;
+    @Autowired
+    private GmEmailService gmEmailService;
     @Autowired
     private UserHeroFragService userHeroFragService;
     @Autowired
@@ -97,7 +101,7 @@ public class ApiUserController {
     public R getUserHeroInfo(@LoginUser UserEntity user) {
         Map<String, Object> userHeroMap = new HashMap<>();
         userHeroMap.put("status", Constant.enable);
-        userHeroMap.put("gmUserId", user.getUserId());
+        userHeroMap.put("userId", user.getUserId());
         List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(userHeroMap);
         return R.ok().put("heroList",heroList);
     }
@@ -110,14 +114,14 @@ public class ApiUserController {
         // 获取玩家英雄信息和穿戴的装备信息
         Map<String, Object> userHeroMap = new HashMap<>();
         userHeroMap.put("status", Constant.enable);
-        userHeroMap.put("gmUserId", user.getUserId());
+        userHeroMap.put("userId", user.getUserId());
         List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(userHeroMap);
         int i = 0;
         while ( i < heroList.size() ) {
             // 获取该英雄已穿戴的装备
             Map<String, Object> userWearMap = new HashMap<>();
             userWearMap.put("status", Constant.enable);
-            userWearMap.put("userHeroId", heroList.get(i).getGmUserHeroId());
+            userWearMap.put("userHeroId", heroList.get(i).getUserHeroId());
             List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearService.getUserWearEQ(userWearMap);
             if ( wearList.size() > 0 ) {
                 heroList.get(i).setWearEQList(wearList);
@@ -128,7 +132,7 @@ public class ApiUserController {
 
         // 获取英雄碎片
         Map<String, Object> heroFragMap = new HashMap<>();
-        heroFragMap.put("gmUserId", user.getUserId());
+        heroFragMap.put("userId", user.getUserId());
         heroFragMap.put("status", Constant.enable);
         List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(heroFragMap);
         map.put("heroFragList",heroFragList);
@@ -136,7 +140,7 @@ public class ApiUserController {
         // 获取装备
         UserEquipmentEntity userEquipment = new UserEquipmentEntity();
         userEquipment.setStatus(Constant.enable);
-        userEquipment.setGmUserId(user.getUserId());
+        userEquipment.setUserId(user.getUserId());
         List<UserEquipInfoRsp> equipmentEntities = userEquipmentService.getUserEquip(userEquipment);
         map.put("equipList",equipmentEntities);
 
@@ -149,7 +153,7 @@ public class ApiUserController {
 
         // 获取经验道具
         UserExperiencePotionEntity exp = new UserExperiencePotionEntity();
-        exp.setGmUserId(user.getUserId());
+        exp.setUserId(user.getUserId());
         List<UserExpInfoRsp> expList = userExService.getUserEx(exp);
         forUseMap.put("expList",expList);
 
@@ -188,7 +192,7 @@ public class ApiUserController {
     public R getPayerInfo(@LoginUser UserEntity user) throws InvocationTargetException, IllegalAccessException {
         // 获取玩家信息
         Map<String, Object> map = new HashMap<>();
-        map.put("address", user.getUserWalletAddress());
+        map.put("address", user.getAddress());
         UserInfoRsp rsp = userService.getPlayerInfo(map);
         rsp.setNextLevelExp(rsp.getPromotionExperience());
         rsp.setFtgMax(Constant.FTG);
@@ -198,14 +202,34 @@ public class ApiUserController {
 
     @PostMapping("getPayerInfoSimple")
     @ApiOperation("获取玩家信息")
-    public R getPayerInfoSimple(UserInfoReq req) throws InvocationTargetException, IllegalAccessException {
+    public R getPayerInfoSimple(@RequestBody UserInfoReq req) throws InvocationTargetException, IllegalAccessException {
         // 表单校验
         ValidatorUtils.validateEntity(req);
-        Map<String, Object> map = new HashMap<>();
-        map.put("address", req.getAddress());
-        // 获取玩家信息
-        UserInfoRsp rsp = userService.getPlayerInfo(map);
+        UserInfoRsp rsp = new UserInfoRsp();
+        if (StringUtils.isNotBlank(req.getAddress())){
+            Map<String, Object> map = new HashMap<>();
+            map.put("address", req.getAddress());
+            // 获取玩家信息
+            rsp = userService.getPlayerInfo(map);
+        }
         return R.ok().put("userInfo",rsp);
+    }
+
+    @PostMapping("addEmail")
+    @ApiOperation("玩家邮箱")
+    public R addEmail(@RequestBody UserInfoReq req) throws InvocationTargetException, IllegalAccessException {
+        // 表单校验
+        if (!ValidatorUtils.checkEmail(req.getEmail())){
+            throw new RRException("Email format error!");
+        }
+        GmEmailEntity email = new GmEmailEntity();
+        Date now = new Date();
+        email.setEmail(req.getEmail());
+        email.setStatus(Constant.enable);
+        email.setCreateTime(now);
+        email.setCreateTimeTs(now.getTime());
+        gmEmailService.save(email);
+        return R.ok();
     }
 
 
@@ -217,7 +241,7 @@ public class ApiUserController {
         ValidatorUtils.validateEntity(req);
         // 获取英雄
         Map<String, Object> userHeroMap = new HashMap<>();
-        userHeroMap.put("gmUserHeroId", req.getGmUserHeroId());
+        userHeroMap.put("userHeroId", req.getUserHeroId());
         UserHeroEntity userHero = userHeroService.getUserHeroById(userHeroMap);
         if ( userHero == null ) {
             System.out.println("获取玩家英雄失败");
@@ -226,15 +250,15 @@ public class ApiUserController {
         BeanUtils.copyProperties(rsp, userHero);
 
         // 获取英雄等级信息
-        HeroLevelEntity heroLevel = heroLevelService.getById(userHero.getGmHeroLevelId());
+        HeroLevelEntity heroLevel = heroLevelService.getById(userHero.getHeroLevelId());
         if (heroLevel == null){
             throw new RRException(ErrorCode.EXP_GET_FAIL.getDesc());
         }
 
         // 晋级到下一级所需经验值
-        rsp.setPromotionExperience(heroLevel.getGmPromotionExperience());
+        rsp.setPromotionExperience(heroLevel.getPromotionExperience());
         // 当前等级获取的经验值
-        rsp.setCurrentExp(ExpUtils.getCurrentExp(heroLevel.getGmExperienceTotal(), heroLevel.getGmPromotionExperience(), user.getExperienceObtain()));
+        rsp.setCurrentExp(ExpUtils.getCurrentExp(heroLevel.getExperienceTotal(), heroLevel.getPromotionExperience(), user.getExperienceObtain()));
 
         // 获取系统全部装备
         Map<String, Object> equipMap = new HashMap<>();
@@ -244,19 +268,20 @@ public class ApiUserController {
         // 获取英雄装备栏
         Map<String, Object> heroEquipMap = new HashMap<>();
         heroEquipMap.put("status",  Constant.enable);
-        heroEquipMap.put("gmHeroId",  rsp.getGmHeroId());
+        heroEquipMap.put("heroId",  rsp.getHeroId());
         List<HeroEquipmentEntity> heroEquipments = heroEquipmentService.getHeroEquipments(heroEquipMap);
         JSONArray jsonArray = new JSONArray();
         for ( HeroEquipmentEntity heroEquipment : heroEquipments ) {
             // 获取英雄已激活/未激活装备
-            jsonArray.add(equipmentInfoService.updateEquipJson2(heroEquipment.getGmEquipId(),equipments, rsp));
+            jsonArray.add(equipmentInfoService.updateEquipJson2(heroEquipment.getEquipId(),equipments, rsp));
 
         }
 
         // 获取英雄技能
         Map<String, Object> skillMap = new HashMap<>();
         skillMap.put("status", Constant.enable);
-        skillMap.put("gmHeroStarId", userHero.getGmHeroStarId());
+        skillMap.put("heroId", userHero.getHeroId());
+        skillMap.put("skillStarCode", userHero.getStarCode());
         HeroSkillEntity heroSkill = heroSkillService.getHeroSkill(skillMap);
         if ( heroSkill == null ) {
             System.out.println("英雄技能获取失败");
@@ -266,21 +291,21 @@ public class ApiUserController {
         rsp.setHeroSkillRsp(skillRsp);
 
         // 获取当前星级+1
-        Long starCode = userHero.getGmStarCode();
+        int starCode = userHero.getStarCode();
         if ( starCode < 5 ) {
             starCode += 1;
         }
         // 获取当前阶段升星所需碎片
         StarInfoEntity starInfo = starInfoService.getOne(new QueryWrapper<StarInfoEntity>()
-                .eq("GM_STAR_CODE", starCode)
+                .eq("STAR_CODE", starCode)
 
         );
 
         // 获取玩家背包中的英雄碎片
         Map<String, Object> heroFragMap = new HashMap<>();
-        heroFragMap.put("gmUserId", user.getUserId());
+        heroFragMap.put("userId", user.getUserId());
         heroFragMap.put("status", Constant.enable);
-        heroFragMap.put("heroId", userHero.getGmHeroId());
+        heroFragMap.put("heroId", userHero.getHeroId());
         List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(heroFragMap);
 
         // 获取英雄等级信息
@@ -288,7 +313,7 @@ public class ApiUserController {
 
         // 获取玩家背包中的经验道具
         UserExperiencePotionEntity exp = new UserExperiencePotionEntity();
-        exp.setGmUserId(user.getUserId());
+        exp.setUserId(user.getUserId());
         List<UserExpInfoRsp> expList = userExService.getUserEx(exp);
 
         Map<String, Object> map = new HashMap();

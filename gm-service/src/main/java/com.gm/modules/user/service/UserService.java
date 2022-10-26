@@ -46,10 +46,10 @@ public interface UserService extends IService<UserEntity> {
 
 	/**
 	 * 根据ID查询用户
-	 * @param gmUserId 用户ID
+	 * @param userId 用户ID
 	 * @return 用户
 	 */
-	UserEntity queryByUserId(Long gmUserId);
+	UserEntity queryByUserId(Long userId);
 
 	int queryEffectiveUserCount(UserEntity userEntity);
 

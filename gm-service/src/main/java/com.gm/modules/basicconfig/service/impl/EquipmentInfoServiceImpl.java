@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
-import com.gm.modules.basicconfig.dao.EquipSynthesisItemDao;
 import com.gm.modules.basicconfig.dao.EquipmentInfoDao;
 import com.gm.modules.basicconfig.entity.EquipSynthesisItemEntity;
 import com.gm.modules.basicconfig.entity.EquipmentInfoEntity;
@@ -25,7 +24,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,7 +105,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
         // 获取该英雄已穿戴的装备
         Map<String, Object> userWearMap = new HashMap<>();
         userWearMap.put("status", Constant.enable);
-        userWearMap.put("userHeroId", rsp.getGmUserHeroId());
+        userWearMap.put("userHeroId", rsp.getUserHeroId());
         List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearDao.getUserWearEQ(userWearMap);
         // 获取装备栏中的装备合成公式
         EquipSynthesisItemEntity eqSIEs = equipSynthesisItemService.getEquipSyntheticFormula(heroEquipId);
@@ -116,7 +114,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
         }
         //封装装备层级
         JSONObject jsonObject = new JSONObject();
-        long fragNum = eqSIEs.getGmEquipFragNum();
+        long fragNum = eqSIEs.getEquipFragNum();
         for (EquipmentInfoEntity equip1 : equips) {
             long equipId = equip1.getEquipId();
             String equipName = equip1.getEquipName();
@@ -124,7 +122,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
             String equipImgUrl = equip1.getEquipImgUrl();
             String equipIconUrl = equip1.getEquipIconUrl();
             // 装备名称封装
-            if (eqSIEs.getGmEquipmentId().equals(equipId)) {
+            if (eqSIEs.getEquipmentId().equals(equipId)) {
                 jsonObject.put("equipId", equipId);
                 jsonObject.put("equipName", equipName);
                 jsonObject.put("equipRareCode",equipRarecode);
@@ -201,13 +199,13 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
         // 循环已穿戴的装备
         for ( UserHeroEquipmentWearRsp equipmentWearRsp : wearList ) {
             // 如果已穿戴装备和英雄装备栏的装备ID相等说明该位置装备已激活
-            if ( equipmentWearRsp.getGmEquipmentId().equals(equipId) ) {
+            if ( equipmentWearRsp.getEquipmentId().equals(equipId) ) {
                 // 固定为第1or2or3层位置的装备
                 if ( StringUtils.isNotBlank(equipmentWearRsp.getParentEquipChain()) && (
                         equipmentWearRsp.getParentEquipChain().equals(parentEquipChainID)
                 )) {
                     // 获取已激活装备的属性
-                    userEquipment = userEquipmentDao.selectById(equipmentWearRsp.getGmUserEquipId());
+                    userEquipment = userEquipmentDao.selectById(equipmentWearRsp.getUserEquipId());
                     activationState = "1";
                     userEquipment.setActivationState(activationState);
                     break;
@@ -333,7 +331,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
                     if ( eqSIEsChildren == null ) {
                         break;
                     }
-                    fragNum = eqSIEsChildren.getGmEquipFragNum();
+                    fragNum = eqSIEsChildren.getEquipFragNum();
                     jsonObject.put("children", equipItemChild(eqSIEsChildren, equips, wearList, parentEquipChainID));
                     jsonObject.put("equipFragId",equipId);
                     jsonObject.put("equipFragNum",fragNum);

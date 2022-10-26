@@ -47,10 +47,10 @@ public class UserEquipmentController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmUserEquipmentId}")
+    @RequestMapping("/info/{userEquipmentId}")
     @RequiresPermissions("user:userequipment:info")
-    public R info(@PathVariable("gmUserEquipmentId") Long gmUserEquipmentId){
-        UserEquipmentEntity userEquipment = userEquipmentService.getById(gmUserEquipmentId);
+    public R info(@PathVariable("userEquipmentId") Long userEquipmentId){
+        UserEquipmentEntity userEquipment = userEquipmentService.getById(userEquipmentId);
 
         return R.ok().put("userEquipment", userEquipment);
     }
@@ -83,8 +83,8 @@ public class UserEquipmentController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("user:userequipment:delete")
-    public R delete(@RequestBody Long[] gmUserEquipmentIds){
-        userEquipmentService.removeByIds(Arrays.asList(gmUserEquipmentIds));
+    public R delete(@RequestBody Long[] userEquipmentIds){
+        userEquipmentService.removeByIds(Arrays.asList(userEquipmentIds));
 
         return R.ok();
     }

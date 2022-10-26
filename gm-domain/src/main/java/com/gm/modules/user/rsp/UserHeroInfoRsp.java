@@ -15,11 +15,11 @@ public class UserHeroInfoRsp {
 	/**
 	 * ID
 	 */
-	private Long gmUserHeroId;
+	private Long userHeroId;
 	/**
 	 * 英雄ID
 	 */
-	private Long gmHeroId;
+	private Long heroId;
 	/**
 	 * 英雄名称
 	 */
@@ -35,7 +35,7 @@ public class UserHeroInfoRsp {
 	/**
 	 * 英雄星级
 	 */
-	private String gmStarCode;
+	private String starCode;
 	/**
 	 * 英雄等级编码
 	 */

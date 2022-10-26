@@ -49,10 +49,10 @@ public class ExperiencePotionController extends AbstractController{
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmExPotionId}")
+    @RequestMapping("/info/{exPotionId}")
     @RequiresPermissions("basicconfig:experiencepotion:info")
-    public R info(@PathVariable("gmExPotionId") Long gmExPotionId){
-        ExperiencePotionEntity experiencePotion = experiencePotionService.getById(gmExPotionId);
+    public R info(@PathVariable("exPotionId") Long exPotionId){
+        ExperiencePotionEntity experiencePotion = experiencePotionService.getById(exPotionId);
 
         return R.ok().put("experiencePotion", experiencePotion);
     }
@@ -94,8 +94,8 @@ public class ExperiencePotionController extends AbstractController{
      */
     @RequestMapping("/delete")
     @RequiresPermissions("basicconfig:experiencepotion:delete")
-    public R delete(@RequestBody Long[] gmExPotionIds){
-        experiencePotionService.removeByIds(Arrays.asList(gmExPotionIds));
+    public R delete(@RequestBody Long[] exPotionIds){
+        experiencePotionService.removeByIds(Arrays.asList(exPotionIds));
 
         return R.ok();
     }

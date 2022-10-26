@@ -3,7 +3,7 @@ $(function () {
         url: baseURL + 'user/userheroequipmentwear/list',
         datatype: "json",
         colModel: [			
-			{ label: 'gmUserHeroEquipmentWearId', name: 'gmUserHeroEquipmentWearId', index: 'GM_USER_HERO_EQUIPMENT_WEAR_ID', width: 50, key: true },
+			{ label: 'userHeroEquipmentWearId', name: 'userHeroEquipmentWearId', index: 'USER_HERO_EQUIPMENT_WEAR_ID', width: 50, key: true },
 			{ label: '会员名称', name: 'userName', width: 80 },
 			{ label: '英雄', name: 'heroName', width: 80 },
 			{ label: '装备', name: 'equipName', width: 80 },
@@ -94,18 +94,18 @@ var vm = new Vue({
 			vm.userHeroEquipmentWear = {};
 		},
 		update: function (event) {
-			var gmUserHeroEquipmentWearId = getSelectedRow();
-			if(gmUserHeroEquipmentWearId == null){
+			var userHeroEquipmentWearId = getSelectedRow();
+			if(userHeroEquipmentWearId == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmUserHeroEquipmentWearId)
+            vm.getInfo(userHeroEquipmentWearId)
 		},
 		saveOrUpdate: function (event) {
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.userHeroEquipmentWear.gmUserHeroEquipmentWearId == null ? "user/userheroequipmentwear/save" : "user/userheroequipmentwear/update";
+                var url = vm.userHeroEquipmentWear.userHeroEquipmentWearId == null ? "user/userheroequipmentwear/save" : "user/userheroequipmentwear/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
@@ -127,8 +127,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmUserHeroEquipmentWearIds = getSelectedRows();
-			if(gmUserHeroEquipmentWearIds == null){
+			var userHeroEquipmentWearIds = getSelectedRows();
+			if(userHeroEquipmentWearIds == null){
 				return ;
 			}
 			var lock = false;
@@ -141,7 +141,7 @@ var vm = new Vue({
                         type: "POST",
                         url: baseURL + "user/userheroequipmentwear/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmUserHeroEquipmentWearIds),
+                        data: JSON.stringify(userHeroEquipmentWearIds),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -155,8 +155,8 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmUserHeroEquipmentWearId){
-			$.get(baseURL + "user/userheroequipmentwear/info/"+gmUserHeroEquipmentWearId, function(r){
+		getInfo: function(userHeroEquipmentWearId){
+			$.get(baseURL + "user/userheroequipmentwear/info/"+userHeroEquipmentWearId, function(r){
                 vm.userHeroEquipmentWear = r.userHeroEquipmentWear;
             });
 		},

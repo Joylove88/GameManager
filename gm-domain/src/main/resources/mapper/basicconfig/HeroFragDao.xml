@@ -20,14 +20,8 @@
     <select id="queryList" resultType="com.gm.modules.basicconfig.entity.HeroFragEntity">
         SELECT A.*,B.HERO_NAME
         from GM_HERO_FRAG A
-        LEFT JOIN GM_HERO_INFO B ON A.GM_HERO_INFO_ID = B.HERO_ID
+        LEFT JOIN GM_HERO_INFO B ON A.HERO_INFO_ID = B.HERO_ID
         WHERE 1=1
-        <!--        <if test="gmStarCode != null">-->
-        <!--            and B.GM_STAR_CODE = ${gmStarCode}-->
-        <!--        </if>-->
-        <!--        <if test="heroName != null">-->
-        <!--            and C.HERO_NAME LIKE '%${heroName}%'-->
-        <!--        </if>-->
     </select>
 
 
@@ -39,7 +33,7 @@
             C.HERO_NAME
         FROM
           GM_HERO_FRAG A
-        LEFT JOIN GM_HERO_INFO C ON A.GM_HERO_INFO_ID = C.HERO_ID
+        LEFT JOIN GM_HERO_INFO C ON A.HERO_INFO_ID = C.HERO_ID
         WHERE
         A.`STATUS` = '1'
     </select>

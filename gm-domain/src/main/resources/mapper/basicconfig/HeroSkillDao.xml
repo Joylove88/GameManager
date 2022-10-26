@@ -3,39 +3,17 @@
 
 <mapper namespace="com.gm.modules.basicconfig.dao.HeroSkillDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.gm.modules.basicconfig.entity.HeroSkillEntity" id="heroSkillMap">
-        <result property="gmHeroSkillId" column="GM_HERO_SKILL_ID"/>
-        <result property="gmHeroStarId" column="GM_HERO_STAR_ID"/>
-        <result property="skillStarLevel" column="SKILL_STAR_LEVEL"/>
-        <result property="skillSolt" column="SKILL_SOLT"/>
-        <result property="skillFixedDamage" column="SKILL_FIXED_DAMAGE"/>
-        <result property="skillDamageBonusHero" column="SKILL_DAMAGE_BONUS_HERO"/>
-        <result property="skillDamageBonusEquip" column="SKILL_DAMAGE_BONUS_EQUIP"/>
-        <result property="skillDescription" column="SKILL_DESCRIPTION"/>
-        <result property="status" column="STATUS"/>
-        <result property="createUser" column="CREATE_USER"/>
-        <result property="createTime" column="CREATE_TIME"/>
-        <result property="createTimeTs" column="CREATE_TIME_TS"/>
-        <result property="updateUser" column="UPDATE_USER"/>
-        <result property="updateTime" column="UPDATE_TIME"/>
-        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
-    </resultMap>
-
     <select id="selectPage" resultType="com.gm.modules.basicconfig.entity.HeroSkillEntity">
         SELECT
             A.*,
-            C.HERO_NAME,
-            D.GM_STAR_CODE
+            B.HERO_NAME
         FROM
             GM_HERO_SKILL A
-        LEFT JOIN GM_HERO_STAR B ON B.GM_HERO_STAR_ID = A.GM_HERO_STAR_ID
-        LEFT JOIN GM_HERO_INFO C ON B.GM_HERO_ID = C.HERO_ID
-        LEFT JOIN GM_STAR_INFO D ON B.GM_STAR_ID = D.GM_STAR_ID
+        LEFT JOIN GM_HERO_INFO B ON A.HERO_ID = B.HERO_ID
 
 
         ${ew.customSqlSegment}
-        ORDER BY C.HERO_NAME ASC,D.GM_STAR_CODE ASC
+        ORDER BY B.HERO_NAME ASC,A.SKILL_STAR_CODE ASC
     </select>
 
     <!--获取英雄技能信息-->
@@ -48,8 +26,11 @@
             <if test="status != null and status != ''">
                 AND A.STATUS = #{status}
             </if>
-            <if test="gmHeroStarId != null and gmHeroStarId != ''">
-                AND A.GM_HERO_STAR_ID = #{gmHeroStarId}
+            <if test="heroId != null and heroId != ''">
+                AND A.HERO_ID = #{heroId}
+            </if>
+            <if test="skillStarCode != null and skillStarCode != ''">
+                AND A.SKILL_STAR_CODE = #{skillStarCode}
             </if>
         </where>
     </select>

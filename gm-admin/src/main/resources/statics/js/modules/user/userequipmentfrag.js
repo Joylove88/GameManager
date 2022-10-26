@@ -3,7 +3,7 @@ $(function () {
         url: baseURL + 'user/userequipmentfrag/list',
         datatype: "json",
         colModel: [			
-			{ label: 'gmUserEquipmentFragId', name: 'gmUserEquipmentFragId', index: 'GM_USER_EQUIPMENT_FRAG_ID', width: 50, key: true,hidden: true },
+			{ label: 'userEquipmentFragId', name: 'userEquipmentFragId', index: 'USER_EQUIPMENT_FRAG_ID', width: 50, key: true,hidden: true },
             { label: '会员名称', name: 'userName', width: 80 },
             { label: '装备卷轴碎片名称', name: 'equipName', width: 80 },
             { label: '装备卷轴碎片稀有度', name: 'equipRarecode', width: 80, formatter: function (value, options, row) {
@@ -22,7 +22,7 @@ $(function () {
                 return erc;
             }
             },
-			{ label: '玩家获得碎片数量', name: 'gmUserEquipFragNum', index: 'GM_USER_EQUIP_FRAG_NUM', width: 80 },
+			{ label: '玩家获得碎片数量', name: 'userEquipFragNum', index: 'USER_EQUIP_FRAG_NUM', width: 80 },
             { label: '来源ID', name: 'sourceId', width: 80 },
             { label: '来源类型', name: 'fromType', width: 80, formatter: function (value, options, row) {
                 if (value == '0') {
@@ -101,18 +101,18 @@ var vm = new Vue({
 			vm.userEquipmentFrag = {};
 		},
 		update: function (event) {
-			var gmUserEquipmentFragId = getSelectedRow();
-			if(gmUserEquipmentFragId == null){
+			var userEquipmentFragId = getSelectedRow();
+			if(userEquipmentFragId == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmUserEquipmentFragId)
+            vm.getInfo(userEquipmentFragId)
 		},
 		saveOrUpdate: function (event) {
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.userEquipmentFrag.gmUserEquipmentFragId == null ? "user/userequipmentfrag/save" : "user/userequipmentfrag/update";
+                var url = vm.userEquipmentFrag.userEquipmentFragId == null ? "user/userequipmentfrag/save" : "user/userequipmentfrag/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
@@ -134,8 +134,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmUserEquipmentFragIds = getSelectedRows();
-			if(gmUserEquipmentFragIds == null){
+			var userEquipmentFragIds = getSelectedRows();
+			if(userEquipmentFragIds == null){
 				return ;
 			}
 			var lock = false;
@@ -148,7 +148,7 @@ var vm = new Vue({
                         type: "POST",
                         url: baseURL + "user/userequipmentfrag/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmUserEquipmentFragIds),
+                        data: JSON.stringify(userEquipmentFragIds),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -162,8 +162,8 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmUserEquipmentFragId){
-			$.get(baseURL + "user/userequipmentfrag/info/"+gmUserEquipmentFragId, function(r){
+		getInfo: function(userEquipmentFragId){
+			$.get(baseURL + "user/userequipmentfrag/info/"+userEquipmentFragId, function(r){
                 vm.userEquipmentFrag = r.userEquipmentFrag;
             });
 		},

@@ -25,23 +25,23 @@ public class UserHeroEquipmentWearEntity implements Serializable {
 	 * ID
 	 */
 	@TableId
-	private Long gmUserHeroEquipmentWearId;
+	private Long userHeroEquipmentWearId;
 	/**
 	 * 英雄ID
 	 */
-	private Long gmHeroId;
+	private Long heroId;
 	/**
 	 * 玩家装备ID
 	 */
-	private Long gmUserEquipId;
+	private Long userEquipId;
 	/**
 	 * 用户ID
 	 */
-	private Long gmUserId;
+	private Long userId;
 	/**
 	 * 玩家英雄ID
 	 */
-	private Long gmUserHeroId;
+	private Long userHeroId;
 	/**
 	 * 父级装备链
 	 */

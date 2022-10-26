@@ -32,16 +32,16 @@ public interface TransactionOrderService extends IService<TransactionOrderEntity
 
     /**
      * 根据用户ID查询该用户消费总额
-     * @param gmUserId 用户ID
+     * @param userId 用户ID
      * @return 消费总额
      */
-    Double queryTotalMoneyByUserId(Long gmUserId);
+    Double queryTotalMoneyByUserId(Long userId);
 
     /**
      * 根据用户ID查询该用户儿子的消费总额
-     * @param gmUserId 用户ID
+     * @param userId 用户ID
      * @return 儿子的消费总额
      */
-    Double querySonTotalMoneyByFatherId(Long gmUserId);
+    Double querySonTotalMoneyByFatherId(Long userId);
 }
 

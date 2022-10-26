@@ -3,14 +3,14 @@ $(function () {
         url: baseURL + 'basicconfig/heroleve/list',
         datatype: "json",
         colModel: [			
-			{ label: 'gmHeroLeveId', name: 'gmHeroLeveId', index: 'GM_HERO_LEVE_ID', width: 50, key: true },
-			{ label: '等级名称', name: 'gmLevelName', index: 'GM_LEVEL_NAME', width: 80 }, 			
-			{ label: '等级描述', name: 'gmLevelDesc', index: 'GM_LEVEL_DESC', width: 80 }, 			
-			{ label: '等级编码', name: 'gmLevelCode', index: 'GM_LEVEL_CODE', width: 80 }, 			
-			{ label: '是否默认，1是，0否', name: 'gmFlag', index: 'GM_FLAG', width: 80 }, 			
-			{ label: '是否删除，1是，0否', name: 'gmDeleted', index: 'GM_DELETED', width: 80 }, 			
-			{ label: '晋级到下一级所需经验值', name: 'gmPromotionExperience', index: 'GM_PROMOTION_EXPERIENCE', width: 80 }, 			
-			{ label: '升级所需累计经验', name: 'gmExperienceTotal', index: 'GM_EXPERIENCE_TOTAL', width: 80 },
+			{ label: 'heroLeveId', name: 'heroLeveId', index: 'HERO_LEVE_ID', width: 50, key: true },
+			{ label: '等级名称', name: 'levelName', index: 'LEVEL_NAME', width: 80 },
+			{ label: '等级描述', name: 'levelDesc', index: 'LEVEL_DESC', width: 80 },
+			{ label: '等级编码', name: 'levelCode', index: 'LEVEL_CODE', width: 80 },
+			{ label: '是否默认，1是，0否', name: 'flag', index: 'FLAG', width: 80 },
+			{ label: '是否删除，1是，0否', name: 'deleted', index: 'DELETED', width: 80 },
+			{ label: '晋级到下一级所需经验值', name: 'promotionExperience', index: 'PROMOTION_EXPERIENCE', width: 80 },
+			{ label: '升级所需累计经验', name: 'experienceTotal', index: 'EXPERIENCE_TOTAL', width: 80 },
 			{ label: '创建人', name: 'createUser', index: 'CREATE_USER', width: 80 },
 			{ label: '创建时间', name: 'createTime', index: 'CREATE_TIME', width: 80 }, 			
 			{ label: '修改人', name: 'updateUser', index: 'UPDATE_USER', width: 80 },
@@ -60,18 +60,18 @@ var vm = new Vue({
 			vm.heroLeve = {};
 		},
 		update: function (event) {
-			var gmHeroLeveId = getSelectedRow();
-			if(gmHeroLeveId == null){
+			var heroLeveId = getSelectedRow();
+			if(heroLeveId == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmHeroLeveId)
+            vm.getInfo(heroLeveId)
 		},
 		saveOrUpdate: function (event) {
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.heroLeve.gmHeroLeveId == null ? "basicconfig/heroleve/save" : "basicconfig/heroleve/update";
+                var url = vm.heroLeve.heroLeveId == null ? "basicconfig/heroleve/save" : "basicconfig/heroleve/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
@@ -93,8 +93,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmHeroLeveIds = getSelectedRows();
-			if(gmHeroLeveIds == null){
+			var heroLeveIds = getSelectedRows();
+			if(heroLeveIds == null){
 				return ;
 			}
 			var lock = false;
@@ -107,7 +107,7 @@ var vm = new Vue({
                         type: "POST",
                         url: baseURL + "basicconfig/heroleve/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmHeroLeveIds),
+                        data: JSON.stringify(heroLeveIds),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -121,8 +121,8 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmHeroLeveId){
-			$.get(baseURL + "basicconfig/heroleve/info/"+gmHeroLeveId, function(r){
+		getInfo: function(heroLeveId){
+			$.get(baseURL + "basicconfig/heroleve/info/"+heroLeveId, function(r){
                 vm.heroLeve = r.heroLeve;
             });
 		},

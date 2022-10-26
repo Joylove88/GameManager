@@ -24,21 +24,21 @@ public class StarInfoEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Long gmStarId;
+	private Long starId;
 	/**
 	 * 星级级别
 	 */
 	@NotNull(message = "Star level cannot be empty!")
-	private Long gmStarCode;
+	private Integer starCode;
 	/**
 	 * 星级属性加成
 	 */
 	@NotNull(message = "The star attribute bonus cannot be empty!")
-	private Long gmStarAttributes;
+	private Double starBuff;
 	/**
 	 * 升星所需碎片数量
 	 */
-	private Long upStarFragNum;
+	private Integer upStarFragNum;
 	/**
 	 * 创建人
 	 */

@@ -3,21 +3,6 @@
 
 <mapper namespace="com.gm.modules.user.dao.UserHeroEquipmentWearDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.gm.modules.user.entity.UserHeroEquipmentWearEntity" id="userHeroEquipmentWearMap">
-        <result property="gmUserHeroEquipmentWearId" column="GM_USER_HERO_EQUIPMENT_WEAR_ID"/>
-        <result property="gmHeroId" column="GM_HERO_ID"/>
-        <result property="gmEquipId" column="GM_USER_EQUIP_ID"/>
-        <result property="gmUserId" column="GM_USER_ID"/>
-        <result property="parentEquipChain" column="PARENT_EQUIP_CHAIN"/>
-        <result property="status" column="STATUS"/>
-        <result property="createUser" column="CREATE_USER"/>
-        <result property="createTime" column="CREATE_TIME"/>
-        <result property="createTimeTs" column="CREATE_TIME_TS"/>
-        <result property="updateUser" column="UPDATE_USER"/>
-        <result property="updateTime" column="UPDATE_TIME"/>
-        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
-    </resultMap>
 
     <select id="selectPage" resultType="com.gm.modules.user.entity.UserHeroEquipmentWearEntity">
         SELECT
@@ -30,13 +15,13 @@
         FROM
             GM_USER_HERO_EQUIPMENT_WEAR A
 				LEFT JOIN
-            gm_user_equipment B ON A.GM_USER_EQUIP_ID = B.GM_USER_EQUIPMENT_ID
+            gm_user_equipment B ON A.USER_EQUIP_ID = B.USER_EQUIPMENT_ID
         LEFT JOIN
-            GM_EQUIPMENT_INFO B2 ON B.GM_EQUIPMENT_ID = B2.EQUIP_ID
+            GM_EQUIPMENT_INFO B2 ON B.EQUIPMENT_ID = B2.EQUIP_ID
         LEFT JOIN
-            GM_HERO_INFO C ON A.GM_HERO_ID = C.HERO_ID
+            GM_HERO_INFO C ON A.HERO_ID = C.HERO_ID
         LEFT JOIN
-            GM_USER E ON A.GM_USER_ID = E.USER_ID
+            GM_USER E ON A.USER_ID = E.USER_ID
 
         ${ew.customSqlSegment}
 
@@ -46,11 +31,11 @@
     <!--获取玩家英雄穿戴中的装备-->
     <select id="getUserWearEQ" resultType="com.gm.modules.user.rsp.UserHeroEquipmentWearRsp">
         SELECT
-            A.GM_USER_HERO_EQUIPMENT_WEAR_ID,
-            A.GM_HERO_ID,
-            A.GM_USER_EQUIP_ID,
-            A.GM_USER_HERO_ID,
-            B.GM_EQUIPMENT_ID,
+            A.USER_HERO_EQUIPMENT_WEAR_ID,
+            A.HERO_ID,
+            A.USER_EQUIP_ID,
+            A.USER_HERO_ID,
+            B.EQUIPMENT_ID,
             A.PARENT_EQUIP_CHAIN,
             A.`STATUS`,
             B2.EQUIP_NAME,
@@ -70,9 +55,9 @@
         FROM
             gm_user_hero_equipment_wear A
         LEFT JOIN
-                gm_user_equipment B ON A.GM_USER_EQUIP_ID = B.GM_USER_EQUIPMENT_ID
+                gm_user_equipment B ON A.USER_EQUIP_ID = B.USER_EQUIPMENT_ID
         LEFT JOIN
-                GM_EQUIPMENT_INFO B2 ON B.GM_EQUIPMENT_ID = B2.EQUIP_ID
+                GM_EQUIPMENT_INFO B2 ON B.EQUIPMENT_ID = B2.EQUIP_ID
         <where>
             <if test="status != null and status != ''">
                 AND A.`STATUS` = #{status}
@@ -81,7 +66,7 @@
                 AND B.`STATUS` = #{statusB}
             </if>
             <if test="userHeroId != null and userHeroId != ''">
-                AND A.GM_USER_HERO_ID = #{userHeroId}
+                AND A.USER_HERO_ID = #{userHeroId}
             </if>
             <if test="parentEquipChain != null and parentEquipChain != ''">
                 AND A.PARENT_EQUIP_CHAIN LIKE '%${parentEquipChain}%'

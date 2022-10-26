@@ -2,27 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.gm.modules.order.dao.TransactionOrderDao">
+    <select id="selectPage" resultType="com.gm.modules.basicconfig.entity.ProbabilityEntity">
+        SELECT
+        A.*
+        FROM
+        GM_TRANSACTION_ORDER A
 
-	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.gm.modules.order.entity.TransactionOrderEntity" id="transactionOrderMap">
-        <result property="gmTransactionOrderId" column="GM_TRANSACTION_ORDER_ID"/>
-        <result property="gmUserId" column="GM_USER_ID"/>
-        <result property="itemType" column="ITEM_TYPE"/>
-        <result property="transactionHash" column="TRANSACTION_HASH"/>
-        <result property="itemData" column="ITEM_DATA"/>
-        <result property="status" column="STATUS"/>
-        <result property="transactionFee" column="TRANSACTION_FEE"/>
-        <result property="transactionGasFee" column="TRANSACTION_GAS_FEE"/>
-        <result property="lottyType" column="LOTTY_TYPE"/>
-        <result property="createUser" column="CREATE_USER"/>
-        <result property="createTime" column="CREATE_TIME"/>
-        <result property="createTimeTs" column="CREATE_TIME_TS"/>
-        <result property="updateTime" column="UPDATE_TIME"/>
-        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
-    </resultMap>
+        ${ew.customSqlSegment}
+
+        ORDER BY A.UPDATE_TIME DESC, A.CREATE_TIME DESC
+    </select>
 
     <select id="queryTotalMoneyByUserId" resultType="double">
-        SELECT IFNULL(sum(TRANSACTION_FEE),0) FROM GM_TRANSACTION_ORDER WHERE GM_USER_ID = #{gmUserId} AND CURRENCY_TYPE = '1' AND STATUS = '1'
+        SELECT IFNULL(sum(TRANSACTION_FEE),0) FROM GM_TRANSACTION_ORDER WHERE USER_ID = #{userId} AND CURRENCY_TYPE = '1' AND STATUS = '1'
     </select>
 
     <select id="querySonTotalMoneyByFatherId" resultType="double">
@@ -31,10 +23,10 @@
         FROM
             gm_user t1
             LEFT JOIN gm_user t2 ON t1.USER_ID = t2.FATHER_ID
-            LEFT JOIN gm_transaction_order t3 ON t2.USER_ID = t3.GM_USER_ID
+            LEFT JOIN gm_transaction_order t3 ON t2.USER_ID = t3.USER_ID
         WHERE
             1 = 1
-            AND t1.USER_ID = #{gmUserId}
+            AND t1.USER_ID = #{userId}
     </select>
 
 </mapper>

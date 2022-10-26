@@ -3,7 +3,7 @@ $(function () {
         url: baseURL + 'basicconfig/equipsynthesisitem/list',
         datatype: "json",
         colModel: [			
-			{ label: 'gmEquipSynthesisItemId', name: 'gmEquipSynthesisItemId', index: 'GM_EQUIP_SYNTHESIS_ITEM_ID', width: 50, key: true },
+			{ label: 'equipSynthesisItemId', name: 'equipSynthesisItemId', index: 'EQUIP_SYNTHESIS_ITEM_ID', width: 50, key: true },
 			{ label: '装备名称', name: 'equipName', width: 80 },
 			{ label: '装备稀有度', name: 'equipRare', width: 50 , formatter: function (value, options, row) {
                 var erc = '';
@@ -22,15 +22,15 @@ $(function () {
             }
             },
 			{ label: '装备卷轴名称', name: 'equipFragName', width: 100 , formatter: function (value, options, row) {
-                return value + " *" + row.gmEquipFragNum;
+                return value + " *" + row.equipFragNum;
             }
             },
-			{ label: '需要的卷轴数量', name: 'gmEquipFragNum', index: 'GM_EQUIP_FRAG_NUM', width: 50 },
+			{ label: '需要的卷轴数量', name: 'equipFragNum', index: 'EQUIP_FRAG_NUM', width: 50 },
 			{ label: '装备合成项1', name: 'equipItemName1', width: 80 },
-			{ label: '装备合成项2', name: 'gmEquipSynthesisItem2', index: 'GM_EQUIP_SYNTHESIS_ITEM2', width: 80 }, 			
-			{ label: '装备合成项3', name: 'gmEquipSynthesisItem3', index: 'GM_EQUIP_SYNTHESIS_ITEM3', width: 80 }, 			
-			{ label: '白装', name: 'gmEquipWhite', index: 'GM_EQUIP_WHITE', width: 80 }, 			
-			{ label: '蓝装', name: 'gmEquipBlue', index: 'GM_EQUIP_BLUE', width: 80 }, 			
+			{ label: '装备合成项2', name: 'equipSynthesisItem2', index: 'EQUIP_SYNTHESIS_ITEM2', width: 80 },
+			{ label: '装备合成项3', name: 'equipSynthesisItem3', index: 'EQUIP_SYNTHESIS_ITEM3', width: 80 },
+			{ label: '白装', name: 'equipWhite', index: 'EQUIP_WHITE', width: 80 },
+			{ label: '蓝装', name: 'equipBlue', index: 'EQUIP_BLUE', width: 80 },
 			{ label: '状态', name: 'status', index: 'STATUS', width: 50 , formatter: function (value, options, row) {
                 if (value == '0') {
                     return '<span class="label badge-danger" style="background-color: #ed5565;">禁用</span>';//禁用
@@ -88,18 +88,18 @@ var vm = new Vue({
 			vm.equipSynthesisItem = {};
 		},
 		update: function (event) {
-			var gmEquipSynthesisItemId = getSelectedRow();
-			if(gmEquipSynthesisItemId == null){
+			var equipSynthesisItemId = getSelectedRow();
+			if(equipSynthesisItemId == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmEquipSynthesisItemId)
+            vm.getInfo(equipSynthesisItemId)
 		},
 		saveOrUpdate: function (event) {
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.equipSynthesisItem.gmEquipSynthesisItemId == null ? "basicconfig/equipsynthesisitem/save" : "basicconfig/equipsynthesisitem/update";
+                var url = vm.equipSynthesisItem.equipSynthesisItemId == null ? "basicconfig/equipsynthesisitem/save" : "basicconfig/equipsynthesisitem/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
@@ -121,8 +121,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmEquipSynthesisItemIds = getSelectedRows();
-			if(gmEquipSynthesisItemIds == null){
+			var equipSynthesisItemIds = getSelectedRows();
+			if(equipSynthesisItemIds == null){
 				return ;
 			}
 			var lock = false;
@@ -135,7 +135,7 @@ var vm = new Vue({
                         type: "POST",
                         url: baseURL + "basicconfig/equipsynthesisitem/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmEquipSynthesisItemIds),
+                        data: JSON.stringify(equipSynthesisItemIds),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -149,8 +149,8 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmEquipSynthesisItemId){
-			$.get(baseURL + "basicconfig/equipsynthesisitem/info/"+gmEquipSynthesisItemId, function(r){
+		getInfo: function(equipSynthesisItemId){
+			$.get(baseURL + "basicconfig/equipsynthesisitem/info/"+equipSynthesisItemId, function(r){
                 vm.equipSynthesisItem = r.equipSynthesisItem;
             });
 		},

@@ -4,6 +4,8 @@ import com.gm.modules.basicconfig.entity.StarInfoEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * 
  * 
@@ -13,5 +15,9 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface StarInfoDao extends BaseMapper<StarInfoEntity> {
-	
+    /**
+     * 获取星级信息
+     * @return
+     */
+	List<StarInfoEntity> getStarInfoPro();
 }

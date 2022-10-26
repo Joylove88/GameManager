@@ -23,19 +23,23 @@ public class ProbabilityEntity implements Serializable {
 	 * ID
 	 */
 	@TableId
-	private Long gmProbabilityId;
+	private Long probabilityId;
 	/**
 	 * 概率
 	 */
-	private Double gmPron;
+	private Double pr;
 	/**
 	 * 概率等级
 	 */
-	private Long gmPronLv;
+	private Integer prLv;
+	/**
+	 * 说明
+	 */
+	private String explanation;
 	/**
 	 * 类型:1:英雄，2:装备，3:经验丸
 	 */
-	private String gmType;
+	private String prType;
 	/**
 	 * 状态：0:禁用，1:启用
 	 */

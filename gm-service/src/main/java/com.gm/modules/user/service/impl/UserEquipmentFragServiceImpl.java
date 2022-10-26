@@ -31,7 +31,7 @@ public class UserEquipmentFragServiceImpl extends ServiceImpl<UserEquipmentFragD
                 new Query<UserEquipmentFragEntity>().getPage(params),
                 new QueryWrapper<UserEquipmentFragEntity>()
                 .eq(StringUtils.isNotBlank(status), "A.STATUS", status)
-                .eq(StringUtils.isNotBlank(fragNum), "A.GM_USER_EQUIP_FRAG_NUM", fragNum)
+                .eq(StringUtils.isNotBlank(fragNum), "A.USER_EQUIP_FRAG_NUM", fragNum)
                 .like(StringUtils.isNotBlank(equipName), "C.EQUIP_NAME", equipName)
                 .like(StringUtils.isNotBlank(userName), "D.USER_NAME", userName)
         );

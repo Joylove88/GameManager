@@ -18,7 +18,7 @@ public class UseExpReq {
 	/**
 	 * 玩家英雄ID
 	 */
-	private Long gmUserHeroId;
+	private Long userHeroId;
 	/**
 	 * 英雄等级
 	 */

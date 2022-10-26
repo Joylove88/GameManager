@@ -58,6 +58,10 @@ public class GmUserVipLevelEntity implements Serializable {
 	 */
 	private String vipLevelName;
 	/**
+	 * VIP图标
+	 */
+	private String vipImgUrl;
+	/**
 	 * 消费金额
 	 */
 	private Double consumeMoney;

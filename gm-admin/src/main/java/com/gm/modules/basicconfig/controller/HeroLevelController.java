@@ -47,10 +47,10 @@ public class HeroLevelController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmHeroLeveId}")
+    @RequestMapping("/info/{heroLeveId}")
     @RequiresPermissions("basicconfig:heroleve:info")
-    public R info(@PathVariable("gmHeroLeveId") Long gmHeroLeveId){
-        HeroLevelEntity heroLeve = heroLevelService.getById(gmHeroLeveId);
+    public R info(@PathVariable("heroLeveId") Long heroLeveId){
+        HeroLevelEntity heroLeve = heroLevelService.getById(heroLeveId);
 
         return R.ok().put("heroLeve", heroLeve);
     }
@@ -83,8 +83,8 @@ public class HeroLevelController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("basicconfig:heroleve:delete")
-    public R delete(@RequestBody Long[] gmHeroLeveIds){
-        heroLevelService.removeByIds(Arrays.asList(gmHeroLeveIds));
+    public R delete(@RequestBody Long[] heroLeveIds){
+        heroLevelService.removeByIds(Arrays.asList(heroLeveIds));
 
         return R.ok();
     }

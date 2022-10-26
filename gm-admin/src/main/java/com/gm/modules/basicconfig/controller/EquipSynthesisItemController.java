@@ -47,10 +47,10 @@ public class EquipSynthesisItemController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmEquipSynthesisItemId}")
+    @RequestMapping("/info/{equipSynthesisItemId}")
     @RequiresPermissions("basicconfig:equipsynthesisitem:info")
-    public R info(@PathVariable("gmEquipSynthesisItemId") Long gmEquipSynthesisItemId){
-        EquipSynthesisItemEntity equipSynthesisItem = equipSynthesisItemService.getById(gmEquipSynthesisItemId);
+    public R info(@PathVariable("equipSynthesisItemId") Long equipSynthesisItemId){
+        EquipSynthesisItemEntity equipSynthesisItem = equipSynthesisItemService.getById(equipSynthesisItemId);
 
         return R.ok().put("equipSynthesisItem", equipSynthesisItem);
     }
@@ -83,8 +83,8 @@ public class EquipSynthesisItemController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("basicconfig:equipsynthesisitem:delete")
-    public R delete(@RequestBody Long[] gmEquipSynthesisItemIds){
-        equipSynthesisItemService.removeByIds(Arrays.asList(gmEquipSynthesisItemIds));
+    public R delete(@RequestBody Long[] equipSynthesisItemIds){
+        equipSynthesisItemService.removeByIds(Arrays.asList(equipSynthesisItemIds));
 
         return R.ok();
     }

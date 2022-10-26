@@ -64,7 +64,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 	@Override
 	public UserEntity queryByAddress(String userAddress) {
 		return baseMapper.selectOne(new QueryWrapper<UserEntity>()
-				.eq("USER_WALLET_ADDRESS",userAddress)
+				.eq("ADDRESS",userAddress)
 		);
 	}
 
@@ -75,8 +75,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		userRegister.setSignDate(userEntity.getSignDate());
 		userRegister.setCreateTime(now);
 		userRegister.setCreateTimeTs(now.getTime());
-		userRegister.setUserName(userEntity.getUserWalletAddress());
-		userRegister.setUserWalletAddress(userEntity.getUserWalletAddress());
+		userRegister.setUserName(userEntity.getAddress());
+		userRegister.setAddress(userEntity.getAddress());
 		userRegister.setUserLevelId(1L);
 		userRegister.setFtg(Constant.FTG);
 		userRegister.setScale(1D);
@@ -140,8 +140,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 	}
 
 	@Override
-	public UserEntity queryByUserId(Long gmUserId) {
-		return baseMapper.selectById(gmUserId);
+	public UserEntity queryByUserId(Long userId) {
+		return baseMapper.selectById(userId);
 	}
 
 	@Override

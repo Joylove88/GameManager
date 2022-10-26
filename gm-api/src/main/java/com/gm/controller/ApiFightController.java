@@ -158,7 +158,7 @@ public class ApiFightController {
 
         // 获取背包英雄
         Map<String, Object> userHeroMap = new HashMap<>();
-        userHeroMap.put("gmUserId", user.getUserId());
+        userHeroMap.put("userId", user.getUserId());
         userHeroMap.put("status", Constant.enable);
         userHeroMap.put("statePlay", Constant.disabled);// 默认：未上阵
         List<UserHeroInfoRsp> bagHeros = userHeroService.getUserAllHero(userHeroMap);
@@ -290,7 +290,7 @@ public class ApiFightController {
 
         // 获取背包英雄
         Map<String, Object> userHeroMap = new HashMap<>();
-        userHeroMap.put("gmUserId", user.getUserId());
+        userHeroMap.put("userId", user.getUserId());
         userHeroMap.put("status", Constant.enable);
         userHeroMap.put("statePlay", Constant.disabled);// 默认：未上阵
         List<UserHeroInfoRsp> bagHeros = userHeroService.getUserAllHero(userHeroMap);
@@ -381,7 +381,7 @@ public class ApiFightController {
         // 获取该玩家全部英雄
         Map<String, Object> userHeroMap = new HashMap<>();
         userHeroMap.put("status", Constant.enable);
-        userHeroMap.put("gmUserId", userId);
+        userHeroMap.put("userId", userId);
         List<UserHeroInfoRsp> userHeros = userHeroService.getUserAllHero(userHeroMap);
 
         int i = 0;
@@ -390,7 +390,7 @@ public class ApiFightController {
             Long userHeroId = Long.valueOf(null == heroIdMap.get("userHero" + i) ? Constant.ZERO_ : heroIdMap.get("userHero" + i).toString());
             if (userHeroId != null && !userHeroId.equals(Constant.ZERO)) {
                 // 校验玩家英雄合法性
-                boolean bl = userHeros.stream().anyMatch(a -> a.getGmUserHeroId().equals(userHeroId));
+                boolean bl = userHeros.stream().anyMatch(a -> a.getUserHeroId().equals(userHeroId));
                 if (!bl){
                     throw new RRException("您不是此英雄的归属者!英雄编码：" + userHeroId);
                 }
@@ -437,7 +437,7 @@ public class ApiFightController {
     private UserHeroEntity setUserHeroState(Long userHeroId, String state){
         // 实例化玩家英雄类 (用于更新玩家英雄上下阵状态)
         UserHeroEntity userHero = new UserHeroEntity();
-        userHero.setGmUserHeroId(userHeroId);
+        userHero.setUserHeroId(userHeroId);
         userHero.setStatePlay(state);// 0下阵，1上阵
         return userHero;
     }
@@ -541,7 +541,7 @@ public class ApiFightController {
                     if (!userHeroId.equals(Constant.ZERO)) {
                         // 获取英雄战力
                         for(UserHeroInfoRsp hero : userHeroInfoRsps){
-                            if (hero.getGmUserHeroId().equals(userHeroId)) {
+                            if (hero.getUserHeroId().equals(userHeroId)) {
                                 newPower = newPower + hero.getHeroPower();
                                 newMinter = Arith.add(newMinter, hero.getMinter());
                             }
@@ -561,7 +561,7 @@ public class ApiFightController {
                     if (!userHeroId.equals(0L)) {
                         // 获取英雄战力
                         for(UserHeroInfoRsp hero : userHeroInfoRsps){
-                            if (hero.getGmUserHeroId().equals(userHeroId)) {
+                            if (hero.getUserHeroId().equals(userHeroId)) {
                                 newPower = newPower + hero.getHeroPower();
                                 newMinter = Arith.add(newMinter, hero.getMinter());
                             }

@@ -6,7 +6,7 @@
     <resultMap type="com.gm.modules.user.entity.UserEntity" id="userMap">
         <result property="userId" column="USER_ID"/>
         <result property="userName" column="USER_NAME"/>
-        <result property="userWalletAddress" column="USER_WALLET_ADDRESS"/>
+        <result property="address" column="ADDRESS"/>
         <result property="userLevelId" column="USER_LEVEL_ID"/>
         <result property="userType" column="USER_TYPE"/>
         <result property="clientIp" column="CLIENT_IP"/>
@@ -30,10 +30,10 @@
 
     <select id="queryEffectiveUserCount" resultType="int">
     SELECT
-        COUNT( DISTINCT A.GM_USER_ID )
+        COUNT( DISTINCT A.USER_ID )
     FROM
         gm_transaction_order A
-        LEFT JOIN gm_user B ON A.GM_USER_ID = B.USER_ID
+        LEFT JOIN gm_user B ON A.USER_ID = B.USER_ID
     WHERE
         B.FATHER_ID = #{userId}
         AND A.`STATUS` = '1'
@@ -50,7 +50,7 @@
         FROM
         gm_user_hero
         WHERE
-        GM_USER_ID = a.USER_ID
+        USER_ID = a.USER_ID
         AND `STATUS` = '1'
         ) AS hero_count,
         (
@@ -59,9 +59,9 @@
         FROM
         gm_user_hero
         WHERE
-        GM_USER_ID = a.USER_ID
+        USER_ID = a.USER_ID
         AND `STATUS` = '1'
-        AND SKIN_LEVEL = 1
+        AND SKIN_TYPE = 1
         ) AS gold_hero_count,
         (
         SELECT
@@ -69,24 +69,28 @@
         FROM
         gm_user_equipment
         WHERE
-        GM_USER_ID = a.USER_ID
+        USER_ID = a.USER_ID
         AND `STATUS` != '0'
         ) AS equipment_count,
         b.LEVEL_CODE,
         b.PROMOTION_EXPERIENCE,
         b.EXPERIENCE_TOTAL,
-        c.TOTAL_AMOUNT AS gold_coins,
-        a.USER_WALLET_ADDRESS AS ADDRESS,
+        c.TOTAL_AMOUNT AS mr_coins,
+        a.ADDRESS AS ADDRESS,
         a.TOTAL_POWER AS POWER,
         a.IMG_URL,
-        a.FTG
+        a.FTG,
+        d.VIP_LEVEL_CODE,
+        d.VIP_LEVEL_NAME,
+        d.VIP_IMG_URL
         FROM
         gm_user a
         LEFT JOIN gm_user_level b ON a.USER_LEVEL_ID = b.ID
         LEFT JOIN gm_user_account c ON a.USER_ID = c.USER_ID
+        LEFT JOIN gm_user_vip_level d ON a.VIP_LEVEL_ID = d.VIP_LEVEL_ID
         <where>
             <if test="address != null and address != ''">
-                AND a.USER_WALLET_ADDRESS = #{address}
+                AND a.ADDRESS = #{address}
             </if>
         </where>
     </select>

@@ -49,10 +49,10 @@ public class HeroSkillController extends AbstractController{
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmHeroSkillId}")
+    @RequestMapping("/info/{heroSkillId}")
     @RequiresPermissions("basicconfig:heroskill:info")
-    public R info(@PathVariable("gmHeroSkillId") Long gmHeroSkillId){
-        HeroSkillEntity heroSkill = heroSkillService.getById(gmHeroSkillId);
+    public R info(@PathVariable("heroSkillId") Long heroSkillId){
+        HeroSkillEntity heroSkill = heroSkillService.getById(heroSkillId);
 
         return R.ok().put("heroSkill", heroSkill);
     }
@@ -94,8 +94,8 @@ public class HeroSkillController extends AbstractController{
      */
     @RequestMapping("/delete")
     @RequiresPermissions("basicconfig:heroskill:delete")
-    public R delete(@RequestBody Long[] gmHeroSkillIds){
-        heroSkillService.removeByIds(Arrays.asList(gmHeroSkillIds));
+    public R delete(@RequestBody Long[] heroSkillIds){
+        heroSkillService.removeByIds(Arrays.asList(heroSkillIds));
 
         return R.ok();
     }

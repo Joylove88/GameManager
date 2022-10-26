@@ -47,10 +47,10 @@ public class UserHeroController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmUserHeroId}")
+    @RequestMapping("/info/{userHeroId}")
     @RequiresPermissions("user:userhero:info")
-    public R info(@PathVariable("gmUserHeroId") Long gmUserHeroId){
-        UserHeroEntity userHero = userHeroService.getById(gmUserHeroId);
+    public R info(@PathVariable("userHeroId") Long userHeroId){
+        UserHeroEntity userHero = userHeroService.getById(userHeroId);
 
         return R.ok().put("userHero", userHero);
     }
@@ -83,8 +83,8 @@ public class UserHeroController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("user:userhero:delete")
-    public R delete(@RequestBody Long[] gmUserHeroIds){
-        userHeroService.removeByIds(Arrays.asList(gmUserHeroIds));
+    public R delete(@RequestBody Long[] userHeroIds){
+        userHeroService.removeByIds(Arrays.asList(userHeroIds));
 
         return R.ok();
     }

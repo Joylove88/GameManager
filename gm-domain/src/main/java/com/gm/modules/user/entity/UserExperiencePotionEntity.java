@@ -25,15 +25,15 @@ public class UserExperiencePotionEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Long gmUserExPotionId;
+	private Long userExPotionId;
 	/**
 	 * 经验药水ID
 	 */
-	private Long gmExPotionId;
+	private Long exPotionId;
 	/**
 	 * 用户ID
 	 */
-	private Long gmUserId;
+	private Long userId;
 	/**
 	 * 经验药水数量
 	 */
@@ -76,6 +76,6 @@ public class UserExperiencePotionEntity implements Serializable {
 	@TableField(exist = false)
 	private Long exValue;
 	@TableField(exist = false)
-	private String gmUserHeroId;
+	private String userHeroId;
 
 }

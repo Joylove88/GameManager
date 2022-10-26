@@ -28,19 +28,19 @@ public class DrawForm {
     @ApiModelProperty(value = "交易hash")
     private String transactionHash;
     /**
-     * 抽奖类型('1':单抽，'2':十连抽)
+     * 召唤次数
      */
-    @ApiModelProperty(value = "抽奖类型")
-    private String drawType;
+    @ApiModelProperty(value = "召唤次数")
+    private Integer summonNum;
+    /**
+     * 召唤类型('1':英雄，'2':装备，'3':药水)
+     */
+    private String summonType;
     /**
      * 货币类型0:金币，1:加密货币
      */
     @ApiModelProperty(value = "货币类型")
     private String curType;
-    /**
-     * 物品类型('1':英雄，'2':装备，'3':药水)
-     */
-    private String itemType;
 
     private BigDecimal fee;
 

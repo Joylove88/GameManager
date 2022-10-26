@@ -3,22 +3,6 @@
 
 <mapper namespace="com.gm.modules.basicconfig.dao.ExperiencePotionDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.gm.modules.basicconfig.entity.ExperiencePotionEntity" id="experiencePotionMap">
-        <result property="gmExPotionId" column="GM_EX_POTION_ID"/>
-        <result property="exPotionName" column="EX_POTION_NAME"/>
-        <result property="exPotionRareCode" column="EX_POTION_RARE_CODE"/>
-        <result property="exValue" column="EX_VALUE"/>
-        <result property="exDescription" column="EX_DESCRIPTION"/>
-        <result property="status" column="STATUS"/>
-        <result property="createUser" column="CREATE_USER"/>
-        <result property="createTime" column="CREATE_TIME"/>
-        <result property="createTimeTs" column="CREATE_TIME_TS"/>
-        <result property="updateUser" column="UPDATE_USER"/>
-        <result property="updateTime" column="UPDATE_TIME"/>
-        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
-    </resultMap>
-
     <select id="getExpInfos" resultType="com.gm.modules.basicconfig.entity.ExperiencePotionEntity">
         SELECT
         A.*

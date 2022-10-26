@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -25,39 +24,39 @@ public class EquipSynthesisItemEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Long gmEquipSynthesisItemId;
+	private Long equipSynthesisItemId;
 	/**
 	 * 装备ID
 	 */
-	private Long gmEquipmentId;
+	private Long equipmentId;
 	/**
 	 * 装备碎片ID
 	 */
-	private Long gmEquipmentFragId;
+	private Long equipmentFragId;
 	/**
 	 * 需要的碎片数量
 	 */
-	private Long gmEquipFragNum;
+	private Long equipFragNum;
 	/**
 	 * 装备合成项1
 	 */
-	private String gmEquipSynthesisItem1;
+	private String equipSynthesisItem1;
 	/**
 	 * 装备合成项2
 	 */
-	private String gmEquipSynthesisItem2;
+	private String equipSynthesisItem2;
 	/**
 	 * 装备合成项3
 	 */
-	private String gmEquipSynthesisItem3;
+	private String equipSynthesisItem3;
 	/**
 	 * 白装
 	 */
-	private String gmEquipWhite;
+	private String equipWhite;
 	/**
 	 * 蓝装
 	 */
-	private String gmEquipBlue;
+	private String equipBlue;
 	/**
 	 * 状态('0':禁用，'1':启用)
 	 */

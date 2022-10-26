@@ -3,10 +3,10 @@ $(function () {
         url: baseURL + 'user/userhero/list',
         datatype: "json",
         colModel: [			
-			{ label: 'gmUserHeroId', name: 'gmUserHeroId', index: 'GM_USER_HERO_ID', width: 50, key: true, hidden:true},
+			{ label: 'userHeroId', name: 'userHeroId', index: 'USER_HERO_ID', width: 50, key: true, hidden:true},
 			{ label: '会员名称', name: 'userName', width: 80 },
             { label: '英雄信息', name: 'heroName', width: 80 , formatter: function (value, options, row) {
-                var starCode = row.gmStarCode != null && row.gmStarCode != 0 ? row.gmStarCode : 0;
+                var starCode = row.starCode != null && row.starCode != 0 ? row.starCode : 0;
                 var starName = "";
                 for (var i = 0; i < starCode; i++) {
                     starName += "★";
@@ -15,7 +15,7 @@ $(function () {
             }
             },
             { label: '英雄战力', name: 'heroPower', width: 80 },
-            { label: '英雄等级', name: 'gmLevelName', width: 80 },
+            { label: '英雄等级', name: 'levelName', width: 80 },
             { label: '累计获得的经验', name: 'experienceObtain', width: 80 },
             { label: '状态', name: 'status', index: 'STATUS', width: 80, formatter: function (value, options, row) {
                     if (value == '0') {
@@ -32,7 +32,7 @@ $(function () {
             { label: '修改时间', name: 'updateTime', index: 'UPDATE_TIME', width: 80},
             {label: '操作', name: '', align: 'center', width: 60, formatter: function (value, options, row) {
                 var html = '';
-                    html += '<i class="fa fa-solid fa-flask" onclick="vm.useEx(\''+row.gmUserId+'\',\''+row.gmUserHeroId+'\');" style="color: #1e84c5;cursor: pointer;line-height: 18px;font-size:20px;"><span style="display:none">使用经验药水</span></i>';
+                    html += '<i class="fa fa-solid fa-flask" onclick="vm.useEx(\''+row.userId+'\',\''+row.userHeroId+'\');" style="color: #1e84c5;cursor: pointer;line-height: 18px;font-size:20px;"><span style="display:none">使用经验药水</span></i>';
                 return html;
             }}
         ],
@@ -73,7 +73,7 @@ var vm = new Vue({
             starCode: '',
             status: '',
             userName: '',
-            gmLevelName: ''
+            levelName: ''
         },
 		userHero: {},
         userExList: {},
@@ -89,18 +89,18 @@ var vm = new Vue({
 			vm.userHero = {};
 		},
 		update: function (event) {
-			var gmUserHeroId = getSelectedRow();
-			if(gmUserHeroId == null){
+			var userHeroId = getSelectedRow();
+			if(userHeroId == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmUserHeroId)
+            vm.getInfo(userHeroId)
 		},
 		saveOrUpdate: function (event) {
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.userHero.gmUserHeroId == null ? "user/userhero/save" : "user/userhero/update";
+                var url = vm.userHero.userHeroId == null ? "user/userhero/save" : "user/userhero/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
@@ -122,8 +122,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmUserHeroIds = getSelectedRows();
-			if(gmUserHeroIds == null){
+			var userHeroIds = getSelectedRows();
+			if(userHeroIds == null){
 				return ;
 			}
 			var lock = false;
@@ -136,7 +136,7 @@ var vm = new Vue({
                         type: "POST",
                         url: baseURL + "user/userhero/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmUserHeroIds),
+                        data: JSON.stringify(userHeroIds),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -150,13 +150,13 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmUserHeroId){
-			$.get(baseURL + "user/userhero/info/"+gmUserHeroId, function(r){
+		getInfo: function(userHeroId){
+			$.get(baseURL + "user/userhero/info/"+userHeroId, function(r){
                 vm.userHero = r.userHero;
             });
 		},
         getUserExs: function (userId) {
-		    vm.userExInfo.gmUserId = userId;
+		    vm.userExInfo.userId = userId;
             $.ajax({
                 type: "POST",
                 url: baseURL + "user/userhero/getUserExs",
@@ -171,7 +171,7 @@ var vm = new Vue({
                 }
             });
         },
-        useEx: function (userId,gmUserHeroId) {
+        useEx: function (userId,userHeroId) {
 		    vm.userExInfo = {userExNum: 0,exPotionRarecode: 1};
 		    vm.getUserExs(userId);
             layer.open({
@@ -187,8 +187,8 @@ var vm = new Vue({
                         layer.msg("使用数量不能为0!");
                         return;
                     }
-                    vm.userExInfo.gmUserId = userId;
-                    vm.userExInfo.gmUserHeroId = gmUserHeroId;
+                    vm.userExInfo.userId = userId;
+                    vm.userExInfo.userHeroId = userHeroId;
                     $.ajax({
                         type: "POST",
                         url: baseURL + "user/userhero/userHeroUseEx",
@@ -211,7 +211,7 @@ var vm = new Vue({
 			vm.showList = true;
 			var page = $("#jqGrid").jqGrid('getGridParam','page');
 			$("#jqGrid").jqGrid('setGridParam',{
-                postData: {'heroName': vm.q.heroName, 'userName': vm.q.userName, 'status': vm.q.status, 'starCode': vm.q.starCode, 'gmLevelName': vm.q.gmLevelName},
+                postData: {'heroName': vm.q.heroName, 'userName': vm.q.userName, 'status': vm.q.status, 'starCode': vm.q.starCode, 'levelName': vm.q.levelName},
                 page:page
             }).trigger("reloadGrid");
 		}

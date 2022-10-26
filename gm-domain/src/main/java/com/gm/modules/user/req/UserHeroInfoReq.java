@@ -10,11 +10,11 @@ public class UserHeroInfoReq {
 	/**
 	 * ID
 	 */
-	private Long gmUserHeroId;
+	private Long userHeroId;
 	/**
 	 * 玩家装备ID
 	 */
-	private Long gmUserEquipmentId;
+	private Long userEquipmentId;
 	/**
 	 * 父子级装备链
 	 */

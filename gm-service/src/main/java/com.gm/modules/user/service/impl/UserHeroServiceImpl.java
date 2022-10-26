@@ -26,15 +26,15 @@ public class UserHeroServiceImpl extends ServiceImpl<UserHeroDao, UserHeroEntity
         String userName = (String) params.get("userName");
         String heroName = (String) params.get("heroName");
         String status = (String) params.get("status");
-        String gmStarCode = (String) params.get("gmStarCode");
-        String gmLevelName = (String) params.get("gmLevelName");
+        String starCode = (String) params.get("starCode");
+        String levelName = (String) params.get("levelName");
         IPage<UserHeroEntity> page = this.page(
                 new Query<UserHeroEntity>().getPage(params),
                 new QueryWrapper<UserHeroEntity>()
                 .eq(StringUtils.isNotBlank(status), "A.STATUS", status)
-                .eq(StringUtils.isNotBlank(gmStarCode), "D.GM_STAR_CODE", gmStarCode)
-                .eq(StringUtils.isNotBlank(gmLevelName), "F.GM_LEVEL_NAME", gmLevelName)
-                .like(StringUtils.isNotBlank(heroName), "C.HERO_NAME", heroName)
+                .eq(StringUtils.isNotBlank(starCode), "A.STAR_CODE", starCode)
+                .eq(StringUtils.isNotBlank(levelName), "F.LEVEL_NAME", levelName)
+                .like(StringUtils.isNotBlank(heroName), "B.HERO_NAME", heroName)
                 .like(StringUtils.isNotBlank(userName), "E.USER_NAME", userName)
 
         );

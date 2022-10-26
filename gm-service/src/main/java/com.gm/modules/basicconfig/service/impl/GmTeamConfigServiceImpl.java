@@ -31,7 +31,7 @@ public class GmTeamConfigServiceImpl extends ServiceImpl<GmTeamConfigDao, GmTeam
                 new Query<GmTeamConfigEntity>().getPage(params),
                 new QueryWrapper<GmTeamConfigEntity>()
                         .eq(StringUtils.isNotBlank(status), "a.STATUS", status)
-                        .like(StringUtils.isNotBlank(userAddress), "b.USER_WALLET_ADDRESS", userAddress)
+                        .like(StringUtils.isNotBlank(userAddress), "b.ADDRESS", userAddress)
         );
 
         return new PageUtils(page);

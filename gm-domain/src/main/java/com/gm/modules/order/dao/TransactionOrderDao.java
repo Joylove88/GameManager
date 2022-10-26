@@ -17,10 +17,10 @@ public interface TransactionOrderDao extends BaseMapper<TransactionOrderEntity> 
     /**
      * 根据用户ID查询该用户消费总额
      */
-    Double queryTotalMoneyByUserId(Long gmUserId);
+    Double queryTotalMoneyByUserId(Long userId);
 
     /**
      * 根据用户ID查询该用户儿子的消费总额
      */
-    Double querySonTotalMoneyByFatherId(Long gmUserId);
+    Double querySonTotalMoneyByFatherId(Long userId);
 }

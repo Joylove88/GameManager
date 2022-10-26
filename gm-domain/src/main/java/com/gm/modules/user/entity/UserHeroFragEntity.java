@@ -24,19 +24,19 @@ public class UserHeroFragEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Long gmUserHeroFragId;
+	private Long userHeroFragId;
 	/**
 	 * 英雄碎片ID
 	 */
-	private Long gmHeroFragId;
+	private Long heroFragId;
 	/**
 	 * 用户ID
 	 */
-	private Long gmUserId;
+	private Long userId;
 	/**
 	 * 玩家获得碎片数量
 	 */
-	private Long gmUserHeroFragNum;
+	private Integer userHeroFragNum;
 	/**
 	 * 铸造HASH
 	 */

@@ -33,7 +33,7 @@ public class UserEntity implements Serializable {
 	/**
 	 * 用户钱包地址
 	 */
-	private String userWalletAddress;
+	private String address;
 	/**
 	 * 用户nonce
 	 */

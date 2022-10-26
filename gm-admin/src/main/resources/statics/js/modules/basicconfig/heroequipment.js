@@ -5,7 +5,7 @@ $(function () {
         url: baseURL + 'basicconfig/heroequipment/list',
         datatype: "json",
         colModel: [			
-			{ label: 'gmHeroEquipmentId', name: 'gmHeroEquipmentId', index: 'GM_HERO_EQUIPMENT_ID', width: 50, key: true },
+			{ label: 'heroEquipmentId', name: 'heroEquipmentId', index: 'HERO_EQUIPMENT_ID', width: 50, key: true },
 			{ label: '英雄', name: 'heroName', width: 80 },
 			{ label: '装备', name: 'equipName', width: 80 },
             { label: '装备稀有度', name: 'equipRarecode', width: 80, formatter: function (value, options, row) {
@@ -24,7 +24,7 @@ $(function () {
                 return erc;
             }
             },
-			{ label: '装备位置', name: 'gmEquipSolt', width: 80 },
+			{ label: '装备位置', name: 'equipSolt', width: 80 },
 			{ label: '状态', name: 'status', index: 'STATUS', width: 80, formatter: function (value, options, row) {
                 if (value == '0') {
                     return '<span class="label badge-danger" style="background-color: #ed5565;">禁用</span>';//禁用
@@ -81,22 +81,22 @@ var vm = new Vue({
 		add: function(){
 			vm.showList = false;
 			vm.title = "新增";
-			vm.heroEquipment = {gmHeroId: '', gmEquipId: '', status: '1', gmEquipSolt: 1};
+			vm.heroEquipment = {heroId: '', equipId: '', status: '1', equipSolt: 1};
             $('#searchEngine').val('');
 		},
 		update: function (event) {
-			var gmHeroEquipmentId = getSelectedRow();
-			if(gmHeroEquipmentId == null){
+			var heroEquipmentId = getSelectedRow();
+			if(heroEquipmentId == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmHeroEquipmentId)
+            vm.getInfo(heroEquipmentId)
 		},
 		saveOrUpdate: function (event) {
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.heroEquipment.gmHeroEquipmentId == null ? "basicconfig/heroequipment/save" : "basicconfig/heroequipment/update";
+                var url = vm.heroEquipment.heroEquipmentId == null ? "basicconfig/heroequipment/save" : "basicconfig/heroequipment/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
@@ -118,8 +118,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmHeroEquipmentIds = getSelectedRows();
-			if(gmHeroEquipmentIds == null){
+			var heroEquipmentIds = getSelectedRows();
+			if(heroEquipmentIds == null){
 				return ;
 			}
 			var lock = false;
@@ -132,7 +132,7 @@ var vm = new Vue({
                         type: "POST",
                         url: baseURL + "basicconfig/heroequipment/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmHeroEquipmentIds),
+                        data: JSON.stringify(heroEquipmentIds),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -146,10 +146,10 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmHeroEquipmentId){
-			$.get(baseURL + "basicconfig/heroequipment/info/"+gmHeroEquipmentId, function(r){
+		getInfo: function(heroEquipmentId){
+			$.get(baseURL + "basicconfig/heroequipment/info/"+heroEquipmentId, function(r){
                 vm.heroEquipment = r.heroEquipment;
-                $('#searchEngine').val(vm.heroEquipment.gmEquipId);
+                $('#searchEngine').val(vm.heroEquipment.equipId);
                 vm.getEquipmentInfoList();
             });
 		},
@@ -169,7 +169,7 @@ var vm = new Vue({
         },
         getSEValue: function () {
             var getSEValue = $('#searchEngineD .option-selected').data('value');
-            vm.heroEquipment.gmEquipId = getSEValue;
+            vm.heroEquipment.equipId = getSEValue;
         },
         getEquipmentInfoList: function () {
             $.get(baseURL + "basicconfig/equipmentinfo/getEquipmentInfoList", function (r) {
@@ -179,7 +179,7 @@ var vm = new Vue({
                     var searchEngine = $('#searchEngine');
                     searchEngine.append("<option value='' selected='selected'>请选择</option>");
                     for (var i = 0; i < vm.equipmentInfoList.length; i++){
-                        var selected =  vm.equipmentInfoList[i].equipId == vm.heroEquipment.gmEquipId ? 'selected="selected"' : '';
+                        var selected =  vm.equipmentInfoList[i].equipId == vm.heroEquipment.equipId ? 'selected="selected"' : '';
                         searchEngine.append("<option "+selected+" value='"+vm.equipmentInfoList[i].equipId+"'>"+vm.equipmentInfoList[i].equipName+"</option>");
                     }
                     $('#searchEngine').comboSelect();

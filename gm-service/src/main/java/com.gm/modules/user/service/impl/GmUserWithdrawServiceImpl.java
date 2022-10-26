@@ -84,7 +84,7 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
         //转账数量
         String amount = useWithdrawReq.getWithdrawMoney();
         //接收者地址
-        String to = user.getUserWalletAddress();
+        String to = user.getAddress();
         //出款合约地址
         String coinAddress = "0x4d9e7fb8503b72b9aD8fc94366899aa99Ab89807";
         //usdt合约地址

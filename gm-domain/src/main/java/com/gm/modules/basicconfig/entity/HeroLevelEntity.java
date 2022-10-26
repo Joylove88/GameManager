@@ -23,35 +23,35 @@ public class HeroLevelEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Long gmHeroLeveId;
+	private Long heroLeveId;
 	/**
 	 * 等级名称
 	 */
-	private String gmLevelName;
+	private String levelName;
 	/**
 	 * 等级描述
 	 */
-	private String gmLevelDesc;
+	private String levelDesc;
 	/**
 	 * 等级编码
 	 */
-	private Integer gmLevelCode;
+	private Integer levelCode;
 	/**
 	 * 是否默认，1是，0否
 	 */
-	private String gmFlag;
+	private String flag;
 	/**
 	 * 是否删除，1是，0否
 	 */
-	private String gmDeleted;
+	private String deleted;
 	/**
 	 * 晋级到下一级所需经验值
 	 */
-	private Long gmPromotionExperience;
+	private Long promotionExperience;
 	/**
 	 * 升级所需累计经验
 	 */
-	private Long gmExperienceTotal;
+	private Long experienceTotal;
 	/**
 	 * 创建人
 	 */

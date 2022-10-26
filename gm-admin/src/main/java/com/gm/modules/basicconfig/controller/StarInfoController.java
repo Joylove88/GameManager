@@ -50,10 +50,10 @@ public class StarInfoController extends AbstractController{
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmStarId}")
+    @RequestMapping("/info/{starId}")
     @RequiresPermissions("basicconfig:starinfo:info")
-    public R info(@PathVariable("gmStarId") Long gmStarId){
-        StarInfoEntity starInfo = starInfoService.getById(gmStarId);
+    public R info(@PathVariable("starId") Long starId){
+        StarInfoEntity starInfo = starInfoService.getById(starId);
 
         return R.ok().put("starInfo", starInfo);
     }
@@ -100,8 +100,8 @@ public class StarInfoController extends AbstractController{
     @SysLog("删除星级配置")
     @RequestMapping("/delete")
     @RequiresPermissions("basicconfig:starinfo:delete")
-    public R delete(@RequestBody Long[] gmStarIds){
-        starInfoService.removeByIds(Arrays.asList(gmStarIds));
+    public R delete(@RequestBody Long[] starIds){
+        starInfoService.removeByIds(Arrays.asList(starIds));
 
         return R.ok();
     }

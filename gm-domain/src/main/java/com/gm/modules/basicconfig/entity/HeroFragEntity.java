@@ -24,15 +24,15 @@ public class HeroFragEntity implements Serializable {
 	 * ID
 	 */
 	@TableId
-	private Long gmHeroFragId;
+	private Long heroFragId;
 	/**
 	 * 英雄ID
 	 */
-	private Long gmHeroInfoId;
+	private Long heroInfoId;
 	/**
 	 * 英雄碎片数量 默认1
 	 */
-	private Long gmHeroFragNum;
+	private Long heroFragNum;
 	/**
 	 * 物品估值
 	 */

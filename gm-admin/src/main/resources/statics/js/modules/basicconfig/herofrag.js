@@ -4,10 +4,10 @@ $(function () {
         url: baseURL + 'basicconfig/herofrag/list',
         datatype: "json",
         colModel: [			
-			{ label: 'gmHeroFragId', name: 'gmHeroFragId', index: 'GM_HERO_FRAG_ID', width: 50, key: true, hidden:true },
-			{ label: '英雄ID', name: 'gmHeroInfoId', index: 'GM_HERO_INFO_ID', width: 80, hidden:true },
+			{ label: 'heroFragId', name: 'heroFragId', index: 'HERO_FRAG_ID', width: 50, key: true, hidden:true },
+			{ label: '英雄ID', name: 'heroInfoId', index: 'HERO_INFO_ID', width: 80, hidden:true },
             { label: '英雄名称', name: 'heroName', width: 80 },
-			{ label: '英雄碎片数量', name: 'gmHeroFragNum', index: 'GM_HERO_FRAG_NUM', width: 80 },
+			{ label: '英雄碎片数量', name: 'heroFragNum', index: 'HERO_FRAG_NUM', width: 80 },
             { label: '状态', name: 'status', index: 'STATUS', width: 80 , formatter: function (value, options, row) {
                     if (value == '0') {
                         return '<span class="label badge-danger" style="background-color: #ed5565;">禁用</span>';//禁用
@@ -67,21 +67,21 @@ var vm = new Vue({
 		add: function(){
 			vm.showList = false;
 			vm.title = "新增";
-			vm.heroFrag = {gmHeroInfoId: '', gmHeroFragNum: 1, itemValuation: 0, status: '1'};
+			vm.heroFrag = {heroInfoId: '', heroFragNum: 1, itemValuation: 0, status: '1'};
 		},
 		update: function (event) {
-			var gmHeroFragId = getSelectedRow();
-			if(gmHeroFragId == null){
+			var heroFragId = getSelectedRow();
+			if(heroFragId == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmHeroFragId)
+            vm.getInfo(heroFragId)
 		},
 		saveOrUpdate: function (event) {
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.heroFrag.gmHeroFragId == null ? "basicconfig/herofrag/save" : "basicconfig/herofrag/update";
+                var url = vm.heroFrag.heroFragId == null ? "basicconfig/herofrag/save" : "basicconfig/herofrag/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
@@ -103,8 +103,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmHeroFragIds = getSelectedRows();
-			if(gmHeroFragIds == null){
+			var heroFragIds = getSelectedRows();
+			if(heroFragIds == null){
 				return ;
 			}
 			var lock = false;
@@ -117,7 +117,7 @@ var vm = new Vue({
                         type: "POST",
                         url: baseURL + "basicconfig/herofrag/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmHeroFragIds),
+                        data: JSON.stringify(heroFragIds),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -131,8 +131,8 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmHeroFragId){
-			$.get(baseURL + "basicconfig/herofrag/info/"+gmHeroFragId, function(r){
+		getInfo: function(heroFragId){
+			$.get(baseURL + "basicconfig/herofrag/info/"+heroFragId, function(r){
                 vm.heroFrag = r.heroFrag;
             });
 		},

@@ -18,7 +18,7 @@
 
     <select id="selectPage" resultType="com.gm.modules.basicconfig.entity.GmTeamConfigEntity">
         SELECT
-            a.*, b.USER_WALLET_ADDRESS AS USER_ADDRESS
+            a.*, b.ADDRESS AS USER_ADDRESS
         FROM
             gm_team_config a
         LEFT JOIN gm_user b ON b.USER_ID = a.USER_ID
@@ -41,12 +41,12 @@
             <if test="dungeonId != null and dungeonId != ''">
                 AND DUNGEON_ID = #{dungeonId}
             </if>
-            <if test="gmUserHeroId != null and gmUserHeroId != ''">
-                AND (USER_HERO1_ID = #{gmUserHeroId}
-                OR USER_HERO2_ID = #{gmUserHeroId}
-                OR USER_HERO3_ID = #{gmUserHeroId}
-                OR USER_HERO4_ID = #{gmUserHeroId}
-                OR USER_HERO5_ID = #{gmUserHeroId})
+            <if test="userHeroId != null and userHeroId != ''">
+                AND (USER_HERO1_ID = #{userHeroId}
+                OR USER_HERO2_ID = #{userHeroId}
+                OR USER_HERO3_ID = #{userHeroId}
+                OR USER_HERO4_ID = #{userHeroId}
+                OR USER_HERO5_ID = #{userHeroId})
             </if>
         </where>
         ORDER BY TEAM_SOLT ASC

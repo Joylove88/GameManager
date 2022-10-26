@@ -51,7 +51,74 @@ public class HeroInfoEntity implements Serializable {
 	 * 英雄描述
 	 */
 	private String heroDescription;
-
+	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
+	/**
+	 * 初始生命值
+	 */
+	private Long health;
+	/**
+	 * 成长属性-生命值
+	 */
+	private Long growHealth;
+	/**
+	 * 初始法力值
+	 */
+	private Long mana;
+	/**
+	 * 成长属性-法力值
+	 */
+	private Long growMana;
+	/**
+	 * 初始生命值恢复
+	 */
+	private Double healthRegen;
+	/**
+	 * 成长属性-生命值恢复
+	 */
+	private Double growHealthRegen;
+	/**
+	 * 初始法力值恢复
+	 */
+	private Double manaRegen;
+	/**
+	 * 成长属性-法力值恢复
+	 */
+	private Double growManaRegen;
+	/**
+	 * 初始护甲
+	 */
+	private Long armor;
+	/**
+	 * 成长属性-护甲
+	 */
+	private Long growArmor;
+	/**
+	 * 初始魔抗
+	 */
+	private Long magicResist;
+	/**
+	 * 成长属性-魔抗
+	 */
+	private Long growMagicResist;
+	/**
+	 * 初始攻击力
+	 */
+	private Long attackDamage;
+	/**
+	 * 成长属性-攻击力
+	 */
+	private Long growAttackDamage;
+	/**
+	 * 初始法攻
+	 */
+	private Long attackSpell;
+	/**
+	 * 成长属性-法攻
+	 */
+	private Long growAttackSpell;
 	/**
 	 * 状态('0':禁用，'1':启用)
 	 */

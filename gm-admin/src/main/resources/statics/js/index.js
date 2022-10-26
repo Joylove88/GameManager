@@ -101,25 +101,25 @@ var vm = new Vue({
                 btn: ['取消'],
             });
         },
-		testDrawStart: function (type) {
-            if(type == 1){
+		testDrawStart: function (summonNum) {
+            if(summonNum == 1){
                 $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
                     vm.testDrawStartGo(1);
                 });
             } else {
                 $('#btnSaveOrUpdate2').button('loading').delay(1000).queue(function() {
-                    vm.testDrawStartGo(2);
+                    vm.testDrawStartGo(10);
                 });
             }
         },
-        testDrawStartGo: function (type) {
-            vm.testDrawStarts.drawType = type;
-            var btnName = type == 1 ? 'btnSaveOrUpdate' : 'btnSaveOrUpdate2';
+        testDrawStartGo: function (summonNum) {
+            vm.testDrawStarts.summonNum = summonNum;
+            var btnName = summonNum == 1 ? 'btnSaveOrUpdate' : 'btnSaveOrUpdate2';
             $.ajax({
                 type: "POST",
                 url: "user/userherofrag/testDrawStart",
                 contentType: "application/json",
-                data: JSON.stringify(vm.testDrawStarts.drawType),
+                data: JSON.stringify(vm.testDrawStarts.summonNum),
                 success: function(r){
                     if(r.code === 0){
                         layer.msg("抽奖成功", {icon: 1});

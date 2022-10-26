@@ -29,4 +29,14 @@
             </if>
         </where>
     </select>
+
+    <!--获取英雄信息-->
+    <select id="getHeroInfoPro" resultType="com.gm.modules.basicconfig.entity.HeroInfoEntity">
+        SELECT
+        A.*
+        FROM
+        GM_HERO_INFO A
+        WHERE
+        A.`STATUS` = '1'
+    </select>
 </mapper>

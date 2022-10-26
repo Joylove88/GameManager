@@ -23,11 +23,23 @@ public class UserInfoRsp {
 	/**
 	 * 总资产
 	 */
-	private Double goldCoins;
+	private Double mrCoins;
 	/**
 	 * 玩家级别
 	 */
 	private Long levelCode;
+	/**
+	 * VIP等级
+	 */
+	private Long vipLevelCode;
+	/**
+	 * VIP名称
+	 */
+	private String vipLevelName;
+	/**
+	 * VIP图标
+	 */
+	private String vipImgUrl;
 	/**
 	 * 晋级到下一级所需经验值
 	 */

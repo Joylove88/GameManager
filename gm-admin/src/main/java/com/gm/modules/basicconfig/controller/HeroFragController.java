@@ -51,10 +51,10 @@ public class HeroFragController extends AbstractController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{gmHeroFragId}")
+    @RequestMapping("/info/{heroFragId}")
     @RequiresPermissions("basicconfig:herofrag:info")
-    public R info(@PathVariable("gmHeroFragId") Long gmHeroFragId){
-        HeroFragEntity heroFrag = heroFragService.getById(gmHeroFragId);
+    public R info(@PathVariable("heroFragId") Long heroFragId){
+        HeroFragEntity heroFrag = heroFragService.getById(heroFragId);
 
         return R.ok().put("heroFrag", heroFrag);
     }
@@ -98,8 +98,8 @@ public class HeroFragController extends AbstractController {
     @SysLog("删除奖池英雄碎片")
     @RequestMapping("/delete")
     @RequiresPermissions("basicconfig:herofrag:delete")
-    public R delete(@RequestBody Long[] gmHeroFragIds){
-        heroFragService.removeByIds(Arrays.asList(gmHeroFragIds));
+    public R delete(@RequestBody Long[] heroFragIds){
+        heroFragService.removeByIds(Arrays.asList(heroFragIds));
 
         return R.ok();
     }

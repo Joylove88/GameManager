@@ -31,7 +31,7 @@ public class UserHeroFragServiceImpl extends ServiceImpl<UserHeroFragDao, UserHe
                 new Query<UserHeroFragEntity>().getPage(params),
                 new QueryWrapper<UserHeroFragEntity>()
                 .eq(StringUtils.isNotBlank(status), "A.STATUS", status)
-                .eq(StringUtils.isNotBlank(fragNum), "A.GM_USER_HERO_FRAG_NUM", fragNum)
+                .eq(StringUtils.isNotBlank(fragNum), "A.USER_HERO_FRAG_NUM", fragNum)
                 .like(StringUtils.isNotBlank(heroName), "C.HERO_NAME", heroName)
                 .like(StringUtils.isNotBlank(userName), "D.USER_NAME", userName)
         );

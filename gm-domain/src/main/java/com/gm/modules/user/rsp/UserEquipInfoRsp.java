@@ -10,11 +10,11 @@ public class UserEquipInfoRsp {
     /**
 	 * 玩家装备id
 	 */
-	private Long gmUserEquipmentId;
+	private Long userEquipmentId;
     /**
 	 * 装备id
 	 */
-	private Long gmEquipmentId;
+	private Long equipmentId;
 	/**
      * 装备名称
 	 */

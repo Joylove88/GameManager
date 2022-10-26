@@ -3,7 +3,7 @@ $(function () {
         url: baseURL + 'basicconfig/experiencepotion/list',
         datatype: "json",
         colModel: [			
-			{ label: 'gmExPotionId', name: 'gmExPotionId', index: 'GM_EX_POTION_ID', width: 50, key: true },
+			{ label: 'exPotionId', name: 'exPotionId', index: 'EX_POTION_ID', width: 50, key: true },
 			{ label: '经验药水名称', name: 'exPotionName', index: 'EX_POTION_NAME', width: 80 }, 			
 			{ label: '药水稀有度', name: 'exPotionRareCode', index: 'EX_POTION_RARE_CODE', width: 80, formatter: function (value, options, row) {
                 var erc = '';
@@ -78,18 +78,18 @@ var vm = new Vue({
 			vm.experiencePotion = {status: '1'};
 		},
 		update: function (event) {
-			var gmExPotionId = getSelectedRow();
-			if(gmExPotionId == null){
+			var exPotionId = getSelectedRow();
+			if(exPotionId == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmExPotionId)
+            vm.getInfo(exPotionId)
 		},
 		saveOrUpdate: function (event) {
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.experiencePotion.gmExPotionId == null ? "basicconfig/experiencepotion/save" : "basicconfig/experiencepotion/update";
+                var url = vm.experiencePotion.exPotionId == null ? "basicconfig/experiencepotion/save" : "basicconfig/experiencepotion/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
@@ -111,8 +111,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmExPotionIds = getSelectedRows();
-			if(gmExPotionIds == null){
+			var exPotionIds = getSelectedRows();
+			if(exPotionIds == null){
 				return ;
 			}
 			var lock = false;
@@ -125,7 +125,7 @@ var vm = new Vue({
                         type: "POST",
                         url: baseURL + "basicconfig/experiencepotion/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmExPotionIds),
+                        data: JSON.stringify(exPotionIds),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -139,8 +139,8 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmExPotionId){
-			$.get(baseURL + "basicconfig/experiencepotion/info/"+gmExPotionId, function(r){
+		getInfo: function(exPotionId){
+			$.get(baseURL + "basicconfig/experiencepotion/info/"+exPotionId, function(r){
                 vm.experiencePotion = r.experiencePotion;
             });
 		},

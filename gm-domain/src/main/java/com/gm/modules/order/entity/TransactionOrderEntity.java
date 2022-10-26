@@ -25,19 +25,23 @@ public class TransactionOrderEntity implements Serializable {
 	 * ID
 	 */
 	@TableId
-	private Long gmTransactionOrderId;
+	private Long transactionOrderId;
 	/**
 	 * 用户ID
 	 */
-	private Long gmUserId;
+	private Long userId;
 	/**
-	 * 物品类型('1':英雄，'2':装备，'3':药水)
+	 * 召唤类型('1':英雄，'2':装备，'3':药水)
 	 */
-	private String itemType;
+	private String summonType;
 	/**
 	 * 货币类型('0':金币，'1':加密货币)
 	 */
 	private String currencyType;
+	/**
+	 * 召唤次数
+	 */
+	private Integer summonNum;
 	/**
 	 * 链上交易HASH
 	 */
@@ -62,10 +66,6 @@ public class TransactionOrderEntity implements Serializable {
 	 * GAS费
 	 */
 	private BigDecimal transactionGasFee;
-	/**
-	 * 抽奖类型('1':单抽，'2':十连抽)
-	 */
-	private String lottyType;
 	/**
 	 * 创建时间
 	 */
