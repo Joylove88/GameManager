@@ -334,9 +334,11 @@ public class ApiUserController {
         ValidatorUtils.validateEntity(useWithdrawReq);
         // 1.查询该会员上次提现时间
         GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(user);
-        Date date = DateUtils.addDateHours(lastWithdraw.getCreateTime(), 24);// 上次提现时间加24小时，然后和当前时间做比较
-        if (date.after(new Date())){// 24小时只能发起一次提现
-            throw new RRException(ErrorCode.WITHDRAW_OVER_TIMES.getDesc());
+        if (lastWithdraw != null){
+            Date date = DateUtils.addDateHours(lastWithdraw.getCreateTime(), 24);// 上次提现时间加24小时，然后和当前时间做比较
+            if (date.after(new Date())){// 24小时只能发起一次提现
+                throw new RRException(ErrorCode.WITHDRAW_OVER_TIMES.getDesc());
+            }
         }
         // 2.查询该会员消费等级
         GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.getById(user.getVipLevelId());
@@ -344,7 +346,7 @@ public class ApiUserController {
         UserAccountEntity userAccountEntity = userAccountService.queryByUserId(user.getUserId());
         if (userAccountEntity.getBalance()*gmUserVipLevel.getWithdrawLimit() < Double.valueOf(useWithdrawReq.getWithdrawMoney())){
             // 提现超额
-            throw new RRException(ErrorCode.WITHDRAW_OVER_TIMES.getDesc());
+            throw new RRException(ErrorCode.WITHDRAW_OVER_MONEY.getDesc());
         }
         try {
             gmUserWithdrawService.withdraw(user,useWithdrawReq);

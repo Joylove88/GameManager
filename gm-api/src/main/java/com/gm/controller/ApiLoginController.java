@@ -230,7 +230,7 @@ public class ApiLoginController {
         Map<String, Object> map = new HashMap<>();
         // 查询首页地址
         String index_page = sysConfigService.getValue("INDEX_PAGE");
-        map.put("inviteLink",index_page+"/invite/"+userEntity.getExpandCode());//请求链接
+        map.put("inviteLink",index_page+"/"+userEntity.getExpandCode());//请求链接
         map.put("viewTimes", userEntity.getExpandCodeViewTimes());//访问人数
         // 查询注册人数
         int count = userService.count(new QueryWrapper<UserEntity>().eq("FATHER_ID", userEntity.getUserId()));

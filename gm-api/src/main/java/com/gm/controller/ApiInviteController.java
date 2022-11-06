@@ -27,7 +27,7 @@ import java.io.IOException;
  * @author Mark axiang
  */
 @RestController
-@RequestMapping("/invite")
+@RequestMapping()
 @Api(tags = "邀请接口")
 public class ApiInviteController {
     @Autowired
@@ -42,7 +42,7 @@ public class ApiInviteController {
     public void inviteRedirect(@PathVariable String expandCode, HttpServletResponse response) throws IOException {
         UserEntity userEntity = userService.queryByExpandCode(expandCode);
         //查询首页地址
-        String index_page = sysConfigService.getValue("INDEX_PAGE");
+        String index_page = sysConfigService.getValue("INDEX_PAGE_MR");
         if (userEntity == null) {
             response.sendRedirect(index_page);
         } else {
