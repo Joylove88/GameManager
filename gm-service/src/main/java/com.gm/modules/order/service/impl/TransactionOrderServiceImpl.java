@@ -11,8 +11,7 @@ import com.gm.modules.fundsAccounting.service.FundsAccountingService;
 import com.gm.modules.order.dao.TransactionOrderDao;
 import com.gm.modules.order.entity.TransactionOrderEntity;
 import com.gm.modules.order.service.TransactionOrderService;
-import com.gm.modules.user.entity.UserBalanceDetailEntity;
-import com.gm.modules.user.req.DrawForm;
+import com.gm.modules.user.req.SummonReq;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.service.GmUserVipLevelService;
 import com.gm.modules.user.service.UserBalanceDetailService;
@@ -55,7 +54,7 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
     }
 
     @Override
-    public void addOrder(UserEntity user, List gifts, DrawForm form) {
+    public void addOrder(UserEntity user, List gifts, SummonReq form) {
         TransactionOrderEntity order = new TransactionOrderEntity();
         Date date = new Date();
         // 为加密货币类型时 订单状态为待处理，并且插入hash值。否则为金币类型时 订单状态为成功，并且插入用户ID
@@ -109,7 +108,7 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
     }
 
     @Override
-    public void updateOrder(DrawForm form, List gifts, Map map) {
+    public void updateOrder(SummonReq form, List gifts, Map map) {
         Date date = new Date();
         String transactionHash = form.getTransactionHash();
 

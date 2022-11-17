@@ -14,9 +14,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gm.annotation.LoginUser;
 import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
-import com.gm.common.utils.Arith;
 import com.gm.common.utils.Constant;
-import com.gm.common.utils.EthTransferListenUtils;
 import com.gm.common.utils.R;
 import com.gm.annotation.Login;
 import com.gm.common.validator.ValidatorUtils;
@@ -25,10 +23,8 @@ import com.gm.modules.drawGift.service.DrawGiftService;
 import com.gm.modules.ethTransfer.service.EthTransferService;
 import com.gm.modules.order.entity.TransactionOrderEntity;
 import com.gm.modules.order.service.TransactionOrderService;
-import com.gm.modules.sys.entity.SysDictEntity;
 import com.gm.modules.sys.service.SysDictService;
-import com.gm.modules.user.entity.UserBalanceDetailEntity;
-import com.gm.modules.user.req.DrawForm;
+import com.gm.modules.user.req.SummonReq;
 import com.gm.modules.user.entity.UserAccountEntity;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.service.UserAccountService;
@@ -54,11 +50,8 @@ import org.web3j.tx.TransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.tx.response.PollingTransactionReceiptProcessor;
 import org.web3j.tx.response.TransactionReceiptProcessor;
-import org.web3j.utils.Convert;
-import org.web3j.utils.Numeric;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -87,9 +80,9 @@ public class ApiDrawController {
     @Autowired
     private EthTransferService ethTransferService;
 
-    @PostMapping("drawCrypto")
-    @ApiOperation("召唤CRYPTO")
-    public R drawCrypto(HttpServletRequest request, @RequestBody DrawForm form)throws Exception{
+    @PostMapping("summonedWithCrypto")
+    @ApiOperation("CRYPTO召唤")
+    public R summonedFromCrypto(HttpServletRequest request, @RequestBody SummonReq form)throws Exception{
         // 表单校验
         ValidatorUtils.validateEntity(form);
         // 设置货币类型 为加密货币
@@ -103,8 +96,7 @@ public class ApiDrawController {
         } else {
             throw new RRException(ErrorCode.SIGN_HASH_EXCEPTION.getDesc());
         }
-        Map<String,Object> map = new HashMap<>();
-        List gifts = new ArrayList();
+        List giftBoxs = new ArrayList();
         Optional<TransactionReceipt> receipt = null;
         // 实例化用户类
         UserEntity user = new UserEntity();
@@ -117,20 +109,18 @@ public class ApiDrawController {
         } else {// 订单不为空说明是二次请求 验证成功后执行核心业务
             // 校验用户是否链上交易成功
             receipt = TransactionVerifyUtils.isVerify(TransactionVerifyUtils.connect(),form.getTransactionHash());
-            ethTransferService.eth(form.getTransactionHash(), order, receipt, form);
+            giftBoxs = ethTransferService.eth(form.getTransactionHash(), order, receipt, form);
         }
-        return R.ok().put("gifts", gifts);
+        return R.ok().put("giftBoxs", giftBoxs);
     }
 
     @Login
-    @PostMapping("drawGold")
-    @ApiOperation("召唤Gold")
-    public R drawGold(@LoginUser UserEntity user, @RequestBody DrawForm form) throws Exception {
+    @PostMapping("summonedWithGold")
+    @ApiOperation("Gold召唤")
+    public R summonedFromGold(@LoginUser UserEntity user, @RequestBody SummonReq form) throws Exception {
         // 设置货币类型 为金币
         form.setCurType(Constant.CurrencyType._GOLD_COINS.getValue());
-
-        List gifts = new ArrayList();
-
+        List giftBoxs = new ArrayList();
         // 地址校验
         if (StringUtils.isNotBlank(user.getAddress())){
             // 获取用户账户余额
@@ -140,7 +130,6 @@ public class ApiDrawController {
             if (userAccount == null){
                 throw new RRException(ErrorCode.USER_ACCOUNT_EXPIRED.getDesc());
             }
-
             // 获取召唤所需金额
             JSONObject drawJson = sysDictService.getContractsAddress("GM_DRAW_CONFIG", "GM_DRAW_TYPE");
             BigDecimal subMoney = BigDecimal.ONE;
@@ -151,7 +140,6 @@ public class ApiDrawController {
                 if (userAccount.getBalance() < subMoney.doubleValue()){
                     throw new RRException(ErrorCode.BALANCE_NOT_ENOUGH.getDesc());
                 }
-
             } else if (form.getSummonNum() == Constant.SummonNum.NUM10.getValue()) {
                 subMoney = drawJson.getBigDecimal("TEN");
                 // 十连抽金额
@@ -159,30 +147,22 @@ public class ApiDrawController {
                     throw new RRException(ErrorCode.BALANCE_NOT_ENOUGH.getDesc());
                 }
             }
-
             // 更新玩家账户余额
             boolean effect = userAccountService.updateAccountSub(user.getUserId(), subMoney);
             if (!effect) {
                 throw new RRException("账户金额更新失败!");// 账户金额更新失败
             }
-
             // 设置form里的金额
             form.setFee(subMoney);
-
-            // 插入一笔订单,订单状态为成功
-            transactionOrderService.addOrder(user,gifts,form);
-
             // 校验成功后开始召唤
-            gifts = drawGiftService.startSummon(user, form);
-
-
+            giftBoxs = drawGiftService.startSummon(user, form);
+            // 插入一笔订单,订单状态为成功
+            transactionOrderService.addOrder(user,giftBoxs,form);
         } else {
-
             throw new RRException(ErrorCode.SIGN_ADDRESS_EXCEPTION.getDesc());
-
         }
 
-        return R.ok().put("gifts", gifts);
+        return R.ok().put("giftBoxs", giftBoxs);
     }
 
     @PostMapping("getNFTURL")

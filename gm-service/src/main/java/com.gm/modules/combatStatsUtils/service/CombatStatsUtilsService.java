@@ -103,8 +103,8 @@ public class CombatStatsUtilsService {
         // 2.获取英雄成长属性并统计当前级别的属性
         long health = heroStar.getGmHealth();
         long mana = heroStar.getGmMana();
-        long healthRegen = heroStar.getGmHealthRegen();
-        long manaRegen = heroStar.getGmManaRegen();
+        double healthRegen = heroStar.getGmHealthRegen();
+        double manaRegen = heroStar.getGmManaRegen();
         long armor = heroStar.getGmArmor();
         long magicResist = heroStar.getGmMagicResist();
         long attackDamage = heroStar.getGmAttackDamage();

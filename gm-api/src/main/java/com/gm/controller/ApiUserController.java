@@ -187,7 +187,7 @@ public class ApiUserController {
     }
 
     @Login
-    @PostMapping("getPayerInfo")
+    @PostMapping("getPlayerInfo")
     @ApiOperation("获取玩家信息")
     public R getPayerInfo(@LoginUser UserEntity user) throws InvocationTargetException, IllegalAccessException {
         // 获取玩家信息
@@ -200,7 +200,7 @@ public class ApiUserController {
         return R.ok().put("userInfo",rsp);
     }
 
-    @PostMapping("getPayerInfoSimple")
+    @PostMapping("getPlayerInfoSimple")
     @ApiOperation("获取玩家信息")
     public R getPayerInfoSimple(@RequestBody UserInfoReq req) throws InvocationTargetException, IllegalAccessException {
         // 表单校验

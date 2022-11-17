@@ -82,19 +82,19 @@ public class AttributeEntity {
     /**
      * 初始生命值恢复
      */
-    private Long hpRegen;
+    private Double hpRegen;
     /**
      * 成长属性-生命值恢复
      */
-    private Long growHpRegen;
+    private Double growHpRegen;
     /**
      * 初始法力值恢复
      */
-    private Long mpRegen;
+    private Double mpRegen;
     /**
      * 成长属性-法力值恢复
      */
-    private Long growMpRegen;
+    private Double growMpRegen;
     /**
      * 初始护甲
      */
@@ -140,11 +140,11 @@ public class AttributeEntity {
     /**
      * 装备属性-生命值恢复
      */
-    private Long equipHealthRegen;
+    private double equipHealthRegen;
     /**
      * 装备属性-法力值恢复
      */
-    private Long equipManaRegen;
+    private double equipManaRegen;
     /**
      * 装备属性-护甲
      */

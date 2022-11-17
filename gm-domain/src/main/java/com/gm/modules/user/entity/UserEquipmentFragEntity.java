@@ -37,7 +37,7 @@ public class UserEquipmentFragEntity implements Serializable {
 	/**
 	 * 玩家获得碎片数量
 	 */
-	private Long userEquipFragNum;
+	private Integer userEquipFragNum;
 	/**
 	 * 铸造HASH
 	 */
@@ -55,7 +55,7 @@ public class UserEquipmentFragEntity implements Serializable {
 	 */
 	private Long sourceId;
 	/**
-	 * 状态('0':禁用，'1':启用)
+	 * 状态('0':禁用，'1':未使用, '2':已消耗)
 	 */
 	private String status;
 	/**

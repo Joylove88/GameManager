@@ -43,24 +43,17 @@ public class Constant {
     public static final String PLAYERS_EARN_TOTAL_REVENUE = "players_earn_total_revenue";
    // 副本资金池余额（最新）
     public static final String DUNGEON_POOLING_BALANCE = "dungeon_pooling_balance";
-
-   // 装备属性随机最大百分比
-    public static final Double eqAttMax = 1.01;
-   // 装备属性随机最小百分比
-    public static final Double eqAttMin = 0.5;
-   // 装备属性随机最小百分比(召唤)
-    public static final Double eqAttCryptoMin = 0.5;
     /**
      * 合约事件名称
      */
     public static final String EVENT_NAME = "Transfer(address,address,uint256)";
 
     /**
-     *  0
+     *  0long
      */
     public static final Long ZERO = 0L;
     /**
-     *  0
+     *  0int
      */
     public static final int ZERO_I = 0;
     /**
@@ -68,7 +61,7 @@ public class Constant {
      */
     public static final Double ZERO_D = 0d;
     /**
-     *  0值
+     *  0字符串
      */
     public static final String ZERO_ = "0";
     /**
@@ -514,6 +507,56 @@ public class Constant {
             this.value = value;
         }
         public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 获取类型（0：副本，1：召唤）
+     */
+    public enum FromType {
+        DUNGEON("0"),
+        SUMMON("1");
+
+        private String value;
+        FromType(String value) {
+            this.value = value;
+        }
+        public String getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 碎片类型（0：成品，1：碎片）
+     */
+    public enum FragType {
+        WHOLE(0),
+        FRAG(1);
+
+        private int value;
+        FragType(int value) {
+            this.value = value;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 装备属性随机最大最小百分比
+     */
+    public enum EquipStatsRange {
+        MIN(0.65),// 召唤产出
+        MAX(1.01),// 召唤产出
+        MIN_FREE(0.4),// 副本产出
+        MAX_FREE(0.81);// 副本产出
+
+        private double value;
+        EquipStatsRange(double value) {
+            this.value = value;
+        }
+        public double getValue() {
             return value;
         }
     }

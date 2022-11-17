@@ -21,7 +21,7 @@ import java.math.BigDecimal;
  */
 @Data
 @ApiModel(value = "抽奖参数")
-public class DrawForm {
+public class SummonReq {
     /**
      * 交易hash
      */

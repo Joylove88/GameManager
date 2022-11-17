@@ -10,11 +10,33 @@
         ${ew.customSqlSegment}
     </select>
 
-    <!--获取装备卷轴碎片关联稀有度信息-->
+    <!--获取装备卷轴关联稀有度信息-->
     <select id="getEquipFragInfo" resultType="com.gm.modules.basicconfig.entity.EquipmentFragEntity">
-        SELECT A.*,B.EQUIP_NAME,B.EQUIP_RARECODE
+        SELECT
+        A.*,
+        B.EQUIP_NAME,
+        B.EQUIP_RARECODE
         FROM GM_EQUIPMENT_FRAG A
         LEFT JOIN GM_EQUIPMENT_INFO B ON A.EQUIPMENT_ID = B.EQUIP_ID
         WHERE A.`STATUS` = '1'
+    </select>
+
+    <!--获取指定稀有度的装备卷轴信息-->
+    <select id="getEquipmentFragPro" resultType="com.gm.modules.basicconfig.entity.EquipmentFragEntity">
+        SELECT
+        A.*,
+        B.EQUIP_NAME,
+        B.EQUIP_RARECODE
+        FROM
+        GM_EQUIPMENT_FRAG A
+        LEFT JOIN GM_EQUIPMENT_INFO B ON A.EQUIPMENT_ID = B.EQUIP_ID
+        <where>
+            <if test="status != null and status != ''">
+                AND A.`STATUS` = #{status}
+            </if>
+            <if test="rareCode != null and rareCode != ''">
+                AND B.EQUIP_RARECODE = #{rareCode}
+            </if>
+        </where>
     </select>
 </mapper>

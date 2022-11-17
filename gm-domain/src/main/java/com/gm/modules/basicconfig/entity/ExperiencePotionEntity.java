@@ -26,11 +26,11 @@ public class ExperiencePotionEntity implements Serializable {
 	@TableId
 	private Long exPotionId;
 	/**
-	 * 经验药水名称
+	 * 经验名称
 	 */
 	private String exPotionName;
 	/**
-	 * 药水稀有度(1:白色,2:绿色,3:蓝色,4:紫色)
+	 * 经验稀有度(1:白色,2:绿色,3:蓝色,4:紫色)
 	 */
 	private String exPotionRareCode;
 	/**
@@ -38,7 +38,7 @@ public class ExperiencePotionEntity implements Serializable {
 	 */
 	private Long exValue;
 	/**
-	 * 药水描述
+	 * 经验描述
 	 */
 	private String exDescription;
 	/**

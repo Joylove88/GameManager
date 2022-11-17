@@ -1,7 +1,10 @@
 package com.gm.modules.basicconfig.service.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -16,7 +19,8 @@ import com.gm.modules.basicconfig.service.EquipmentFragService;
 
 @Service("equinpmentFragService")
 public class EquipmentFragServiceImpl extends ServiceImpl<EquipmentFragDao, EquipmentFragEntity> implements EquipmentFragService {
-
+    @Autowired
+    private EquipmentFragDao equipmentFragDao;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         String equipName = (String) params.get("equipName");
@@ -31,6 +35,11 @@ public class EquipmentFragServiceImpl extends ServiceImpl<EquipmentFragDao, Equi
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<EquipmentFragEntity> getEquipmentFragPro(Map<String, Object> map) {
+        return equipmentFragDao.getEquipmentFragPro(map);
     }
 
 }

@@ -37,7 +37,7 @@ public class UserExperiencePotionEntity implements Serializable {
 	/**
 	 * 经验药水数量
 	 */
-	private Long userExNum;
+	private Integer userExNum;
 	/**
 	 * 铸造HASH
 	 */

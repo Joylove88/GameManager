@@ -80,6 +80,16 @@ public class Arith {
     }
 
     public static void main(String[] args) {
-        System.out.println(UUID20());
+        int i = 0;
+        int n = 0;
+        while (i<300){
+            double num = randomWithinRangeHundred(0.65,1.01);
+            System.out.println(num);
+            if(num == 1.0){
+                n++;
+            }
+            i++;
+        }
+        System.out.println(n);
     }
 }

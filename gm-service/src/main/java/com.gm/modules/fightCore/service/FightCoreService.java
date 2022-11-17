@@ -11,6 +11,7 @@ import com.gm.common.utils.LotteryGiftsUtils;
 import com.gm.modules.basicconfig.dao.*;
 import com.gm.modules.basicconfig.dto.AttributeEntity;
 import com.gm.modules.basicconfig.entity.*;
+import com.gm.modules.basicconfig.rsp.GiftBoxEquipmentRsp;
 import com.gm.modules.basicconfig.rsp.TeamInfoRsp;
 import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
 import com.gm.modules.drawGift.service.DrawGiftService;
@@ -26,11 +27,8 @@ import com.gm.modules.user.rsp.*;
 import com.gm.modules.user.service.UserAccountService;
 import com.gm.modules.user.service.UserBalanceDetailService;
 import com.gm.modules.user.service.UserDailyOutputIncomeRecordService;
-import com.gm.modules.user.service.UserLevelService;
-import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -794,7 +792,7 @@ public class FightCoreService {
         // 英雄最新血量
         long hHP = heros.get(attH).getHp();
         // 英雄恢复血量
-        long hHPRegen = heros.get(attH).getHpRegen();
+        Double hHPRegen = heros.get(attH).getHpRegen();
         // 英雄护甲
         long hArmor = heros.get(attH).getArmor();
         // 英雄魔抗
@@ -1012,15 +1010,16 @@ public class FightCoreService {
             rsp.setUserHeroInfoRsps(getTeamHeroInfoList(combatRecord.getTeamId(), null));
 
             // 通过副本获取爆率等级
-            List<Object> gifts = new ArrayList<>();
             GmDungeonConfigEntity dungeonConfig = dungeonConfigDao.selectById(combatRecord.getDungeonId());
+            List<GiftBoxEquipmentRsp> giftBoxEquipmentRsps = new ArrayList<>();
             if (dungeonConfig != null) {
                 try {
                     // 奖励玩家装备 通过副本爆率控制概率
                     Random rd = new Random();
                     int rdEQ = rd.nextInt(99);
                     if (rdEQ % dungeonConfig.getBurstRate() == 0) {
-                        gifts = drawGiftService.dungeonRewardsEQ(user, dungeonConfig, combatRecord);
+                        drawGiftService.claimEquipment(user, dungeonConfig, combatRecord);
+                        giftBoxEquipmentRsps = DrawGiftService.giftBoxEquipmentRsps;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1028,11 +1027,12 @@ public class FightCoreService {
             }
             // 存储装备集合
             List<UserEquipInfoRsp> userEquipInfoRsps = new ArrayList<>();
+
             // 产出装备
-            if (gifts.size() > 0) {
+            if (giftBoxEquipmentRsps.size() > 0) {
                 int i = 0;
-                while ( i < gifts.size()){
-                    UserEquipInfoRsp userEquipInfoRsp = json2bean(gifts.get(i).toString(), UserEquipInfoRsp.class);
+                while ( i < giftBoxEquipmentRsps.size()){
+                    UserEquipInfoRsp userEquipInfoRsp = json2bean(giftBoxEquipmentRsps.get(i).toString(), UserEquipInfoRsp.class);
                     userEquipInfoRsps.add(userEquipInfoRsp);
                     i++;
                 }

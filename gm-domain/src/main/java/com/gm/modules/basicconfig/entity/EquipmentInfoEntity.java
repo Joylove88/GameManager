@@ -73,11 +73,11 @@ public class EquipmentInfoEntity implements Serializable {
 	/**
 	 * 初始生命值恢复
 	 */
-	private Long equipHealthRegen;
+	private Double equipHealthRegen;
 	/**
 	 * 初始法力值恢复
 	 */
-	private Long equipManaRegen;
+	private Double equipManaRegen;
 	/**
 	 * 初始护甲
 	 */

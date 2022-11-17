@@ -6,14 +6,13 @@ import com.gm.common.validator.ValidatorUtils;
 import com.gm.modules.drawGift.service.DrawGiftService;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroFragEntity;
-import com.gm.modules.user.req.DrawForm;
+import com.gm.modules.user.req.SummonReq;
 import com.gm.modules.user.service.UserHeroFragService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 
@@ -97,12 +96,12 @@ public class UserHeroFragController {
         //开始抽奖
         UserEntity userEntity = new UserEntity();
         userEntity.setUserId(1508401841157644289L);
-        DrawForm drawForm = new DrawForm();
-        drawForm.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
-        drawForm.setSummonNum(summonNum);
-        drawForm.setSummonType("1");
-        List s = drawGiftService.startSummon(userEntity, drawForm);
-        return R.ok().put("s",s);
+        SummonReq summonReq = new SummonReq();
+        summonReq.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
+        summonReq.setSummonNum(summonNum);
+        summonReq.setSummonType("1");
+        drawGiftService.startSummon(userEntity, summonReq);
+        return R.ok();
     }
 
     /**
@@ -113,11 +112,11 @@ public class UserHeroFragController {
         //开始抽奖
         UserEntity userEntity = new UserEntity();
         userEntity.setUserId(1508401841157644289L);
-        DrawForm drawForm = new DrawForm();
-        drawForm.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
-        drawForm.setSummonNum(summonNum);
-        List s = drawGiftService.startSummon(userEntity,drawForm);
-        return R.ok().put("s",s);
+        SummonReq summonReq = new SummonReq();
+        summonReq.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
+        summonReq.setSummonNum(summonNum);
+        drawGiftService.startSummon(userEntity, summonReq);
+        return R.ok();
     }
 
     /**
@@ -128,11 +127,11 @@ public class UserHeroFragController {
         //开始抽奖
         UserEntity userEntity = new UserEntity();
         userEntity.setUserId(1508401841157644289L);
-        DrawForm drawForm = new DrawForm();
-        drawForm.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
-        drawForm.setSummonNum(summonNum);
-        List s = drawGiftService.startSummon(userEntity,drawForm);
-        return R.ok().put("s",s);
+        SummonReq summonReq = new SummonReq();
+        summonReq.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
+        summonReq.setSummonNum(summonNum);
+        drawGiftService.startSummon(userEntity, summonReq);
+        return R.ok();
     }
 
 }

@@ -11,7 +11,7 @@ import com.gm.modules.order.service.TransactionOrderService;
 import com.gm.modules.sys.service.SysConfigService;
 import com.gm.modules.sys.service.SysDictService;
 import com.gm.modules.user.entity.UserEntity;
-import com.gm.modules.user.req.DrawForm;
+import com.gm.modules.user.req.SummonReq;
 import com.gm.modules.user.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +71,9 @@ public class EthTransferService {
      */
     private static String TOKENS_ADDRESS;
 
-    public void eth(String txHash, TransactionOrderEntity order, Optional<TransactionReceipt> receipt, DrawForm form) throws Exception {
+    public List eth(String txHash, TransactionOrderEntity order, Optional<TransactionReceipt> receipt, SummonReq form) throws Exception {
+        // 召唤集合
+        List gifts = new ArrayList();
         if (receipt != null) {
             // 获取地址
             JSONObject addressJson = sysDictService.getContractsAddress("CONTRACTS", "ADDRESS");
@@ -81,9 +83,6 @@ public class EthTransferService {
             TOKENS_ADDRESS = addressJson.getString("TOKENS_ADDRESS");
             CAPITAL_POOL_ADDRESS = addressJson.getString("CAPITAL_POOL_ADDRESS");
             TEAM_ADDRESS = addressJson.getString("TEAM_ADDRESS");
-
-            // 召唤集合
-            List gifts = new ArrayList();
 
             // 实例化用户类
             UserEntity user = new UserEntity();
@@ -187,20 +186,18 @@ public class EthTransferService {
 
             // 链上交易状态成功执行召唤，更新订单状态
             if (status.equals(Constant.CHAIN_STATE1)){
-
                 // 校验成功后开始召唤
                 gifts = drawGiftService.startSummon(user, form);
-
                 // 更新当前订单状态为成功
                 map.put("status",Constant.enable);
                 transactionOrderService.updateOrder(form,gifts,map);
-
             } else if(status.equals(Constant.CHAIN_STATE0)) {// 链上交易状态失败执行，更新订单状态
                 // 更新当前订单状态为失败
                 map.put("status",Constant.failed);
                 transactionOrderService.updateOrder(form,gifts,map);
             }
         }
+        return gifts;
     }
 }
 

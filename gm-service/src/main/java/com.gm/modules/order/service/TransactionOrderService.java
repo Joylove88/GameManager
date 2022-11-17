@@ -3,7 +3,7 @@ package com.gm.modules.order.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.order.entity.TransactionOrderEntity;
-import com.gm.modules.user.req.DrawForm;
+import com.gm.modules.user.req.SummonReq;
 import com.gm.modules.user.entity.UserEntity;
 
 import java.util.List;
@@ -24,9 +24,9 @@ public interface TransactionOrderService extends IService<TransactionOrderEntity
      * 抽奖订单
      * @param form
      */
-    void addOrder(UserEntity user, List gifts, DrawForm form);
+    void addOrder(UserEntity user, List gifts, SummonReq form);
 
-    void updateOrder(DrawForm form, List gifts, Map map);
+    void updateOrder(SummonReq form, List gifts, Map map);
 
     TransactionOrderEntity getOrderHash(String hash);
 

@@ -85,11 +85,11 @@ public class UserEquipmentEntity implements Serializable {
 	/**
 	 * 生命值恢复
 	 */
-	private Long equipHealthRegen;
+	private Double equipHealthRegen;
 	/**
 	 * 法力值恢复
 	 */
-	private Long equipManaRegen;
+	private Double equipManaRegen;
 	/**
 	 * 护甲
 	 */
