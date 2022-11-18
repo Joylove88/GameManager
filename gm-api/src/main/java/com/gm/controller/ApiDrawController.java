@@ -123,9 +123,11 @@ public class ApiDrawController {
         List giftBoxs = new ArrayList();
         // 地址校验
         if (StringUtils.isNotBlank(user.getAddress())){
-            // 获取用户账户余额
+            // 获取用户战斗账户余额
             QueryWrapper<UserAccountEntity> wrapper = new QueryWrapper<UserAccountEntity>()
-                    .eq("USER_ID",user.getUserId());
+                    .eq("USER_ID", user.getUserId())
+                    .eq("CURRENCY", Constant.ZERO_)
+            ;
             UserAccountEntity userAccount = userAccountService.getOne(wrapper);
             if (userAccount == null){
                 throw new RRException(ErrorCode.USER_ACCOUNT_EXPIRED.getDesc());
@@ -148,7 +150,7 @@ public class ApiDrawController {
                 }
             }
             // 更新玩家账户余额
-            boolean effect = userAccountService.updateAccountSub(user.getUserId(), subMoney);
+            boolean effect = userAccountService.updateAccountSub(user.getUserId(), subMoney, Constant.ZERO_);
             if (!effect) {
                 throw new RRException("账户金额更新失败!");// 账户金额更新失败
             }
