@@ -65,6 +65,10 @@ public class Constant {
      */
     public static final String ZERO_ = "0";
     /**
+     *  1字符串
+     */
+    public static final String ONE_ = "1";
+    /**
      *  玩家默认最大体力值
      */
     public static final Long FTG = 60L;

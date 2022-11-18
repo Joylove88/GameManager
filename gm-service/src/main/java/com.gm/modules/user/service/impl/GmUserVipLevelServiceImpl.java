@@ -129,11 +129,11 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
             Double brokerRatio = totalMoney == 0 ? vipLevel.getFirstBrokerage() : vipLevel.getBrokerage();
             BigDecimal broker = Arith.multiply(order.getTransactionFee(), BigDecimal.valueOf(brokerRatio));
             fget = Arith.multiply(broker, new BigDecimal(f));//父亲所得
-            // 更新账户金额
+            // 更新代理账户金额
             UserEntity fatherUser = userService.queryByUserId(user.getFatherId());
-            userAccountService.updateAccountAdd(fatherUser.getUserId(), fget);
+            userAccountService.updateAccountAdd(fatherUser.getUserId(), fget, Constant.ONE_);
             UserAccountEntity userAccount = userAccountService.queryByUserId(fatherUser.getUserId());
-            // 插入父亲账变
+            // 插入父亲代理账户账变
             UserBalanceDetailEntity userBalanceDetail = new UserBalanceDetailEntity();
             userBalanceDetail.setAmount(fget);
             userBalanceDetail.setSourceId(order.getTransactionOrderId());
@@ -147,7 +147,7 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
                 // 查询爷爷
                 UserEntity grandFatherUser = userService.queryByUserId(user.getGrandfatherId());
                 // 更新爷爷账变金额
-                userAccountService.updateAccountAdd(grandFatherUser.getUserId(), gfget);
+                userAccountService.updateAccountAdd(grandFatherUser.getUserId(), gfget, Constant.ONE_);
                 UserAccountEntity gfUserAccount = userAccountService.queryByUserId(grandFatherUser.getUserId());
 
                 gfget = Arith.multiply(broker, new BigDecimal(gf));//爷爷所得

@@ -989,7 +989,7 @@ public class FightCoreService {
         if (Constant.BattleResult._WIN.getValue().equals(combatRecord.getStatus()) && balanceDetails.size() == 0) {
 
             // 更新玩家账户余额
-            boolean effect = userAccountService.updateAccountAdd(user.getUserId(), combatRecord.getGetGoldCoins());
+            boolean effect = userAccountService.updateAccountAdd(user.getUserId(), combatRecord.getGetGoldCoins(),Constant.ZERO_);
             if (!effect) {
                 throw new RRException("账户金额更新失败!");// 账户金额更新失败
             }
