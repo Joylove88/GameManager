@@ -30,13 +30,13 @@ public class UserAccountServiceImpl extends ServiceImpl<UserAccountDao, UserAcco
     }
 
     @Override
-    public boolean updateAccountAdd(Long userId, BigDecimal addMoney) {
-        return retBool(userAccountDao.updateAccountAdd(userId,addMoney));
+    public boolean updateAccountAdd(Long userId, BigDecimal addMoney, String currency) {
+        return retBool(userAccountDao.updateAccountAdd(userId, addMoney, currency));
     }
 
     @Override
-    public boolean updateAccountSub(Long userId, BigDecimal subMoney) {
-        return retBool(userAccountDao.updateAccountAdd(userId,subMoney));
+    public boolean updateAccountSub(Long userId, BigDecimal subMoney, String currency) {
+        return retBool(userAccountDao.updateAccountSub(userId, subMoney, currency));
     }
 
     @Override

@@ -25,7 +25,7 @@ public interface UserAccountService extends IService<UserAccountEntity> {
      * @param addMoney   金额
      * @return boolean
      */
-    boolean updateAccountAdd(Long userId, BigDecimal addMoney);
+    boolean updateAccountAdd(Long userId, BigDecimal addMoney, String currency);
 
     /**
      * 给用户减少金额
@@ -34,7 +34,7 @@ public interface UserAccountService extends IService<UserAccountEntity> {
      * @param subMoney   金额
      * @return boolean
      */
-    boolean updateAccountSub(Long userId, BigDecimal subMoney);
+    boolean updateAccountSub(Long userId, BigDecimal subMoney, String currency);
 
     /**
      * 根据用户ID查询账户

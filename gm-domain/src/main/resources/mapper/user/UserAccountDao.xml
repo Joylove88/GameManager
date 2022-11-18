@@ -15,9 +15,11 @@
     </resultMap>
 
     <update id="updateAccountAdd">
-        UPDATE gm_user_account SET TOTAL_AMOUNT = IFNULL(TOTAL_AMOUNT, 0) + #{addMoney} ,BALANCE = IFNULL(BALANCE,0) + #{addMoney} WHERE USER_ID = #{userId}
+        UPDATE gm_user_account SET TOTAL_AMOUNT = IFNULL(TOTAL_AMOUNT, 0) + #{addMoney} ,BALANCE = IFNULL(BALANCE,0) + #{addMoney}
+        WHERE USER_ID = #{userId} AND CURRENCY = #{currency}
     </update>
     <update id="updateAccountSub">
-        UPDATE gm_user_account SET TOTAL_AMOUNT = IFNULL(TOTAL_AMOUNT, 0) - #{subMoney} ,BALANCE = IFNULL(BALANCE,0) - #{subMoney} WHERE USER_ID = #{userId}
+        UPDATE gm_user_account SET TOTAL_AMOUNT = IFNULL(TOTAL_AMOUNT, 0) - #{subMoney} ,BALANCE = IFNULL(BALANCE,0) - #{subMoney}
+        WHERE USER_ID = #{userId} AND CURRENCY = #{currency}
     </update>
 </mapper>

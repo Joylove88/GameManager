@@ -30,9 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service("userService")
 public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements UserService {
@@ -94,14 +92,20 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
 		userDao.insert(userRegister);
 
-		// 用户注册完成后自动添加一条用户资金账户数据
-		UserAccountEntity userAccountEntity = new UserAccountEntity();
-		userAccountEntity.setUserId(userRegister.getUserId());
-		userAccountEntity.setBalance(Constant.ZERO_D);
-		userAccountEntity.setTotalAmount(Constant.ZERO_D);
-		userAccountEntity.setFrozen(Constant.ZERO_D);
-		userAccountEntity.setStatus(Constant.enable);
-		userAccountDao.insert(userAccountEntity);
+		// 用户注册完成后自动生成用户战斗账户，代理账户
+		int i = 0;
+		while (i < 2){
+			String currency = i == 0 ? "0" : "1";
+			UserAccountEntity userAccountEntity = new UserAccountEntity();
+			userAccountEntity.setUserId(userRegister.getUserId());
+			userAccountEntity.setBalance(Constant.ZERO_D);
+			userAccountEntity.setTotalAmount(Constant.ZERO_D);
+			userAccountEntity.setFrozen(Constant.ZERO_D);
+			userAccountEntity.setStatus(Constant.enable);
+			userAccountEntity.setCurrency(currency);// 0战斗,1代理
+			userAccountDao.insert(userAccountEntity);
+			i++;
+		}
 
 		// 用户注册完成后自动添加一条矿工数据
 		GmMiningInfoEntity miningInfoEntity = new GmMiningInfoEntity();
