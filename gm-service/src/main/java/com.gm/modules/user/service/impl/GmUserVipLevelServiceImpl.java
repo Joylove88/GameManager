@@ -177,4 +177,9 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
         BigDecimal repoFee = Arith.multiply(order.getTransactionFee(), Constant.CashPoolScale._REPO.getValue());// 获取该订单金额的20%
         fundsAccountingService.setCashPoolAdd(Constant.CashPool._REPO.getValue(), repoFee);
     }
+
+    @Override
+    public GmUserVipLevelEntity queryById(Long vipLevelId) {
+        return baseMapper.selectById(vipLevelId);
+    }
 }

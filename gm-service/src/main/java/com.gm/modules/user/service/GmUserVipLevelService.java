@@ -19,5 +19,7 @@ public interface GmUserVipLevelService extends IService<GmUserVipLevelEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     void updateUserVipLevel(TransactionOrderEntity order);
+
+    GmUserVipLevelEntity queryById(Long vipLevelId);
 }
 

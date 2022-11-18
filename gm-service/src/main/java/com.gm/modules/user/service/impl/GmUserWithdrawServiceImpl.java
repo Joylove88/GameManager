@@ -117,6 +117,8 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
         gmUserWithdraw.setWithdrawHash(hash);
         int insert = baseMapper.insert(gmUserWithdraw);
         // 定时任务去刷新交易状态
+
+
     }
 
 }

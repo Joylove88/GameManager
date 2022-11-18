@@ -18,15 +18,14 @@ import com.gm.common.utils.*;
 import com.gm.common.validator.ValidatorUtils;
 import com.gm.annotation.Login;
 import com.gm.modules.sys.service.SysConfigService;
+import com.gm.modules.user.entity.GmUserVipLevelEntity;
+import com.gm.modules.user.entity.UserAccountEntity;
 import com.gm.modules.user.req.InviteDataForm;
 import com.gm.modules.user.req.InviteForm;
 import com.gm.modules.user.req.SignIn;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserLoginLogEntity;
-import com.gm.modules.user.service.UserBalanceDetailService;
-import com.gm.modules.user.service.UserTokenService;
-import com.gm.modules.user.service.UserLoginLogService;
-import com.gm.modules.user.service.UserService;
+import com.gm.modules.user.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
@@ -64,6 +63,10 @@ public class ApiLoginController {
     private SysConfigService sysConfigService;
     @Autowired
     private UserBalanceDetailService userBalanceDetailService;
+    @Autowired
+    private UserAccountService userAccountService;
+    @Autowired
+    private GmUserVipLevelService gmUserVipLevelService;
 
     @PostMapping("signIn")
     @ApiOperation("签名验证")
@@ -224,7 +227,7 @@ public class ApiLoginController {
      */
     @Login
     @PostMapping("inviteData")
-    @ApiOperation("邀请链接数据")
+    @ApiOperation("代理账户数据")
     public R inviteData(@LoginUser UserEntity userEntity) {
         // 查询该邀请码数据
         Map<String, Object> map = new HashMap<>();
@@ -238,9 +241,27 @@ public class ApiLoginController {
         // 查询消费人数
         int effectiveCount = userService.queryEffectiveUserCount(userEntity);
         map.put("consumer", effectiveCount);
-        // 查询邀请奖励
-        String userAgentRebate = userBalanceDetailService.queryAgentRebate(userEntity);
-        map.put("userAgentRebate",userAgentRebate);
+        // 查询代理账户余额
+//        String userAgentRebate = userBalanceDetailService.queryAgentRebate(userEntity);
+        UserAccountEntity userAccount = userAccountService.queryByUserIdAndCur(userEntity.getUserId(),Constant.ONE_);
+        map.put("userAgentRebate",userAccount.getBalance());
+        // 查询代理账户可提余额，查询用户消费等级
+        GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.queryById(userEntity.getVipLevelId());
+        map.put("userAgentRebateWithdraw",Arith.multiply(new BigDecimal(userAccount.getBalance()),new BigDecimal(gmUserVipLevel.getWithdrawLimit())));
+        return R.ok(map);
+    }
+
+    @Login
+    @PostMapping("fightingData")
+    @ApiOperation("战斗账户数据")
+    public R fightingData(@LoginUser UserEntity userEntity) {
+        Map<String, Object> map = new HashMap<>();
+        // 查询战斗账户余额
+        UserAccountEntity userAccount = userAccountService.queryByUserIdAndCur(userEntity.getUserId(),Constant.ZERO_);
+        map.put("userFightingBalance",userAccount.getBalance());
+        // 查询代理账户可提余额，查询用户消费等级
+        GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.queryById(userEntity.getVipLevelId());
+        map.put("userFightingWithdraw",Arith.multiply(new BigDecimal(userAccount.getBalance()),new BigDecimal(gmUserVipLevel.getWithdrawLimit())));
         return R.ok(map);
     }
 

@@ -19,6 +19,7 @@ import java.util.Map;
 public class UserAccountServiceImpl extends ServiceImpl<UserAccountDao, UserAccountEntity> implements UserAccountService {
     @Autowired
     private UserAccountDao userAccountDao;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<UserAccountEntity> page = this.page(
@@ -42,7 +43,15 @@ public class UserAccountServiceImpl extends ServiceImpl<UserAccountDao, UserAcco
     @Override
     public UserAccountEntity queryByUserId(Long userId) {
         return baseMapper.selectOne(new QueryWrapper<UserAccountEntity>()
-                .eq("user_id",userId)
+                .eq("user_id", userId)
+        );
+    }
+
+    @Override
+    public UserAccountEntity queryByUserIdAndCur(Long userId, String currency) {
+        return baseMapper.selectOne(new QueryWrapper<UserAccountEntity>()
+                .eq("user_id", userId)
+                .eq("currency", currency)
         );
     }
 

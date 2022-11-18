@@ -42,5 +42,7 @@ public interface UserAccountService extends IService<UserAccountEntity> {
      * @return 用户账户
      */
     UserAccountEntity queryByUserId(Long userId);
+
+    UserAccountEntity queryByUserIdAndCur(Long userId, String currency);
 }
 
