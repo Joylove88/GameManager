@@ -57,5 +57,9 @@ public class UserBalanceDetailEntity implements Serializable {
 	 * 交易类型id：提现id,副本产出id,召唤订单id,市场交易ID,代理返佣id
 	 */
 	private Long sourceId;
+	/**
+	 * 币种
+	 */
+	private String currency;
 
 }

@@ -14,6 +14,7 @@
         <result property="tradeDesc" column="TRADE_DESC"/>
         <result property="userBalance" column="USER_BALANCE"/>
         <result property="sourceId" column="SOURCE_ID"/>
+        <result property="currency" column="currency"/>
     </resultMap>
 
     <select id="getUserBalanceDetail" resultType="com.gm.modules.user.entity.UserBalanceDetailEntity">
