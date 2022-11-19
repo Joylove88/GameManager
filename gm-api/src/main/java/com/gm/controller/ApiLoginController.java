@@ -248,6 +248,7 @@ public class ApiLoginController {
         // 查询代理账户可提余额，查询用户消费等级
         GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.queryById(userEntity.getVipLevelId());
         map.put("userAgentRebateWithdraw",Arith.multiply(new BigDecimal(userAccount.getBalance()),new BigDecimal(gmUserVipLevel.getWithdrawLimit())));
+        map.put("withdrawHandlingFee",gmUserVipLevel.getWithdrawHandlingFee());
         return R.ok(map);
     }
 
@@ -262,6 +263,7 @@ public class ApiLoginController {
         // 查询代理账户可提余额，查询用户消费等级
         GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.queryById(userEntity.getVipLevelId());
         map.put("userFightingWithdraw",Arith.multiply(new BigDecimal(userAccount.getBalance()),new BigDecimal(gmUserVipLevel.getWithdrawLimit())));
+        map.put("withdrawHandlingFee",gmUserVipLevel.getWithdrawHandlingFee());
         return R.ok(map);
     }
 

@@ -21,6 +21,7 @@
         <result property="withdrawFrequency" column="WITHDRAW_FREQUENCY"/>
         <result property="firstBrokerage" column="FIRST_BROKERAGE"/>
         <result property="brokerage" column="BROKERAGE"/>
+        <result property="withdrawHandlingFee" column="WITHDRAW_HANDLING_FEE"/>
     </resultMap>
 
 

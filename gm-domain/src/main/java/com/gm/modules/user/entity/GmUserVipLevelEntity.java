@@ -89,5 +89,9 @@ public class GmUserVipLevelEntity implements Serializable {
 	 * 消费返佣金
 	 */
 	private Double brokerage;
+	/**
+	 * 提现手续费
+	 */
+	private Double withdrawHandlingFee;
 
 }

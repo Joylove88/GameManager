@@ -11,6 +11,7 @@ $(function () {
             {label: '邀请人数消费金额', name: 'inviteConsumeMoney', index: 'INVITE_CONSUME_MONEY', width: 80},
             {label: '提现上限', name: 'withdrawLimit', index: 'WITHDRAW_LIMIT', width: 80},
             {label: '提现频率', name: 'withdrawFrequency', index: 'WITHDRAW_FREQUENCY', width: 80},
+            {label: '提现手续费', name: 'withdrawHandlingFee', index: 'WITHDRAW_HANDLING_FEE', width: 80},
             {label: '首次消费返佣金', name: 'firstBrokerage', index: 'FIRST_BROKERAGE', width: 80},
             {label: '消费返佣金', name: 'brokerage', index: 'BROKERAGE', width: 80},
             {label: '创建人', name: 'createUser', index: 'CREATE_USER', width: 80},
