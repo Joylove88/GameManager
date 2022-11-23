@@ -154,7 +154,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 	}
 
 	@Override
-	public UserInfoRsp getPlayerInfo(Map<String, Object> map) {
+	public List<UserInfoRsp> getPlayerInfo(Map<String, Object> map) {
 		return userDao.getPlayerInfo(map);
 	}
 

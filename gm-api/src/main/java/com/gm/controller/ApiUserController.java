@@ -191,13 +191,33 @@ public class ApiUserController {
     @ApiOperation("获取玩家信息")
     public R getPayerInfo(@LoginUser UserEntity user) throws InvocationTargetException, IllegalAccessException {
         // 获取玩家信息
-        Map<String, Object> map = new HashMap<>();
-        map.put("address", user.getAddress());
-        UserInfoRsp rsp = userService.getPlayerInfo(map);
+        UserInfoRsp rsp = getUserInfo(user.getAddress());
         rsp.setNextLevelExp(rsp.getPromotionExperience());
         rsp.setFtgMax(Constant.FTG);
         rsp.setCurrentExp(ExpUtils.getCurrentExp(rsp.getExperienceTotal(), rsp.getPromotionExperience(), user.getExperienceObtain()));
         return R.ok().put("userInfo",rsp);
+    }
+
+    private UserInfoRsp getUserInfo(String address){
+        UserInfoRsp rsp = new UserInfoRsp();
+        Map<String, Object> map = new HashMap<>();
+        map.put("address", address);
+        List<UserInfoRsp> list = userService.getPlayerInfo(map);
+        Double mrCoins = Constant.ZERO_D;
+        Double mrCoinsAgent = Constant.ZERO_D;
+        int i = 0;
+        while (i < list.size()){
+            if (list.get(i).getCurrency().equals(Constant.ZERO_)) {
+                mrCoins = list.get(i).getMrCoins();
+            } else if (list.get(i).getCurrency().equals(Constant.ONE_)){
+                mrCoinsAgent = list.get(i).getMrCoins();
+            }
+            i++;
+        }
+        rsp = list.get(0);
+        rsp.setMrCoins(mrCoins);
+        rsp.setMrCoinsAgent(mrCoinsAgent);
+        return rsp;
     }
 
     @PostMapping("getPlayerInfoSimple")
@@ -207,10 +227,7 @@ public class ApiUserController {
         ValidatorUtils.validateEntity(req);
         UserInfoRsp rsp = new UserInfoRsp();
         if (StringUtils.isNotBlank(req.getAddress())){
-            Map<String, Object> map = new HashMap<>();
-            map.put("address", req.getAddress());
-            // 获取玩家信息
-            rsp = userService.getPlayerInfo(map);
+            rsp = getUserInfo(req.getAddress());
         }
         return R.ok().put("userInfo",rsp);
     }

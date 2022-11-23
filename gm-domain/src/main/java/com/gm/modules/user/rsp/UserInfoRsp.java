@@ -25,6 +25,14 @@ public class UserInfoRsp {
 	 */
 	private Double mrCoins;
 	/**
+	 * 代理奖励
+	 */
+	private Double mrCoinsAgent;
+	/**
+	 * 币种(0:战斗账户，1：代理账户)
+	 */
+	private String currency;
+	/**
 	 * 玩家级别
 	 */
 	private Long levelCode;

@@ -13,6 +13,7 @@ import com.gm.common.utils.PageUtils;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.rsp.UserInfoRsp;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,5 +59,5 @@ public interface UserService extends IService<UserEntity> {
 	 * @param map
 	 * @return
 	 */
-	UserInfoRsp getPlayerInfo(Map<String, Object> map);
+	List<UserInfoRsp> getPlayerInfo(Map<String, Object> map);
 }

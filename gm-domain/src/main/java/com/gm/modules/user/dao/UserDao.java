@@ -13,6 +13,7 @@ import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.rsp.UserInfoRsp;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,5 +31,5 @@ public interface UserDao extends BaseMapper<UserEntity> {
      * @param map
      * @return
      */
-    UserInfoRsp getPlayerInfo(Map<String, Object> map);
+    List<UserInfoRsp> getPlayerInfo(Map<String, Object> map);
 }
