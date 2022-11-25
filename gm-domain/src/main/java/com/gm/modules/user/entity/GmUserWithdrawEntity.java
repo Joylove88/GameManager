@@ -57,5 +57,9 @@ public class GmUserWithdrawEntity implements Serializable {
      * 提现交易哈希
      */
     private String withdrawHash;
+    /**
+     * 提现账户类型(0:战斗账户，1：代理账户)
+     */
+    private String currency;
 
 }

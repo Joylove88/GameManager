@@ -15,10 +15,7 @@ import com.gm.annotation.Login;
 import com.gm.annotation.LoginUser;
 import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
-import com.gm.common.utils.Constant;
-import com.gm.common.utils.DateUtils;
-import com.gm.common.utils.ExpUtils;
-import com.gm.common.utils.R;
+import com.gm.common.utils.*;
 import com.gm.common.validator.ValidatorUtils;
 import com.gm.modules.basicconfig.entity.*;
 import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
@@ -35,10 +32,7 @@ import jnr.a64asm.CONDITION;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -375,6 +369,24 @@ public class ApiUserController {
             e.printStackTrace();
         }
         return R.ok();
+    }
+
+    @Login
+    @PostMapping("fightingWithdrawList")
+    @ApiOperation("战斗玩家提现记录")
+    public R fightingWithdrawList(@LoginUser UserEntity user, @RequestParam Map<String, Object> params) {
+        // 1.查询该用户战斗玩家提现记录
+        PageUtils page = gmUserWithdrawService.queryWithdrawList(user.getUserId(),params,"0");
+        return R.ok().put("page", page);
+    }
+
+    @Login
+    @PostMapping("inviteWithdrawList")
+    @ApiOperation("代理玩家提现记录")
+    public R inviteWithdrawList(@LoginUser UserEntity user, @RequestParam Map<String, Object> params) {
+        // 1.查询该用户代理账户提现记录
+        PageUtils page = gmUserWithdrawService.queryWithdrawList(user.getUserId(),params,"1");
+        return R.ok().put("page", page);
     }
 
 }

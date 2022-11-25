@@ -22,6 +22,7 @@
         <result property="firstBrokerage" column="FIRST_BROKERAGE"/>
         <result property="brokerage" column="BROKERAGE"/>
         <result property="withdrawHandlingFee" column="WITHDRAW_HANDLING_FEE"/>
+        <result property="needCheck" column="NEED_CHECK"/>
     </resultMap>
 
 

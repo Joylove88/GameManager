@@ -14,6 +14,7 @@
         <result property="updateTime" column="UPDATE_TIME"/>
         <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
         <result property="withdrawHash" column="WITHDRAW_HASH"/>
+        <result property="currency" column="CURRENCY"/>
     </resultMap>
 
 

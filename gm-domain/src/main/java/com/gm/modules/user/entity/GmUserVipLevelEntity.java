@@ -93,5 +93,9 @@ public class GmUserVipLevelEntity implements Serializable {
 	 * 提现手续费
 	 */
 	private Double withdrawHandlingFee;
+	/**
+	 * 提现是否需要审核（0：需要，1：不需要）
+	 */
+	private Integer needCheck;
 
 }

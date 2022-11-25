@@ -69,10 +69,11 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
         // 1.生成提现订单，状态为待出款
         GmUserWithdrawEntity gmUserWithdraw = new GmUserWithdrawEntity();
         gmUserWithdraw.setCreateTime(new Date());
-        gmUserWithdraw.setCreateTimeTs(System.currentTimeMillis());
+        gmUserWithdraw.setCreateTimeTs(gmUserWithdraw.getCreateTime().getTime());
         gmUserWithdraw.setStatus(Constant.WithdrawStatus.APPLY.getValue());
         gmUserWithdraw.setUserId(user.getUserId());
         gmUserWithdraw.setWithdrawMoney(new BigDecimal(useWithdrawReq.getWithdrawMoney()));
+        gmUserWithdraw.setCurrency(useWithdrawReq.getWithdrawType());
 //        // 2.调用智能合约进行转账
 //        //发送方地址
 //        String from = "0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45";
@@ -124,7 +125,7 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
         }
         // 插入账变明细
         // 查询账户余额
-        UserAccountEntity userAccountEntity = userAccountService.queryByUserIdAndCur(user.getUserId(),useWithdrawReq.getWithdrawType());
+        UserAccountEntity userAccountEntity = userAccountService.queryByUserIdAndCur(user.getUserId(), useWithdrawReq.getWithdrawType());
         UserBalanceDetailEntity userBalanceDetailEntity = new UserBalanceDetailEntity();
         userBalanceDetailEntity.setUserId(user.getUserId());
         userBalanceDetailEntity.setCurrency(useWithdrawReq.getWithdrawType());
@@ -149,6 +150,20 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
                 .last("limit 1")
         );
         return gmUserWithdrawEntity != null;
+    }
+
+    @Override
+    public PageUtils queryWithdrawList(Long userId, Map<String, Object> params, String currency) {
+        IPage<GmUserWithdrawEntity> page = this.page(
+                new Query<GmUserWithdrawEntity>().getPage(params),
+                new QueryWrapper<GmUserWithdrawEntity>()
+                        .eq("user_id", userId)
+                        .eq("currency", currency)
+                        .orderByAsc("create_time")
+
+        );
+
+        return new PageUtils(page);
     }
 
 }
