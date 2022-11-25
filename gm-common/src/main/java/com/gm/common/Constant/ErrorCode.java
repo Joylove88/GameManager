@@ -20,6 +20,9 @@ public enum ErrorCode {
 	INVITE_ADDRESS_NOT_EXIST(110,"invite address not exists!"),//上级地址不存在
 	WITHDRAW_OVER_TIMES(111,"24 hours only once!"),//24小时只能提现一次
 	WITHDRAW_OVER_MONEY(112,"withdraw over!"),//提现超额
+	WITHDRAW_UPDATE_ACCOUNT_FAIL(113,"withdraw update account fail!"),//提现更新账户失败
+	WITHDRAW_INSERT_FAIL(114,"withdraw insert fail!"),//提现插入失败
+	WITHDRAW_INSERT_BALANCE_DETAIL_FAIL(115,"withdraw insert balance detail fail!"),//提现插入账变明细失败
 
 
 

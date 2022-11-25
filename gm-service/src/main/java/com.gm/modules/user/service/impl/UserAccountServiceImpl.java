@@ -55,4 +55,9 @@ public class UserAccountServiceImpl extends ServiceImpl<UserAccountDao, UserAcco
         );
     }
 
+    @Override
+    public boolean withdrawFreeze(Long userId, BigDecimal freezeMoney,String currency) {
+        return retBool(userAccountDao.withdrawFreeze(userId, freezeMoney, currency));
+    }
+
 }

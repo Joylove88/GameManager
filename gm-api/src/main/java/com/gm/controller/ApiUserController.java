@@ -360,7 +360,7 @@ public class ApiUserController {
         // 2.查询该会员消费等级
         GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.getById(user.getVipLevelId());
         // 3.查询该会员当前余额
-        UserAccountEntity userAccountEntity = userAccountService.queryByUserId(user.getUserId());
+        UserAccountEntity userAccountEntity = userAccountService.queryByUserIdAndCur(user.getUserId(),useWithdrawReq.getWithdrawType());
         if (userAccountEntity.getBalance()*gmUserVipLevel.getWithdrawLimit() < Double.valueOf(useWithdrawReq.getWithdrawMoney())){
             // 提现超额
             throw new RRException(ErrorCode.WITHDRAW_OVER_MONEY.getDesc());

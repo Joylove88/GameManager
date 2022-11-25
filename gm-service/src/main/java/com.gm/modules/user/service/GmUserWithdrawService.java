@@ -24,5 +24,7 @@ public interface GmUserWithdrawService extends IService<GmUserWithdrawEntity> {
     GmUserWithdrawEntity lastWithdraw(UserEntity user);
 
     void withdraw(UserEntity user,UseWithdrawReq useWithdrawReq) throws ExecutionException, InterruptedException, IOException;
+
+    boolean haveApplyWithdrawOrder(Long userId);
 }
 

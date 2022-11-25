@@ -3,37 +3,30 @@ package com.gm.modules.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gm.common.Constant.ErrorCode;
+import com.gm.common.exception.RRException;
+import com.gm.common.utils.Arith;
+import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.common.web3Utils.TransactionVerifyUtils;
 import com.gm.modules.user.dao.GmUserWithdrawDao;
 import com.gm.modules.user.entity.GmUserWithdrawEntity;
+import com.gm.modules.user.entity.UserAccountEntity;
+import com.gm.modules.user.entity.UserBalanceDetailEntity;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.req.UseWithdrawReq;
 import com.gm.modules.user.service.GmUserWithdrawService;
+import com.gm.modules.user.service.UserAccountService;
+import com.gm.modules.user.service.UserBalanceDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.web3j.abi.FunctionEncoder;
-import org.web3j.abi.TypeReference;
-import org.web3j.abi.datatypes.Address;
-import org.web3j.abi.datatypes.Function;
-import org.web3j.abi.datatypes.Type;
-import org.web3j.abi.datatypes.generated.Uint256;
-import org.web3j.crypto.Credentials;
-import org.web3j.crypto.RawTransaction;
-import org.web3j.crypto.TransactionEncoder;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.utils.Convert;
-import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -46,6 +39,10 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
 
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
+    @Autowired
+    private UserAccountService userAccountService;
+    @Autowired
+    private UserBalanceDetailService userBalanceDetailService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -73,52 +70,85 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
         GmUserWithdrawEntity gmUserWithdraw = new GmUserWithdrawEntity();
         gmUserWithdraw.setCreateTime(new Date());
         gmUserWithdraw.setCreateTimeTs(System.currentTimeMillis());
-        gmUserWithdraw.setStatus(0);
+        gmUserWithdraw.setStatus(Constant.WithdrawStatus.APPLY.getValue());
         gmUserWithdraw.setUserId(user.getUserId());
         gmUserWithdraw.setWithdrawMoney(new BigDecimal(useWithdrawReq.getWithdrawMoney()));
-        // 2.调用智能合约进行转账
-        //发送方地址
-        String from = "0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45";
-        //发送方私钥
-        String privateKey = "0xf94a3b8f8b5b7d6ed5a8a77a60252de6adc867629bfe2316b495c05e15017e54";
-        //转账数量
-        String amount = useWithdrawReq.getWithdrawMoney();
-        //接收者地址
-        String to = user.getAddress();
-        //出款合约地址
-        String coinAddress = "0x4d9e7fb8503b72b9aD8fc94366899aa99Ab89807";
-        //usdt合约地址
-        String usdtAddress = "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd";
-        //查询地址交易编号随机数
-        BigInteger nonce = web3j.ethGetTransactionCount(from, DefaultBlockParameterName.PENDING).send().getTransactionCount();
-        //支付的矿工费
-        BigInteger gasPrice = web3j.ethGasPrice().send().getGasPrice();
-        //旷工费限制
-        BigInteger gasLimit = new BigInteger("21000");
-        //秘钥凭证
-        Credentials credentials = Credentials.create(privateKey);
-
-        BigInteger amountWei = Convert.toWei(amount, Convert.Unit.ETHER).toBigInteger();
-        //封装转账交易
-        Function function = new Function(
-                "transfer",
-                Arrays.<Type>asList(
-                        new Address(usdtAddress),
-                        new Address(to),
-                        new Uint256(amountWei)
-                ),
-                Collections.<TypeReference<?>>emptyList());
-        String data = FunctionEncoder.encode(function);
-        //签名交易
-        RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, gasPrice, gasLimit, coinAddress, data);
-        byte[] signMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
-        //广播交易
-        String hash = web3j.ethSendRawTransaction(Numeric.toHexString(signMessage)).sendAsync().get().getTransactionHash();
-        gmUserWithdraw.setWithdrawHash(hash);
+//        // 2.调用智能合约进行转账
+//        //发送方地址
+//        String from = "0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45";
+//        //发送方私钥
+//        String privateKey = "0xf94a3b8f8b5b7d6ed5a8a77a60252de6adc867629bfe2316b495c05e15017e54";
+//        //转账数量
+//        String amount = useWithdrawReq.getWithdrawMoney();
+//        //接收者地址
+//        String to = user.getAddress();
+//        //出款合约地址
+//        String coinAddress = "0x4d9e7fb8503b72b9aD8fc94366899aa99Ab89807";
+//        //usdt合约地址
+//        String usdtAddress = "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd";
+//        //查询地址交易编号随机数
+//        BigInteger nonce = web3j.ethGetTransactionCount(from, DefaultBlockParameterName.PENDING).send().getTransactionCount();
+//        //支付的矿工费
+//        BigInteger gasPrice = web3j.ethGasPrice().send().getGasPrice();
+//        //旷工费限制
+//        BigInteger gasLimit = new BigInteger("21000");
+//        //秘钥凭证
+//        Credentials credentials = Credentials.create(privateKey);
+//
+//        BigInteger amountWei = Convert.toWei(amount, Convert.Unit.ETHER).toBigInteger();
+//        //封装转账交易
+//        Function function = new Function(
+//                "transfer",
+//                Arrays.<Type>asList(
+//                        new Address(usdtAddress),
+//                        new Address(to),
+//                        new Uint256(amountWei)
+//                ),
+//                Collections.<TypeReference<?>>emptyList());
+//        String data = FunctionEncoder.encode(function);
+//        //签名交易
+//        RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, gasPrice, gasLimit, coinAddress, data);
+//        byte[] signMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
+//        //广播交易
+//        String hash = web3j.ethSendRawTransaction(Numeric.toHexString(signMessage)).sendAsync().get().getTransactionHash();
+//        gmUserWithdraw.setWithdrawHash(hash);
         int insert = baseMapper.insert(gmUserWithdraw);
-        // 定时任务去刷新交易状态
+        if (insert != 1) {
+            throw new RRException(ErrorCode.WITHDRAW_INSERT_FAIL.getDesc());
+        }
+        // 冻结账号余额
+        BigDecimal frozeMoney = Arith.add(new BigDecimal(useWithdrawReq.getWithdrawMoney()), new BigDecimal(useWithdrawReq.getWithdrawHandlingFee()));
+        boolean b = userAccountService.withdrawFreeze(user.getUserId(), frozeMoney, useWithdrawReq.getWithdrawType());
+        if (!b) {
+            throw new RRException(ErrorCode.WITHDRAW_UPDATE_ACCOUNT_FAIL.getDesc());
+        }
+        // 插入账变明细
+        // 查询账户余额
+        UserAccountEntity userAccountEntity = userAccountService.queryByUserIdAndCur(user.getUserId(),useWithdrawReq.getWithdrawType());
+        UserBalanceDetailEntity userBalanceDetailEntity = new UserBalanceDetailEntity();
+        userBalanceDetailEntity.setUserId(user.getUserId());
+        userBalanceDetailEntity.setCurrency(useWithdrawReq.getWithdrawType());
+        userBalanceDetailEntity.setAmount(gmUserWithdraw.getWithdrawMoney());
+        userBalanceDetailEntity.setTradeType("00");//提现
+        userBalanceDetailEntity.setUserBalance(Arith.subtract(new BigDecimal(userAccountEntity.getBalance()), frozeMoney).doubleValue());
+        userBalanceDetailEntity.setTradeTime(new Date());
+        userBalanceDetailEntity.setTradeTimeTs(userBalanceDetailEntity.getTradeTime().getTime());
+        userBalanceDetailEntity.setSourceId(gmUserWithdraw.getWithdrawId());
+        userBalanceDetailEntity.setTradeDesc("申请提现冻结");
+        boolean b1 = userBalanceDetailService.save(userBalanceDetailEntity);
+        if (!b1) {
+            throw new RRException(ErrorCode.WITHDRAW_INSERT_BALANCE_DETAIL_FAIL.getDesc());
+        }
+    }
 
-
+    @Override
+    public boolean haveApplyWithdrawOrder(Long userId) {
+        GmUserWithdrawEntity gmUserWithdrawEntity = baseMapper.selectOne(new QueryWrapper<GmUserWithdrawEntity>()
+                .eq("user_id", userId)
+                .ne("status", Constant.WithdrawStatus.APPLY)
+                .last("limit 1")
+        );
+        return gmUserWithdrawEntity != null;
     }
 
 }

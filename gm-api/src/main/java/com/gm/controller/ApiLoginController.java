@@ -18,13 +18,10 @@ import com.gm.common.utils.*;
 import com.gm.common.validator.ValidatorUtils;
 import com.gm.annotation.Login;
 import com.gm.modules.sys.service.SysConfigService;
-import com.gm.modules.user.entity.GmUserVipLevelEntity;
-import com.gm.modules.user.entity.UserAccountEntity;
+import com.gm.modules.user.entity.*;
 import com.gm.modules.user.req.InviteDataForm;
 import com.gm.modules.user.req.InviteForm;
 import com.gm.modules.user.req.SignIn;
-import com.gm.modules.user.entity.UserEntity;
-import com.gm.modules.user.entity.UserLoginLogEntity;
 import com.gm.modules.user.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -67,6 +64,8 @@ public class ApiLoginController {
     private UserAccountService userAccountService;
     @Autowired
     private GmUserVipLevelService gmUserVipLevelService;
+    @Autowired
+    private GmUserWithdrawService gmUserWithdrawService;
 
     @PostMapping("signIn")
     @ApiOperation("签名验证")
@@ -247,8 +246,26 @@ public class ApiLoginController {
         map.put("userAgentRebate",userAccount.getBalance());
         // 查询代理账户可提余额，查询用户消费等级
         GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.queryById(userEntity.getVipLevelId());
-        map.put("userAgentRebateWithdraw",Arith.multiply(new BigDecimal(userAccount.getBalance()),new BigDecimal(gmUserVipLevel.getWithdrawLimit())));
+        BigDecimal userAgentRebateWithdraw = Arith.multiply(new BigDecimal(userAccount.getBalance()), new BigDecimal(gmUserVipLevel.getWithdrawLimit()));
+        map.put("userAgentRebateWithdraw", userAgentRebateWithdraw);
         map.put("withdrawHandlingFee",gmUserVipLevel.getWithdrawHandlingFee());
+        // 查询提现状态
+        map.put("withdrawStatus","0");// 可提
+        // 查询该用户是否已有提现订单
+        boolean b = gmUserWithdrawService.haveApplyWithdrawOrder(userEntity.getUserId());
+        if (b){
+            map.put("withdrawStatus","1");// 已经有申请提现中订单
+        }
+        if (userAgentRebateWithdraw.compareTo(BigDecimal.ZERO) == -1){
+            map.put("withdrawStatus","2");// 可提现额度不足
+        }
+        GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(userEntity);
+        if (lastWithdraw != null){
+            Date date = DateUtils.addDateHours(lastWithdraw.getCreateTime(), 24);// 上次提现时间加24小时，然后和当前时间做比较
+            if (date.after(new Date())){// 24小时只能发起一次提现
+                map.put("withdrawStatus","3");// 24小时只能发起一笔
+            }
+        }
         return R.ok(map);
     }
 
@@ -262,8 +279,27 @@ public class ApiLoginController {
         map.put("userFightingBalance",userAccount.getBalance());
         // 查询代理账户可提余额，查询用户消费等级
         GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.queryById(userEntity.getVipLevelId());
-        map.put("userFightingWithdraw",Arith.multiply(new BigDecimal(userAccount.getBalance()),new BigDecimal(gmUserVipLevel.getWithdrawLimit())));
+        BigDecimal userFightingWithdraw = Arith.multiply(new BigDecimal(userAccount.getBalance()), new BigDecimal(gmUserVipLevel.getWithdrawLimit()));
+        map.put("userFightingWithdraw", userFightingWithdraw);
         map.put("withdrawHandlingFee",gmUserVipLevel.getWithdrawHandlingFee());
+
+        // 查询提现状态
+        map.put("withdrawStatus","0");// 可提
+        // 查询该用户是否已有提现订单
+        boolean b = gmUserWithdrawService.haveApplyWithdrawOrder(userEntity.getUserId());
+        if (b){
+            map.put("withdrawStatus","1");// 已经有申请提现中订单
+        }
+        if (userFightingWithdraw.compareTo(BigDecimal.ZERO) == -1){
+            map.put("withdrawStatus","2");// 可提现额度不足
+        }
+        GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(userEntity);
+        if (lastWithdraw != null){
+            Date date = DateUtils.addDateHours(lastWithdraw.getCreateTime(), 24);// 上次提现时间加24小时，然后和当前时间做比较
+            if (date.after(new Date())){// 24小时只能发起一次提现
+                map.put("withdrawStatus","3");// 24小时只能发起一笔
+            }
+        }
         return R.ok(map);
     }
 

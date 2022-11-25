@@ -564,4 +564,22 @@ public class Constant {
             return value;
         }
     }
+
+    /**
+     * 提现状态（0：申请提现，1：提现成功，2：提现失败）
+     */
+    public enum WithdrawStatus {
+        APPLY(0),
+        SUCCESS(1),
+        FAIL(2);
+
+        private int value;
+        WithdrawStatus(int value) {
+            this.value = value;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
 }

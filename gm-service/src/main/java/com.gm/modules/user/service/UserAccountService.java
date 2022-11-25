@@ -44,5 +44,13 @@ public interface UserAccountService extends IService<UserAccountEntity> {
     UserAccountEntity queryByUserId(Long userId);
 
     UserAccountEntity queryByUserIdAndCur(Long userId, String currency);
+
+    /**
+     * 冻结账户余额
+     * @param userId 用户ID
+     * @param freezeMoney 金额
+     * @param currency 提现类型
+     */
+    boolean withdrawFreeze(Long userId, BigDecimal freezeMoney,String currency);
 }
 
