@@ -566,12 +566,14 @@ public class Constant {
     }
 
     /**
-     * 提现状态（0：申请提现，1：提现成功，2：提现失败）
+     * 提现状态（0：申请提现，1：审核通过，2：审核失败，3：提现成功，4：提现失败）
      */
     public enum WithdrawStatus {
         APPLY(0),
-        SUCCESS(1),
-        FAIL(2);
+        CHECK_SUCCESS(1),
+        CHECK_FAIL(2),
+        SUCCESS(3),
+        FAIL(4);
 
         private int value;
         WithdrawStatus(int value) {

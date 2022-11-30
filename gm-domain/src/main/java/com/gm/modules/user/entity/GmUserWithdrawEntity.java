@@ -34,7 +34,7 @@ public class GmUserWithdrawEntity implements Serializable {
      */
     private BigDecimal withdrawMoney;
     /**
-     * 提现状态（0：申请提现，1：提现成功，2：提现失败）
+     * 提现状态（0：申请提现，1：审核通过，2：审核失败，3：提现成功，4：提现失败）
      */
     private Integer status;
     /**
@@ -61,5 +61,29 @@ public class GmUserWithdrawEntity implements Serializable {
      * 提现账户类型(0:战斗账户，1：代理账户)
      */
     private String currency;
+    /**
+     * 审核时间
+     */
+    private Date checkTime;
+    /**
+     * 审核用户
+     */
+    private Long checkUser;
+    /**
+     * 确认时间
+     */
+    private Date confirmTime;
+    /**
+     * 审核时间时间戳
+     */
+    private Long checkTimeTs;
+    /**
+     * 确认时间时间戳
+     */
+    private Long confirmTimeTs;
+    /**
+     * 提现手续费
+     */
+    private BigDecimal serviceFee;
 
 }

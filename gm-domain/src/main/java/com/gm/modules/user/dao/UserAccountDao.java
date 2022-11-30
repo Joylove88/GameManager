@@ -40,4 +40,12 @@ public interface UserAccountDao extends BaseMapper<UserAccountEntity> {
      * @param currency 类型
      */
     Integer withdrawFreeze(@Param("userId") Long userId, @Param("freezeMoney") BigDecimal freezeMoney,@Param("currency") String currency);
+
+    /**
+     * 冻结账户余额
+     * @param userId 用户ID
+     * @param thawMoney 冻结金额
+     * @param currency 类型
+     */
+    Integer withdrawThaw(@Param("userId")Long userId, @Param("thawMoney") BigDecimal thawMoney,@Param("currency")  String currency);
 }

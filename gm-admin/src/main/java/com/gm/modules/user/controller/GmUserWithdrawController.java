@@ -1,15 +1,17 @@
 package com.gm.modules.user.controller;
 
+import com.gm.common.exception.RRException;
+import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
+import com.gm.modules.sys.controller.AbstractController;
 import com.gm.modules.user.entity.GmUserWithdrawEntity;
 import com.gm.modules.user.service.GmUserWithdrawService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.Map;
 
 
@@ -22,7 +24,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("user/gmuserwithdraw")
-public class GmUserWithdrawController {
+public class GmUserWithdrawController extends AbstractController{
     @Autowired
     private GmUserWithdrawService gmUserWithdrawService;
 
@@ -50,35 +52,41 @@ public class GmUserWithdrawController {
     }
 
     /**
-     * 保存
+     * 审核通过
      */
-    @RequestMapping("/save")
-    @RequiresPermissions("user:gmuserwithdraw:save")
-    public R save(@RequestBody GmUserWithdrawEntity gmUserWithdraw) {
-        gmUserWithdrawService.save(gmUserWithdraw);
-
-        return R.ok();
-    }
-
-    /**
-     * 修改
-     */
-    @RequestMapping("/update")
-    @RequiresPermissions("user:gmuserwithdraw:update")
-    public R update(@RequestBody GmUserWithdrawEntity gmUserWithdraw) {
+    @RequestMapping("/pass")
+    @RequiresPermissions("user:gmuserwithdraw:pass")
+    public R checkPass(@RequestBody GmUserWithdrawEntity gmUserWithdraw) {
         ValidatorUtils.validateEntity(gmUserWithdraw);
-        gmUserWithdrawService.updateById(gmUserWithdraw);
+        // 查询该笔订单
+        gmUserWithdraw = gmUserWithdrawService.getById(gmUserWithdraw.getWithdrawId());
+        if (gmUserWithdraw == null) {
+            throw new RRException("order not exit");
+        }
+        if (Constant.WithdrawStatus.APPLY.getValue() != gmUserWithdraw.getStatus()) {
+            throw new RRException("order not apply");
+        }
+        gmUserWithdrawService.checkPass(gmUserWithdraw,getUserId());
 
         return R.ok();
     }
 
     /**
-     * 删除
+     * 审核失败
      */
-    @RequestMapping("/delete")
-    @RequiresPermissions("user:gmuserwithdraw:delete")
-    public R delete(@RequestBody Long[] withdrawIds) {
-        gmUserWithdrawService.removeByIds(Arrays.asList(withdrawIds));
+    @RequestMapping("/fail")
+    @RequiresPermissions("user:gmuserwithdraw:fail")
+    public R checkFail(@RequestBody GmUserWithdrawEntity gmUserWithdraw) {
+        ValidatorUtils.validateEntity(gmUserWithdraw);
+        // 查询该笔订单
+        gmUserWithdraw = gmUserWithdrawService.getById(gmUserWithdraw.getWithdrawId());
+        if (gmUserWithdraw == null) {
+            throw new RRException("order not exit");
+        }
+        if (Constant.WithdrawStatus.APPLY.getValue() != gmUserWithdraw.getStatus()) {
+            throw new RRException("order not apply");
+        }
+        gmUserWithdrawService.checkFail(gmUserWithdraw,getUserId());
 
         return R.ok();
     }

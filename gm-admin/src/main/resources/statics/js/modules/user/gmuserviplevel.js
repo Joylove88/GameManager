@@ -14,6 +14,8 @@ $(function () {
             {label: '提现手续费', name: 'withdrawHandlingFee', index: 'WITHDRAW_HANDLING_FEE', width: 80},
             {label: '首次消费返佣金', name: 'firstBrokerage', index: 'FIRST_BROKERAGE', width: 80},
             {label: '消费返佣金', name: 'brokerage', index: 'BROKERAGE', width: 80},
+            {label: '提现手续费', name: 'withdrawHandlingFee', index: 'BROKERAGE', width: 80},
+            {label: '提现是否审核', name: 'needCheck', index: 'BROKERAGE', width: 80},
             {label: '创建人', name: 'createUser', index: 'CREATE_USER', width: 80},
             {label: '创建时间', name: 'createTime', index: 'CREATE_TIME', width: 80},
             {label: '创建时间', name: 'createTimeTs', index: 'CREATE_TIME_TS', width: 80, hidden: true},

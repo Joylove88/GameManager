@@ -52,5 +52,13 @@ public interface UserAccountService extends IService<UserAccountEntity> {
      * @param currency 提现类型
      */
     boolean withdrawFreeze(Long userId, BigDecimal freezeMoney,String currency);
+
+    /**
+     * 解冻账户余额
+     * @param userId 用户ID
+     * @param thawMoney 金额
+     * @param currency 提现类型
+     */
+    boolean withdrawThaw(Long userId, BigDecimal thawMoney, String currency);
 }
 

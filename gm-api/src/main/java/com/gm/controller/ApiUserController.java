@@ -359,8 +359,9 @@ public class ApiUserController {
             // 提现超额
             throw new RRException(ErrorCode.WITHDRAW_OVER_MONEY.getDesc());
         }
+        useWithdrawReq.setWithdrawHandlingFee(gmUserVipLevel.getWithdrawHandlingFee());
         try {
-            gmUserWithdrawService.withdraw(user,useWithdrawReq);
+            gmUserWithdrawService.withdraw(user,gmUserVipLevel,useWithdrawReq);
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

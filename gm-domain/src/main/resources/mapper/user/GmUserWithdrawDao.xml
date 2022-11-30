@@ -15,6 +15,11 @@
         <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
         <result property="withdrawHash" column="WITHDRAW_HASH"/>
         <result property="currency" column="CURRENCY"/>
+        <result property="checkTime" column="CHECK_TIME"/>
+        <result property="checkUser" column="CHECK_USER"/>
+        <result property="confirmTime" column="CONFIRM_TIME"/>
+        <result property="checkTimeTs" column="CHECK_TIME_TS"/>
+        <result property="confirmTimeTs" column="CONFIRM_TIME_TS"/>
     </resultMap>
 
 
