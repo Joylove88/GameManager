@@ -20,6 +20,7 @@ import com.gm.common.validator.ValidatorUtils;
 import com.gm.modules.basicconfig.entity.*;
 import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
 import com.gm.modules.basicconfig.service.*;
+import com.gm.modules.order.service.TransactionOrderService;
 import com.gm.modules.user.entity.*;
 import com.gm.modules.user.req.UseWithdrawReq;
 import com.gm.modules.user.req.UserHeroInfoReq;
@@ -88,6 +89,8 @@ public class ApiUserController {
     private GmUserVipLevelService gmUserVipLevelService;
     @Autowired
     private UserExperiencePotionService userExperiencePotionService;
+    @Autowired
+    private TransactionOrderService transactionOrderService;
 
     @Login
     @PostMapping("getUserHeroInfo")
@@ -388,6 +391,23 @@ public class ApiUserController {
         // 1.查询该用户代理账户提现记录
         PageUtils page = gmUserWithdrawService.queryWithdrawList(user.getUserId(),params,"1");
         return R.ok().put("page", page);
+    }
+
+    @Login
+    @PostMapping("vipLevelList")
+    @ApiOperation("消费等级信息列表")
+    public R vipLevelList(@LoginUser UserEntity user) {
+        // 1.查询消费等级列表
+        List<GmUserVipLevelEntity> gmUserVipLevelEntities = gmUserVipLevelService.vipLevelList(user);
+        // 2.查询该用户当前累计消费总额
+        Double consumeMoney = transactionOrderService.queryTotalMoneyByUserId(user.getUserId());
+        // 3.查询该用户的儿子的所有消费总额
+        Double sonConsumeMoney = transactionOrderService.querySonTotalMoneyByFatherId(user.getUserId());
+        Map<String,Object> map = new HashMap<>();
+        map.put("consumeMoney",consumeMoney);
+        map.put("sonConsumeMoney",sonConsumeMoney);
+        map.put("vipLevelList",gmUserVipLevelEntities);
+        return R.ok().put("data", map);
     }
 
 }

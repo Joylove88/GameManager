@@ -8,13 +8,17 @@ $(function () {
             {label: '提现金额', name: 'withdrawMoney', index: 'WITHDRAW_MONEY', width: 80},
             {label: '手续费', name: 'serviceFee', index: 'SERVICE_FEE', width: 80},
             {
-                label: '提现状态（0：申请提现，1：提现成功，2：提现失败）', name: 'status', index: 'STATUS', width: 80, formatter: function (value, options, row) {
+                label: '提现状态', name: 'status', index: 'STATUS', width: 80, formatter: function (value, options, row) {
                 if (value == '0') {
                     return '<span class="label badge-danger" style="background-color: #ed5565;">申请</span>';
                 } else if (value == '1') {
-                    return '<span class="label label-info">成功</span>';
+                    return '<span class="label label-info">审核通过</span>';
                 } else if (value == '2') {
-                    return '<span class="label label-info">失败</span>';
+                    return '<span class="label label-info">审核失败</span>';
+                } else if (value == '3') {
+                    return '<span class="label label-info">提现成功</span>';
+                } else if (value == '4') {
+                    return '<span class="label label-info">提现失败</span>';
                 }
             }
             },

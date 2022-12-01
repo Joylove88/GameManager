@@ -182,4 +182,11 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
     public GmUserVipLevelEntity queryById(Long vipLevelId) {
         return baseMapper.selectById(vipLevelId);
     }
+
+    @Override
+    public List<GmUserVipLevelEntity> vipLevelList(UserEntity user) {
+        // 1.查询当前会员等级
+        return baseMapper.selectList(new QueryWrapper<GmUserVipLevelEntity>()
+                .orderByAsc("VIP_LEVEL_CODE"));
+    }
 }
