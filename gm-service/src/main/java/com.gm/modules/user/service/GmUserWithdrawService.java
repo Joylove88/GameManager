@@ -8,15 +8,12 @@ import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.req.UseWithdrawReq;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
  * 提现表
- *
- * @author Axiang
- * @email Axiang@gmail.com
- * @date 2022-08-09 19:13:43
  */
 public interface GmUserWithdrawService extends IService<GmUserWithdrawEntity> {
 
@@ -33,5 +30,11 @@ public interface GmUserWithdrawService extends IService<GmUserWithdrawEntity> {
     void checkPass(GmUserWithdrawEntity gmUserWithdraw,Long userId);
 
     void checkFail(GmUserWithdrawEntity gmUserWithdraw, Long userId);
+
+    List<GmUserWithdrawEntity> queryOrderByStatus(Integer status);
+
+    void transfer(GmUserWithdrawEntity gmUserWithdrawEntity) throws IOException, ExecutionException, InterruptedException;
+
+    void confirmTransfer(GmUserWithdrawEntity gmUserWithdrawEntity);
 }
 

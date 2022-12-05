@@ -34,7 +34,7 @@ public class GmUserWithdrawEntity implements Serializable {
      */
     private BigDecimal withdrawMoney;
     /**
-     * 提现状态（0：申请提现，1：审核通过，2：审核失败，3：提现成功，4：提现失败）
+     * 提现状态（0：申请提现，1：审核通过，2：审核失败，3:提现中，4：提现成功，5：提现失败）
      */
     private Integer status;
     /**
