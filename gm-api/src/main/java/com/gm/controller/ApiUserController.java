@@ -403,9 +403,12 @@ public class ApiUserController {
         Double consumeMoney = transactionOrderService.queryTotalMoneyByUserId(user.getUserId());
         // 3.查询该用户的儿子的所有消费总额
         Double sonConsumeMoney = transactionOrderService.querySonTotalMoneyByFatherId(user.getUserId());
+        // 4.查询该用户的下级人数
+        Integer userInviteNum = userService.queryInviteNum(user);
         Map<String,Object> map = new HashMap<>();
         map.put("consumeMoney",consumeMoney);
         map.put("sonConsumeMoney",sonConsumeMoney);
+        map.put("userInviteNum",userInviteNum);
         map.put("vipLevelList",gmUserVipLevelEntities);
         return R.ok().put("data", map);
     }

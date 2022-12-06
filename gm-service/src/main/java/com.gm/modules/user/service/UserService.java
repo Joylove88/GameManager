@@ -60,4 +60,6 @@ public interface UserService extends IService<UserEntity> {
 	 * @return
 	 */
 	List<UserInfoRsp> getPlayerInfo(Map<String, Object> map);
+
+    Integer queryInviteNum(UserEntity user);
 }

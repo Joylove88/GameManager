@@ -10,6 +10,7 @@ package com.gm.modules.user.service.impl;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gm.common.utils.Constant;
@@ -156,6 +157,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 	@Override
 	public List<UserInfoRsp> getPlayerInfo(Map<String, Object> map) {
 		return userDao.getPlayerInfo(map);
+	}
+
+	@Override
+	public Integer queryInviteNum(UserEntity user) {
+		return userDao.selectCount(new QueryWrapper<UserEntity>()
+				.eq("father_id",user.getUserId())
+		);
 	}
 
 }
