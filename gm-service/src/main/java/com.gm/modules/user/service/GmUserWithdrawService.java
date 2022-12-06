@@ -35,6 +35,6 @@ public interface GmUserWithdrawService extends IService<GmUserWithdrawEntity> {
 
     void transfer(GmUserWithdrawEntity gmUserWithdrawEntity) throws IOException, ExecutionException, InterruptedException;
 
-    void confirmTransfer(GmUserWithdrawEntity gmUserWithdrawEntity);
+    void confirmTransfer(GmUserWithdrawEntity gmUserWithdrawEntity) throws IOException;
 }
 

@@ -60,5 +60,15 @@ public interface UserAccountService extends IService<UserAccountEntity> {
      * @param currency 提现类型
      */
     boolean withdrawThaw(Long userId, BigDecimal thawMoney, String currency);
+
+    /**
+     * 提现成功
+     */
+    boolean withdrawSuccess(Long userId, BigDecimal withdrawMoney, String currency);
+
+    /**
+     * 提现失败
+     */
+    boolean withdrawFail(Long userId, BigDecimal withdrawMoney, String currency);
 }
 

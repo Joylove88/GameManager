@@ -33,6 +33,9 @@ import org.web3j.crypto.RawTransaction;
 import org.web3j.crypto.TransactionEncoder;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
+import org.web3j.protocol.core.methods.response.EthTransaction;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
@@ -301,6 +304,8 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
         GmUserWithdrawEntity newWithdraw = new GmUserWithdrawEntity();
         newWithdraw.setWithdrawId(gmUserWithdrawEntity.getWithdrawId());
         newWithdraw.setStatus(Constant.WithdrawStatus.ING.getValue());
+        newWithdraw.setUpdateTime(new Date());
+        newWithdraw.setUpdateTimeTs(newWithdraw.getUpdateTime().getTime());
         int update = baseMapper.update(newWithdraw, new UpdateWrapper<GmUserWithdrawEntity>()
                 .eq("withdraw_id", newWithdraw.getWithdrawId())
                 .eq("status", Constant.WithdrawStatus.CHECK_SUCCESS.getValue())
@@ -319,8 +324,114 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
     }
 
     @Override
-    public void confirmTransfer(GmUserWithdrawEntity gmUserWithdrawEntity) {
+    public void confirmTransfer(GmUserWithdrawEntity gmUserWithdrawEntity) throws IOException {
+        EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(gmUserWithdrawEntity.getWithdrawHash()).send();
+        Optional<TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
+        if (transactionReceipt.isPresent()) {
+            TransactionReceipt receipt = transactionReceipt.get();
+            String status = receipt.getStatus();
+            if ("0x1".equals(status)) {
+                // 成功
+                // 1.更新订单状态
+                GmUserWithdrawEntity newGmUserWithdrawEntity = new GmUserWithdrawEntity();
+                newGmUserWithdrawEntity.setWithdrawId(gmUserWithdrawEntity.getWithdrawId());
+                newGmUserWithdrawEntity.setConfirmTime(new Date());
+                newGmUserWithdrawEntity.setConfirmTimeTs(newGmUserWithdrawEntity.getConfirmTime().getTime());
+                newGmUserWithdrawEntity.setStatus(Constant.WithdrawStatus.SUCCESS.getValue());
+                int update = baseMapper.update(newGmUserWithdrawEntity, new UpdateWrapper<GmUserWithdrawEntity>()
+                        .eq("withdraw_id", newGmUserWithdrawEntity.getWithdrawId())
+                        .eq("status", Constant.WithdrawStatus.ING.getValue())
+                );
+                if (update != 1) {
+                    throw new RRException("confirmTransfer 更新订单状态失败" + gmUserWithdrawEntity.getWithdrawId());
+                }
+                // 2.更新账户余额
+                BigDecimal withdrawMoney = Arith.add(gmUserWithdrawEntity.getWithdrawMoney(), gmUserWithdrawEntity.getServiceFee());
+                boolean b = userAccountService.withdrawSuccess(gmUserWithdrawEntity.getUserId(), withdrawMoney, gmUserWithdrawEntity.getCurrency());
+                if (!b) {
+                    throw new RRException("confirmTransfer 更新账户余额失败" + gmUserWithdrawEntity.getWithdrawId());
+                }
+                // 3.插入账变明细
+                // 查询账户余额
+                UserAccountEntity userAccountEntity = userAccountService.queryByUserIdAndCur(gmUserWithdrawEntity.getUserId(), gmUserWithdrawEntity.getCurrency());
+                UserBalanceDetailEntity userBalanceDetailEntity = new UserBalanceDetailEntity();
+                userBalanceDetailEntity.setUserId(gmUserWithdrawEntity.getUserId());
+                userBalanceDetailEntity.setCurrency(gmUserWithdrawEntity.getCurrency());
+                userBalanceDetailEntity.setAmount(Arith.add(gmUserWithdrawEntity.getWithdrawMoney(), gmUserWithdrawEntity.getServiceFee()));
+                userBalanceDetailEntity.setTradeType("00");//提现
+                userBalanceDetailEntity.setUserBalance(userAccountEntity.getBalance());
+                userBalanceDetailEntity.setTradeTime(new Date());
+                userBalanceDetailEntity.setTradeTimeTs(userBalanceDetailEntity.getTradeTime().getTime());
+                userBalanceDetailEntity.setSourceId(gmUserWithdrawEntity.getWithdrawId());
+                userBalanceDetailEntity.setTradeDesc("提现成功");
+                boolean b1 = userBalanceDetailService.save(userBalanceDetailEntity);
+                if (!b1) {
+                    throw new RRException(ErrorCode.WITHDRAW_INSERT_BALANCE_DETAIL_FAIL.getDesc());
+                }
+            } else if ("0x0".equals(status)) {
+                // 失败
+                // 1.更新订单状态
+                GmUserWithdrawEntity newGmUserWithdrawEntity = new GmUserWithdrawEntity();
+                newGmUserWithdrawEntity.setWithdrawId(gmUserWithdrawEntity.getWithdrawId());
+                newGmUserWithdrawEntity.setConfirmTime(new Date());
+                newGmUserWithdrawEntity.setConfirmTimeTs(newGmUserWithdrawEntity.getConfirmTime().getTime());
+                newGmUserWithdrawEntity.setStatus(Constant.WithdrawStatus.FAIL.getValue());
+                int update = baseMapper.update(newGmUserWithdrawEntity, new UpdateWrapper<GmUserWithdrawEntity>()
+                        .eq("withdraw_id", newGmUserWithdrawEntity.getWithdrawId())
+                        .eq("status", Constant.WithdrawStatus.ING.getValue())
+                );
+                if (update != 1) {
+                    throw new RRException("confirmTransfer 更新订单状态失败" + gmUserWithdrawEntity.getWithdrawId());
+                }
+                // 2.更新账户余额
+                BigDecimal withdrawMoney = Arith.add(gmUserWithdrawEntity.getWithdrawMoney(), gmUserWithdrawEntity.getServiceFee());
+                boolean b = userAccountService.withdrawFail(gmUserWithdrawEntity.getUserId(), withdrawMoney, gmUserWithdrawEntity.getCurrency());
+                if (!b) {
+                    throw new RRException("confirmTransfer 更新账户余额失败" + gmUserWithdrawEntity.getWithdrawId());
+                }
+                // 3.插入账变明细
+                // 查询账户余额
+                UserAccountEntity userAccountEntity = userAccountService.queryByUserIdAndCur(gmUserWithdrawEntity.getUserId(), gmUserWithdrawEntity.getCurrency());
+                UserBalanceDetailEntity userBalanceDetailEntity = new UserBalanceDetailEntity();
+                userBalanceDetailEntity.setUserId(gmUserWithdrawEntity.getUserId());
+                userBalanceDetailEntity.setCurrency(gmUserWithdrawEntity.getCurrency());
+                userBalanceDetailEntity.setAmount(Arith.add(gmUserWithdrawEntity.getWithdrawMoney(), gmUserWithdrawEntity.getServiceFee()));
+                userBalanceDetailEntity.setTradeType("17");//提现失败，解冻
+                userBalanceDetailEntity.setUserBalance(userAccountEntity.getBalance());
+                userBalanceDetailEntity.setTradeTime(new Date());
+                userBalanceDetailEntity.setTradeTimeTs(userBalanceDetailEntity.getTradeTime().getTime());
+                userBalanceDetailEntity.setSourceId(gmUserWithdrawEntity.getWithdrawId());
+                userBalanceDetailEntity.setTradeDesc("提现失败，解冻");
+                boolean b1 = userBalanceDetailService.save(userBalanceDetailEntity);
+                if (!b1) {
+                    throw new RRException(ErrorCode.WITHDRAW_INSERT_BALANCE_DETAIL_FAIL.getDesc());
+                }
+            }
+        }
+    }
 
+    public static void main(String[] args) throws IOException {
+//        String hash = "0xc757ef40930cb2c344ad59e46c64d3eeb34904c65f4f2da48ac97a15d21298a4";
+        String hash = "0x6810d6daa686237f67be5d4439e760cf1d11d1b2bab09a39b5e99bdd7357789b";
+        Web3j web3j = TransactionVerifyUtils.connect();
+        EthTransaction send = web3j.ethGetTransactionByHash(hash).send();
+//{"jsonrpc":"2.0","id":0,"result":{"blockHash":"0x774ea2461c184fb9efa985f5cc1149724d74eccfbe65a7ae91109dc9f92ec5a7","blockNumber":"0x17d2b42","from":"0xaa25aa7a19f9c426e07dee59b12f944f4d9f1dd3","gas":"0x5208","gasPrice":"0x430e23400","hash":"0xc757ef40930cb2c344ad59e46c64d3eeb34904c65f4f2da48ac97a15d21298a4","input":"0x","nonce":"0x646314","to":"0x89394dd3903ae07723012292ddb1f5ca1b6bce45","transactionIndex":"0x0","value":"0x6f05b59d3b20000","type":"0x0","v":"0xe6","r":"0x69a9788699c1be77bb88e219742c321d33e57271c8a9c90bc51c5e6e3815f72b","s":"0x31ebcfaf76bb407255e93e9722bbe7236d445482cfda59945793155ca95f5284"}}
+//{"jsonrpc":"2.0","id":0,"result":{"blockHash":"0x1dde6b1f5ad062d03d3f4618c1a984eba64f0ac7ceb00b46bc9aeb29bea531f6","blockNumber":"0x1803967","from":"0xaa25aa7a19f9c426e07dee59b12f944f4d9f1dd3","gas":"0x5208","gasPrice":"0x430e23400","hash":"0x6810d6daa686237f67be5d4439e760cf1d11d1b2bab09a39b5e99bdd7357789b","input":"0x","nonce":"0x656ccc","to":"0xb2bf67468170f1b8f32f29011c2e9ab302d80749","transactionIndex":"0x2","value":"0x6f05b59d3b20000","type":"0x0","v":"0xe6","r":"0x81366c481d587eaef0fe00c0f26ca1959a20a53240a308a002324134fa98784d","s":"0x6b2d60013d57de8752f931b8a34f2afa7404d58bded90e85d41c1bfd28a20183"}}
+        EthGetTransactionReceipt send1 = web3j.ethGetTransactionReceipt(hash).send();
+//{"jsonrpc":"2.0","id":1,"result":{"blockHash":"0x774ea2461c184fb9efa985f5cc1149724d74eccfbe65a7ae91109dc9f92ec5a7","blockNumber":"0x17d2b42","contractAddress":null,"cumulativeGasUsed":"0x5208","effectiveGasPrice":"0x430e23400","from":"0xaa25aa7a19f9c426e07dee59b12f944f4d9f1dd3","gasUsed":"0x5208","logs":[],"logsBloom":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","status":"0x1","to":"0x89394dd3903ae07723012292ddb1f5ca1b6bce45","transactionHash":"0xc757ef40930cb2c344ad59e46c64d3eeb34904c65f4f2da48ac97a15d21298a4","transactionIndex":"0x0","type":"0x0"}}
+//{"jsonrpc":"2.0","id":1,"result":{"blockHash":"0x1dde6b1f5ad062d03d3f4618c1a984eba64f0ac7ceb00b46bc9aeb29bea531f6","blockNumber":"0x1803967","contractAddress":null,"cumulativeGasUsed":"0x48569","effectiveGasPrice":"0x430e23400","from":"0xaa25aa7a19f9c426e07dee59b12f944f4d9f1dd3","gasUsed":"0x5208","logs":[],"logsBloom":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","status":"0x0","to":"0xb2bf67468170f1b8f32f29011c2e9ab302d80749","transactionHash":"0x6810d6daa686237f67be5d4439e760cf1d11d1b2bab09a39b5e99bdd7357789b","transactionIndex":"0x2","type":"0x0"}}
+        System.out.println(111);
+
+        EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(hash).send();
+        Optional<TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
+        boolean present = transactionReceipt.isPresent();
+        System.out.println(present);
+        String s = transactionReceipt.toString();
+        System.out.println(s);
+        if (transactionReceipt.isPresent()) {
+            String status = transactionReceipt.get().getStatus();
+            System.out.println(status);
+        }
     }
 
 }

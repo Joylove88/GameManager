@@ -30,4 +30,8 @@
         UPDATE gm_user_account SET BALANCE = IFNULL(BALANCE, 0) + #{thawMoney} ,FROZEN = IFNULL(FROZEN,0) - #{thawMoney}
         WHERE USER_ID = #{userId} AND CURRENCY = #{currency}
     </update>
+    <update id="withdrawSuccess">
+        UPDATE gm_user_account SET TOTAL_AMOUNT = IFNULL(TOTAL_AMOUNT, 0) - #{withdrawMoney} ,FROZEN = IFNULL(FROZEN,0) - #{withdrawMoney}
+        WHERE USER_ID = #{userId} AND CURRENCY = #{currency}
+    </update>
 </mapper>

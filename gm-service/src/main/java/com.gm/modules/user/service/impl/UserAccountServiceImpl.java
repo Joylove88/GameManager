@@ -10,12 +10,14 @@ import com.gm.modules.user.entity.UserAccountEntity;
 import com.gm.modules.user.service.UserAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
 
 @Service("userAccountService")
+@Transactional
 public class UserAccountServiceImpl extends ServiceImpl<UserAccountDao, UserAccountEntity> implements UserAccountService {
     @Autowired
     private UserAccountDao userAccountDao;
@@ -63,6 +65,16 @@ public class UserAccountServiceImpl extends ServiceImpl<UserAccountDao, UserAcco
     @Override
     public boolean withdrawThaw(Long userId, BigDecimal thawMoney, String currency) {
         return retBool(userAccountDao.withdrawThaw(userId, thawMoney, currency));
+    }
+
+    @Override
+    public boolean withdrawSuccess(Long userId, BigDecimal withdrawMoney, String currency) {
+        return retBool(userAccountDao.withdrawSuccess(userId, withdrawMoney, currency));
+    }
+
+    @Override
+    public boolean withdrawFail(Long userId, BigDecimal withdrawMoney, String currency) {
+        return retBool(userAccountDao.withdrawThaw(userId, withdrawMoney, currency));
     }
 
 }
