@@ -17,6 +17,7 @@ import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
 import com.gm.common.utils.*;
 import com.gm.common.validator.ValidatorUtils;
+import com.gm.common.web3Utils.TransactionVerifyUtils;
 import com.gm.modules.basicconfig.entity.*;
 import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
 import com.gm.modules.basicconfig.service.*;
@@ -34,9 +35,16 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.utils.Convert;
+import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -343,9 +351,25 @@ public class ApiUserController {
     @Login
     @PostMapping("withdraw")
     @ApiOperation("玩家提现")
-    public R withdraw(@LoginUser UserEntity user, @RequestBody UseWithdrawReq useWithdrawReq) {
+    public R withdraw(@LoginUser UserEntity user, @RequestBody UseWithdrawReq useWithdrawReq) throws IOException {
         // 表单校验
         ValidatorUtils.validateEntity(useWithdrawReq);
+        // 根据交易哈希查询交易
+        Web3j web3j = TransactionVerifyUtils.connect();
+        EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(useWithdrawReq.getRefundHash()).send();
+        Optional<TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
+        if (!transactionReceipt.isPresent()) {
+            throw new RRException("query hash fail");
+        }
+        TransactionReceipt receipt = transactionReceipt.get();
+        String data = receipt.getLogs().get(0).getData();
+        String one = data.substring(0, 66);// 时间戳
+        String two = data.substring(66, 130);// gas费
+        String there = data.substring(130, 194);// 提款金额
+        BigInteger oneBigInteger = Numeric.toBigInt(one);
+        BigDecimal twoBigDecimal = Convert.fromWei(Numeric.toBigInt("0x"+two).toString(), Convert.Unit.ETHER);
+        BigDecimal thereBigDecimal = Convert.fromWei(Numeric.toBigInt("0x"+there).toString(), Convert.Unit.ETHER);
+        useWithdrawReq.setWithdrawMoney(thereBigDecimal);
         // 1.查询该会员上次提现时间
         GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(user);
         if (lastWithdraw != null){
@@ -358,11 +382,11 @@ public class ApiUserController {
         GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.getById(user.getVipLevelId());
         // 3.查询该会员当前余额
         UserAccountEntity userAccountEntity = userAccountService.queryByUserIdAndCur(user.getUserId(),useWithdrawReq.getWithdrawType());
-        if (userAccountEntity.getBalance()*gmUserVipLevel.getWithdrawLimit() < Double.valueOf(useWithdrawReq.getWithdrawMoney())){
+        if (userAccountEntity.getBalance()*gmUserVipLevel.getWithdrawLimit() < thereBigDecimal.doubleValue()){
             // 提现超额
             throw new RRException(ErrorCode.WITHDRAW_OVER_MONEY.getDesc());
         }
-        useWithdrawReq.setWithdrawHandlingFee(gmUserVipLevel.getWithdrawHandlingFee());
+        useWithdrawReq.setWithdrawHandlingFee(new BigDecimal(gmUserVipLevel.getWithdrawHandlingFee()));
         try {
             gmUserWithdrawService.withdraw(user,gmUserVipLevel,useWithdrawReq);
         } catch (ExecutionException e) {

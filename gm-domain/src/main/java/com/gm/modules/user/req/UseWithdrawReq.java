@@ -3,6 +3,7 @@ package com.gm.modules.user.req;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import java.math.BigDecimal;
 
 /**
  * 玩家提现请求参数
@@ -10,10 +11,10 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class UseWithdrawReq {
     /**
-     * 提现金额
+     * 扣gas费交易哈希
      */
-    @NotBlank(message = "withdraw money can not null")
-    private String withdrawMoney;
+    @NotBlank(message = "refundHash can not null")
+    private String refundHash;
     /**
      * 提现类型(0:战斗账户，1：代理账户)
      */
@@ -22,6 +23,10 @@ public class UseWithdrawReq {
     /**
      * 提现手续费
      */
-    private Double withdrawHandlingFee;
+    private BigDecimal withdrawHandlingFee;
+    /**
+     * 提现金额
+     */
+    private BigDecimal withdrawMoney;
 
 }
