@@ -359,9 +359,13 @@ public class ApiUserController {
         EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(useWithdrawReq.getRefundHash()).send();
         Optional<TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
         if (!transactionReceipt.isPresent()) {
-            throw new RRException("query hash fail");
+//            throw new RRException("query hash fail");
+            return R.ok();
         }
         TransactionReceipt receipt = transactionReceipt.get();
+        if (!"0x1".equals(receipt.getStatus())){//不成功
+            return R.ok();
+        }
         String data = receipt.getLogs().get(0).getData();
         String one = data.substring(0, 66);// 时间戳
         String two = data.substring(66, 130);// gas费
