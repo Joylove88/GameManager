@@ -2,6 +2,7 @@ package com.gm.modules.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
+import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserEquipmentEntity;
 import com.gm.modules.user.rsp.UserEquipInfoRsp;
 
@@ -25,5 +26,7 @@ public interface UserEquipmentService extends IService<UserEquipmentEntity> {
      * @return
      */
     List<UserEquipInfoRsp> getUserEquip(UserEquipmentEntity userEquipmentEntity);
+
+    List<UserEquipmentEntity> queryUserEquipment(UserEntity user);
 }
 

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.modules.user.dao.UserHeroFragDao;
+import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroFragEntity;
 import com.gm.modules.user.rsp.UserHeroFragInfoRsp;
 import com.gm.modules.user.service.UserHeroFragService;
@@ -49,6 +50,15 @@ public class UserHeroFragServiceImpl extends ServiceImpl<UserHeroFragDao, UserHe
         Date now = new Date();
         map.put("updateTime", now.getTime());
         userHeroFragDao.depleteHeroFrag(map);
+    }
+
+    @Override
+    public List<UserHeroFragEntity> queryUserHeroFrag(UserEntity user) {
+        return userHeroFragDao.selectList(new QueryWrapper<UserHeroFragEntity>()
+                .eq("USER_ID",user.getUserId())
+                .eq("STATUS",1)
+                .orderByAsc("CREATE_TIME")
+        );
     }
 
 }

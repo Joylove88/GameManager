@@ -2,6 +2,7 @@ package com.gm.modules.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
+import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserEquipmentFragEntity;
 import com.gm.modules.user.rsp.UserEquipmentFragInfoRsp;
 
@@ -25,5 +26,7 @@ public interface UserEquipmentFragService extends IService<UserEquipmentFragEnti
      * @return
      */
     List<UserEquipmentFragInfoRsp> getUserAllEquipFrag(Long userId);
+
+    List<UserEquipmentFragEntity> queryUserEquipmentFrag(UserEntity user);
 }
 

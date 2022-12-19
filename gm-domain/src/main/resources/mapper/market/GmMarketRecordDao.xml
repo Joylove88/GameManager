@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.market.dao.GmMarketRecordDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.market.entity.GmMarketRecordEntity" id="gmMarketRecordMap">
+        <result property="id" column="ID"/>
+        <result property="marketOnlineId" column="MARKET_ONLINE_ID"/>
+        <result property="buyUserId" column="BUY_USER_ID"/>
+        <result property="sellUserId" column="SELL_USER_ID"/>
+        <result property="sellPrice" column="SELL_PRICE"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+    </resultMap>
+
+
+</mapper>

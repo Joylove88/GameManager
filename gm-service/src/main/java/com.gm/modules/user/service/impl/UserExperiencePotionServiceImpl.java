@@ -133,4 +133,13 @@ public class UserExperiencePotionServiceImpl extends ServiceImpl<UserExperienceP
         return true;
     }
 
+    @Override
+    public List<UserExperiencePotionEntity> queryUserExperiencePotion(UserEntity user) {
+        return userExperiencePotionDao.selectList(new QueryWrapper<UserExperiencePotionEntity>()
+                .eq("USER_ID",user.getUserId())
+                .eq("STATUS",1)
+                .orderByAsc("CREATE_TIME")
+        );
+    }
+
 }

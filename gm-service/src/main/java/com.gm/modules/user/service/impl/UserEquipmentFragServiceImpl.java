@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.modules.user.dao.UserEquipmentFragDao;
+import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserEquipmentFragEntity;
 import com.gm.modules.user.rsp.UserEquipmentFragInfoRsp;
 import com.gm.modules.user.service.UserEquipmentFragService;
@@ -42,6 +43,15 @@ public class UserEquipmentFragServiceImpl extends ServiceImpl<UserEquipmentFragD
     @Override
     public List<UserEquipmentFragInfoRsp> getUserAllEquipFrag(Long userId) {
         return userEquipmentFragDao.getUserAllEquipFrag(userId);
+    }
+
+    @Override
+    public List<UserEquipmentFragEntity> queryUserEquipmentFrag(UserEntity user) {
+        return userEquipmentFragDao.selectList(new QueryWrapper<UserEquipmentFragEntity>()
+                .eq("USER_ID",user.getUserId())
+                .eq("STATUS",1)
+                .orderByAsc("CREATE_TIME")
+        );
     }
 
 }

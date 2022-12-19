@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.modules.user.dao.UserEquipmentDao;
+import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserEquipmentEntity;
 import com.gm.modules.user.rsp.UserEquipInfoRsp;
 import com.gm.modules.user.service.UserEquipmentService;
@@ -42,6 +43,15 @@ public class UserEquipmentServiceImpl extends ServiceImpl<UserEquipmentDao, User
     @Override
     public List<UserEquipInfoRsp> getUserEquip(UserEquipmentEntity userEquipmentEntity) {
         return userEquipmentDao.getUserEquip(userEquipmentEntity);
+    }
+
+    @Override
+    public List<UserEquipmentEntity> queryUserEquipment(UserEntity user) {
+        return userEquipmentDao.selectList(new QueryWrapper<UserEquipmentEntity>()
+                .eq("USER_ID",user.getUserId())
+                .eq("STATUS",1)
+                .orderByAsc("CREATE_TIME")
+        );
     }
 
 }

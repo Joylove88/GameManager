@@ -2,6 +2,7 @@ package com.gm.modules.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
+import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
 
@@ -31,5 +32,7 @@ public interface UserHeroService extends IService<UserHeroEntity> {
      * @return
      */
     UserHeroEntity getUserHeroById(Map<String, Object> map);
+
+    List<UserHeroEntity> queryUserHero(UserEntity user);
 }
 
