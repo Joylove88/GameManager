@@ -13,6 +13,7 @@ import com.gm.modules.basicconfig.entity.HeroLevelEntity;
 import com.gm.modules.user.dao.UserExperiencePotionDao;
 import com.gm.modules.user.dao.UserHeroDao;
 import com.gm.modules.user.entity.UserEntity;
+import com.gm.modules.user.entity.UserEquipmentFragEntity;
 import com.gm.modules.user.entity.UserExperiencePotionEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
 import com.gm.modules.user.req.UseExpReq;
@@ -134,12 +135,15 @@ public class UserExperiencePotionServiceImpl extends ServiceImpl<UserExperienceP
     }
 
     @Override
-    public List<UserExperiencePotionEntity> queryUserExperiencePotion(UserEntity user) {
-        return userExperiencePotionDao.selectList(new QueryWrapper<UserExperiencePotionEntity>()
-                .eq("USER_ID",user.getUserId())
-                .eq("STATUS",1)
-                .orderByAsc("CREATE_TIME")
+    public PageUtils queryUserExperiencePotion(Long userId, Map<String, Object> params) {
+        IPage<UserExperiencePotionEntity> page = this.page(
+                new Query<UserExperiencePotionEntity>().getPage(params),
+                new QueryWrapper<UserExperiencePotionEntity>()
+                        .eq("A.USER_ID",userId)
+                        .eq("A.STATUS",1)
+
         );
+        return new PageUtils(page);
     }
 
 }

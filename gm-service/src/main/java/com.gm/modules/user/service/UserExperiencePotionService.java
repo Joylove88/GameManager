@@ -25,6 +25,6 @@ public interface UserExperiencePotionService extends IService<UserExperiencePoti
 
     boolean userHeroUseEx(UserEntity user, UseExpReq useExpReq);
 
-    List<UserExperiencePotionEntity> queryUserExperiencePotion(UserEntity user);
+    PageUtils queryUserExperiencePotion(Long userId, Map<String, Object> params);
 }
 

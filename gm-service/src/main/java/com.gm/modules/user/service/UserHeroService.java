@@ -33,6 +33,7 @@ public interface UserHeroService extends IService<UserHeroEntity> {
      */
     UserHeroEntity getUserHeroById(Map<String, Object> map);
 
-    List<UserHeroEntity> queryUserHero(UserEntity user);
+    PageUtils queryUserHero(Long userId, Map<String, Object> params);
+
 }
 

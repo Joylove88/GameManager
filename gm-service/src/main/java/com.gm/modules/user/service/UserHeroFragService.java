@@ -34,6 +34,6 @@ public interface UserHeroFragService extends IService<UserHeroFragEntity> {
      */
     void depleteHeroFrag(Map<String, Object> map);
 
-    List<UserHeroFragEntity> queryUserHeroFrag(UserEntity user);
+    PageUtils queryUserHeroFrag(Long userId, Map<String, Object> params);
 }
 

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.modules.user.dao.UserHeroDao;
+import com.gm.modules.user.entity.GmUserWithdrawEntity;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
@@ -54,12 +55,15 @@ public class UserHeroServiceImpl extends ServiceImpl<UserHeroDao, UserHeroEntity
     }
 
     @Override
-    public List<UserHeroEntity> queryUserHero(UserEntity user) {
-        return userHeroDao.selectList(new QueryWrapper<UserHeroEntity>()
-                .eq("USER_ID",user.getUserId())
-                .eq("STATUS",1)
-                .orderByAsc("CREATE_TIME")
+    public PageUtils queryUserHero(Long userId, Map<String, Object> params) {
+        IPage<UserHeroEntity> page = this.page(
+                new Query<UserHeroEntity>().getPage(params),
+                new QueryWrapper<UserHeroEntity>()
+                        .eq("A.USER_ID",userId)
+                        .eq("A.STATUS",1)
+
         );
+        return new PageUtils(page);
     }
 
 }

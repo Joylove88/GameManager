@@ -27,6 +27,6 @@ public interface UserEquipmentFragService extends IService<UserEquipmentFragEnti
      */
     List<UserEquipmentFragInfoRsp> getUserAllEquipFrag(Long userId);
 
-    List<UserEquipmentFragEntity> queryUserEquipmentFrag(UserEntity user);
+    PageUtils queryUserEquipmentFrag(Long userId, Map<String, Object> params);
 }
 

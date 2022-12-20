@@ -2,24 +2,23 @@ package com.gm.controller;
 
 import com.gm.annotation.Login;
 import com.gm.annotation.LoginUser;
+import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.R;
 import com.gm.modules.market.dto.GetItemsReq;
 import com.gm.modules.user.entity.*;
 import com.gm.modules.user.service.*;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 市场接口
  */
 @RestController
-@RequestMapping()
+@RequestMapping("/api")
 @Api(tags = "市场接口")
 public class ApiMarketController {
     @Autowired
@@ -40,28 +39,39 @@ public class ApiMarketController {
      */
     @Login
     @PostMapping("getItems")
-    public R getItems(@LoginUser UserEntity user, @RequestBody GetItemsReq getItemsReq) {
-        switch (getItemsReq.getItemsType()) {
+    public R getItems(@LoginUser UserEntity user, @RequestParam Map<String, Object> params) {
+        String itemsType = (String)params.getOrDefault("itemsType","99");
+        switch (itemsType) {
             case "0":
                 //1.获取我的英雄
-                List<UserHeroEntity> userHeroEntityList = userHeroService.queryUserHero(user);
-                return R.ok().put("data", userHeroEntityList);
+                PageUtils page = userHeroService.queryUserHero(user.getUserId(),params);
+                return R.ok().put("page", page);
+//                List<UserHeroEntity> userHeroEntityList = userHeroService.queryUserHero(user);
+//                return R.ok().put("data", userHeroEntityList);
             case "1":
                 //2.获取我的英雄碎片
-                List<UserHeroFragEntity> userHeroFragEntityList = userHeroFragService.queryUserHeroFrag(user);
-                return R.ok().put("data", userHeroFragEntityList);
+                PageUtils page2 = userHeroFragService.queryUserHeroFrag(user.getUserId(),params);
+                return R.ok().put("page", page2);
+//                List<UserHeroFragEntity> userHeroFragEntityList = userHeroFragService.queryUserHeroFrag(user);
+//                return R.ok().put("data", userHeroFragEntityList);
             case "2":
                 //3.获取我的装备
-                List<UserEquipmentEntity> userEquipmentEntityList = userEquipmentService.queryUserEquipment(user);
-                return R.ok().put("data", userEquipmentEntityList);
+                PageUtils page3 = userEquipmentService.queryUserEquipment(user.getUserId(),params);
+                return R.ok().put("page", page3);
+//                List<UserEquipmentEntity> userEquipmentEntityList = userEquipmentService.queryUserEquipment(user);
+//                return R.ok().put("data", userEquipmentEntityList);
             case "3":
                 //4.获取我的装备卷轴
-                List<UserEquipmentFragEntity> userEquipmentFragEntityList = userEquipmentFragService.queryUserEquipmentFrag(user);
-                return R.ok().put("data", userEquipmentFragEntityList);
+                PageUtils page4 = userEquipmentFragService.queryUserEquipmentFrag(user.getUserId(),params);
+                return R.ok().put("page", page4);
+//                List<UserEquipmentFragEntity> userEquipmentFragEntityList = userEquipmentFragService.queryUserEquipmentFrag(user);
+//                return R.ok().put("data", userEquipmentFragEntityList);
             case "4":
                 //5.获取我的药水
-                List<UserExperiencePotionEntity> userExperiencePotionEntityList = userExperiencePotionService.queryUserExperiencePotion(user);
-                return R.ok().put("data", userExperiencePotionEntityList);
+                PageUtils page5 = userExperiencePotionService.queryUserExperiencePotion(user.getUserId(),params);
+                return R.ok().put("page", page5);
+//                List<UserExperiencePotionEntity> userExperiencePotionEntityList = userExperiencePotionService.queryUserExperiencePotion(user);
+//                return R.ok().put("data", userExperiencePotionEntityList);
         }
         return R.ok();
     }

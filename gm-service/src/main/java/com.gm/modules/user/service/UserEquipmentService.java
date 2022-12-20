@@ -27,6 +27,6 @@ public interface UserEquipmentService extends IService<UserEquipmentEntity> {
      */
     List<UserEquipInfoRsp> getUserEquip(UserEquipmentEntity userEquipmentEntity);
 
-    List<UserEquipmentEntity> queryUserEquipment(UserEntity user);
+    PageUtils queryUserEquipment(Long userId, Map<String, Object> params);
 }
 
