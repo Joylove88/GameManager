@@ -3,6 +3,7 @@ package com.gm.modules.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.modules.user.dao.UserEquipmentDao;
@@ -56,6 +57,15 @@ public class UserEquipmentServiceImpl extends ServiceImpl<UserEquipmentDao, User
 
         );
         return new PageUtils(page);
+    }
+
+    @Override
+    public UserEquipmentEntity getUserEquipmentById(Long userId ,Long userEquipmentId) {
+        return userEquipmentDao.selectOne(new QueryWrapper<UserEquipmentEntity>()
+                .eq("status", Constant.enable)
+                .eq("user_id",userId)
+                .eq("user_equipment_id",userEquipmentId)
+        );
     }
 
 }

@@ -6,6 +6,7 @@ import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,12 @@ public interface UserHeroService extends IService<UserHeroEntity> {
      */
     UserHeroEntity getUserHeroById(Map<String, Object> map);
 
+    /**
+     * 我的英雄列表，分页
+     * @param userId
+     * @param params
+     * @return
+     */
     PageUtils queryUserHero(Long userId, Map<String, Object> params);
 
 }

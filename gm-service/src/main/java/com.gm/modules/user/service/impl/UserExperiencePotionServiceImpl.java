@@ -146,4 +146,13 @@ public class UserExperiencePotionServiceImpl extends ServiceImpl<UserExperienceP
         return new PageUtils(page);
     }
 
+    @Override
+    public UserExperiencePotionEntity getUserExperiencePotionById(Long userId ,Long userExPotionId) {
+        return userExperiencePotionDao.selectOne(new QueryWrapper<UserExperiencePotionEntity>()
+                .eq("status", Constant.enable)
+                .eq("user_id",userId)
+                .eq("user_equipment_id",userExPotionId)
+        );
+    }
+
 }

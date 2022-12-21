@@ -3,6 +3,7 @@ package com.gm.modules.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.modules.user.dao.UserHeroFragDao;
@@ -63,6 +64,15 @@ public class UserHeroFragServiceImpl extends ServiceImpl<UserHeroFragDao, UserHe
 
         );
         return new PageUtils(page);
+    }
+
+    @Override
+    public UserHeroFragEntity getUserHeroById(Long userId ,Long userHeroFragId) {
+        return userHeroFragDao.selectOne(new QueryWrapper<UserHeroFragEntity>()
+                .eq("status", Constant.enable)
+                .eq("user_id",userId)
+                .eq("user_hero_frag_id",userHeroFragId)
+        );
     }
 
 }

@@ -34,6 +34,19 @@ public interface UserHeroFragService extends IService<UserHeroFragEntity> {
      */
     void depleteHeroFrag(Map<String, Object> map);
 
+    /**
+     * 查询我的英雄碎片
+     * @param userId
+     * @param params
+     * @return
+     */
     PageUtils queryUserHeroFrag(Long userId, Map<String, Object> params);
+
+    /**
+     * 根据用户ID 和 英雄碎片ID 查询我的这个英雄碎片
+     * @param userHeroFragMap
+     * @return
+     */
+    UserHeroFragEntity getUserHeroById(Long userId ,Long userHeroFragId);
 }
 
