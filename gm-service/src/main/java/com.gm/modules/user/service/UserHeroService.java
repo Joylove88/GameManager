@@ -50,7 +50,6 @@ public interface UserHeroService extends IService<UserHeroEntity> {
      */
     UserHeroInfoRsp getUserHeroByIdRsp(Map<String, Object> map);
 
-    List<UserHeroEntity> queryUserHero(UserEntity user);
     /**
      * 我的英雄列表，分页
      * @param userId

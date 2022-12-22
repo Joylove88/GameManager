@@ -14,12 +14,12 @@
     </select>
 
     <select id="queryTotalMoneyByUserId" resultType="double">
-        SELECT IFNULL(sum(TRANSACTION_FEE),0) FROM GM_TRANSACTION_ORDER WHERE USER_ID = #{userId} AND CURRENCY_TYPE = '1' AND STATUS = '1'
+        SELECT IFNULL(sum(REAL_FEE),0) FROM GM_TRANSACTION_ORDER WHERE USER_ID = #{userId} AND CURRENCY_TYPE = '1' AND STATUS = '1'
     </select>
 
     <select id="querySonTotalMoneyByFatherId" resultType="double">
         SELECT
-            IFNULL(sum(TRANSACTION_FEE),0)
+            IFNULL(sum(REAL_FEE),0)
         FROM
             gm_user t1
             LEFT JOIN gm_user t2 ON t1.USER_ID = t2.FATHER_ID
