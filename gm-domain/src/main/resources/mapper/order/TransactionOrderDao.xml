@@ -10,7 +10,7 @@
 
         ${ew.customSqlSegment}
 
-        ORDER BY A.UPDATE_TIME DESC, A.CREATE_TIME DESC
+        ORDER BY A.CREATE_TIME DESC, A.UPDATE_TIME DESC
     </select>
 
     <select id="queryTotalMoneyByUserId" resultType="double">

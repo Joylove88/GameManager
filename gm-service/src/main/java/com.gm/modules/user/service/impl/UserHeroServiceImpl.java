@@ -8,6 +8,7 @@ import com.gm.common.utils.Query;
 import com.gm.modules.user.dao.UserHeroDao;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
+import com.gm.modules.user.rsp.UserHeroInfoNotAllRsp;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
 import com.gm.modules.user.service.UserHeroService;
 import org.apache.commons.lang.StringUtils;
@@ -49,8 +50,18 @@ public class UserHeroServiceImpl extends ServiceImpl<UserHeroDao, UserHeroEntity
     }
 
     @Override
+    public List<UserHeroInfoNotAllRsp> getUserAllHeroSimple(Map<String, Object> map) {
+        return userHeroDao.getUserAllHeroSimple(map);
+    }
+
+    @Override
     public UserHeroEntity getUserHeroById(Map<String, Object> map) {
         return userHeroDao.getUserHeroById(map);
+    }
+
+    @Override
+    public UserHeroInfoRsp getUserHeroByIdRsp(Map<String, Object> map) {
+        return userHeroDao.getUserHeroByIdRsp(map);
     }
 
     @Override

@@ -14,8 +14,11 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * 日期处理
@@ -27,6 +30,16 @@ public class DateUtils {
 	public final static String DATE_PATTERN = "yyyy-MM-dd";
 	/** 时间格式(yyyy-MM-dd HH:mm:ss) */
 	public final static String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+
+    public static final DateFormat dfDateTime1 = new SimpleDateFormat("yyyy-MM-dd");
+
+    /**
+     * 得到对应格式的时间
+     */
+    public static String getCurrentData(Date date,String sdf) {
+        SimpleDateFormat formatter = new SimpleDateFormat(sdf);
+        return formatter.format(date);
+    }
 
     /**
      * 日期格式化 日期格式为：yyyy-MM-dd
@@ -162,5 +175,22 @@ public class DateUtils {
     public static Date addDateYears(Date date, int years) {
         DateTime dateTime = new DateTime(date);
         return dateTime.plusYears(years).toDate();
+    }
+
+    /**
+     *
+     * 此方法描述的是：返回基于当前时间相差几天的函数
+     *
+     * @author: xiaobin
+     * @version: 2017年11月26日 下午8:35:25
+     */
+    @SuppressWarnings("static-access")
+    public static Date caculateDay(int day) {
+        Date date = new Date();// 取时间
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        calendar.add(calendar.DATE, day);// 把日期往前减少一天，若想把日期向后推一天则将负数改为正数
+        date = calendar.getTime();
+        return date;
     }
 }

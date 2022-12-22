@@ -1,6 +1,8 @@
 package com.gm.modules.drawGift.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.gm.common.exception.RRException;
 import com.gm.common.utils.*;
 import com.gm.modules.basicconfig.dao.ExperiencePotionDao;
 import com.gm.modules.basicconfig.dao.HeroFragDao;
@@ -8,6 +10,7 @@ import com.gm.modules.basicconfig.dao.HeroInfoDao;
 import com.gm.modules.basicconfig.dao.ProbabilityDao;
 import com.gm.modules.basicconfig.dto.AttributeSimpleEntity;
 import com.gm.modules.basicconfig.dto.DrawDtoTestEntity;
+import com.gm.modules.basicconfig.dto.SummonedEventDto;
 import com.gm.modules.basicconfig.entity.*;
 import com.gm.modules.basicconfig.rsp.GiftBoxEquipmentRsp;
 import com.gm.modules.basicconfig.rsp.GiftBoxExpRsp;
@@ -17,7 +20,9 @@ import com.gm.modules.basicconfig.service.EquipmentInfoService;
 import com.gm.modules.basicconfig.service.StarInfoService;
 import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
 import com.gm.modules.fightCore.service.FightCoreService;
+import com.gm.modules.fundsAccounting.service.FundsAccountingService;
 import com.gm.modules.sys.service.SysConfigService;
+import com.gm.modules.sys.service.SysDictService;
 import com.gm.modules.user.entity.*;
 import com.gm.modules.user.req.SummonReq;
 import com.gm.modules.user.service.*;
@@ -31,13 +36,18 @@ import java.util.*;
 
 /**
  * 抽奖业务类
+ *
  * @author Axiang
  * @email Axiang@gmail.com
  * @date 2022-01-23 19:06:59
  */
 @Service("drawGiftService")
-public class DrawGiftService{
+public class DrawGiftService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DrawGiftService.class);
+    @Autowired
+    private SysDictService sysDictService;
+    @Autowired
+    private UserAccountService userAccountService;
     @Autowired
     private UserHeroFragService userHeroFragService;
     @Autowired
@@ -68,6 +78,10 @@ public class DrawGiftService{
     private CombatStatsUtilsService combatStatsUtilsService;
     @Autowired
     private FightCoreService fightCoreService;
+    @Autowired
+    private GmWhitelistPresaleService whitelistPresaleService;
+    @Autowired
+    private FundsAccountingService fundsAccountingService;
     /**
      * 当前服务器时间
      */
@@ -76,6 +90,10 @@ public class DrawGiftService{
      * 皮肤等级0普通1黄金...
      */
     private static int skinType = 0;
+    /**
+     * 可购买数量
+     */
+    private static int quantity = 0;
     /**
      * 初始化属性
      */
@@ -95,12 +113,13 @@ public class DrawGiftService{
 
     /**
      * 进入召唤
+     *
      * @param user
      * @param form
      * @return
      * @throws Exception
      */
-    public List startSummon(UserEntity user, SummonReq form) throws Exception {
+    public List startSummon(UserEntity user, SummonReq form, SummonedEventDto summonedEventDto) throws Exception {
         // 初始化时间
         now = new Date();
         // 初始化返回英雄召唤集合
@@ -111,37 +130,37 @@ public class DrawGiftService{
         giftBoxExpRsps = new ArrayList<>();
         // 初始化响应集合
         List list = new ArrayList();
-        Map<String,Object> proMap = new HashMap<>();
+        Map<String, Object> proMap = new HashMap<>();
         proMap.put("STATUS", Constant.enable);
         // 获取全部物品概率
         List<ProbabilityEntity> probabilitys = probabilityDao.selectByMap(proMap);
         // 初始化概率存储器
         List<Double> orignalRates = new ArrayList<>(probabilitys.size());
         // 进入召唤逻辑
-        if (Constant.SummonType.HERO.getValue().equals(form.getSummonType())){
+        if (Constant.SummonType.HERO.getValue().equals(form.getSummonType())) {
             // 提取英雄概率
             for (ProbabilityEntity pr : probabilitys) {
-                if (pr.getPrType().equals(Constant.SummonType.HERO.getValue())){
+                if (pr.getPrType().equals(Constant.SummonType.HERO.getValue())) {
                     orignalRates.add(pr.getPr());
                 }
             }
             // 英雄召唤
-            heroSummonPool(user, form, orignalRates);
+            heroSummonPool(user, form, orignalRates, summonedEventDto);
             list = giftBoxHeroRsps;
-        } else if (Constant.SummonType.EQUIPMENT.getValue().equals(form.getSummonType())){
+        } else if (Constant.SummonType.EQUIPMENT.getValue().equals(form.getSummonType())) {
             // 提取装备概率
             for (ProbabilityEntity pr : probabilitys) {
-                if (pr.getPrType().equals(Constant.SummonType.EQUIPMENT.getValue())){
+                if (pr.getPrType().equals(Constant.SummonType.EQUIPMENT.getValue())) {
                     orignalRates.add(pr.getPr());
                 }
             }
             // 装备召唤
-            equipmentSummonPool(user, form, null, orignalRates);
+            equipmentSummonPool(user, form, null, orignalRates, summonedEventDto);
             list = giftBoxEquipmentRsps;
-        } else if (Constant.SummonType.EXPERIENCE.getValue().equals(form.getSummonType())){
+        } else if (Constant.SummonType.EXPERIENCE.getValue().equals(form.getSummonType())) {
             // 提取经验道具概率
             for (ProbabilityEntity pr : probabilitys) {
-                if (pr.getPrType().equals(Constant.SummonType.EXPERIENCE.getValue())){
+                if (pr.getPrType().equals(Constant.SummonType.EXPERIENCE.getValue())) {
                     orignalRates.add(pr.getPr());
                 }
             }
@@ -149,18 +168,122 @@ public class DrawGiftService{
             expSummonPool(user, form, orignalRates);
             list = giftBoxExpRsps;
         }
+
+        // 更新当前玩家召唤(购买)数量 返金币
+        if (summonedEventDto.getId() != null) {
+            updateWhitelistPreSale(user.getUserId(), summonedEventDto, form.getSummonNum(), form.getCurType());
+        }
         return list;
     }
 
     /**
+     * 活动：预售白名单
+     *
+     * @param address
+     * @return
+     */
+    public SummonedEventDto getSummonedPrice(String address) {
+        // 获取召唤返利开关：0：关闭，1开启
+        String summonRebateSwitch = sysConfigService.getValue(Constant.SysConfig.SUMMON_REBATE_SWITCH.getValue());
+        // 获取原价
+        String priceDict = sysDictService.getValueByNameAndKey("GM_DRAW_CONFIG", "GM_DRAW_TYPE");
+        JSONObject priceJson = JSONObject.parseObject(priceDict);
+        // 活动ID
+        Long id = null;
+        // 单抽原价格
+        Double onePrice = Double.valueOf(priceJson.getString("ONE"));
+        // 十连抽原价格
+        Double tenPrice = Double.valueOf(priceJson.getString("TEN"));
+        // 单抽折扣后的价格
+        Double onePriceNew = Double.valueOf(priceJson.getString("ONE"));
+        // 十连抽折扣后的价格
+        Double tenPriceNew = Double.valueOf(priceJson.getString("TEN"));
+        // 数量限制
+        Integer quantityAvailable = 0;
+        // 已购买数量
+        Integer quantityUsed = 0;
+        // 折扣率
+        Double discountRate = 1d;
+        // 返单抽金币（加密货币抽奖时用到）
+        Double rebateOne = Constant.ZERO_D;
+        // 返十连抽金币（加密货币抽奖时用到）
+        Double rebateTen = Constant.ZERO_D;
+        // 获取预售白名单信息，如果该玩家不在名单内，或超出活动日期 则无法获取到。
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("type", Constant.ZERO_);// 0:预售
+        reqMap.put("address", address);// 地址
+        List<GmWhitelistPresaleEntity> whitelistPresales = whitelistPresaleService.getWhitelistPresale(reqMap);
+        int i = 0;
+        // 插入折扣后的价格
+        while (i < whitelistPresales.size()) {
+            // 获取可购买数量
+            quantity = whitelistPresales.get(i).getQuantityAvailable() - whitelistPresales.get(i).getQuantityUsed();
+            Double disRate = whitelistPresales.get(i).getDiscountRate();
+            id = whitelistPresales.get(i).getId();
+            // 获取原价次数(当可购买数量小于十连抽数量时会用到)
+            int originalNum = Constant.SummonNum.NUM10.getValue() - quantity;
+            rebateOne = onePrice - onePrice * disRate;// 返单抽金币
+            rebateTen = quantity < Constant.SummonNum.NUM10.getValue() ? ((quantity * onePrice) - (quantity * onePrice * disRate)) : tenPrice - tenPrice * disRate;// 返十连抽金币
+            onePriceNew = onePrice * disRate;// 单抽价格
+            tenPriceNew = quantity < Constant.SummonNum.NUM10.getValue() ? ((quantity * onePrice * disRate) + (originalNum * onePrice)) : tenPrice * disRate;// 十连抽价格
+            quantityUsed = whitelistPresales.get(i).getQuantityUsed();// 已购买数量
+            quantityAvailable = whitelistPresales.get(i).getQuantityAvailable();// 数量限制
+            discountRate = whitelistPresales.get(i).getDiscountRate();// 折扣率
+            i++;
+        }
+        SummonedEventDto rsp = new SummonedEventDto();
+        rsp.setId(id);
+        rsp.setOnePrice(onePrice);
+        rsp.setTenPrice(tenPrice);
+        rsp.setOnePriceNew(onePriceNew);
+        rsp.setTenPriceNew(tenPriceNew);
+        rsp.setRebateOne(rebateOne);
+        rsp.setRebateTen(rebateTen);
+        rsp.setQuantityUsed(quantityUsed);
+        rsp.setDiscountRate(discountRate);
+        rsp.setQuantityAvailable(quantityAvailable);
+        rsp.setSummonRebateSwitch(summonRebateSwitch);
+        return rsp;
+    }
+
+    /**
+     * 更新当前玩家召唤(购买)数量 并返金币
+     *
+     * @param summonedEventDto
+     * @param num
+     */
+    private void updateWhitelistPreSale(Long userId, SummonedEventDto summonedEventDto, Integer num, String curType) {
+        GmWhitelistPresaleEntity whitelistPresale = new GmWhitelistPresaleEntity();
+        whitelistPresale.setId(summonedEventDto.getId());
+        // 如果已购买数量大于可购买数量 直接更新为与可购买数量同值
+        num = summonedEventDto.getQuantityUsed() + num > summonedEventDto.getQuantityAvailable() ? summonedEventDto.getQuantityAvailable() : summonedEventDto.getQuantityUsed() + num;
+        whitelistPresale.setQuantityUsed(num);
+        whitelistPresaleService.updateById(whitelistPresale);
+
+        // 如玩家支付类型为加密货币并且召唤返利开启的时候则进行返金币
+        if (curType.equals(Constant.ONE_) && summonedEventDto.getSummonRebateSwitch().equals(Constant.enable)) {
+            // 如十连抽则返十连抽计算后的金币 单抽则返单抽计算后的金币
+            BigDecimal addMoney = BigDecimal.valueOf(num == Constant.SummonNum.NUM10.getValue() ? summonedEventDto.getRebateTen() : summonedEventDto.getRebateOne());
+            // 更新玩家账户余额
+            boolean effect = userAccountService.updateAccountAdd(userId, addMoney, Constant.ZERO_);
+            // 用户池入账
+            fundsAccountingService.setCashPoolAdd(Constant.CashPool._USER.getValue(), addMoney);
+            if (!effect) {
+                LOGGER.error("Player account deduction failed!");// 账户金额更新失败
+            }
+        }
+    }
+
+    /**
      * 系统发放成品英雄到玩家背包
+     *
      * @param prLv
      * @param giftBoxNum
-     * @param userId
+     * @param user
      * @param txHash
      * @return
      */
-    private void sendHeroForPlayer(int prLv, int giftBoxNum, Long userId, String txHash){
+    private void sendHeroForPlayer(int prLv, int giftBoxNum, UserEntity user, String txHash, SummonedEventDto summonedEventDto, Integer summonNum) {
         // 获取系统全部英雄
         List<HeroInfoEntity> heroInfos = heroInfoDao.getHeroInfoPro();
         // 获取星级及属性加成信息
@@ -173,7 +296,7 @@ public class DrawGiftService{
         attributeSimple = null;
         // 根据抽中的盒子数量添加
         int i = 0;
-        while (i < giftBoxNum){
+        while (i < giftBoxNum) {
             // 随机某个英雄
             Random randomHeroIndex = new Random();
             int heroIndex = randomHeroIndex.nextInt(heroInfos.size());
@@ -182,38 +305,43 @@ public class DrawGiftService{
             // 使用万能策略模式计算各星级属性
             UniversalStrategyModeTool<Integer> ifFunction = new UniversalStrategyModeTool<>(new HashMap<>());
             ifFunction
-                    .add(Constant.PrLv.PrLv2.getValue(), ()->
+                    .add(Constant.PrLv.PrLv2.getValue(), () ->
                             // 1星英雄属性
                             getStarWithAttribute(starInfos.get(0), Constant.SkinType.ORIGINAL.getValue(), attributeSimple)
                     )
-                    .add(Constant.PrLv.PrLv3.getValue(), ()->
+                    .add(Constant.PrLv.PrLv3.getValue(), () ->
                             // 2星英雄属性
                             getStarWithAttribute(starInfos.get(1), Constant.SkinType.ORIGINAL.getValue(), attributeSimple)
                     )
-                    .add(Constant.PrLv.PrLv4.getValue(), ()->
+                    .add(Constant.PrLv.PrLv4.getValue(), () ->
                             // 3星英雄属性
                             getStarWithAttribute(starInfos.get(2), Constant.SkinType.ORIGINAL.getValue(), attributeSimple)
                     )
-                    .add(Constant.PrLv.PrLv5.getValue(), ()->
+                    .add(Constant.PrLv.PrLv5.getValue(), () ->
                             // 4星英雄属性
                             getStarWithAttribute(starInfos.get(3), Constant.SkinType.ORIGINAL.getValue(), attributeSimple)
                     )
-                    .add(Constant.PrLv.PrLv6.getValue(), ()->
+                    .add(Constant.PrLv.PrLv6.getValue(), () ->
                             // 5星英雄属性
                             getStarWithAttribute(starInfos.get(4), Constant.SkinType.ORIGINAL.getValue(), attributeSimple)
                     )
-                    .add(Constant.PrLv.PrLv7.getValue(), ()->
+                    .add(Constant.PrLv.PrLv7.getValue(), () ->
                             // 黄金1星英雄属性
                             getStarWithAttribute(starInfos.get(0), Constant.SkinType.GOLD.getValue(), attributeSimple)
                     );
             ifFunction.doIf(prLv);
 
             // 开始发放英雄至玩家背包
-            double scale = heroInfos.get(heroIndex).getScale();
+            double scale = user.getScale() * heroInfos.get(heroIndex).getScale();
+            // 验证活动有效性 验证当前玩家召唤（购买）数量是否已达到限制数量
+            if (summonedEventDto.getId() != null && quantity > 0) {
+                scale = scale * summonedEventDto.getDiscountRate();
+                quantity--;
+            }
             UserHeroEntity userHero = new UserHeroEntity();
             userHero.setHeroId(heroInfos.get(heroIndex).getHeroId());// 英雄ID
             userHero.setHeroLevelId(100000009L);// 初始等级1
-            userHero.setUserId(userId);// 用户ID
+            userHero.setUserId(user.getUserId());// 用户ID
             userHero.setStatus(Constant.enable);
             userHero.setStatePlay(Constant.disabled);// 默认：未上阵
             userHero.setMintStatus(Constant.enable);
@@ -239,23 +367,24 @@ public class DrawGiftService{
             // 英雄战力
             double heroPower = 0d;
             // 计算英雄战力
-            heroPower = combatStatsUtilsService.getHeroPower(attributeSimple, scale);
+            heroPower = combatStatsUtilsService.getHeroPower(attributeSimple);
             userHero.setHeroPower((long) heroPower);
             // 初始化GAIA经济系统
             fightCoreService.initTradeBalanceParameter();
             // 计算矿工数
-            BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(userHero.getHeroPower()));
+            // 获取scale后的战力值
+            BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(userHero.getHeroPower() * scale));
             userHero.setMinter(minter);// 矿工数
             userHero.setOracle(CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1)));// 神谕值
             // 更新系统中保存的市场总鸡蛋
-            sysConfigService.updateValueByKey(Constant.MARKET_EGGS, CalculateTradeUtil.marketEggs.toString());
+            sysConfigService.updateValueByKey(Constant.SysConfig.MARKET_EGGS.getValue(), CalculateTradeUtil.marketEggs.toString());
             userHeroAdds.add(userHero);
 
             // 存储英雄召唤返回集合
             GiftBoxHeroRsp giftBoxHeroRsp = new GiftBoxHeroRsp();
             giftBoxHeroRsp.setHeroName(heroInfos.get(heroIndex).getHeroName());// 英雄名称
             giftBoxHeroRsp.setHeroIconUrl(heroInfos.get(heroIndex).getHeroIconUrl());// 英雄图标
-            giftBoxHeroRsp.setHeroFragNum(Constant.Quantity._ONE.getValue());// 英雄碎片数量，如果为星级英雄 数量固定1
+            giftBoxHeroRsp.setHeroFragNum(Constant.Quantity.Q1.getValue());// 英雄碎片数量，如果为星级英雄 数量固定1
             giftBoxHeroRsp.setHeroType(Constant.FragType.WHOLE.getValue());// 英雄类型：0星级英雄，1英雄碎片
             giftBoxHeroRsp.setStarCode(attributeSimple.getStarCode());// 英雄星级
             int skinType = prLv == Constant.PrLv.PrLv7.getValue() ? Constant.SkinType.GOLD.getValue() : Constant.SkinType.ORIGINAL.getValue();
@@ -271,11 +400,12 @@ public class DrawGiftService{
     /**
      * 通过星级百分比计算对应的属性
      * 获取皮肤类型
+     *
      * @param starInfo
      * @param st
      * @param a
      */
-    private void getStarWithAttribute(StarInfoEntity starInfo, int st, AttributeSimpleEntity a){
+    private void getStarWithAttribute(StarInfoEntity starInfo, int st, AttributeSimpleEntity a) {
         // 皮肤类型赋值
         skinType = st;
         // 星级属性赋值
@@ -285,18 +415,20 @@ public class DrawGiftService{
 
     /**
      * 系统发放随机1-3数量的英雄碎片到玩家背包
-     * @param giftBoxNum 盒子数量
-     * @param userId 玩家ID
-     * @param txHash 交易HASH
+     *
+     * @param giftBoxNum       盒子数量
+     * @param user             玩家信息
+     * @param txHash           交易HASH
+     * @param summonedEventDto 活动信息
      * @return
      */
-    private void sendHeroFlagForPlayer(int giftBoxNum, Long userId, String txHash){
+    private void sendHeroFlagForPlayer(int giftBoxNum, UserEntity user, String txHash, SummonedEventDto summonedEventDto) {
         // 获取系统全部英雄碎片信息
         List<HeroFragEntity> heroFrags = heroFragDao.getHeroFragPro();
         // 存储要添加的碎片集合
         List<UserHeroFragEntity> userHeroFragAdds = new ArrayList<>();
         int i = 0;
-        while (i < giftBoxNum){
+        while (i < giftBoxNum) {
             // 随机某个英雄的碎片
             Random randomHeroIndex = new Random();
             int heroIndex = randomHeroIndex.nextInt(heroFrags.size());
@@ -304,17 +436,25 @@ public class DrawGiftService{
             // 随机1-3英雄碎片数量
             Random randomFlagNum = new Random();
             int flagNum = randomFlagNum.nextInt(4);
-            if ( flagNum == 0 ) {
+            if (flagNum == 0) {
                 flagNum = 1;
             }
 
             int j = 0;
             while (j < flagNum) {
                 // 开始发放碎片至玩家背包
+                // 开始发放英雄至玩家背包
+                double scale = user.getScale() * heroFrags.get(heroIndex).getScale();
+                // 验证活动有效性 验证当前玩家召唤（购买）数量是否已达到限制数量
+                if (summonedEventDto.getId() != null && quantity > 0) {
+                    scale = scale * summonedEventDto.getDiscountRate();
+                    quantity--;
+                }
                 UserHeroFragEntity userHeroFrag = new UserHeroFragEntity();
                 userHeroFrag.setHeroFragId(heroFrags.get(heroIndex).getHeroFragId());
-                userHeroFrag.setUserHeroFragNum(Constant.Quantity._ONE.getValue());
-                userHeroFrag.setUserId(userId);
+                userHeroFrag.setUserHeroFragNum(Constant.Quantity.Q1.getValue());
+                userHeroFrag.setUserId(user.getUserId());
+                userHeroFrag.setScale(scale);
                 userHeroFrag.setStatus(Constant.enable);
                 userHeroFrag.setMintStatus(Constant.enable);
                 userHeroFrag.setMintHash(txHash);
@@ -344,12 +484,13 @@ public class DrawGiftService{
 
     /**
      * 英雄召唤池
+     *
      * @param user
      * @param summonReq
      * @return
      * @throws Exception
      */
-    private void heroSummonPool(UserEntity user,SummonReq summonReq, List<Double> orignalRates) throws Exception {
+    private void heroSummonPool(UserEntity user, SummonReq summonReq, List<Double> orignalRates, SummonedEventDto summonedEventDto) throws Exception {
         // 抽奖次数
         Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates, summonReq.getSummonNum());
         // 奖品发放
@@ -359,35 +500,35 @@ public class DrawGiftService{
             // 使用万能策略模式
             UniversalStrategyModeTool<Integer> ifFunction = new UniversalStrategyModeTool<>(new HashMap<>());
             ifFunction
-                    .add(Constant.PrLv.PrLv1.getValue(), ()->
+                    .add(Constant.PrLv.PrLv1.getValue(), () ->
                             // 1级概率产出1-3碎片
-                            sendHeroFlagForPlayer(giftBoxNum, user.getUserId(), summonReq.getTransactionHash())
+                            sendHeroFlagForPlayer(giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto)
                     )
-                    .add(Constant.PrLv.PrLv2.getValue(), ()->
+                    .add(Constant.PrLv.PrLv2.getValue(), () ->
                             // 2级概率产出1星英雄
-                            sendHeroForPlayer(Constant.PrLv.PrLv2.getValue(), giftBoxNum, user.getUserId(), summonReq.getTransactionHash())
+                            sendHeroForPlayer(Constant.PrLv.PrLv2.getValue(), giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto, summonReq.getSummonNum())
                     )
-                    .add(Constant.PrLv.PrLv3.getValue(), ()->
+                    .add(Constant.PrLv.PrLv3.getValue(), () ->
                             // 3级概率产出2星英雄
-                            sendHeroForPlayer(Constant.PrLv.PrLv3.getValue(), giftBoxNum, user.getUserId(), summonReq.getTransactionHash())
+                            sendHeroForPlayer(Constant.PrLv.PrLv3.getValue(), giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto, summonReq.getSummonNum())
                     )
-                    .add(Constant.PrLv.PrLv4.getValue(), ()->
+                    .add(Constant.PrLv.PrLv4.getValue(), () ->
                             // 4级概率产出3星英雄
-                                sendHeroForPlayer(Constant.PrLv.PrLv4.getValue(), giftBoxNum, user.getUserId(), summonReq.getTransactionHash())
+                            sendHeroForPlayer(Constant.PrLv.PrLv4.getValue(), giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto, summonReq.getSummonNum())
                     )
-                    .add(Constant.PrLv.PrLv5.getValue(), ()->
+                    .add(Constant.PrLv.PrLv5.getValue(), () ->
                             // 5级概率产出4星英雄
-                            sendHeroForPlayer(Constant.PrLv.PrLv5.getValue(), giftBoxNum, user.getUserId(), summonReq.getTransactionHash())
+                            sendHeroForPlayer(Constant.PrLv.PrLv5.getValue(), giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto, summonReq.getSummonNum())
                     )
-                    .add(Constant.PrLv.PrLv6.getValue(), ()->
+                    .add(Constant.PrLv.PrLv6.getValue(), () ->
                             // 6级概率产出5星英雄
-                            sendHeroForPlayer(Constant.PrLv.PrLv6.getValue(), giftBoxNum, user.getUserId(), summonReq.getTransactionHash())
+                            sendHeroForPlayer(Constant.PrLv.PrLv6.getValue(), giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto, summonReq.getSummonNum())
                     )
-                    .add(Constant.PrLv.PrLv7.getValue(), ()->
+                    .add(Constant.PrLv.PrLv7.getValue(), () ->
                             // 7级概率产出黄金1星英雄
-                            sendHeroForPlayer(Constant.PrLv.PrLv7.getValue(), giftBoxNum, user.getUserId(), summonReq.getTransactionHash())
+                            sendHeroForPlayer(Constant.PrLv.PrLv7.getValue(), giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto, summonReq.getSummonNum())
                     );
-            ifFunction.doIf(entry.getKey() + Constant.Quantity._ONE.getValue());
+            ifFunction.doIf(entry.getKey() + Constant.Quantity.Q1.getValue());
             //            LOGGER.info(gifts.get(entry.getKey()).getGmHeroStarId() + ", count=" + entry.getValue() + ", probability="
 //                    + entry.getValue());
         }
@@ -395,11 +536,12 @@ public class DrawGiftService{
 
     /**
      * 系统发放装备到玩家背包
-     * @param prLv 概率等级
-     * @param map 条件集合
+     *
+     * @param prLv         概率等级
+     * @param map          条件集合
      * @param combatRecord 战斗记录
      */
-    private void sendEquipmentForPlayer(int prLv, Map<String, Object> map, GmCombatRecordEntity combatRecord){
+    private void sendEquipmentForPlayer(int prLv, Map<String, Object> map, GmCombatRecordEntity combatRecord, UserEntity user, SummonedEventDto summonedEventDto) {
         // 获取盒子数量
         int giftBoxNum = Integer.parseInt(map.get("giftBoxNum").toString());
         // 获取指定稀有度的装备
@@ -410,16 +552,16 @@ public class DrawGiftService{
         // 存储发放的装备集合
         List<UserEquipmentEntity> userEquipmentAdds = new ArrayList<>();
         int i = 0;
-        while (i < giftBoxNum){
+        while (i < giftBoxNum) {
             // 随机生成一件装备下标
             Random randomHeroIndex = new Random();
             int equipmentIndex = randomHeroIndex.nextInt(equipmentInfos.size());
             // 开始发放装备至玩家背包
+            double scale = user.getScale() * equipmentInfos.get(equipmentIndex).getScale();
             UserEquipmentEntity userEquipment = new UserEquipmentEntity();
             userEquipment.setEquipmentId(equipmentInfos.get(equipmentIndex).getEquipId());
-            userEquipment.setUserId(Long.valueOf(map.get("userId").toString()));
+            userEquipment.setUserId(user.getUserId());
             userEquipment.setStatus(Constant.enable);
-            userEquipment.setScale(equipmentInfos.get(equipmentIndex).getScale());// 矿工比例
             // 生成NFT唯一编码
             userEquipment.setNftId(Arith.UUID20());
 
@@ -428,17 +570,24 @@ public class DrawGiftService{
             // 获取随机属性最小百分比
             Double eqAttMax = Constant.EquipStatsRange.MAX.getValue();
             // 如果战斗记录为空本次为召唤反之为副本产出
+            String txHash = null == map.get("txHash") ? null : map.get("txHash").toString();
+            userEquipment.setMintHash(txHash);
             if (combatRecord == null) {
-                String txHash = null == map.get("txHash") ? null : map.get("txHash").toString();
                 userEquipment.setFromType(Constant.FromType.SUMMON.getValue());
-                userEquipment.setMintHash(txHash);
                 userEquipment.setMintStatus(Constant.enable);
+                // 验证活动有效性 验证当前玩家召唤（购买）数量是否已达到限制数量
+                if (summonedEventDto.getId() != null && quantity > 0) {
+                    scale = scale * summonedEventDto.getDiscountRate();
+                    quantity--;
+                }
             } else {
                 eqAttMin = Constant.EquipStatsRange.MIN_FREE.getValue();
                 eqAttMax = Constant.EquipStatsRange.MAX_FREE.getValue();
                 userEquipment.setFromType(Constant.FromType.DUNGEON.getValue());
                 userEquipment.setSourceId(combatRecord.getId());
             }
+            userEquipment.setScale(scale);// 矿工比例
+
             // 随机装备属性
             Double rap = Arith.randomWithinRangeHundred(eqAttMax, eqAttMin);
             long health = (long) (equipmentInfos.get(equipmentIndex).getEquipHealth() * rap);// 初始生命值
@@ -463,11 +612,11 @@ public class DrawGiftService{
             // 初始化GAIA经济系统
             fightCoreService.initTradeBalanceParameter();
             // 计算矿工数
-            BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(userEquipment.getEquipPower()));
+            BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(userEquipment.getEquipPower() * scale));
             userEquipment.setMinter(minter);// 矿工数
             userEquipment.setOracle(CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1)));// 神谕值
             // 更新系统中保存的市场总鸡蛋
-            sysConfigService.updateValueByKey(Constant.MARKET_EGGS, CalculateTradeUtil.marketEggs.toString());
+            sysConfigService.updateValueByKey(Constant.SysConfig.MARKET_EGGS.getValue(), CalculateTradeUtil.marketEggs.toString());
 
             userEquipment.setCreateTime(now);
             userEquipment.setCreateTimeTs(now.getTime());
@@ -478,7 +627,7 @@ public class DrawGiftService{
             giftBoxEquipmentRsp.setEquipIconUrl(equipmentInfos.get(equipmentIndex).getEquipIconUrl());// 图标
             giftBoxEquipmentRsp.setEquipRareCode(Integer.valueOf(equipmentInfos.get(equipmentIndex).getEquipRarecode()));// 稀有度
             giftBoxEquipmentRsp.setEquipType(Constant.FragType.WHOLE.getValue());// 装备类型：0 装备,1 卷轴
-            giftBoxEquipmentRsp.setEquipFragNum(Constant.Quantity._ONE.getValue());// 数量
+            giftBoxEquipmentRsp.setEquipFragNum(Constant.Quantity.Q1.getValue());// 数量
             giftBoxEquipmentRsps.add(giftBoxEquipmentRsp);
             i++;
         }
@@ -490,11 +639,12 @@ public class DrawGiftService{
 
     /**
      * 系统发放1数量的装备卷轴到玩家背包
-     * @param prLv 概率等级
-     * @param map 条件集合
+     *
+     * @param prLv         概率等级
+     * @param map          条件集合
      * @param combatRecord 战斗记录
      */
-    private void sendEquipmentFlagForPlayer(int prLv, Map<String, Object> map, GmCombatRecordEntity combatRecord){
+    private void sendEquipmentFlagForPlayer(int prLv, Map<String, Object> map, GmCombatRecordEntity combatRecord, UserEntity user, SummonedEventDto summonedEventDto) {
         // 获取盒子数量
         int giftBoxNum = Integer.parseInt(map.get("giftBoxNum").toString());
         // 获取指定稀有度的装备卷轴
@@ -505,26 +655,33 @@ public class DrawGiftService{
         // 存储发放的装备卷轴集合
         List<UserEquipmentFragEntity> userEquipmentFragAdds = new ArrayList<>();
         int i = 0;
-        while (i < giftBoxNum){
+        while (i < giftBoxNum) {
             // 随机生成卷轴下标
             Random randomHeroIndex = new Random();
             int equipmentFragIndex = randomHeroIndex.nextInt(equipmentFrags.size());
             // 开始发放卷轴至玩家背包
+            double scale = user.getScale() * equipmentFrags.get(equipmentFragIndex).getScale();
             UserEquipmentFragEntity userEquipmentFrag = new UserEquipmentFragEntity();
             userEquipmentFrag.setUserEquipmentFragId(equipmentFrags.get(equipmentFragIndex).getEquipmentFragId());
-            userEquipmentFrag.setUserId(Long.valueOf(map.get("userId").toString()));
+            userEquipmentFrag.setUserId(user.getUserId());
             userEquipmentFrag.setStatus(Constant.enable);
             // 如果战斗记录为空本次为召唤反之为副本产出
+            String txHash = null == map.get("txHash") ? null : map.get("txHash").toString();
+            userEquipmentFrag.setMintHash(txHash);
             if (combatRecord == null) {
-                String txHash = null == map.get("txHash") ? null : map.get("txHash").toString();
                 userEquipmentFrag.setFromType(Constant.FromType.SUMMON.getValue());
-                userEquipmentFrag.setMintHash(txHash);
                 userEquipmentFrag.setMintStatus(Constant.enable);
+                // 验证活动有效性 验证当前玩家召唤（购买）数量是否已达到限制数量
+                if (summonedEventDto.getId() != null && quantity > 0) {
+                    scale = scale * summonedEventDto.getDiscountRate();
+                    quantity--;
+                }
             } else {
                 userEquipmentFrag.setFromType(Constant.FromType.DUNGEON.getValue());
                 userEquipmentFrag.setSourceId(combatRecord.getId());
             }
-            userEquipmentFrag.setUserEquipFragNum(Constant.Quantity._ONE.getValue());
+            userEquipmentFrag.setScale(scale);
+            userEquipmentFrag.setUserEquipFragNum(Constant.Quantity.Q1.getValue());
             userEquipmentFrag.setCreateTime(now);
             userEquipmentFrag.setCreateTimeTs(now.getTime());
             userEquipmentFragAdds.add(userEquipmentFrag);
@@ -534,7 +691,7 @@ public class DrawGiftService{
             giftBoxEquipmentRsp.setEquipIconUrl(equipmentFrags.get(equipmentFragIndex).getEquipFragIconUrl());// 图标
             giftBoxEquipmentRsp.setEquipRareCode(Integer.valueOf(equipmentFrags.get(equipmentFragIndex).getEquipRarecode()));// 稀有度
             giftBoxEquipmentRsp.setEquipType(Constant.FragType.FRAG.getValue());// 装备类型：0 装备,1 卷轴
-            giftBoxEquipmentRsp.setEquipFragNum(Constant.Quantity._ONE.getValue());// 数量
+            giftBoxEquipmentRsp.setEquipFragNum(Constant.Quantity.Q1.getValue());// 数量
             giftBoxEquipmentRsps.add(giftBoxEquipmentRsp);
             i++;
         }
@@ -546,15 +703,16 @@ public class DrawGiftService{
 
     /**
      * 装备\卷轴召唤池
+     *
      * @param user
      * @param summonReq
      * @param combatRecord
      * @param orignalRates
      */
-    private void equipmentSummonPool(UserEntity user, SummonReq summonReq, GmCombatRecordEntity combatRecord, List<Double> orignalRates){
+    private void equipmentSummonPool(UserEntity user, SummonReq summonReq, GmCombatRecordEntity combatRecord, List<Double> orignalRates, SummonedEventDto summonedEventDto) {
         Map<String, Object> map = new HashMap<>();
         // 如果战斗记录为空本次为召唤反之为副本产出
-        if (combatRecord == null){
+        if (combatRecord == null) {
             map.put("txHash", summonReq.getTransactionHash());
         }
         // 抽奖次数
@@ -564,43 +722,42 @@ public class DrawGiftService{
             // 当前概率等级奖品的数量
             int giftBoxNum = entry.getValue();
             map.put("giftBoxNum", giftBoxNum);
-            map.put("userId", user.getUserId());
             // 使用万能策略模式
             UniversalStrategyModeTool<Integer> ifFunction = new UniversalStrategyModeTool<>(new HashMap<>());
             ifFunction
-                    .add(Constant.PrLv.PrLv1.getValue(), ()->
+                    .add(Constant.PrLv.PrLv1.getValue(), () ->
                             // 1级概率产出白色装备
-                            sendEquipmentForPlayer(Constant.PrLv.PrLv1.getValue(), map, combatRecord)
+                            sendEquipmentForPlayer(Constant.PrLv.PrLv1.getValue(), map, combatRecord, user, summonedEventDto)
                     )
-                    .add(Constant.PrLv.PrLv2.getValue(), ()->
+                    .add(Constant.PrLv.PrLv2.getValue(), () ->
                             // 2级概率产出绿色卷轴*1
-                            sendEquipmentFlagForPlayer(Constant.PrLv.PrLv2.getValue(),  map, combatRecord)
+                            sendEquipmentFlagForPlayer(Constant.PrLv.PrLv2.getValue(), map, combatRecord, user, summonedEventDto)
                     )
-                    .add(Constant.PrLv.PrLv3.getValue(), ()->
+                    .add(Constant.PrLv.PrLv3.getValue(), () ->
                             // 3级概率产出绿色装备
-                            sendEquipmentForPlayer(Constant.PrLv.PrLv2.getValue(), map, combatRecord)
+                            sendEquipmentForPlayer(Constant.PrLv.PrLv2.getValue(), map, combatRecord, user, summonedEventDto)
                     )
-                    .add(Constant.PrLv.PrLv4.getValue(), ()->
+                    .add(Constant.PrLv.PrLv4.getValue(), () ->
                             // 4级概率产出紫色卷轴*1
-                            sendEquipmentFlagForPlayer(Constant.PrLv.PrLv4.getValue(),  map, combatRecord)
+                            sendEquipmentFlagForPlayer(Constant.PrLv.PrLv4.getValue(), map, combatRecord, user, summonedEventDto)
                     )
-                    .add(Constant.PrLv.PrLv5.getValue(), ()->
+                    .add(Constant.PrLv.PrLv5.getValue(), () ->
                             // 5级概率产出蓝色装备
-                            sendEquipmentForPlayer(Constant.PrLv.PrLv3.getValue(), map, combatRecord)
+                            sendEquipmentForPlayer(Constant.PrLv.PrLv3.getValue(), map, combatRecord, user, summonedEventDto)
                     )
-                    .add(Constant.PrLv.PrLv6.getValue(), ()->
+                    .add(Constant.PrLv.PrLv6.getValue(), () ->
                             // 6级概率产出紫色装备
-                            sendEquipmentForPlayer(Constant.PrLv.PrLv4.getValue(), map, combatRecord)
+                            sendEquipmentForPlayer(Constant.PrLv.PrLv4.getValue(), map, combatRecord, user, summonedEventDto)
                     )
-                    .add(Constant.PrLv.PrLv7.getValue(), ()->
+                    .add(Constant.PrLv.PrLv7.getValue(), () ->
                             // 7级概率产出橙色卷轴*1
-                            sendEquipmentFlagForPlayer(Constant.PrLv.PrLv5.getValue(), map, combatRecord)
+                            sendEquipmentFlagForPlayer(Constant.PrLv.PrLv5.getValue(), map, combatRecord, user, summonedEventDto)
                     )
-                    .add(Constant.PrLv.PrLv8.getValue(), ()->
+                    .add(Constant.PrLv.PrLv8.getValue(), () ->
                             // 8级概率产出橙色装备
-                            sendEquipmentForPlayer(Constant.PrLv.PrLv5.getValue(), map, combatRecord)
+                            sendEquipmentForPlayer(Constant.PrLv.PrLv5.getValue(), map, combatRecord, user, summonedEventDto)
                     );
-            ifFunction.doIf(entry.getKey() + Constant.Quantity._ONE.getValue());
+            ifFunction.doIf(entry.getKey() + Constant.Quantity.Q1.getValue());
 //            LOGGER.info(gifts.get(entry.getKey()).getEquipId() + ", count=" + entry.getValue() + ", probability="
 //                    + entry.getValue());
         }
@@ -608,6 +765,7 @@ public class DrawGiftService{
 
     /**
      * 副本产出的装备
+     *
      * @param user
      * @param dungeon
      * @param combatRecord
@@ -639,24 +797,23 @@ public class DrawGiftService{
         }
         // 随机副本产出装备数量
         Random rm = new Random();
-        int rmon = rm.nextInt(3);
-        if (rmon < 1) {
-            rmon = 1;
-        }
+        int rmon = rm.nextInt(Constant.Quantity.Q3.getValue());
+        rmon = rmon == 0 ? Constant.Quantity.Q1.getValue() : rmon;
         SummonReq summonReq = new SummonReq();
         summonReq.setSummonNum(rmon);
         // 开始奖品发放
-        equipmentSummonPool(user, summonReq, combatRecord, orignalRates);
+        equipmentSummonPool(user, summonReq, combatRecord, orignalRates, null);
     }
 
     /**
      * 经验召唤池
+     *
      * @param user
      * @param summonReq
      * @param orignalRates
      * @return
      */
-    private void expSummonPool(UserEntity user, SummonReq summonReq, List<Double> orignalRates){
+    private void expSummonPool(UserEntity user, SummonReq summonReq, List<Double> orignalRates) {
         Map<String, Object> map = new HashMap<>();
         map.put("txHash", summonReq.getTransactionHash());
         Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates, summonReq.getSummonNum());
@@ -669,23 +826,23 @@ public class DrawGiftService{
             // 使用万能策略模式
             UniversalStrategyModeTool<Integer> ifFunction = new UniversalStrategyModeTool<>(new HashMap<>());
             ifFunction
-                    .add(Constant.PrLv.PrLv1.getValue(), ()->
-                            // 1级概率产出2白色，1绿色
+                    .add(Constant.PrLv.PrLv1.getValue(), () ->
+                            // 1级概率产出随机1-10件
                             sendExpPropForPlayer(Constant.PrLv.PrLv1.getValue(), map)
                     )
-                    .add(Constant.PrLv.PrLv2.getValue(), ()->
-                            // 2级概率产出4白色，2绿色，1蓝色
-                            sendExpPropForPlayer(Constant.PrLv.PrLv2.getValue(),  map)
-                    )
-                    .add(Constant.PrLv.PrLv3.getValue(), ()->
-                            // 3级概率产出6白色，4绿色，2蓝色，1紫色
+                    .add(Constant.PrLv.PrLv2.getValue(), () ->
+                            // 2级概率产出随机1-8件
                             sendExpPropForPlayer(Constant.PrLv.PrLv2.getValue(), map)
                     )
-                    .add(Constant.PrLv.PrLv4.getValue(), ()->
-                            // 3级概率产出8白色，5绿色，3蓝色，2紫色
-                            sendExpPropForPlayer(Constant.PrLv.PrLv4.getValue(),  map)
+                    .add(Constant.PrLv.PrLv3.getValue(), () ->
+                            // 3级概率产出随机1-4件
+                            sendExpPropForPlayer(Constant.PrLv.PrLv2.getValue(), map)
+                    )
+                    .add(Constant.PrLv.PrLv4.getValue(), () ->
+                            // 4级概率产出1件
+                            sendExpPropForPlayer(Constant.PrLv.PrLv4.getValue(), map)
                     );
-            ifFunction.doIf(entry.getKey() + Constant.Quantity._ONE.getValue());
+            ifFunction.doIf(entry.getKey() + Constant.Quantity.Q1.getValue());
 //            LOGGER.info(gifts.get(entry.getKey()).getEquipId() + ", count=" + entry.getValue() + ", probability="
 //                    + entry.getValue());
         }
@@ -693,10 +850,11 @@ public class DrawGiftService{
 
     /**
      * 系统发放经验道具至玩家背包
+     *
      * @param prLv
      * @param map
      */
-    private void sendExpPropForPlayer(int prLv, Map<String, Object> map){
+    private void sendExpPropForPlayer(int prLv, Map<String, Object> map) {
         // 获取盒子数量
         int giftBoxNum = Integer.parseInt(map.get("giftBoxNum").toString());
         // 获取系统全部经验信息
@@ -706,16 +864,36 @@ public class DrawGiftService{
         // 存储要添加的经验的集合
         List<UserExperiencePotionEntity> userExpAdds = new ArrayList<>();
         int i = 0;
-        while (i < giftBoxNum){
+        while (i < giftBoxNum) {
             int expsI = prLv - 1;
+            Random random = new Random();
+            int expNum;
+            switch (prLv) {
+                case 1:
+                    expNum = random.nextInt(Constant.Quantity.Q11.getValue());
+                    break;
+                case 2:
+                    expNum = random.nextInt(Constant.Quantity.Q9.getValue());
+                    break;
+                case 3:
+                    expNum = random.nextInt(Constant.Quantity.Q5.getValue());
+                    break;
+                case 4:
+                    expNum = random.nextInt(Constant.Quantity.Q2.getValue());
+                    break;
+                default:
+                    expNum = Constant.Quantity.Q1.getValue();
+                    break;
+            }
+            expNum = expNum == 0 ? Constant.Quantity.Q1.getValue() : expNum;
             int j = 0;
-            while (j < prLv) {
+            while (j < expNum) {
                 // 开始发放经验至玩家背包
                 String txHash = null == map.get("txHash") ? null : map.get("txHash").toString();
                 UserExperiencePotionEntity userExp = new UserExperiencePotionEntity();
                 userExp.setExPotionId(exps.get(expsI).getExPotionId());
                 userExp.setUserId(Long.valueOf(map.get("userId").toString()));
-                userExp.setUserExNum(Constant.Quantity._ONE.getValue());
+                userExp.setUserExNum(Constant.Quantity.Q1.getValue());
                 userExp.setStatus(Constant.enable);
                 userExp.setMintStatus(Constant.enable);
                 userExp.setMintHash(txHash);
@@ -725,10 +903,10 @@ public class DrawGiftService{
                 j++;
             }
 
-            // 存储英雄召唤返回集合
+            // 存储经验召唤返回集合
             GiftBoxExpRsp giftBoxExpRsp = new GiftBoxExpRsp();
             giftBoxExpRsp.setExpName(exps.get(expsI).getExPotionName());// 经验名称
-            giftBoxExpRsp.setExpNum(prLv);// 经验数量
+            giftBoxExpRsp.setExpNum(expNum);// 经验数量
             giftBoxExpRsp.setExpRare(Integer.valueOf(exps.get(expsI).getExPotionRareCode()));// 经验稀有度(1:白色,2:绿色,3:蓝色,4:紫色)
             giftBoxExpRsp.setExpValue(exps.get(expsI).getExValue());// 经验值
             giftBoxExpRsp.setExpIconUrl(exps.get(expsI).getExIconUrl());// 图标地址
@@ -801,7 +979,7 @@ public class DrawGiftService{
 
         //获取每件物品的中奖概率
         List<Double> orignalRates = new ArrayList<Double>(gifts.size());
-        for (DrawDtoTestEntity gift: gifts) {
+        for (DrawDtoTestEntity gift : gifts) {
             double probability = gift.getGmProbability();
             if (probability < 0) {
                 probability = 0;
@@ -809,7 +987,7 @@ public class DrawGiftService{
             orignalRates.add(probability);
         }
         int j = 0;
-        while (j < 1){
+        while (j < 1) {
             // statistics
             Map<Integer, Integer> count = new HashMap<Integer, Integer>();
             //召唤次数

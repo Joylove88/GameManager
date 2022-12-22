@@ -1,15 +1,14 @@
 /**
  * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
+ * <p>
  * https://www.renren.io
- *
+ * <p>
  * 版权所有，侵权必究！
  */
 
 package com.gm.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gm.annotation.Login;
 import com.gm.annotation.LoginUser;
 import com.gm.common.Constant.ErrorCode;
@@ -21,6 +20,7 @@ import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
 import com.gm.modules.basicconfig.dto.AttributeSimpleEntity;
 import com.gm.modules.basicconfig.entity.*;
+import com.gm.modules.basicconfig.rsp.HeroLevelRsp;
 import com.gm.modules.basicconfig.rsp.TeamInfoRsp;
 import com.gm.modules.basicconfig.service.*;
 import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
@@ -51,7 +51,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/api")
-@Api(tags="用户信息接口")
+@Api(tags = "用户信息接口")
 public class ApiIncreaseCombatPowerController {
     @Autowired
     private UserService userService;
@@ -99,23 +99,23 @@ public class ApiIncreaseCombatPowerController {
     @Login
     @PostMapping("equipment")
     @ApiOperation("英雄装备激活OR合成")
-    public R equipment(@LoginUser UserEntity user,  @RequestBody UserHeroInfoReq req) throws InvocationTargetException, IllegalAccessException {
+    public R equipment(@LoginUser UserEntity user, @RequestBody UserHeroInfoReq req) throws InvocationTargetException, IllegalAccessException {
         // 表单校验
         ValidatorUtils.validateEntity(req);
         // 获取英雄
         UserHeroEntity userHero = getUserHero(req.getUserHeroId());
         UserHeroInfoRsp rsp = new UserHeroInfoRsp();
-        BeanUtils.copyProperties(rsp,userHero);
+        BeanUtils.copyProperties(rsp, userHero);
         // 获取玩家装备信息
         UserEquipmentEntity userEquipment = new UserEquipmentEntity();
         userEquipment.setUserId(user.getUserId());
         userEquipment.setUserEquipmentId(req.getUserEquipmentId());
         List<UserEquipInfoRsp> equipment = userEquipmentService.getUserEquip(userEquipment);
-        if ( equipment.size() == 0 ) {
+        if (equipment.size() == 0) {
             throw new RRException("您未获得该装备或已激活");
         }
-        for ( UserEquipInfoRsp equipInfoRsp : equipment ) {
-            if ( equipInfoRsp.getStatus().equals(Constant.used) ) {
+        for (UserEquipInfoRsp equipInfoRsp : equipment) {
+            if (equipInfoRsp.getStatus().equals(Constant.used)) {
                 throw new RRException("该装备已使用");
             }
         }
@@ -154,35 +154,36 @@ public class ApiIncreaseCombatPowerController {
 
         // 获取该装备战力（本次变化的战力）
         equpPower = equipment.get(0).getEquipPower();
-        updateCombatPower(user, req.getUserHeroId(), setUserEquip.getUserEquipmentId(), equpPower);
+        updateCombatPower(user, req.getUserHeroId(), setUserEquip.getUserEquipmentId(), equpPower, null);
 
         Map<String, Object> map = new HashMap();
         map.put("changePower", equpPower);
-        return R.ok().put("data",map);
+        return R.ok().put("data", map);
     }
 
     /**
      * 校验子级装备是否已激活（子级装备激活后才可激活父级装备）
+     *
      * @param req
      * @param equipmentId
      */
-    private void verifyEquipment(UserHeroInfoReq req, Long equipmentId){
+    private void verifyEquipment(UserHeroInfoReq req, Long equipmentId) {
         // 获取该装备的合成公式
         EquipSynthesisItemEntity eqSIEs = equipSynthesisItemService.getEquipSyntheticFormula(equipmentId);
         // 如果合成公式不为空说明为可合成装备 只有可合成装备才进行校验
-        if ( eqSIEs != null ) {
+        if (eqSIEs != null) {
             // 封装该装备合成公式
             List list = combatStatsUtilsService.getEquipItems(eqSIEs);
             // 该合成公式所需的装备数量
             int equipNum = 0;
             int i = 0;
-            while ( i < list.size() ){
+            while (i < list.size()) {
                 // 获取合成公式是否包含多件装备
                 boolean b = list.get(i).toString().contains(",");
                 // 多件装备
-                if( b ){
+                if (b) {
                     String[] equipItems2 = list.get(i).toString().split(",");
-                    for( String e1 : equipItems2 ){
+                    for (String e1 : equipItems2) {
                         equipNum++;
                     }
                 } else {// 单件装备
@@ -196,13 +197,13 @@ public class ApiIncreaseCombatPowerController {
             userWearMap.put("userHeroId", req.getUserHeroId());
             userWearMap.put("parentEquipChain", req.getParentEquipChain());
             List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearService.getUserWearEQ(userWearMap);
-            for ( UserHeroEquipmentWearRsp equipmentWearRsp : wearList ) {
-                if ( equipmentWearRsp.getUserEquipId().equals(req.getUserEquipmentId()) ) {
+            for (UserHeroEquipmentWearRsp equipmentWearRsp : wearList) {
+                if (equipmentWearRsp.getUserEquipId().equals(req.getUserEquipmentId())) {
                     throw new RRException("该装备已使用");
                 }
             }
             // 开始校验：该装备合成公式的下级装备数量 是否与已激活装备数量相同 如果相同则校验通过
-            if ( equipNum != wearList.size() ){
+            if (equipNum != wearList.size()) {
                 throw new RRException("请先激活下层全部装备");
             }
         }
@@ -210,6 +211,7 @@ public class ApiIncreaseCombatPowerController {
 
     /**
      * 装备合成
+     *
      * @param user
      * @param req
      */
@@ -222,21 +224,22 @@ public class ApiIncreaseCombatPowerController {
         // 获取英雄
         UserHeroEntity userHero = getUserHero(req.getUserHeroId());
 
-        return R.ok().put("data",null);
+        return R.ok().put("data", null);
     }
 
     /**
      * 校验英雄
+     *
      * @param userHeroId
      * @return
      */
-    private UserHeroEntity getUserHero(Long userHeroId){
+    private UserHeroEntity getUserHero(Long userHeroId) {
         // 获取英雄
         Map<String, Object> userHeroMap = new HashMap<>();
         userHeroMap.put("status", Constant.enable);
         userHeroMap.put("userHeroId", userHeroId);
         UserHeroEntity userHero = userHeroService.getUserHeroById(userHeroMap);
-        if ( userHero == null ) {
+        if (userHero == null) {
             System.out.println("获取玩家英雄失败");
         }
         return userHero;
@@ -244,11 +247,12 @@ public class ApiIncreaseCombatPowerController {
 
     /**
      * 更新战力(判断该英雄是否在上阵中, 只有上阵中的英雄更新战力及矿工)
+     *
      * @param user
      * @param userHeroId
      * @param changePower
      */
-    private void updateCombatPower(UserEntity user, Long userHeroId, Long userEquipId, Long changePower){
+    private void updateCombatPower(UserEntity user, Long userHeroId, Long userEquipId, Long changePower, Double scale) {
         // 获取队伍
         Map<String, Object> teamParams = new HashMap<>();
         teamParams.put("userId", user.getUserId());
@@ -272,8 +276,8 @@ public class ApiIncreaseCombatPowerController {
         } else {
             // 获取英雄矿工数量
             CalculateTradeUtil.miners = hero.getMinter();
-            System.out.println("获取当前玩家矿工数量: " +CalculateTradeUtil.miners);
-            BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(changePower));
+            System.out.println("获取当前玩家矿工数量: " + CalculateTradeUtil.miners);
+            BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(changePower * scale));
             newOracle = Arith.divide((Arith.add(Arith.multiply(Arith.divide(hero.getOracle(), minterRate), BigDecimal.valueOf(hero.getHeroPower())), BigDecimal.valueOf(changePower)))
                     , Arith.multiply(BigDecimal.valueOf((hero.getHeroPower() + changePower)), minterRate));
             newMinter = minter;
@@ -284,8 +288,8 @@ public class ApiIncreaseCombatPowerController {
         userHeroService.updateById(hero);
 
         // 英雄已在队伍上阵
-        if ( teamInfoRsps.size() > 0 ) {
-            for (TeamInfoRsp teamInfoRsp : teamInfoRsps){
+        if (teamInfoRsps.size() > 0) {
+            for (TeamInfoRsp teamInfoRsp : teamInfoRsps) {
                 // 获取队伍旧战力值
                 long oldPower = teamInfoRsp.getTeamPower();
                 // 获取最新队伍战力（队伍战力+本次操作改变的战力）
@@ -325,7 +329,7 @@ public class ApiIncreaseCombatPowerController {
         List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(heroFragMap);
         // 获取当前星级+1
         int starCode = userHero.getStarCode();
-        if ( starCode < Constant.StarLv.Lv5.getValue() ) {
+        if (starCode < Constant.StarLv.Lv5.getValue()) {
             starCode += 1;
         } else {
             throw new RRException("星级已满");
@@ -334,16 +338,16 @@ public class ApiIncreaseCombatPowerController {
         // 获取星级信息
         List<StarInfoEntity> starInfos = starInfoService.getStarInfoPro();
         // 初始化升星所需碎片
-        int upStarFragNum = 0;
+        int nextStarFragNum = 0;
         // 初始化当前星级属性加成
         double starBuff = 0d;
         // 初始化升星后的属性加成
         double starBuffPlus = 0d;
-        for (StarInfoEntity starInfo : starInfos){
+        for (StarInfoEntity starInfo : starInfos) {
             // 设置升星后的属性
-            if (starInfo.getStarCode() == starCode){
+            if (starInfo.getStarCode() == starCode) {
                 // 获取升星所需碎片
-                upStarFragNum = starInfo.getUpStarFragNum();
+                nextStarFragNum = starInfo.getUpStarFragNum();
                 // 获取升星后的属性加成
                 starBuffPlus = starInfo.getStarBuff();
             }
@@ -362,7 +366,7 @@ public class ApiIncreaseCombatPowerController {
         // 初始化升星后英雄战力
         long upPower = 0;
         // 先校验玩家背包英雄碎片是否足够本次升星操作
-        if (heroFragList.get(0).getHeroFragNum() >= upStarFragNum) {
+        if (heroFragList.get(0).getHeroFragNum() >= nextStarFragNum) {
             try {
                 // 获取英雄初始属性
                 HeroInfoEntity heroInfo = heroInfoService.getById(userHero.getHeroId());
@@ -370,20 +374,23 @@ public class ApiIncreaseCombatPowerController {
                 // 获取当前星级英雄属性
                 attributeStar = combatStatsUtilsService.getHeroAttribute(heroInfo, starBuff);
                 // 获取当前星级英雄战力
-                nowPower = combatStatsUtilsService.getHeroPower(attributeStar, heroInfo.getScale());
+                nowPower = combatStatsUtilsService.getHeroPower(attributeStar);
 
                 // 获取升星后的英雄属性
                 attributeStarPlus = combatStatsUtilsService.getHeroAttribute(heroInfo, starBuffPlus);
                 // 获取升星后英雄战力
-                upPower = combatStatsUtilsService.getHeroPower(attributeStarPlus, heroInfo.getScale());
+                upPower = combatStatsUtilsService.getHeroPower(attributeStarPlus);
 
                 // 获取本次增加的属性
                 attributeSimpleAdd = combatStatsUtilsService.getAttributesAddedAfterStarUpgrade(attributeStar, attributeStarPlus);
 
                 // 获取本次增加的战力
                 changePower = upPower - nowPower;
+
+                // 获取英雄碎片的SCALE的平均值
+                Double scale = heroFragList.get(0).getScale();
                 // 消耗英雄碎片
-                heroFragMap.put("heroFragNum", upStarFragNum);
+                heroFragMap.put("heroFragNum", nextStarFragNum);
                 userHeroFragService.depleteHeroFrag(heroFragMap);
                 // 英雄升星\更新英雄战力
                 Date now = new Date();
@@ -403,10 +410,10 @@ public class ApiIncreaseCombatPowerController {
                 userHeroUp.setUpdateTimeTs(now.getTime());
                 userHeroService.updateById(userHeroUp);
                 // 更新战力及矿工
-                updateCombatPower(user, req.getUserHeroId(), null, changePower);
+                updateCombatPower(user, req.getUserHeroId(), null, changePower, scale);
             } catch (RRException e) {
                 e.printStackTrace();
-                throw new RRException("升星失败:"+e.getMsg());
+                throw new RRException("升星失败:" + e.getMsg());
             }
 
         } else {
@@ -414,7 +421,16 @@ public class ApiIncreaseCombatPowerController {
         }
         Map<String, Object> map = new HashMap();
         map.put("changePower", changePower);
-        return R.ok().put("data",map);
+        return R.ok().put("data", map);
+    }
+
+
+    @PostMapping("getHeroLevels")
+    @ApiOperation("获取英雄升级表")
+    public R getHeroLevels() {
+        // 获取英雄等级信息
+        List<HeroLevelRsp> heroLevels = heroLevelService.getHeroLevels();
+        return R.ok().put("heroLevels", heroLevels);
     }
 
     @Login
@@ -434,9 +450,9 @@ public class ApiIncreaseCombatPowerController {
         exp.setUserId(user.getUserId());
         List<UserExpInfoRsp> userExpProps = userExService.getUserEx(exp);
         // 获取经验道具基础信息
-        List<ExperiencePotionEntity> expInfos =  experiencePotionService.getExpInfos();
+        List<ExperiencePotionEntity> expInfos = experiencePotionService.getExpInfos();
         Long expTotal = 0l;//总经验
-        for (ExperiencePotionEntity expInfo : expInfos){
+        for (ExperiencePotionEntity expInfo : expInfos) {
             UserExpInfoRsp userExpInfo = new UserExpInfoRsp();
             userExpInfo.setExpName(expInfo.getExPotionName());
             userExpInfo.setExpRare(expInfo.getExPotionRareCode());
@@ -445,7 +461,7 @@ public class ApiIncreaseCombatPowerController {
             userExpInfo.setExpDescription(expInfo.getExDescription());
             userExpInfo.setExpNum(Constant.ZERO);
             int i = 0;
-            while ( i < userExpProps.size() ){
+            while (i < userExpProps.size()) {
                 if (expInfo.getExPotionRareCode().equals(userExpProps.get(i).getExpRare())) {
                     userExpInfo.setExpNum(userExpProps.get(i).getExpNum());
                     // 计算全部经验道具累加后的总经验值
@@ -458,12 +474,11 @@ public class ApiIncreaseCombatPowerController {
             rsp.add(userExpInfo);
 
 
-
         }
         Map<String, Object> rspMap = new HashMap<>();
         rspMap.put("expInfo", rsp);
         rspMap.put("expTotal", expTotal);
-        return R.ok().put("data",rspMap);
+        return R.ok().put("data", rspMap);
     }
 
     @Login
@@ -473,13 +488,13 @@ public class ApiIncreaseCombatPowerController {
         // 表单校验
         ValidatorUtils.validateEntity(useExpReq);
         // 经验药水数量
-        if (useExpReq.getExpNum() == null && useExpReq.getExpNum() == 0){
+        if (useExpReq.getExpNum() == null && useExpReq.getExpNum() == 0) {
             throw new RRException(ErrorCode.EXP_NUM_NOT_NULL.getDesc());
         }
         // 药水稀有度
-        if (StringUtils.isNotBlank(useExpReq.getExpRare())){
+        if (StringUtils.isNotBlank(useExpReq.getExpRare())) {
             // 参数安全校验 防止注入攻击;
-            if(ValidatorUtils.securityVerify(useExpReq.getExpRare())){
+            if (ValidatorUtils.securityVerify(useExpReq.getExpRare())) {
                 throw new RRException(ErrorCode.EXP_RARE_NOT_NULL.getDesc());
             }
         } else {

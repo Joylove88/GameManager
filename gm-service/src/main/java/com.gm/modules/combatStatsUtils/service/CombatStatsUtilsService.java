@@ -183,10 +183,10 @@ public class CombatStatsUtilsService {
 
 
     // 获取英雄战斗力
-    public int getHeroPower(AttributeSimpleEntity attributeSimple, double scale){
+    public int getHeroPower(AttributeSimpleEntity attributeSimple){
         double heroPower = ((attributeSimple.getHp() * 0.1) + (attributeSimple.getMp() * 0.1) + attributeSimple.getAttackDamage()
                 + ((attributeSimple.getArmor() + attributeSimple.getMagicResist()) * 4.5) +
-                attributeSimple.getHpRegen() * 0.1 + attributeSimple.getMpRegen() * 0.3) * scale;
+                attributeSimple.getHpRegen() * 0.1 + attributeSimple.getMpRegen() * 0.3);
         return (int) heroPower;
     }
 

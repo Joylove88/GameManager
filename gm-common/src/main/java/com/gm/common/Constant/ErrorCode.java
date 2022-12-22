@@ -4,8 +4,8 @@ public enum ErrorCode {
 
 	USER_NOT_TOKEN(50,"Failed to get user token!"),//获取用户Token失败
 	USER_GET_FAIL(51,"Failed to get user information!"),//获取用户信息失败
-	EXP_GET_FAIL(51,"Failed to get level information!"),//获取等级信息失败
-	USER_GET_BAL_FAIL(51,"Failed to get user balance!"),//获取用户余额失败
+	EXP_GET_FAIL(52,"Failed to get level information!"),//获取等级信息失败
+	USER_GET_BAL_FAIL(53,"Failed to get user balance!"),//获取用户余额失败
 	USER_NOT_EXIST(100,"The account does not exist, please contact customer service!"),//账号不存在，请联系客服！
 	USER_PASSWORD_ERROR(101,"wrong password!"),//密码错误
 	USER_ACCOUNT_EXPIRED(102,"Username has expired, please contact customer service!"),//用户名已失效，请联系客服！
@@ -23,6 +23,7 @@ public enum ErrorCode {
 	WITHDRAW_UPDATE_ACCOUNT_FAIL(113,"withdraw update account fail!"),//提现更新账户失败
 	WITHDRAW_INSERT_FAIL(114,"withdraw insert fail!"),//提现插入失败
 	WITHDRAW_INSERT_BALANCE_DETAIL_FAIL(115,"withdraw insert balance detail fail!"),//提现插入账变明细失败
+	REQUEST_PARAMETER_DATA_EXCEPTION(999,"Request parameter data exception!"),//请求参数数据异常
 
 
 

@@ -38,6 +38,10 @@ public class UserHeroFragEntity implements Serializable {
 	 */
 	private Integer userHeroFragNum;
 	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
+	/**
 	 * 铸造HASH
 	 */
 	private String mintHash;

@@ -1,6 +1,7 @@
 package com.gm.modules.user.rsp;
 
 import lombok.Data;
+import sun.dc.pr.PRError;
 
 /**
  * 玩家英雄碎片
@@ -16,8 +17,12 @@ public class UserHeroFragInfoRsp {
 	 */
 	private String heroFragIconUrl;
 	/**
-	 * 英雄碎片数量
+	 * 玩家英雄碎片数量
 	 */
-	private Long heroFragNum;
+	private Integer heroFragNum;
+	/**
+	 * 玩家碎片矿工比例（这里取的平均值）
+	 */
+	private Double scale;
 
 }

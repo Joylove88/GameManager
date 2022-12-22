@@ -7,15 +7,19 @@ import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.modules.basicconfig.dao.HeroLevelDao;
 import com.gm.modules.basicconfig.entity.HeroLevelEntity;
+import com.gm.modules.basicconfig.rsp.HeroLevelRsp;
 import com.gm.modules.basicconfig.service.HeroLevelService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 
 @Service("heroLeveService")
 public class HeroLevelServiceImpl extends ServiceImpl<HeroLevelDao, HeroLevelEntity> implements HeroLevelService {
-
+    @Autowired
+    private HeroLevelDao heroLevelDao;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<HeroLevelEntity> page = this.page(
@@ -24,6 +28,11 @@ public class HeroLevelServiceImpl extends ServiceImpl<HeroLevelDao, HeroLevelEnt
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<HeroLevelRsp> getHeroLevels() {
+        return heroLevelDao.getHeroLevels();
     }
 
 }

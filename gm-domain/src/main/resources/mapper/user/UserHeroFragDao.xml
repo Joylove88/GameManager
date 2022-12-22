@@ -43,6 +43,7 @@
     <select id="getUserAllHeroFrag" resultType="com.gm.modules.user.rsp.UserHeroFragInfoRsp">
         SELECT
             COUNT(*) AS HERO_FRAG_NUM,
+            AVG(A.SCALE) SCALE,
             B.HERO_FRAG_ICON_URL,
             C.HERO_NAME
         FROM

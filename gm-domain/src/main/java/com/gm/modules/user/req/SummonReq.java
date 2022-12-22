@@ -42,6 +42,14 @@ public class SummonReq {
     @ApiModelProperty(value = "货币类型")
     private String curType;
 
-    private BigDecimal fee;
+    /**
+     * 订单金额
+     */
+    private BigDecimal orderFee;
+
+    /**
+     * 实际支付金额
+     */
+    private BigDecimal realFee;
 
 }

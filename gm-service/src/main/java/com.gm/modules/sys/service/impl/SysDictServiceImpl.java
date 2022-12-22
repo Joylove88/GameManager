@@ -60,4 +60,13 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictDao, SysDictEntity> i
         return JSONObject.parseObject(sysDict.getValue());
     }
 
+    @Override
+    public String getValueByNameAndKey(String dictName, String dictType) {
+        SysDictEntity sysDict = sysDictDao.selectOne(new QueryWrapper<SysDictEntity>()
+                .eq("name", dictName)
+                .eq("type", dictType)
+        );
+        return sysDict.getValue();
+    }
+
 }

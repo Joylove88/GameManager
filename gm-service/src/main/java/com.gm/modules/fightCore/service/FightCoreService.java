@@ -313,7 +313,7 @@ public class FightCoreService {
 
             // 更新系统中保存的玩家赚取总收入
             CalculateTradeUtil.totalPlayersGold = Arith.add(CalculateTradeUtil.totalPlayersGold, goldCoins);
-            sysConfigService.updateValueByKey(Constant.PLAYERS_EARN_TOTAL_REVENUE, CalculateTradeUtil.totalPlayersGold.toString());
+            sysConfigService.updateValueByKey(Constant.SysConfig.PLAYERS_EARN_TOTAL_REVENUE.getValue(), CalculateTradeUtil.totalPlayersGold.toString());
 
             // 用户池入账
             fundsAccountingService.setCashPoolAdd(Constant.CashPool._USER.getValue(), goldCoins);// 添加该场战斗获取的收益
@@ -395,7 +395,7 @@ public class FightCoreService {
         // 可产出的金币
         addMoney = CalculateTradeUtil.userGetGold;
         // 更新系统中保存的市场总鸡蛋
-        sysConfigService.updateValueByKey(Constant.MARKET_EGGS, CalculateTradeUtil.marketEggs.toString());
+        sysConfigService.updateValueByKey(Constant.SysConfig.MARKET_EGGS.getValue(), CalculateTradeUtil.marketEggs.toString());
 
         return addMoney;
     }
@@ -407,7 +407,7 @@ public class FightCoreService {
         System.out.println("初始化经济平衡系统......");
 
         // 获取市场总鸡蛋数量
-        String totalEggs = sysConfigService.getValue(Constant.MARKET_EGGS);
+        String totalEggs = sysConfigService.getValue(Constant.SysConfig.MARKET_EGGS.getValue());
         System.out.println("获取市场总鸡蛋数量: "+totalEggs);
         CalculateTradeUtil.marketEggs = new BigDecimal(totalEggs);
 
@@ -417,7 +417,7 @@ public class FightCoreService {
         System.out.println("获取副本池金额: " + CalculateTradeUtil.FundPool);
 
         // 玩家赚取总收入
-        CalculateTradeUtil.totalPlayersGold = new BigDecimal(sysConfigService.getValue(Constant.PLAYERS_EARN_TOTAL_REVENUE));
+        CalculateTradeUtil.totalPlayersGold = new BigDecimal(sysConfigService.getValue(Constant.SysConfig.PLAYERS_EARN_TOTAL_REVENUE.getValue()));
         System.out.println("获取系统全部玩家赚取总收入: " + CalculateTradeUtil.totalPlayersGold);
 
         // 重置矿工数
@@ -999,7 +999,8 @@ public class FightCoreService {
 
             // 插入账变明细
             balanceMap.put("userId", user.getUserId());
-            balanceMap.put("amount", combatRecord.getGetGoldCoins());
+            balanceMap.put("orderFee", combatRecord.getGetGoldCoins());
+            balanceMap.put("realFee", combatRecord.getGetGoldCoins());
             balanceMap.put("tradeType", Constant.TradeType.DUNGEON_REVENUE.getValue());
             balanceMap.put("tradeDesc", "战斗收益");
             userBalanceDetailService.insertBalanceDetail(balanceMap);

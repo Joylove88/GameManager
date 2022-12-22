@@ -39,6 +39,10 @@ public class UserEquipmentFragEntity implements Serializable {
 	 */
 	private Integer userEquipFragNum;
 	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
+	/**
 	 * 铸造HASH
 	 */
 	private String mintHash;

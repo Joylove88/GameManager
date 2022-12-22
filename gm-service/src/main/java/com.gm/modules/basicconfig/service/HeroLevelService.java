@@ -3,7 +3,9 @@ package com.gm.modules.basicconfig.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.basicconfig.entity.HeroLevelEntity;
+import com.gm.modules.basicconfig.rsp.HeroLevelRsp;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +18,11 @@ import java.util.Map;
 public interface HeroLevelService extends IService<HeroLevelEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 获取英雄等级表
+     * @return
+     */
+    List<HeroLevelRsp> getHeroLevels();
 }
 

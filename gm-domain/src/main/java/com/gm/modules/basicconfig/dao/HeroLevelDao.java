@@ -2,6 +2,7 @@ package com.gm.modules.basicconfig.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gm.modules.basicconfig.entity.HeroLevelEntity;
+import com.gm.modules.basicconfig.rsp.HeroLevelRsp;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -21,4 +22,9 @@ public interface HeroLevelDao extends BaseMapper<HeroLevelEntity> {
 	 * @return
 	 */
 	List<HeroLevelEntity> getHeroLevel(HeroLevelEntity heroLeveEntity);
+	/**
+	 * 获取英雄等级表
+	 * @return
+	 */
+	List<HeroLevelRsp> getHeroLevels();
 }

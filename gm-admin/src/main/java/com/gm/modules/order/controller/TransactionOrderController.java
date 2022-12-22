@@ -47,10 +47,10 @@ public class TransactionOrderController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{transactionOrderId}")
+    @RequestMapping("/info/{id}")
     @RequiresPermissions("order:transactionorder:info")
-    public R info(@PathVariable("transactionOrderId") Long transactionOrderId){
-        TransactionOrderEntity transactionOrder = transactionOrderService.getById(transactionOrderId);
+    public R info(@PathVariable("id") Long id){
+        TransactionOrderEntity transactionOrder = transactionOrderService.getById(id);
 
         return R.ok().put("transactionOrder", transactionOrder);
     }
@@ -83,8 +83,8 @@ public class TransactionOrderController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("order:transactionorder:delete")
-    public R delete(@RequestBody Long[] transactionOrderIds){
-        transactionOrderService.removeByIds(Arrays.asList(transactionOrderIds));
+    public R delete(@RequestBody Long[] ids){
+        transactionOrderService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }

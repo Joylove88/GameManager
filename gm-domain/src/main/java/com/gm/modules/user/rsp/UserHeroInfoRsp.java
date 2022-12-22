@@ -29,10 +29,6 @@ public class UserHeroInfoRsp {
 	 */
 	private Long heroPower;
 	/**
-	 * 英雄矿工数
-	 */
-	private BigDecimal minter;
-	/**
 	 * 英雄星级
 	 */
 	private String starCode;

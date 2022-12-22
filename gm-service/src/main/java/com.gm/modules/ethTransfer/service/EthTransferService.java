@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.gm.common.utils.Arith;
 import com.gm.common.utils.Constant;
 import com.gm.common.utils.EthTransferListenUtils;
+import com.gm.modules.basicconfig.dto.SummonedEventDto;
 import com.gm.modules.drawGift.service.DrawGiftService;
 import com.gm.modules.fundsAccounting.service.FundsAccountingService;
 import com.gm.modules.order.entity.TransactionOrderEntity;
@@ -27,6 +28,7 @@ import java.util.*;
 
 /**
  * 链上业务类
+ *
  * @author Axiang
  * @email Axiang@gmail.com
  * @date 2022-01-23 19:06:59
@@ -67,9 +69,9 @@ public class EthTransferService {
      */
     private static String CAPITAL_POOL_ADDRESS;
     /**
-     * 代币地址
+     * BUSD地址
      */
-    private static String TOKENS_ADDRESS;
+    private static String BUSD_ADDRESS;
 
     public List eth(String txHash, TransactionOrderEntity order, Optional<TransactionReceipt> receipt, SummonReq form) throws Exception {
         // 召唤集合
@@ -80,24 +82,21 @@ public class EthTransferService {
             NFT_HERO_ADDRESS = addressJson.getString("NFT_HERO_ADDRESS");
             NFT_EQUIP_ADDRESS = addressJson.getString("NFT_EQUIP_ADDRESS");
             NFT_EX_ADDRESS = addressJson.getString("NFT_EX_ADDRESS");
-            TOKENS_ADDRESS = addressJson.getString("TOKENS_ADDRESS");
+            BUSD_ADDRESS = addressJson.getString("BUSD_ADDRESS");
             CAPITAL_POOL_ADDRESS = addressJson.getString("CAPITAL_POOL_ADDRESS");
             TEAM_ADDRESS = addressJson.getString("TEAM_ADDRESS");
 
             // 实例化用户类
             UserEntity user = new UserEntity();
 
-            Map<String,Object> map = new HashMap<>();
-
+            Map<String, Object> map = new HashMap<>();
             BigDecimal amount = BigDecimal.valueOf(0L);// 资金池
             BigDecimal amountTeam = BigDecimal.valueOf(0L);// 团队抽成
 
             // token交易数量(召唤次数)
             int tokenNum = 0;
-
             // 类型1英雄，2装备，3道具
             String type = "";
-
             // 获取生成的token数量
             if (receipt.get().getLogs().size() > 0) {
                 for (int j = 0; j < receipt.get().getLogs().size(); j++) {
@@ -114,7 +113,7 @@ public class EthTransferService {
                         } else if (NFT_EX_ADDRESS.toLowerCase().equals(addressTo)) {// 经验NFT
                             type = Constant.SummonType.EXPERIENCE.getValue();
                             tokenNum++;
-                        } else if (TOKENS_ADDRESS.toLowerCase().equals(addressTo)) {// 代币数量（费用+团队抽成）
+                        } else if (BUSD_ADDRESS.toLowerCase().equals(addressTo)) {// 代币数量（费用+团队抽成）
                             Address tokenAddress = new Address(receipt.get().getLogs().get(j).getTopics().get(2));
                             String tokenNumHex = Numeric.toBigInt(receipt.get().getLogs().get(j).getData()).toString();
                             if (CAPITAL_POOL_ADDRESS.toLowerCase().equals(tokenAddress.toString())) {// 资金池
@@ -124,11 +123,6 @@ public class EthTransferService {
                             }
                         }
                     }
-                    // 获取用户地址
-//					if (receipt.get().getLogs().get(j).getTopics().size() > 0){
-//						addressFrom = receipt.get().getLogs().get(j).getTopics().get(2);
-//						addressFrom = addressFrom.replace(Constant.HEX_ZERO,"");
-//					}
                 }
                 LOGGER.info("本次费用：" + amount);
                 LOGGER.info("本次手续费：" + amountTeam);
@@ -137,36 +131,43 @@ public class EthTransferService {
             }
             String status = receipt.get().getStatus();
             String address = receipt.get().getFrom();
-
+            // 金额总计
+            amount = Arith.add(amount, amountTeam);
             // 查询系统是否存在该用户
             user = userService.queryByAddress(address.toLowerCase());
             // 用户不存在则执行自动注册
-            if (user == null){
+            if (user == null) {
                 UserEntity userRegister = new UserEntity();
                 Date date = new Date();
                 userRegister.setSignDate(date);
                 userRegister.setAddress(address.toLowerCase());
                 user = userService.userRegister(userRegister);
             }
-
+            // 获取召唤价格及活动信息
+            SummonedEventDto summonedEventDto = drawGiftService.getSummonedPrice(user.getAddress());
+            BigDecimal price = tokenNum == Constant.Quantity.Q1.getValue() ? BigDecimal.valueOf(summonedEventDto.getOnePriceNew()) : BigDecimal.valueOf(summonedEventDto.getTenPriceNew());
+            if (amount.compareTo(price) == -1) {
+                return null;
+            }
+            BigDecimal rebateGoldCoins = tokenNum == Constant.Quantity.Q1.getValue() ? BigDecimal.valueOf(summonedEventDto.getOnePriceNew()) : BigDecimal.valueOf(summonedEventDto.getTenPriceNew());
             map.put("userId", user.getUserId());
             map.put("from", address);
             map.put("gasUsed", receipt.get().getGasUsed());
             map.put("blockNumber", receipt.get().getBlockNumber());
-            amount = Arith.add(amount, amountTeam);
-            map.put("fee", amount);
+            map.put("orderFee", amount);
+            map.put("realFee", Arith.subtract(amount, rebateGoldCoins));
 
             // 设置召唤次数
             form.setSummonNum(tokenNum);
 
             // 设置物品类型
-            if (type.equals(Constant.SummonType.HERO.getValue())){
+            if (type.equals(Constant.SummonType.HERO.getValue())) {
                 // 英雄召唤
                 form.setSummonType(Constant.SummonType.HERO.getValue());
-            } else if (type.equals(Constant.SummonType.EQUIPMENT.getValue())){
+            } else if (type.equals(Constant.SummonType.EQUIPMENT.getValue())) {
                 // 装备召唤
                 form.setSummonType(Constant.SummonType.EQUIPMENT.getValue());
-            } else if (type.equals(Constant.SummonType.EXPERIENCE.getValue())){
+            } else if (type.equals(Constant.SummonType.EXPERIENCE.getValue())) {
                 // 经验召唤
                 form.setSummonType(Constant.SummonType.EXPERIENCE.getValue());
             }
@@ -178,23 +179,23 @@ public class EthTransferService {
             if (order == null) {
                 // 通过交易hash查找订单是否存在
                 TransactionOrderEntity orderEntity = transactionOrderService.getOrderHash(txHash);
-                if (orderEntity == null){
+                if (orderEntity == null) {
                     // 插入一笔订单,订单状态默认待处理
-                    transactionOrderService.addOrder(user,null,form);
+                    transactionOrderService.addOrder(user, null, form);
                 }
             }
 
             // 链上交易状态成功执行召唤，更新订单状态
-            if (status.equals(Constant.CHAIN_STATE1)){
+            if (status.equals(Constant.CHAIN_STATE1)) {
                 // 校验成功后开始召唤
-                gifts = drawGiftService.startSummon(user, form);
+                gifts = drawGiftService.startSummon(user, form, summonedEventDto);
                 // 更新当前订单状态为成功
-                map.put("status",Constant.enable);
-                transactionOrderService.updateOrder(form,gifts,map);
-            } else if(status.equals(Constant.CHAIN_STATE0)) {// 链上交易状态失败执行，更新订单状态
+                map.put("status", Constant.enable);
+                transactionOrderService.updateOrder(form, gifts, map);
+            } else if (status.equals(Constant.CHAIN_STATE0)) {// 链上交易状态失败执行，更新订单状态
                 // 更新当前订单状态为失败
-                map.put("status",Constant.failed);
-                transactionOrderService.updateOrder(form,gifts,map);
+                map.put("status", Constant.failed);
+                transactionOrderService.updateOrder(form, gifts, map);
             }
         }
         return gifts;

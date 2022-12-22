@@ -8,11 +8,18 @@
 
 package com.gm.common.web3Utils;
 
+import com.gm.common.utils.Arith;
+import com.gm.common.utils.Constant;
+import com.gm.common.utils.EthTransferListenUtils;
+import org.web3j.abi.datatypes.Address;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.utils.Convert;
+import org.web3j.utils.Numeric;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 public class TransactionVerifyUtils {
@@ -65,11 +72,11 @@ public class TransactionVerifyUtils {
 	}
 
 	public static void main(String[] args) {
-		Optional<TransactionReceipt> receipt = isVerify(connect(),"0x7218d42dd8e854d82101a4f1a7b23321d2e42208c58fa96b21568b5d860c437b");
+		Optional<TransactionReceipt> receipt = isVerify(connect(),"0x7586154595b996d6fad912e59b2f7ab0720cdd34134f3d1876e06811b66710be");
 		System.out.println(receipt);
-//		String TOKENS_ADDRESS = "0x0abBfa62C78187f201021D19b7D341332c8c6553";
-//		String CAPITAL_POOL_ADDRESS = "0xb1EE547128A61E3941aC26374038ecB79a3A21B5";
-//		String TEAM_ADDRESS = "0x4f03d425edb670ed056348d17bb57b99a9197250";
+//		String BUSD_ADDRESS = "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee";
+//		String CAPITAL_POOL_ADDRESS = "0xb2bF67468170f1b8F32f29011c2E9ab302D80749";
+//		String TEAM_ADDRESS = "0x2A3Ee1e41A8A11546C5732CFB447b752c9F09618";
 //		BigDecimal amount = BigDecimal.valueOf(0L);// 资金池
 //		BigDecimal amountTeam = BigDecimal.valueOf(0L);// 团队抽成
 //		if (receipt !=null) {
@@ -93,7 +100,7 @@ public class TransactionVerifyUtils {
 //						} else if (Constant.NFT_EX_ADDRESS.toLowerCase().equals(addressTo)) {// 经验NFT
 //							type = 3;
 //							tokenNum++;
-//						} else if (TOKENS_ADDRESS.toLowerCase().equals(addressTo)) {// 代币数量（费用+团队抽成）
+//						} else if (BUSD_ADDRESS.toLowerCase().equals(addressTo)) {// 代币数量（费用+团队抽成）
 //							Address tokenAddress = new Address(receipt.get().getLogs().get(j).getTopics().get(2));
 //							String tokenNumHex = Numeric.toBigInt(receipt.get().getLogs().get(j).getData()).toString();
 //							if (CAPITAL_POOL_ADDRESS.toLowerCase().equals(tokenAddress.toString())) {// 资金池
@@ -103,11 +110,6 @@ public class TransactionVerifyUtils {
 //							}
 //						}
 //					}
-//					// 获取用户地址
-////					if (receipt.get().getLogs().get(j).getTopics().size() > 0){
-////						addressFrom = receipt.get().getLogs().get(j).getTopics().get(2);
-////						addressFrom = addressFrom.replace(Constant.HEX_ZERO,"");
-////					}
 //				}
 //				System.out.println("本次转入资金池：" + amount);
 //				System.out.println("本次转入团队池：" + amountTeam);

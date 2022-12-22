@@ -7,17 +7,21 @@ import lombok.Data;
  */
 @Data
 public class UserHeroInfoReq {
-	/**
-	 * ID
-	 */
-	private Long userHeroId;
-	/**
-	 * 玩家装备ID
-	 */
-	private Long userEquipmentId;
-	/**
-	 * 父子级装备链
-	 */
-	private String parentEquipChain;
+    /**
+     * ID
+     */
+    private Long userHeroId;
+    /**
+     * 英雄名称
+     */
+    private String heroName;
+    /**
+     * 玩家装备ID
+     */
+    private Long userEquipmentId;
+    /**
+     * 父子级装备链
+     */
+    private String parentEquipChain;
 
 }

@@ -35,6 +35,10 @@ public class EquipmentFragEntity implements Serializable {
 	 */
 	private Long equipmentFragNum;
 	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
+	/**
 	 * 物品估值
 	 */
 	private Double itemValuation;

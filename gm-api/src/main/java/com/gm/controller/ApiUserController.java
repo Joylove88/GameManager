@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
+ * <p>
  * https://www.renren.io
- *
+ * <p>
  * 版权所有，侵权必究！
  */
 
@@ -30,7 +30,6 @@ import com.gm.modules.user.rsp.*;
 import com.gm.modules.user.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import jnr.a64asm.CONDITION;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +54,7 @@ import java.util.concurrent.ExecutionException;
  */
 @RestController
 @RequestMapping("/api")
-@Api(tags="用户信息接口")
+@Api(tags = "用户信息接口")
 public class ApiUserController {
     @Autowired
     private UserService userService;
@@ -69,6 +68,8 @@ public class ApiUserController {
     private UserAccountService userAccountService;
     @Autowired
     private GmEmailService gmEmailService;
+    @Autowired
+    private HeroInfoService heroInfoService;
     @Autowired
     private UserHeroFragService userHeroFragService;
     @Autowired
@@ -108,7 +109,25 @@ public class ApiUserController {
         userHeroMap.put("status", Constant.enable);
         userHeroMap.put("userId", user.getUserId());
         List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(userHeroMap);
-        return R.ok().put("heroList",heroList);
+        return R.ok().put("heroList", heroList);
+    }
+
+    @PostMapping("getHeroInfo")
+    @ApiOperation("获取英雄信息")
+    public R getHeroInfo(@RequestBody UserHeroInfoReq req) {
+        // 安全校验 防止注入攻击;
+        if (ValidatorUtils.securityVerify(req.getHeroName())) {
+            throw new RRException(ErrorCode.REQUEST_PARAMETER_DATA_EXCEPTION.getDesc());
+        }
+        HeroInfoEntity heroInfo = heroInfoService.getOne(new QueryWrapper<HeroInfoEntity>()
+                .eq("HERO_NAME", req.getHeroName())
+                .eq("STATUS", Constant.enable)
+        );
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", heroInfo.getHeroName());
+        map.put("imgUrl", heroInfo.getHeroImgUrl());
+        map.put("description", heroInfo.getHeroDescription());
+        return R.ok().put("data", map);
     }
 
     @Login
@@ -122,36 +141,36 @@ public class ApiUserController {
         userHeroMap.put("userId", user.getUserId());
         List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(userHeroMap);
         int i = 0;
-        while ( i < heroList.size() ) {
+        while (i < heroList.size()) {
             // 获取该英雄已穿戴的装备
             Map<String, Object> userWearMap = new HashMap<>();
             userWearMap.put("status", Constant.enable);
             userWearMap.put("userHeroId", heroList.get(i).getUserHeroId());
             List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearService.getUserWearEQ(userWearMap);
-            if ( wearList.size() > 0 ) {
+            if (wearList.size() > 0) {
                 heroList.get(i).setWearEQList(wearList);
             }
             i++;
         }
-        map.put("heroList",heroList);
+        map.put("heroList", heroList);
 
         // 获取英雄碎片
         Map<String, Object> heroFragMap = new HashMap<>();
         heroFragMap.put("userId", user.getUserId());
         heroFragMap.put("status", Constant.enable);
         List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(heroFragMap);
-        map.put("heroFragList",heroFragList);
+        map.put("heroFragList", heroFragList);
 
         // 获取装备
         UserEquipmentEntity userEquipment = new UserEquipmentEntity();
         userEquipment.setStatus(Constant.enable);
         userEquipment.setUserId(user.getUserId());
         List<UserEquipInfoRsp> equipmentEntities = userEquipmentService.getUserEquip(userEquipment);
-        map.put("equipList",equipmentEntities);
+        map.put("equipList", equipmentEntities);
 
         // 获取装备碎片
         List<UserEquipmentFragInfoRsp> equipmentFragEntities = userEquipmentFragService.getUserAllEquipFrag(user.getUserId());
-        map.put("equipFragList",equipmentFragEntities);
+        map.put("equipFragList", equipmentFragEntities);
 
         // 获取消耗品
         Map<String, Object> forUseMap = new HashMap<>();
@@ -160,9 +179,9 @@ public class ApiUserController {
         UserExperiencePotionEntity exp = new UserExperiencePotionEntity();
         exp.setUserId(user.getUserId());
         List<UserExpInfoRsp> expList = userExService.getUserEx(exp);
-        forUseMap.put("expList",expList);
+        forUseMap.put("expList", expList);
 
-        map.put("consumables",forUseMap);
+        map.put("consumables", forUseMap);
         return R.ok(map);
     }
 
@@ -173,21 +192,22 @@ public class ApiUserController {
         UserQueryBalanceRsp rsp = new UserQueryBalanceRsp();
         // 获取用户账户余额
         UserAccountEntity userAccount = getUserAccount(user);
-        if (userAccount == null){
+        if (userAccount == null) {
             throw new RRException(ErrorCode.USER_GET_BAL_FAIL.getDesc());
         }
-        BeanUtils.copyProperties(rsp,userAccount);
-        return R.ok().put("userAccount",rsp);
+        BeanUtils.copyProperties(rsp, userAccount);
+        return R.ok().put("userAccount", rsp);
     }
 
     /**
      * 获取用户账户余额
+     *
      * @param user
      * @return
      */
-    private UserAccountEntity getUserAccount(UserEntity user){
+    private UserAccountEntity getUserAccount(UserEntity user) {
         QueryWrapper<UserAccountEntity> wrapper = new QueryWrapper<UserAccountEntity>()
-                .eq("USER_ID",user.getUserId());
+                .eq("USER_ID", user.getUserId());
         return userAccountService.getOne(wrapper);
     }
 
@@ -200,10 +220,10 @@ public class ApiUserController {
         rsp.setNextLevelExp(rsp.getPromotionExperience());
         rsp.setFtgMax(Constant.FTG);
         rsp.setCurrentExp(ExpUtils.getCurrentExp(rsp.getExperienceTotal(), rsp.getPromotionExperience(), user.getExperienceObtain()));
-        return R.ok().put("userInfo",rsp);
+        return R.ok().put("userInfo", rsp);
     }
 
-    private UserInfoRsp getUserInfo(String address){
+    private UserInfoRsp getUserInfo(String address) {
         UserInfoRsp rsp = new UserInfoRsp();
         Map<String, Object> map = new HashMap<>();
         map.put("address", address);
@@ -211,10 +231,10 @@ public class ApiUserController {
         Double mrCoins = Constant.ZERO_D;
         Double mrCoinsAgent = Constant.ZERO_D;
         int i = 0;
-        while (i < list.size()){
+        while (i < list.size()) {
             if (list.get(i).getCurrency().equals(Constant.ZERO_)) {
                 mrCoins = list.get(i).getMrCoins();
-            } else if (list.get(i).getCurrency().equals(Constant.ONE_)){
+            } else if (list.get(i).getCurrency().equals(Constant.ONE_)) {
                 mrCoinsAgent = list.get(i).getMrCoins();
             }
             i++;
@@ -231,17 +251,17 @@ public class ApiUserController {
         // 表单校验
         ValidatorUtils.validateEntity(req);
         UserInfoRsp rsp = new UserInfoRsp();
-        if (StringUtils.isNotBlank(req.getAddress())){
+        if (StringUtils.isNotBlank(req.getAddress())) {
             rsp = getUserInfo(req.getAddress());
         }
-        return R.ok().put("userInfo",rsp);
+        return R.ok().put("userInfo", rsp);
     }
 
     @PostMapping("addEmail")
     @ApiOperation("玩家邮箱")
     public R addEmail(@RequestBody UserInfoReq req) throws InvocationTargetException, IllegalAccessException {
         // 表单校验
-        if (!ValidatorUtils.checkEmail(req.getEmail())){
+        if (!ValidatorUtils.checkEmail(req.getEmail())) {
             throw new RRException("Email format error!");
         }
         GmEmailEntity email = new GmEmailEntity();
@@ -258,14 +278,14 @@ public class ApiUserController {
     @Login
     @PostMapping("getHeroDetail")
     @ApiOperation("获取英雄详细信息")
-    public R getHeroDetail(@LoginUser UserEntity user,  @RequestBody UserHeroInfoReq req) throws InvocationTargetException, IllegalAccessException {
+    public R getHeroDetail(@LoginUser UserEntity user, @RequestBody UserHeroInfoReq req) throws InvocationTargetException, IllegalAccessException {
         // 表单校验
         ValidatorUtils.validateEntity(req);
         // 获取英雄
         Map<String, Object> userHeroMap = new HashMap<>();
         userHeroMap.put("userHeroId", req.getUserHeroId());
         UserHeroEntity userHero = userHeroService.getUserHeroById(userHeroMap);
-        if ( userHero == null ) {
+        if (userHero == null) {
             System.out.println("获取玩家英雄失败");
         }
         UserHeroInfoRsp rsp = new UserHeroInfoRsp();
@@ -273,7 +293,7 @@ public class ApiUserController {
 
         // 获取英雄等级信息
         HeroLevelEntity heroLevel = heroLevelService.getById(userHero.getHeroLevelId());
-        if (heroLevel == null){
+        if (heroLevel == null) {
             throw new RRException(ErrorCode.EXP_GET_FAIL.getDesc());
         }
 
@@ -289,13 +309,13 @@ public class ApiUserController {
 
         // 获取英雄装备栏
         Map<String, Object> heroEquipMap = new HashMap<>();
-        heroEquipMap.put("status",  Constant.enable);
-        heroEquipMap.put("heroId",  rsp.getHeroId());
+        heroEquipMap.put("status", Constant.enable);
+        heroEquipMap.put("heroId", rsp.getHeroId());
         List<HeroEquipmentEntity> heroEquipments = heroEquipmentService.getHeroEquipments(heroEquipMap);
         JSONArray jsonArray = new JSONArray();
-        for ( HeroEquipmentEntity heroEquipment : heroEquipments ) {
+        for (HeroEquipmentEntity heroEquipment : heroEquipments) {
             // 获取英雄已激活/未激活装备
-            jsonArray.add(equipmentInfoService.updateEquipJson2(heroEquipment.getEquipId(),equipments, rsp));
+            jsonArray.add(equipmentInfoService.updateEquipJson2(heroEquipment.getEquipId(), equipments, rsp));
 
         }
 
@@ -305,16 +325,16 @@ public class ApiUserController {
         skillMap.put("heroId", userHero.getHeroId());
         skillMap.put("skillStarCode", userHero.getStarCode());
         HeroSkillEntity heroSkill = heroSkillService.getHeroSkill(skillMap);
-        if ( heroSkill == null ) {
+        if (heroSkill == null) {
             System.out.println("英雄技能获取失败");
         }
         HeroSkillRsp skillRsp = new HeroSkillRsp();
-        BeanUtils.copyProperties(skillRsp,heroSkill);
+        BeanUtils.copyProperties(skillRsp, heroSkill);
         rsp.setHeroSkillRsp(skillRsp);
 
         // 获取当前星级+1
         int starCode = userHero.getStarCode();
-        if ( starCode < 5 ) {
+        if (starCode < 5) {
             starCode += 1;
         }
         // 获取当前阶段升星所需碎片
@@ -330,22 +350,12 @@ public class ApiUserController {
         heroFragMap.put("heroId", userHero.getHeroId());
         List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(heroFragMap);
 
-        // 获取英雄等级信息
-        List<HeroLevelEntity> heroLevels = heroLevelService.list();
-
-        // 获取玩家背包中的经验道具
-        UserExperiencePotionEntity exp = new UserExperiencePotionEntity();
-        exp.setUserId(user.getUserId());
-        List<UserExpInfoRsp> expList = userExService.getUserEx(exp);
-
         Map<String, Object> map = new HashMap();
         map.put("heroInfo", rsp);
         map.put("equipments", jsonArray);
-        map.put("heroLevels", heroLevels);
-        map.put("expList", expList);
         map.put("upStarFragNum", starInfo.getUpStarFragNum());
         map.put("heroFragNum", heroFragList.get(0).getHeroFragNum());
-        return R.ok().put("data",map);
+        return R.ok().put("data", map);
     }
 
     @Login
@@ -363,7 +373,7 @@ public class ApiUserController {
             return R.ok();
         }
         TransactionReceipt receipt = transactionReceipt.get();
-        if (!"0x1".equals(receipt.getStatus())){//不成功
+        if (!"0x1".equals(receipt.getStatus())) {//不成功
             return R.ok();
         }
         String data = receipt.getLogs().get(0).getData();
@@ -371,28 +381,28 @@ public class ApiUserController {
         String two = data.substring(66, 130);// gas费
         String there = data.substring(130, 194);// 提款金额
         BigInteger oneBigInteger = Numeric.toBigInt(one);
-        BigDecimal twoBigDecimal = Convert.fromWei(Numeric.toBigInt("0x"+two).toString(), Convert.Unit.ETHER);
-        BigDecimal thereBigDecimal = Convert.fromWei(Numeric.toBigInt("0x"+there).toString(), Convert.Unit.ETHER);
+        BigDecimal twoBigDecimal = Convert.fromWei(Numeric.toBigInt("0x" + two).toString(), Convert.Unit.ETHER);
+        BigDecimal thereBigDecimal = Convert.fromWei(Numeric.toBigInt("0x" + there).toString(), Convert.Unit.ETHER);
         useWithdrawReq.setWithdrawMoney(thereBigDecimal);
         // 1.查询该会员上次提现时间
         GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(user);
-        if (lastWithdraw != null){
+        if (lastWithdraw != null) {
             Date date = DateUtils.addDateHours(lastWithdraw.getCreateTime(), 24);// 上次提现时间加24小时，然后和当前时间做比较
-            if (date.after(new Date())){// 24小时只能发起一次提现
+            if (date.after(new Date())) {// 24小时只能发起一次提现
                 throw new RRException(ErrorCode.WITHDRAW_OVER_TIMES.getDesc());
             }
         }
         // 2.查询该会员消费等级
         GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.getById(user.getVipLevelId());
         // 3.查询该会员当前余额
-        UserAccountEntity userAccountEntity = userAccountService.queryByUserIdAndCur(user.getUserId(),useWithdrawReq.getWithdrawType());
-        if (userAccountEntity.getBalance()*gmUserVipLevel.getWithdrawLimit() < thereBigDecimal.doubleValue()){
+        UserAccountEntity userAccountEntity = userAccountService.queryByUserIdAndCur(user.getUserId(), useWithdrawReq.getWithdrawType());
+        if (userAccountEntity.getBalance() * gmUserVipLevel.getWithdrawLimit() < thereBigDecimal.doubleValue()) {
             // 提现超额
             throw new RRException(ErrorCode.WITHDRAW_OVER_MONEY.getDesc());
         }
         useWithdrawReq.setWithdrawHandlingFee(new BigDecimal(gmUserVipLevel.getWithdrawHandlingFee()));
         try {
-            gmUserWithdrawService.withdraw(user,gmUserVipLevel,useWithdrawReq);
+            gmUserWithdrawService.withdraw(user, gmUserVipLevel, useWithdrawReq);
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -408,7 +418,7 @@ public class ApiUserController {
     @ApiOperation("战斗玩家提现记录")
     public R fightingWithdrawList(@LoginUser UserEntity user, @RequestParam Map<String, Object> params) {
         // 1.查询该用户战斗玩家提现记录
-        PageUtils page = gmUserWithdrawService.queryWithdrawList(user.getUserId(),params,"0");
+        PageUtils page = gmUserWithdrawService.queryWithdrawList(user.getUserId(), params, "0");
         return R.ok().put("page", page);
     }
 
@@ -417,7 +427,7 @@ public class ApiUserController {
     @ApiOperation("代理玩家提现记录")
     public R inviteWithdrawList(@LoginUser UserEntity user, @RequestParam Map<String, Object> params) {
         // 1.查询该用户代理账户提现记录
-        PageUtils page = gmUserWithdrawService.queryWithdrawList(user.getUserId(),params,"1");
+        PageUtils page = gmUserWithdrawService.queryWithdrawList(user.getUserId(), params, "1");
         return R.ok().put("page", page);
     }
 
@@ -433,11 +443,11 @@ public class ApiUserController {
         Double sonConsumeMoney = transactionOrderService.querySonTotalMoneyByFatherId(user.getUserId());
         // 4.查询该用户的下级人数
         Integer userInviteNum = userService.queryInviteNum(user);
-        Map<String,Object> map = new HashMap<>();
-        map.put("consumeMoney",consumeMoney);
-        map.put("sonConsumeMoney",sonConsumeMoney);
-        map.put("userInviteNum",userInviteNum);
-        map.put("vipLevelList",gmUserVipLevelEntities);
+        Map<String, Object> map = new HashMap<>();
+        map.put("consumeMoney", consumeMoney);
+        map.put("sonConsumeMoney", sonConsumeMoney);
+        map.put("userInviteNum", userInviteNum);
+        map.put("vipLevelList", gmUserVipLevelEntities);
         return R.ok().put("data", map);
     }
 

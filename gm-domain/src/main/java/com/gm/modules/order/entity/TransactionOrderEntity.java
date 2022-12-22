@@ -25,7 +25,7 @@ public class TransactionOrderEntity implements Serializable {
 	 * ID
 	 */
 	@TableId
-	private Long transactionOrderId;
+	private Long id;
 	/**
 	 * 用户ID
 	 */
@@ -45,13 +45,13 @@ public class TransactionOrderEntity implements Serializable {
 	/**
 	 * 链上交易HASH
 	 */
-	private String transactionHash;
+	private String hash;
 	/**
 	 * 抽到的物品信息
 	 */
 	private String itemData;
 	/**
-	 * 状态('0':待处理，'1':成功，'2':失败)
+	 * 状态('0':待处理，'1':成功，'2':失败，‘3’:异常)
 	 */
 	private String status;
 	/**
@@ -59,13 +59,17 @@ public class TransactionOrderEntity implements Serializable {
 	 */
 	private Long blockNumber;
 	/**
-	 * 消耗金额
+	 * 订单金额
 	 */
-	private BigDecimal transactionFee;
+	private BigDecimal orderFee;
+	/**
+	 * 实际支付金额
+	 */
+	private BigDecimal realFee;
 	/**
 	 * GAS费
 	 */
-	private BigDecimal transactionGasFee;
+	private BigDecimal gasFee;
 	/**
 	 * 创建时间
 	 */

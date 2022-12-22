@@ -17,12 +17,10 @@ import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.modules.user.dao.GmMiningInfoDao;
+import com.gm.modules.user.dao.GmWhitelistAgentDao;
 import com.gm.modules.user.dao.UserAccountDao;
 import com.gm.modules.user.dao.UserDao;
-import com.gm.modules.user.entity.GmMiningInfoEntity;
-import com.gm.modules.user.entity.UserAccountEntity;
-import com.gm.modules.user.entity.UserTokenEntity;
-import com.gm.modules.user.entity.UserEntity;
+import com.gm.modules.user.entity.*;
 import com.gm.modules.user.rsp.UserInfoRsp;
 import com.gm.modules.user.service.UserTokenService;
 import com.gm.modules.user.service.UserService;
@@ -43,6 +41,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 	private UserAccountDao userAccountDao;
 	@Autowired
 	private GmMiningInfoDao miningInfoDao;
+	@Autowired
+	private GmWhitelistAgentDao whitelistAgentDao;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -68,14 +68,14 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 	}
 
 	@Override
-	public UserEntity userRegister(UserEntity userEntity) {
+	public UserEntity userRegister(UserEntity user) {
 		UserEntity userRegister = new UserEntity();
 		Date now = new Date();
-		userRegister.setSignDate(userEntity.getSignDate());
+		userRegister.setSignDate(user.getSignDate());
 		userRegister.setCreateTime(now);
 		userRegister.setCreateTimeTs(now.getTime());
-		userRegister.setUserName(userEntity.getAddress());
-		userRegister.setAddress(userEntity.getAddress());
+		userRegister.setUserName(user.getAddress());
+		userRegister.setAddress(user.getAddress());
 		userRegister.setUserLevelId(1L);
 		userRegister.setFtg(Constant.FTG);
 		userRegister.setScale(1D);
@@ -87,9 +87,17 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		userRegister.setOnlineFlag(Constant.enable);
 
 		userRegister.setExpandCode(RandomStringUtils.randomAlphanumeric(6));
-		userRegister.setFatherId(userEntity.getFatherId());
-		userRegister.setGrandfatherId(userEntity.getGrandfatherId());
-		userRegister.setVipLevelId(1539878146445455362L);
+		userRegister.setFatherId(user.getFatherId());
+		userRegister.setGrandfatherId(user.getGrandfatherId());
+		// 获取代理白名单
+		GmWhitelistAgentEntity whitelistAgent =whitelistAgentDao.selectOne(new QueryWrapper<GmWhitelistAgentEntity>()
+						.eq("STATUS", Constant.enable)
+						.eq("ADDRESS", user.getAddress()));
+		if (whitelistAgent != null) {
+			userRegister.setVipLevelId(1539886242337173506L);
+		} else {
+			userRegister.setVipLevelId(1539878146445455362L);
+		}
 
 		userDao.insert(userRegister);
 

@@ -9,4 +9,10 @@
         WHERE DELETED = '0' AND EXPERIENCE_TOTAL &lt;= #{experienceTotal}
         ORDER BY LEVEL_CODE DESC
     </select>
+    <!--获取英雄等级表-->
+    <select id="getHeroLevels" resultType="com.gm.modules.basicconfig.rsp.HeroLevelRsp">
+        SELECT * FROM GM_HERO_LEVEL
+        WHERE DELETED = '0'
+    </select>
+
 </mapper>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gm.modules.user.dao.GmWhitelistPresaleDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gm.modules.user.entity.GmWhitelistPresaleEntity" id="gmWhitelistPresaleMap">
+        <result property="id" column="ID"/>
+        <result property="address" column="ADDRESS"/>
+        <result property="email" column="EMAIL"/>
+        <result property="discountRate" column="DISCOUNT_RATE"/>
+        <result property="quantityAvailable" column="QUANTITY_AVAILABLE"/>
+        <result property="status" column="STATUS"/>
+        <result property="createUser" column="CREATE_USER"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createTimeTs" column="CREATE_TIME_TS"/>
+        <result property="updateUser" column="UPDATE_USER"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
+    </resultMap>
+    <select id="selectPage" resultType="com.gm.modules.user.entity.GmWhitelistPresaleEntity">
+        SELECT
+        *
+        FROM
+        gm_whitelist_presale
+
+        ${ew.customSqlSegment}
+    </select>
+
+    <!--获取预售白名单-->
+    <select id="getWhitelistPresale" resultType="com.gm.modules.user.entity.GmWhitelistPresaleEntity">
+        SELECT
+        A.*
+        FROM
+        gm_whitelist_presale A
+        <where>
+            AND  A.QUANTITY_USED &lt; A.QUANTITY_AVAILABLE AND A.ADDRESS = #{address}
+            <if test="status != null and status != ''">
+                AND A.`STATUS` = #{status}
+            </if>
+            <if test="type != null and type != ''">
+                AND A.TYPE = #{type}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND A.START_TIME &lt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND A.END_TIME &gt;= #{endTime}
+            </if>
+        </where>
+    </select>
+</mapper>

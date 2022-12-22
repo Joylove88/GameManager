@@ -261,4 +261,9 @@ public class EthTransferListenUtils {
     public static void setBlock_Num(int blockNum){
 
     }
+
+    public static void main(String[] args) {
+        byte[] hash = Hash.sha3(String.valueOf(Constant.EVENT_NAME).getBytes());
+        System.out.println(Numeric.toHexString(hash));
+    }
 }

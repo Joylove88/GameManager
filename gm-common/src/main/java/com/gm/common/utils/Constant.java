@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
+ * <p>
  * https://www.renren.io
- *
+ * <p>
  * 版权所有，侵权必究！
  */
 
@@ -16,11 +16,11 @@ import java.math.BigDecimal;
  * @author Mark sunlightcs@gmail.com
  */
 public class Constant {
-	/** 超级管理员ID */
-	public static final int SUPER_ADMIN = 1;
+    /** 超级管理员ID */
+    public static final int SUPER_ADMIN = 1;
     /** 数据权限过滤 */
-	public static final String SQL_FILTER = "sql_filter";
-   //前端类型
+    public static final String SQL_FILTER = "sql_filter";
+    //前端类型
     public static final String USER_AGENT = "User-Agent";
 
     public static final String FRONT_TYPE_WEB = "web";
@@ -28,20 +28,7 @@ public class Constant {
     public static final String FRONT_TYPE_ANDROID = "android";
     public static final String FRONT_TYPE_IOS = "ios";
     public static final String FRONT_TYPE_PC = "pc";
-    /**
-     * 市场总鸡蛋数量
-     */
-    public static final String MARKET_EGGS = "market_eggs";
-    /**
-     * 区块号
-     */
-    public static final String BLOCK_NUMBER = "block_number";
-
-    /**
-     * 玩家赚取总收入
-     */
-    public static final String PLAYERS_EARN_TOTAL_REVENUE = "players_earn_total_revenue";
-   // 副本资金池余额（最新）
+    // 副本资金池余额（最新）
     public static final String DUNGEON_POOLING_BALANCE = "dungeon_pooling_balance";
     /**
      * 合约事件名称
@@ -91,15 +78,15 @@ public class Constant {
     /**
      * 英雄合约地址
      */
-    public static final String NFT_HERO_ADDRESS = "0x25B15dE515eBBD047e026D64463801f044785cc6";
+    public static final String NFT_HERO_ADDRESS = "0x1c72906E0392b31D37f07fc72045960bf0D383a4";
     /**
      * 经验合约地址
      */
-    public static final String NFT_EX_ADDRESS = "0x50E39B4B42893c95A0797dbc0EDFB8Ec236620f4";
+    public static final String NFT_EX_ADDRESS = "0x82D27810050baEf93f9Af9a6613724E0eA425F16";
     /**
      * 装备合约地址
      */
-    public static final String NFT_EQUIP_ADDRESS = "0x50E39B4B42893c95A0797dbc0EDFB8Ec236620f4";
+    public static final String NFT_EQUIP_ADDRESS = "0x9188353ef930A15dcBC726b028Aa82AcD185E295";
     /**
      * 链上状态0
      */
@@ -161,14 +148,14 @@ public class Constant {
      */
     public static final String used = "2";
 
-	/**
-	 * 菜单类型
-	 */
+    /**
+     * 菜单类型
+     */
     public enum MenuType {
         /**
          * 目录
          */
-    	CATALOG(0),
+        CATALOG(0),
         /**
          * 菜单
          */
@@ -188,7 +175,7 @@ public class Constant {
             return value;
         }
     }
-    
+
     /**
      * 定时任务状态
      */
@@ -196,16 +183,18 @@ public class Constant {
         /**
          * 正常
          */
-    	NORMAL(0),
+        NORMAL(0),
         /**
          * 暂停
          */
-    	PAUSE(1);
+        PAUSE(1);
 
         private int value;
+
         ScheduleStatus(int value) {
             this.value = value;
         }
+
         public int getValue() {
             return value;
         }
@@ -229,10 +218,32 @@ public class Constant {
         QCLOUD(3);
 
         private int value;
+
         CloudService(int value) {
             this.value = value;
         }
+
         public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 系统参数
+     */
+    public enum SysConfig {
+        MARKET_EGGS("market_eggs"),// 市场总鸡蛋数量
+        BLOCK_NUMBER("block_number"),// 区块号
+        SUMMON_REBATE_SWITCH("summon_rebate_switch"),// 召唤返利开关：0：关闭，1开启
+        PLAYERS_EARN_TOTAL_REVENUE("players_earn_total_revenue");// 玩家赚取总收入
+
+        private String value;
+
+        SysConfig(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
             return value;
         }
     }
@@ -251,9 +262,11 @@ public class Constant {
         WITHDRAW_THAW("19"),//后台提现解冻
         WITHDRAW_SUCCESS("14");//后台提现成功
         private String value;
+
         TradeType(String value) {
             this.value = value;
         }
+
         public String getValue() {
             return value;
         }
@@ -267,9 +280,11 @@ public class Constant {
         EQUIPMENT("2"),//装备
         EXPERIENCE("3");//药水
         private String value;
+
         SummonType(String value) {
             this.value = value;
         }
+
         public String getValue() {
             return value;
         }
@@ -290,9 +305,11 @@ public class Constant {
         NUM9(9),
         NUM10(10);
         private int value;
+
         SummonNum(int value) {
             this.value = value;
         }
+
         public int getValue() {
             return value;
         }
@@ -306,9 +323,11 @@ public class Constant {
         _IN_BATTLE("1"),// 战斗中
         _BATTLE_IS_OVER("2");// 战斗结束
         private String value;
+
         BattleState(String value) {
             this.value = value;
         }
+
         public String getValue() {
             return value;
         }
@@ -321,9 +340,11 @@ public class Constant {
         _LOSE("0"),// LOSE
         _WIN("1");// WIN
         private String value;
+
         BattleResult(String value) {
             this.value = value;
         }
+
         public String getValue() {
             return value;
         }
@@ -337,9 +358,11 @@ public class Constant {
         _SUP("1"),// 恢复
         _SUP_ADD("2");// 加成
         private String value;
+
         SkillType(String value) {
             this.value = value;
         }
+
         public String getValue() {
             return value;
         }
@@ -356,9 +379,11 @@ public class Constant {
         LV5("[神技·九天神雷]");// 五级副本怪物专属技能
 
         private String value;
+
         SkillNameM(String value) {
             this.value = value;
         }
+
         public String getValue() {
             return value;
         }
@@ -375,9 +400,11 @@ public class Constant {
         _ORANGE("5");// 稀有度橙色
 
         private String value;
+
         RareCode(String value) {
             this.value = value;
         }
+
         public String getValue() {
             return value;
         }
@@ -391,9 +418,11 @@ public class Constant {
         _CRYPTO("1");// 加密货币
 
         private String value;
+
         CurrencyType(String value) {
             this.value = value;
         }
+
         public String getValue() {
             return value;
         }
@@ -410,9 +439,11 @@ public class Constant {
         _TEAM("team_cash_pool");// 团队抽成资金池
 
         private String value;
+
         CashPool(String value) {
             this.value = value;
         }
+
         public String getValue() {
             return value;
         }
@@ -428,9 +459,11 @@ public class Constant {
         _TEAM(BigDecimal.valueOf(0.05));// 团队比例
 
         private BigDecimal value;
+
         CashPoolScale(BigDecimal value) {
             this.value = value;
         }
+
         public BigDecimal getValue() {
             return value;
         }
@@ -440,16 +473,25 @@ public class Constant {
      * 数量
      */
     public enum Quantity {
-        _ONE(1),
-        _TWO(2),
-        _THREE(3),
-        _FOUR(4),
-        _FIVE(5);
+        Q1(1),
+        Q2(2),
+        Q3(3),
+        Q4(4),
+        Q5(5),
+        Q6(6),
+        Q7(7),
+        Q8(8),
+        Q9(9),
+        Q10(10),
+        Q11(11),
+        Q12(12);
 
         private Integer value;
+
         Quantity(Integer value) {
             this.value = value;
         }
+
         public Integer getValue() {
             return value;
         }
@@ -464,9 +506,11 @@ public class Constant {
         DIAMOND(2);// 钻石
 
         private Integer value;
+
         SkinType(Integer value) {
             this.value = value;
         }
+
         public Integer getValue() {
             return value;
         }
@@ -488,9 +532,11 @@ public class Constant {
         PrLv10(10);
 
         private int value;
+
         PrLv(int value) {
             this.value = value;
         }
+
         public int getValue() {
             return value;
         }
@@ -507,9 +553,11 @@ public class Constant {
         Lv5(5);
 
         private int value;
+
         StarLv(int value) {
             this.value = value;
         }
+
         public int getValue() {
             return value;
         }
@@ -523,9 +571,11 @@ public class Constant {
         SUMMON("1");
 
         private String value;
+
         FromType(String value) {
             this.value = value;
         }
+
         public String getValue() {
             return value;
         }
@@ -539,9 +589,11 @@ public class Constant {
         FRAG(1);
 
         private int value;
+
         FragType(int value) {
             this.value = value;
         }
+
         public int getValue() {
             return value;
         }
@@ -557,9 +609,11 @@ public class Constant {
         MAX_FREE(0.81);// 副本产出
 
         private double value;
+
         EquipStatsRange(double value) {
             this.value = value;
         }
+
         public double getValue() {
             return value;
         }
@@ -577,9 +631,11 @@ public class Constant {
         FAIL(5);
 
         private int value;
+
         WithdrawStatus(int value) {
             this.value = value;
         }
+
         public int getValue() {
             return value;
         }

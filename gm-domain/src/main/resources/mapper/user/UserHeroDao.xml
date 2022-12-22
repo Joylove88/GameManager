@@ -53,6 +53,36 @@
         A.USER_HERO_ID,
         A.EXPERIENCE_OBTAIN,
         A.HERO_POWER,
+        B.HERO_NAME,
+        B.HERO_IMG_URL,
+        B.HERO_ICON_URL,
+        B.HERO_KEEL_URL,
+        B.HERO_DESCRIPTION,
+        F.LEVEL_CODE
+        FROM
+        GM_USER_HERO A
+        LEFT JOIN
+        GM_HERO_INFO B ON A.HERO_ID = B.HERO_ID
+        LEFT JOIN
+        GM_HERO_LEVEL F ON A.HERO_LEVEL_ID = F.HERO_LEVE_ID
+        <where>
+            <if test="status != null and status != ''">
+                AND A.`STATUS` = #{status}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND A.USER_ID = #{userId}
+            </if>
+            <if test="statePlay != null and statePlay != ''">
+                AND A.STATE_PLAY = #{statePlay}
+            </if>
+        </where>
+    </select>
+    <!--获取玩家全部英雄非全部参数-->
+    <select id="getUserAllHeroSimple" resultType="com.gm.modules.user.rsp.UserHeroInfoNotAllRsp">
+        SELECT
+        A.USER_HERO_ID,
+        A.EXPERIENCE_OBTAIN,
+        A.HERO_POWER,
         A.MINTER,
         B.HERO_NAME,
         B.HERO_IMG_URL,

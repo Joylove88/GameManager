@@ -3,6 +3,7 @@ package com.gm.modules.user.controller;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
+import com.gm.modules.basicconfig.dto.SummonedEventDto;
 import com.gm.modules.drawGift.service.DrawGiftService;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroFragEntity;
@@ -17,8 +18,8 @@ import java.util.Map;
 
 
 /**
- * 
  * 会员拥有的英雄碎片
+ *
  * @author Axiang
  * @email Axiang@gmail.com
  * @date 2022-02-06 18:25:15
@@ -36,7 +37,7 @@ public class UserHeroFragController {
      */
     @RequestMapping("/list")
     @RequiresPermissions("user:userherofrag:list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = userHeroFragService.queryPage(params);
 
         return R.ok().put("page", page);
@@ -48,7 +49,7 @@ public class UserHeroFragController {
      */
     @RequestMapping("/info/{userHeroFragId}")
     @RequiresPermissions("user:userherofrag:info")
-    public R info(@PathVariable("userHeroFragId") Long userHeroFragId){
+    public R info(@PathVariable("userHeroFragId") Long userHeroFragId) {
         UserHeroFragEntity userHeroFrag = userHeroFragService.getById(userHeroFragId);
 
         return R.ok().put("userHeroFrag", userHeroFrag);
@@ -59,7 +60,7 @@ public class UserHeroFragController {
      */
     @RequestMapping("/save")
     @RequiresPermissions("user:userherofrag:save")
-    public R save(@RequestBody UserHeroFragEntity userHeroFrag){
+    public R save(@RequestBody UserHeroFragEntity userHeroFrag) {
         userHeroFragService.save(userHeroFrag);
 
         return R.ok();
@@ -70,10 +71,10 @@ public class UserHeroFragController {
      */
     @RequestMapping("/update")
     @RequiresPermissions("user:userherofrag:update")
-    public R update(@RequestBody UserHeroFragEntity userHeroFrag){
+    public R update(@RequestBody UserHeroFragEntity userHeroFrag) {
         ValidatorUtils.validateEntity(userHeroFrag);
         userHeroFragService.updateById(userHeroFrag);
-        
+
         return R.ok();
     }
 
@@ -82,7 +83,7 @@ public class UserHeroFragController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("user:userherofrag:delete")
-    public R delete(@RequestBody Long[] userHeroFragIds){
+    public R delete(@RequestBody Long[] userHeroFragIds) {
         userHeroFragService.removeByIds(Arrays.asList(userHeroFragIds));
 
         return R.ok();
@@ -100,7 +101,9 @@ public class UserHeroFragController {
         summonReq.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
         summonReq.setSummonNum(summonNum);
         summonReq.setSummonType("1");
-        drawGiftService.startSummon(userEntity, summonReq);
+        // 获取预售白名单折扣率后的信息
+        SummonedEventDto summonedEventDto = drawGiftService.getSummonedPrice(userEntity.getAddress());
+        drawGiftService.startSummon(userEntity, summonReq, summonedEventDto);
         return R.ok();
     }
 
@@ -108,14 +111,16 @@ public class UserHeroFragController {
      * 装备模拟抽奖
      */
     @RequestMapping("/testEQDrawStart")
-    public R testEQDrawStart(@RequestBody Integer summonNum)throws Exception{
+    public R testEQDrawStart(@RequestBody Integer summonNum) throws Exception {
         //开始抽奖
         UserEntity userEntity = new UserEntity();
         userEntity.setUserId(1508401841157644289L);
         SummonReq summonReq = new SummonReq();
         summonReq.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
         summonReq.setSummonNum(summonNum);
-        drawGiftService.startSummon(userEntity, summonReq);
+        // 获取预售白名单折扣率后的信息
+        SummonedEventDto summonedEventDto = drawGiftService.getSummonedPrice(userEntity.getAddress());
+        drawGiftService.startSummon(userEntity, summonReq, summonedEventDto);
         return R.ok();
     }
 
@@ -130,7 +135,9 @@ public class UserHeroFragController {
         SummonReq summonReq = new SummonReq();
         summonReq.setTransactionHash("0x332bc39ef2149dccd759bd25df180e8ff035bfdf732aa9812c05235f7c65d4df");
         summonReq.setSummonNum(summonNum);
-        drawGiftService.startSummon(userEntity, summonReq);
+        // 获取预售白名单折扣率后的信息
+        SummonedEventDto summonedEventDto = drawGiftService.getSummonedPrice(userEntity.getAddress());
+        drawGiftService.startSummon(userEntity, summonReq, summonedEventDto);
         return R.ok();
     }
 

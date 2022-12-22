@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
+ * <p>
  * https://www.renren.io
- *
+ * <p>
  * 版权所有，侵权必究！
  */
 
@@ -10,16 +10,14 @@ package com.gm.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.gm.annotation.Login;
 import com.gm.annotation.LoginUser;
 import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
 import com.gm.common.utils.*;
 import com.gm.common.validator.ValidatorUtils;
-import com.gm.annotation.Login;
 import com.gm.modules.sys.service.SysConfigService;
 import com.gm.modules.user.entity.*;
-import com.gm.modules.user.req.InviteDataForm;
 import com.gm.modules.user.req.InviteForm;
 import com.gm.modules.user.req.SignIn;
 import com.gm.modules.user.service.*;
@@ -28,18 +26,22 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.web3j.crypto.*;
+import org.web3j.crypto.ECDSASignature;
+import org.web3j.crypto.Hash;
+import org.web3j.crypto.Keys;
+import org.web3j.crypto.Sign;
 import org.web3j.utils.Numeric;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 登录接口
@@ -48,7 +50,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/api")
-@Api(tags="登录接口")
+@Api(tags = "登录接口")
 public class ApiLoginController {
     @Autowired
     private UserService userService;
@@ -69,19 +71,19 @@ public class ApiLoginController {
 
     @PostMapping("signIn")
     @ApiOperation("签名验证")
-    public R signIn(HttpServletRequest request,@RequestBody SignIn signIn) throws ParseException {
+    public R signIn(HttpServletRequest request, @RequestBody SignIn signIn) throws ParseException {
         String msgDate = "";
         Date signDate = new Date();
         // 通过MSG获取日期
-        if (StringUtils.isEmpty(signIn.getMsg())){
+        if (StringUtils.isEmpty(signIn.getMsg())) {
             throw new RRException("Data exception!");
         }
         // MSG安全校验 防止注入攻击;
-        if(ValidatorUtils.securityVerify(signIn.getMsg())){
+        if (ValidatorUtils.securityVerify(signIn.getMsg())) {
             throw new RRException(ErrorCode.SIGN_MSG_EXCEPTION.getDesc());
         }
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        msgDate = signIn.getMsg().substring(signIn.getMsg().indexOf("[") + 1,signIn.getMsg().indexOf("]"));
+        msgDate = signIn.getMsg().substring(signIn.getMsg().indexOf("[") + 1, signIn.getMsg().indexOf("]"));
         signDate = format.parse(msgDate);
 
         // 登录类型
@@ -92,29 +94,28 @@ public class ApiLoginController {
         String clientIp = IPUtils.getIpAddr(request);
         signIn.setClientIp(clientIp);
         Map<String, Object> map = new HashMap<>();
-        if (StringUtils.isNotBlank(signIn.getAddress())){
+        if (StringUtils.isNotBlank(signIn.getAddress())) {
 
             // Address安全校验 防止注入攻击;
-            if(ValidatorUtils.securityVerify(signIn.getAddress())){
+            if (ValidatorUtils.securityVerify(signIn.getAddress())) {
                 throw new RRException(ErrorCode.SIGN_ADDRESS_EXCEPTION.getDesc());
             }
             // signedMsg安全校验 防止注入攻击;
-            if(ValidatorUtils.securityVerify(signIn.getSignedMsg())){
+            if (ValidatorUtils.securityVerify(signIn.getSignedMsg())) {
                 throw new RRException(ErrorCode.SIGN_SIGNEDMSG_EXCEPTION.getDesc());
             }
             // 检测用户是否存在
             UserEntity userEntity = userService.queryByAddress(signIn.getAddress());
-            if(userEntity != null){
+            if (userEntity != null) {
 
                 // 检测签名日期是否在用户登陆日志内存在 （防止黑客攻击）
                 List list = userLoginLogService.queryUserLoginLog(signDate);
-                if (list.size() > 0){
+                if (list.size() > 0) {
                     throw new RRException("The log already exists the date signed!");
                 }
 
                 // 获得两个时间的毫秒时间差异
                 long isDate = userEntity.getSignDate().getTime() - Constant.HOUR12;
-
 
                 // 获取用户最后登陆的12小时内的日志数据
                 UserLoginLogEntity log = new UserLoginLogEntity();
@@ -125,10 +126,10 @@ public class ApiLoginController {
                 // 赋值接收的日期
                 userEntity.setSignDate(signDate);
                 // 获取到的日志数据必须非空
-                if (login12Hs.size() > 0){
+                if (login12Hs.size() > 0) {
                     // 如果接收到的时间大于最新的登陆日志时间说明正常 则进行验签
-                    if (signDate.getTime() > login12Hs.get(0).getLoginTimeTs()){
-                        map = login(signIn,userEntity);
+                    if (signDate.getTime() > login12Hs.get(0).getLoginTimeTs()) {
+                        map = login(signIn, userEntity);
                     } else {
                         // 进入这里说明存在异常，先将账户状态设置冻结（防止黑客攻击）
                         UserEntity userStatus = new UserEntity();
@@ -137,36 +138,35 @@ public class ApiLoginController {
                         userService.updateById(userStatus);
 
                         // 如果接收到的时间大于登陆日志内最新日期12小时内的最开始的日期 说明玩家存在向前跨时区 属于正常 则进行验签
-                        if (signDate.getTime() > login12Hs.get(login12Hs.size()-1).getLoginTimeTs()){
-                            map = login(signIn,userEntity);
+                        if (signDate.getTime() > login12Hs.get(login12Hs.size() - 1).getLoginTimeTs()) {
+                            map = login(signIn, userEntity);
                         } else {
                             throw new RRException("Signature date is abnormal!");
                         }
                     }
                 } else {
-                    throw new RRException("Log date is abnormal!");
+                    map = login(signIn, userEntity);
                 }
             } else {
-
                 // 用户不存在则执行自动注册
                 UserEntity userRegister = new UserEntity();
                 userRegister.setSignDate(signDate);
                 userRegister.setAddress(signIn.getAddress().toLowerCase());
                 userService.userRegister(userRegister);
                 UserEntity userRe = userService.queryByAddress(signIn.getAddress());
-                map = login(signIn,userRe);
+                map = login(signIn, userRe);
             }
         }
         return R.ok(map);
     }
 
-    private Map login(SignIn signIn,UserEntity userEntity){
+    private Map login(SignIn signIn, UserEntity userEntity) {
         Map<String, Object> map = new HashMap<>();
         // 进行验签 通过后返回TOKEN
-        Boolean result = MetaMaskUtil.validate(signIn.getSignedMsg(),signIn.getMsg(),signIn.getAddress());
-        if (result){
+        Boolean result = MetaMaskUtil.validate(signIn.getSignedMsg(), signIn.getMsg(), signIn.getAddress());
+        if (result) {
             // 保存登录记录
-            userLoginLogService.saveLoginLog(userEntity,signIn.getUserAgent(),signIn.getClientIp(), "0","用户登陆成功");
+            userLoginLogService.saveLoginLog(userEntity, signIn.getUserAgent(), signIn.getClientIp(), "0", "用户登陆成功");
             // 开始登陆
             map = userService.login(userEntity);
         } else {
@@ -178,7 +178,7 @@ public class ApiLoginController {
     @Login
     @PostMapping("logout")
     @ApiOperation("退出")
-    public R logout(@ApiIgnore @RequestAttribute("userId") long userId){
+    public R logout(@ApiIgnore @RequestAttribute("userId") long userId) {
         tokenService.expireToken(userId);
         return R.ok();
     }
@@ -232,7 +232,7 @@ public class ApiLoginController {
         Map<String, Object> map = new HashMap<>();
         // 查询首页地址
         String index_page = sysConfigService.getValue("INDEX_PAGE");
-        map.put("inviteLink",index_page+"/"+userEntity.getExpandCode());//请求链接
+        map.put("inviteLink", index_page + "/" + userEntity.getExpandCode());//请求链接
         map.put("viewTimes", userEntity.getExpandCodeViewTimes());//访问人数
         // 查询注册人数
         int count = userService.count(new QueryWrapper<UserEntity>().eq("FATHER_ID", userEntity.getUserId()));
@@ -242,28 +242,28 @@ public class ApiLoginController {
         map.put("consumer", effectiveCount);
         // 查询代理账户余额
 //        String userAgentRebate = userBalanceDetailService.queryAgentRebate(userEntity);
-        UserAccountEntity userAccount = userAccountService.queryByUserIdAndCur(userEntity.getUserId(),Constant.ONE_);
-        map.put("userAgentRebate",userAccount.getBalance());
+        UserAccountEntity userAccount = userAccountService.queryByUserIdAndCur(userEntity.getUserId(), Constant.ONE_);
+        map.put("userAgentRebate", userAccount.getBalance());
         // 查询代理账户可提余额，查询用户消费等级
         GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.queryById(userEntity.getVipLevelId());
         BigDecimal userAgentRebateWithdraw = Arith.multiply(new BigDecimal(userAccount.getBalance()), new BigDecimal(gmUserVipLevel.getWithdrawLimit()));
         map.put("userAgentRebateWithdraw", userAgentRebateWithdraw);
-        map.put("withdrawHandlingFee",gmUserVipLevel.getWithdrawHandlingFee());
+        map.put("withdrawHandlingFee", gmUserVipLevel.getWithdrawHandlingFee());
         // 查询提现状态
-        map.put("withdrawStatus","0");// 可提
+        map.put("withdrawStatus", "0");// 可提
         // 查询该用户是否已有提现订单
         boolean b = gmUserWithdrawService.haveApplyWithdrawOrder(userEntity.getUserId());
-        if (b){
-            map.put("withdrawStatus","1");// 已经有申请提现中订单
+        if (b) {
+            map.put("withdrawStatus", "1");// 已经有申请提现中订单
         }
-        if (userAgentRebateWithdraw.compareTo(BigDecimal.ZERO) == -1){
-            map.put("withdrawStatus","2");// 可提现额度不足
+        if (userAgentRebateWithdraw.compareTo(BigDecimal.ZERO) == -1) {
+            map.put("withdrawStatus", "2");// 可提现额度不足
         }
         GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(userEntity);
-        if (lastWithdraw != null){
+        if (lastWithdraw != null) {
             Date date = DateUtils.addDateHours(lastWithdraw.getCreateTime(), 24);// 上次提现时间加24小时，然后和当前时间做比较
-            if (date.after(new Date())){// 24小时只能发起一次提现
-                map.put("withdrawStatus","3");// 24小时只能发起一笔
+            if (date.after(new Date())) {// 24小时只能发起一次提现
+                map.put("withdrawStatus", "3");// 24小时只能发起一笔
             }
         }
         return R.ok(map);
@@ -275,29 +275,29 @@ public class ApiLoginController {
     public R fightingData(@LoginUser UserEntity userEntity) {
         Map<String, Object> map = new HashMap<>();
         // 查询战斗账户余额
-        UserAccountEntity userAccount = userAccountService.queryByUserIdAndCur(userEntity.getUserId(),Constant.ZERO_);
-        map.put("userFightingBalance",userAccount.getBalance());
+        UserAccountEntity userAccount = userAccountService.queryByUserIdAndCur(userEntity.getUserId(), Constant.ZERO_);
+        map.put("userFightingBalance", userAccount.getBalance());
         // 查询代理账户可提余额，查询用户消费等级
         GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.queryById(userEntity.getVipLevelId());
         BigDecimal userFightingWithdraw = Arith.multiply(new BigDecimal(userAccount.getBalance()), new BigDecimal(gmUserVipLevel.getWithdrawLimit()));
         map.put("userFightingWithdraw", userFightingWithdraw);
-        map.put("withdrawHandlingFee",gmUserVipLevel.getWithdrawHandlingFee());
+        map.put("withdrawHandlingFee", gmUserVipLevel.getWithdrawHandlingFee());
 
         // 查询提现状态
-        map.put("withdrawStatus","0");// 可提
+        map.put("withdrawStatus", "0");// 可提
         // 查询该用户是否已有提现订单
         boolean b = gmUserWithdrawService.haveApplyWithdrawOrder(userEntity.getUserId());
-        if (b){
-            map.put("withdrawStatus","1");// 已经有申请提现中订单
+        if (b) {
+            map.put("withdrawStatus", "1");// 已经有申请提现中订单
         }
-        if (userFightingWithdraw.compareTo(BigDecimal.ZERO) == -1){
-            map.put("withdrawStatus","2");// 可提现额度不足
+        if (userFightingWithdraw.compareTo(BigDecimal.ZERO) == -1) {
+            map.put("withdrawStatus", "2");// 可提现额度不足
         }
         GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(userEntity);
-        if (lastWithdraw != null){
+        if (lastWithdraw != null) {
             Date date = DateUtils.addDateHours(lastWithdraw.getCreateTime(), 24);// 上次提现时间加24小时，然后和当前时间做比较
-            if (date.after(new Date())){// 24小时只能发起一次提现
-                map.put("withdrawStatus","3");// 24小时只能发起一笔
+            if (date.after(new Date())) {// 24小时只能发起一次提现
+                map.put("withdrawStatus", "3");// 24小时只能发起一笔
             }
         }
         return R.ok(map);
@@ -317,7 +317,7 @@ public class ApiLoginController {
         String MESSAGE_PREFIX = "\u0019Ethereum Signed Message:\n";
         String message = MESSAGE_PREFIX + msg.length() + msg;
         byte[] hash = Hash.sha3(message.getBytes(StandardCharsets.UTF_8));
-        ECDSASignature es = new ECDSASignature( Numeric.toBigInt(r), Numeric.toBigInt(s));
+        ECDSASignature es = new ECDSASignature(Numeric.toBigInt(r), Numeric.toBigInt(s));
         System.out.println("0x1a43d9d9f10058e03feda50c2aa657b18f1e1181"); //Expected Address
         System.out.println("0x" + Keys.getAddress(Sign.recoverFromSignature(v - 27, es, hash))); //recovered Address
 

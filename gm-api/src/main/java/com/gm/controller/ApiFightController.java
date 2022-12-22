@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
+ * <p>
  * https://www.renren.io
- *
+ * <p>
  * 版权所有，侵权必究！
  */
 
@@ -28,6 +28,7 @@ import com.gm.modules.user.entity.UserHeroEntity;
 import com.gm.modules.user.req.FightInfoReq;
 import com.gm.modules.user.rsp.FightClaimRsp;
 import com.gm.modules.user.rsp.FightInfoRsp;
+import com.gm.modules.user.rsp.UserHeroInfoNotAllRsp;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
 import com.gm.modules.user.service.GmMiningInfoService;
 import com.gm.modules.user.service.UserHeroService;
@@ -53,7 +54,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/api")
-@Api(tags="战斗接口")
+@Api(tags = "战斗接口")
 public class ApiFightController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiFightController.class);
     @Autowired
@@ -98,7 +99,7 @@ public class ApiFightController {
     @PostMapping("claim")
     @ApiOperation("点击战斗结果领取奖励")
     public R claim(@LoginUser UserEntity user, @RequestBody FightInfoReq req) throws Exception {
-        FightClaimRsp fightClaimRsp = fightCoreService.claim(user,req.getCombatId());
+        FightClaimRsp fightClaimRsp = fightCoreService.claim(user, req.getCombatId());
         return R.ok().put("claims", fightClaimRsp);
     }
 
@@ -110,10 +111,10 @@ public class ApiFightController {
         teamParams.put("userId", user.getUserId());
         List<TeamInfoRsp> list = teamConfigService.getTeamInfoList(teamParams);
         // 如果为新用户 则自动创建3条队伍
-        if (list.size() == 0){
+        if (list.size() == 0) {
             int i = 0;
-            while (i < 3){
-                int num = (i+1);
+            while (i < 3) {
+                int num = (i + 1);
                 GmTeamConfigEntity teamConfig = new GmTeamConfigEntity();
                 teamConfig.setTeamPower(Constant.ZERO);
                 teamConfig.setTeamName("TEAM" + num);
@@ -134,10 +135,10 @@ public class ApiFightController {
             }
         }
 
-        if(list.size() > 0) {
+        if (list.size() > 0) {
             // 每个队伍插入英雄集合
             int i = 0;
-            while (i < list.size()){
+            while (i < list.size()) {
                 // 该队伍是否在战斗中
                 list.get(i).setEndSec(0L);
                 if (list.get(i).getEndTimeTs() != null) {
@@ -184,7 +185,7 @@ public class ApiFightController {
         if (combatRecords.size() > 0) {
             JSONArray jsonArray = JSONArray.parseArray(combatRecords.get(0).getCombatDescription());
             int i = 0;
-            while ( i < jsonArray.size() ){
+            while (i < jsonArray.size()) {
                 JSONObject jsonObject = JSONObject.parseObject(jsonArray.get(i).toString());
                 battleDetails.add(jsonObject);
                 i++;
@@ -225,16 +226,16 @@ public class ApiFightController {
         EquipmentInfoEntity eq = new EquipmentInfoEntity();
         eq.setStatus(Constant.enable);
         List<EquipmentInfoRsp> equipmentInfoRsps = equipmentInfoService.getEquipmentInfo(eq);
-        if( dungeonInfoRsps.size() > 0 ){
+        if (dungeonInfoRsps.size() > 0) {
             int i = 0;
-            while ( i < dungeonInfoRsps.size()){
+            while (i < dungeonInfoRsps.size()) {
                 // 根据每层副本产出的装备稀有度获取对应的装备
                 List<EquipmentInfoRsp> equipmentInfoRsps2 = new ArrayList<>();
-                if ( equipmentInfoRsps.size() > 0 ) {
-                    for ( EquipmentInfoRsp equipmentInfoRsp : equipmentInfoRsps ) {
+                if (equipmentInfoRsps.size() > 0) {
+                    for (EquipmentInfoRsp equipmentInfoRsp : equipmentInfoRsps) {
                         String[] rareCodes = dungeonInfoRsps.get(i).getRangeEquip().split("-");
-                        for ( String rareCode : rareCodes ){
-                            if ( rareCode.equals(equipmentInfoRsp.getEquipRarecode()) ) {
+                        for (String rareCode : rareCodes) {
+                            if (rareCode.equals(equipmentInfoRsp.getEquipRarecode())) {
                                 equipmentInfoRsps2.add(equipmentInfoRsp);
                             }
                         }
@@ -251,15 +252,15 @@ public class ApiFightController {
                 dungeonInfoRsps.get(i).setMonsterInfoRsps(monsterInfoRsps);
 
                 int j = 0;
-                while ( j < teamInfoList.size() ){
+                while (j < teamInfoList.size()) {
                     // 插入战斗中的队伍及英雄集合
                     // 判断该队伍是否在该副本战斗
-                    if ( dungeonInfoRsps.get(i).getId().equals(teamInfoList.get(j).getDungeonId()) ) {
+                    if (dungeonInfoRsps.get(i).getId().equals(teamInfoList.get(j).getDungeonId())) {
                         Date now = new Date();
                         // 获取倒计时
                         Long endSec = (teamInfoList.get(j).getEndTimeTs() - now.getTime()) / 1000;
                         // 如果倒计时大于0 说明队伍战斗中
-                        if ( endSec > 0 ) {
+                        if (endSec > 0) {
                             // 获取战斗信息
                             GmCombatRecordEntity combatRecord = combatRecordService.getOne(new QueryWrapper<GmCombatRecordEntity>()
                                     .eq("TEAM_ID", req.getTeamId())// 玩家队伍ID
@@ -267,7 +268,7 @@ public class ApiFightController {
                             );
                             TeamInfoInBattleRsp teamInBattle = new TeamInfoInBattleRsp();
                             teamInBattle.setId(teamInfoList.get(j).getId());
-                            if ( combatRecord != null ) {
+                            if (combatRecord != null) {
                                 teamInBattle.setCombatId(combatRecord.getId());
                             }
                             teamInBattle.setEndSec(endSec);
@@ -298,13 +299,13 @@ public class ApiFightController {
         // 获取当前队伍
         teamParams.put("id", req.getTeamId());
         TeamInfoRsp teamInfo = teamConfigService.getTeamInfo(teamParams);
-        if ( teamInfo == null ) {
+        if (teamInfo == null) {
             System.out.println("在副本中获取当前队伍失败");
         }
         int j = 0;
-        while ( j < teamInfoList.size() ){
+        while (j < teamInfoList.size()) {
             // 插入队伍配置中的英雄
-            if ( teamInfoList.get(j).getId().equals(req.getTeamId()) ) {
+            if (teamInfoList.get(j).getId().equals(req.getTeamId())) {
                 teamInfo.setUserHeroInfoRsps(fightCoreService.getTeamHeroInfoList(null, teamInfoList.get(j)));
             }
 
@@ -345,7 +346,7 @@ public class ApiFightController {
                 teamHeroIdMap.put("userHero3", teamInfoRsps.get(i).getUserHero4Id());
                 teamHeroIdMap.put("userHero4", teamInfoRsps.get(i).getUserHero5Id());
                 int teamHeroI = 0;
-                while (teamHeroI < teamHeroIdMap.size()){
+                while (teamHeroI < teamHeroIdMap.size()) {
                     // 获取玩家英雄ID
                     Long userHeroId = Long.valueOf(null == teamHeroIdMap.get("userHero" + teamHeroI) ? Constant.ZERO_ : teamHeroIdMap.get("userHero" + teamHeroI).toString());
                     if (userHeroId != null && !userHeroId.equals(Constant.ZERO)) {
@@ -358,7 +359,7 @@ public class ApiFightController {
         }
 
         int newI = 0;
-        while (newI < heroIdMap.size()){
+        while (newI < heroIdMap.size()) {
             // 获取玩家英雄ID
             Long userHeroId = Long.valueOf(null == heroIdMap.get("userHero" + newI) ? Constant.ZERO_ : heroIdMap.get("userHero" + newI).toString());
             // 开始校验
@@ -375,23 +376,23 @@ public class ApiFightController {
      * @param userId
      * @return
      */
-    private List<UserHeroInfoRsp> theHeroIsRepeat(Map<String, Object> heroIdMap, Long userId) {
+    private List<UserHeroInfoNotAllRsp> theHeroIsRepeat(Map<String, Object> heroIdMap, Long userId) {
         Set set = new HashSet();
         List list = new ArrayList();
         // 获取该玩家全部英雄
         Map<String, Object> userHeroMap = new HashMap<>();
         userHeroMap.put("status", Constant.enable);
         userHeroMap.put("userId", userId);
-        List<UserHeroInfoRsp> userHeros = userHeroService.getUserAllHero(userHeroMap);
+        List<UserHeroInfoNotAllRsp> userHeros = userHeroService.getUserAllHeroSimple(userHeroMap);
 
         int i = 0;
-        while (i < heroIdMap.size()){
+        while (i < heroIdMap.size()) {
             // 获取玩家英雄ID
             Long userHeroId = Long.valueOf(null == heroIdMap.get("userHero" + i) ? Constant.ZERO_ : heroIdMap.get("userHero" + i).toString());
             if (userHeroId != null && !userHeroId.equals(Constant.ZERO)) {
                 // 校验玩家英雄合法性
                 boolean bl = userHeros.stream().anyMatch(a -> a.getUserHeroId().equals(userHeroId));
-                if (!bl){
+                if (!bl) {
                     throw new RRException("您不是此英雄的归属者!英雄编码：" + userHeroId);
                 }
                 set.add(userHeroId);
@@ -400,7 +401,7 @@ public class ApiFightController {
             i++;
         }
         // 开始校验
-        if ( set.size() != list.size() ) {
+        if (set.size() != list.size()) {
             throw new RRException("英雄重复上阵!");
         }
         return userHeros;
@@ -413,16 +414,16 @@ public class ApiFightController {
      * @param i
      * @return
      */
-    private GmTeamConfigEntity setTeamUserHeroId(GmTeamConfigEntity team, Long userHeroId, int i){
+    private GmTeamConfigEntity setTeamUserHeroId(GmTeamConfigEntity team, Long userHeroId, int i) {
         if (i == 0) {
             team.setUserHero1Id(userHeroId);
-        } else if (i == 1){
+        } else if (i == 1) {
             team.setUserHero2Id(userHeroId);
-        } else if (i == 2){
+        } else if (i == 2) {
             team.setUserHero3Id(userHeroId);
-        } else if (i == 3){
+        } else if (i == 3) {
             team.setUserHero4Id(userHeroId);
-        } else if (i == 4){
+        } else if (i == 4) {
             team.setUserHero5Id(userHeroId);
         }
         return team;
@@ -434,7 +435,7 @@ public class ApiFightController {
      * @param state
      * @return
      */
-    private UserHeroEntity setUserHeroState(Long userHeroId, String state){
+    private UserHeroEntity setUserHeroState(Long userHeroId, String state) {
         // 实例化玩家英雄类 (用于更新玩家英雄上下阵状态)
         UserHeroEntity userHero = new UserHeroEntity();
         userHero.setUserHeroId(userHeroId);
@@ -458,22 +459,22 @@ public class ApiFightController {
         heroIdMap.put("userHero4", req.getUserHero5Id());
 
         // 校验当前队伍是否存英雄重复上阵，校验玩家英雄合法性
-        List<UserHeroInfoRsp> userHeroInfoRsps = theHeroIsRepeat(heroIdMap, user.getUserId());
+        List<UserHeroInfoNotAllRsp> userHeroInfoRsps = theHeroIsRepeat(heroIdMap, user.getUserId());
 
         // 获取当前玩家的全部队伍
         Map<String, Object> params = new HashMap<>();
         params.put("userId", user.getUserId());
         List<TeamInfoRsp> teamInfos = teamConfigService.getTeamInfoList(params);
-        if (teamInfos.size() == 0 ) {
+        if (teamInfos.size() == 0) {
             throw new RRException("英雄上下阵时获取队伍信息失败!");
         }
         // 校验英雄是否已在其他队伍上阵
         theHeroIsExistedOtherTeam(teamInfos, heroIdMap, req.getTeamId());
         // 获取当前队伍
         TeamInfoRsp teamInfo = new TeamInfoRsp();
-        int i =0;
-        while (i < teamInfos.size()){
-            if (teamInfos.get(i).getId().equals(req.getTeamId())){
+        int i = 0;
+        while (i < teamInfos.size()) {
+            if (teamInfos.get(i).getId().equals(req.getTeamId())) {
                 teamInfo = teamInfos.get(i);
             }
             i++;
@@ -491,7 +492,7 @@ public class ApiFightController {
         teamHeroIdMap.put("userHero3", teamInfo.getUserHero4Id());
         teamHeroIdMap.put("userHero4", teamInfo.getUserHero5Id());
         int oldI = 0;
-        while (oldI < teamHeroIdMap.size()){
+        while (oldI < teamHeroIdMap.size()) {
             // 获取玩家英雄ID
             Long userHeroId = Long.valueOf(null == teamHeroIdMap.get("userHero" + oldI) ? Constant.ZERO_ : teamHeroIdMap.get("userHero" + oldI).toString());
             if (userHeroId != null && !userHeroId.equals(Constant.ZERO)) {
@@ -525,7 +526,7 @@ public class ApiFightController {
         // 队伍中英雄上下阵操作识别 大于0为已操作
         int num = 0;
         int newI = 0;
-        while (newI < heroIdMap.size()){
+        while (newI < heroIdMap.size()) {
             // 获取队伍中的英雄ID
             Long teamHeroId = Long.valueOf(null == teamHeroIdMap.get("userHero" + newI) ? Constant.ZERO_ : teamHeroIdMap.get("userHero" + newI).toString());
             // 获取玩家英雄ID
@@ -540,7 +541,7 @@ public class ApiFightController {
                     // 上阵操作
                     if (!userHeroId.equals(Constant.ZERO)) {
                         // 获取英雄战力
-                        for(UserHeroInfoRsp hero : userHeroInfoRsps){
+                        for (UserHeroInfoNotAllRsp hero : userHeroInfoRsps) {
                             if (hero.getUserHeroId().equals(userHeroId)) {
                                 newPower = newPower + hero.getHeroPower();
                                 newMinter = Arith.add(newMinter, hero.getMinter());
@@ -560,7 +561,7 @@ public class ApiFightController {
                 } else { // 无上下阵操作
                     if (!userHeroId.equals(0L)) {
                         // 获取英雄战力
-                        for(UserHeroInfoRsp hero : userHeroInfoRsps){
+                        for (UserHeroInfoNotAllRsp hero : userHeroInfoRsps) {
                             if (hero.getUserHeroId().equals(userHeroId)) {
                                 newPower = newPower + hero.getHeroPower();
                                 newMinter = Arith.add(newMinter, hero.getMinter());
@@ -575,11 +576,11 @@ public class ApiFightController {
         }
 
         // 更新玩家英雄上阵状态
-        if (userHeros.size() > 0){
+        if (userHeros.size() > 0) {
             userHeroService.updateBatchById(userHeros);
         }
         // 说明玩家有上下阵操作
-        if (num != 0){
+        if (num != 0) {
             // 获取本次操作之前的战力值
             oldPower = teamInfo.getTeamPower() == null ? 0L : teamInfo.getTeamPower();
             // 获取本次操作改变的战力值
@@ -600,7 +601,7 @@ public class ApiFightController {
         List battleDetails = new ArrayList();
 //        System.out.println(jsonArray);
         int i = 0;
-        while (i<jsonArray.size()){
+        while (i < jsonArray.size()) {
             JSONObject jsonObject = JSONObject.parseObject(jsonArray.get(i).toString());
             System.out.println(jsonObject);
             battleDetails.add(jsonObject);
