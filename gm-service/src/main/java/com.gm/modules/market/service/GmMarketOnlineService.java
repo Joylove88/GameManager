@@ -5,7 +5,9 @@ import com.gm.common.utils.PageUtils;
 import com.gm.modules.market.dto.PutOnMarketReq;
 import com.gm.modules.market.entity.GmMarketOnlineEntity;
 import com.gm.modules.user.entity.UserEntity;
+import com.gm.modules.user.entity.UserHeroEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,5 +27,19 @@ public interface GmMarketOnlineService extends IService<GmMarketOnlineEntity> {
      * @param putOnMarketReq
      */
     void putOnMarket(UserEntity user, PutOnMarketReq putOnMarketReq);
+
+    /**
+     * 查询用户的在售英雄
+     * @param userId
+     * @return
+     */
+    List<UserHeroEntity> queryUserOnMarketHero(Long userId);
+
+    /**
+     * 查询用户的在售英雄碎片
+     * @param userId
+     * @return
+     */
+    PageUtils queryUserOnMarketHeroFrag(Long userId);
 }
 

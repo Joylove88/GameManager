@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -110,7 +111,7 @@ public class ApiMarketController {
                 gmMarketOnlineService.putOnMarket(user, putOnMarketReq);
                 break;
             case "1":
-                UserHeroFragEntity userHeroFrag = userHeroFragService.getUserHeroById(user.getUserId(),putOnMarketReq.getItemsId());
+                UserHeroFragEntity userHeroFrag = userHeroFragService.getUserHeroById(user.getUserId(), putOnMarketReq.getItemsId());
                 if (userHeroFrag == null) {
                     throw new RRException("user hero frag not exit");
                 }
@@ -118,7 +119,7 @@ public class ApiMarketController {
                 gmMarketOnlineService.putOnMarket(user, putOnMarketReq);
                 break;
             case "2":
-                UserEquipmentEntity userEquipment = userEquipmentService.getUserEquipmentById(user.getUserId(),putOnMarketReq.getItemsId());
+                UserEquipmentEntity userEquipment = userEquipmentService.getUserEquipmentById(user.getUserId(), putOnMarketReq.getItemsId());
                 if (userEquipment == null) {
                     throw new RRException("user equipment not exit");
                 }
@@ -126,7 +127,7 @@ public class ApiMarketController {
                 gmMarketOnlineService.putOnMarket(user, putOnMarketReq);
                 break;
             case "3":
-                UserEquipmentFragEntity userEquipmentFrag = userEquipmentFragService.getUserEquipmentFragById(user.getUserId(),putOnMarketReq.getItemsId());
+                UserEquipmentFragEntity userEquipmentFrag = userEquipmentFragService.getUserEquipmentFragById(user.getUserId(), putOnMarketReq.getItemsId());
                 if (userEquipmentFrag == null) {
                     throw new RRException("user equipment frag not exit");
                 }
@@ -134,7 +135,7 @@ public class ApiMarketController {
                 gmMarketOnlineService.putOnMarket(user, putOnMarketReq);
                 break;
             case "4":
-                UserExperiencePotionEntity userExperiencePotion = userExperiencePotionService.getUserExperiencePotionById(user.getUserId(),putOnMarketReq.getItemsId());
+                UserExperiencePotionEntity userExperiencePotion = userExperiencePotionService.getUserExperiencePotionById(user.getUserId(), putOnMarketReq.getItemsId());
                 if (userExperiencePotion == null) {
                     throw new RRException("user experience potion not exit");
                 }
@@ -144,4 +145,27 @@ public class ApiMarketController {
         }
         return R.ok();
     }
+
+    /**
+     * 我的在售物品
+     */
+    @Login
+    @PostMapping("getItemsOnMarket")
+    public R getItemsOnMarket(@LoginUser UserEntity user, @RequestParam Map<String, Object> params) {
+        Map<String, Object> map = new HashMap<>();
+        //1.获取我的在售英雄
+        List<UserHeroEntity> heroList = gmMarketOnlineService.queryUserOnMarketHero(user.getUserId());
+        map.put("heroList", heroList);
+        //2.获取我的在售英雄碎片
+        PageUtils heroFragList = gmMarketOnlineService.queryUserOnMarketHeroFrag(user.getUserId());
+        map.put("heroFragList", heroFragList);
+        //3.获取我的在售装备
+//        PageUtils page3 = userEquipmentService.queryUserOnMarketEquipment(user.getUserId());
+        //4.获取我的在售装备卷轴
+//        PageUtils page4 = userEquipmentFragService.queryUserOnMarketEquipmentFrag(user.getUserId());
+        //5.获取我的在售药水
+//        PageUtils page5 = userExperiencePotionService.queryUserOnMarketExperiencePotion(user.getUserId());
+        return R.ok().put("data", map);
+    }
+
 }

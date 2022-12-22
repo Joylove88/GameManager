@@ -10,10 +10,12 @@ import com.gm.modules.market.dto.PutOnMarketReq;
 import com.gm.modules.market.entity.GmMarketOnlineEntity;
 import com.gm.modules.market.service.GmMarketOnlineService;
 import com.gm.modules.user.entity.UserEntity;
+import com.gm.modules.user.entity.UserHeroEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 
@@ -43,6 +45,17 @@ public class GmMarketOnlineServiceImpl extends ServiceImpl<GmMarketOnlineDao, Gm
         gmMarketOnlineEntity.setCreateTime(new Date());
         gmMarketOnlineEntity.setCreateTimeTs(gmMarketOnlineEntity.getCreateTime().getTime());
         baseMapper.insert(gmMarketOnlineEntity);
+    }
+
+    @Override
+    public List<UserHeroEntity> queryUserOnMarketHero(Long userId) {
+
+        return null;
+    }
+
+    @Override
+    public PageUtils queryUserOnMarketHeroFrag(Long userId) {
+        return null;
     }
 
 }

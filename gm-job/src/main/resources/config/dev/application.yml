@@ -65,4 +65,4 @@ mybatis-plus:
     cache-enabled: false
     call-setters-on-nulls: true
     jdbc-type-for-null: 'null'
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启sql日志
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启sql日志
