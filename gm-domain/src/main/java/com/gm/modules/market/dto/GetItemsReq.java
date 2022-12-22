@@ -14,4 +14,16 @@ public class GetItemsReq {
      */
 //    @NotBlank(message = "itemsType can not null")
     private String itemsType;
+    /**
+     * 英雄星级
+     */
+    private Integer starCode;
+    /**
+     * 装备稀有度(1:白色,2:绿色,3:蓝色,4:紫色,5:橙色)
+     */
+    private String equipRarecode;
+    /**
+     * 药水稀有度(1:白色,2:绿色,3:蓝色,4:紫色)
+     */
+    private String exEquipRarecode;
 }

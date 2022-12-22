@@ -25,6 +25,19 @@ public interface UserExperiencePotionService extends IService<UserExperiencePoti
 
     boolean userHeroUseEx(UserEntity user, UseExpReq useExpReq);
 
-    List<UserExperiencePotionEntity> queryUserExperiencePotion(UserEntity user);
+    /**
+     * 查询我的物品 分页
+     * @param userId
+     * @param params
+     * @return
+     */
+    PageUtils queryUserExperiencePotion(Long userId, Map<String, Object> params);
+
+    /**
+     * 查询用户的药水
+     * @param userExperiencePotionMap
+     * @return
+     */
+    UserExperiencePotionEntity getUserExperiencePotionById(Long userId ,Long userExPotionId);
 }
 

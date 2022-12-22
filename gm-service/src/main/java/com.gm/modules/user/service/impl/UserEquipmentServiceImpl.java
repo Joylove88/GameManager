@@ -3,11 +3,13 @@ package com.gm.modules.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.modules.user.dao.UserEquipmentDao;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserEquipmentEntity;
+import com.gm.modules.user.entity.UserHeroFragEntity;
 import com.gm.modules.user.rsp.UserEquipInfoRsp;
 import com.gm.modules.user.service.UserEquipmentService;
 import org.apache.commons.lang.StringUtils;
@@ -46,11 +48,23 @@ public class UserEquipmentServiceImpl extends ServiceImpl<UserEquipmentDao, User
     }
 
     @Override
-    public List<UserEquipmentEntity> queryUserEquipment(UserEntity user) {
-        return userEquipmentDao.selectList(new QueryWrapper<UserEquipmentEntity>()
-                .eq("USER_ID",user.getUserId())
-                .eq("STATUS",1)
-                .orderByAsc("CREATE_TIME")
+    public PageUtils queryUserEquipment(Long userId, Map<String, Object> params) {
+        IPage<UserEquipmentEntity> page = this.page(
+                new Query<UserEquipmentEntity>().getPage(params),
+                new QueryWrapper<UserEquipmentEntity>()
+                        .eq("A.USER_ID",userId)
+                        .eq("A.STATUS",1)
+
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public UserEquipmentEntity getUserEquipmentById(Long userId ,Long userEquipmentId) {
+        return userEquipmentDao.selectOne(new QueryWrapper<UserEquipmentEntity>()
+                .eq("status", Constant.enable)
+                .eq("user_id",userId)
+                .eq("user_equipment_id",userEquipmentId)
         );
     }
 

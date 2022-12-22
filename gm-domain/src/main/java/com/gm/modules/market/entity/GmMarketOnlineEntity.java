@@ -24,11 +24,11 @@ public class GmMarketOnlineEntity implements Serializable {
 	 * id
 	 */
 	@TableId
-	private BigDecimal id;
+	private Long id;
 	/**
 	 * 售卖者
 	 */
-	private BigDecimal userId;
+	private Long userId;
 	/**
 	 * 物品类型（0：英雄，1：英雄碎片，2：装备，3：装备卷轴，4：药水）
 	 */
@@ -36,7 +36,7 @@ public class GmMarketOnlineEntity implements Serializable {
 	/**
 	 * 商品ID
 	 */
-	private BigDecimal goodsId;
+	private Long goodsId;
 	/**
 	 * 状态(0：上架，1：已售，2：下架)
 	 */

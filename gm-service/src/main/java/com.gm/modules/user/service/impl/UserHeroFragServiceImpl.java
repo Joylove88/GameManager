@@ -3,10 +3,12 @@ package com.gm.modules.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.modules.user.dao.UserHeroFragDao;
 import com.gm.modules.user.entity.UserEntity;
+import com.gm.modules.user.entity.UserHeroEntity;
 import com.gm.modules.user.entity.UserHeroFragEntity;
 import com.gm.modules.user.rsp.UserHeroFragInfoRsp;
 import com.gm.modules.user.service.UserHeroFragService;
@@ -53,11 +55,23 @@ public class UserHeroFragServiceImpl extends ServiceImpl<UserHeroFragDao, UserHe
     }
 
     @Override
-    public List<UserHeroFragEntity> queryUserHeroFrag(UserEntity user) {
-        return userHeroFragDao.selectList(new QueryWrapper<UserHeroFragEntity>()
-                .eq("USER_ID",user.getUserId())
-                .eq("STATUS",1)
-                .orderByAsc("CREATE_TIME")
+    public PageUtils queryUserHeroFrag(Long userId, Map<String, Object> params) {
+        IPage<UserHeroFragEntity> page = this.page(
+                new Query<UserHeroFragEntity>().getPage(params),
+                new QueryWrapper<UserHeroFragEntity>()
+                        .eq("A.USER_ID",userId)
+                        .eq("A.STATUS",1)
+
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public UserHeroFragEntity getUserHeroById(Long userId ,Long userHeroFragId) {
+        return userHeroFragDao.selectOne(new QueryWrapper<UserHeroFragEntity>()
+                .eq("status", Constant.enable)
+                .eq("user_id",userId)
+                .eq("user_hero_frag_id",userHeroFragId)
         );
     }
 
