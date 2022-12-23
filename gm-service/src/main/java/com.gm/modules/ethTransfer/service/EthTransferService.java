@@ -153,10 +153,12 @@ public class EthTransferService {
             // 获取召唤价格及活动信息
             SummonedEventDto summonedEventDto = drawGiftService.getSummonedPrice(user.getAddress());
             BigDecimal price = tokenNum == Constant.Quantity.Q1.getValue() ? BigDecimal.valueOf(summonedEventDto.getOnePriceNew()) : BigDecimal.valueOf(summonedEventDto.getTenPriceNew());
+            LOGGER.info("price: " + price);
             if (amount.compareTo(price) == -1) {
                 return null;
             }
             BigDecimal rebateGoldCoins = amount.compareTo(price) != 0 ? Arith.subtract(amount, price) : price;
+            LOGGER.info("rebateGoldCoins: " + rebateGoldCoins);
             map.put("userId", user.getUserId());
             map.put("from", address);
             map.put("gasUsed", receipt.get().getGasUsed());
@@ -183,6 +185,10 @@ public class EthTransferService {
             form.setSummonNum(tokenNum);
             // 设置NFT_tokenID
             form.setTokenIds(tokenIds);
+            // 设置订单金额
+            form.setOrderFee(amount);
+            // 设置实付金额
+            form.setRealFee(rebateGoldCoins);
 
             // 如果订单为空则创建新订单
             if (order == null) {
