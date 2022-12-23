@@ -17,5 +17,26 @@
         <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
     </resultMap>
 
+    <select id="queryUserOnMarketHero" resultType="com.gm.modules.user.entity.UserHeroEntity">
+SELECT
+	b.*
+FROM
+	gm_market_online a
+	LEFT JOIN gm_user_hero b ON a.GOODS_ID = b.USER_HERO_ID
+WHERE
+	a.USER_ID = #{userId}
+	AND a.STATUS = 0
+    </select>
+
+    <select id="queryUserOnMarketHeroFrag" resultType="com.gm.modules.user.entity.UserHeroFragEntity">
+SELECT
+	b.*
+FROM
+	gm_market_online a
+	LEFT JOIN gm_user_hero_frag b ON a.GOODS_ID = b.USER_HERO_FRAG_ID
+WHERE
+	a.USER_ID = #{userId}
+	AND a.STATUS = 0
+    </select>
 
 </mapper>
