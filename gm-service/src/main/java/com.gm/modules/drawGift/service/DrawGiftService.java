@@ -355,8 +355,8 @@ public class DrawGiftService {
             userHero.setScale(scale);// 矿工比例
             userHero.setCreateTime(now);// 召唤时间
             userHero.setCreateTimeTs(now.getTime());
-            userHero.setNftId(Long.parseLong(tokenIds.get(i)));// NFT_tokenID
-            tokenIds.remove(i);
+            userHero.setNftId(Long.parseLong(tokenIds.get(0)));// NFT_tokenID
+            tokenIds.remove(0);
 
             // 设置星级
             userHero.setStarCode(attributeSimple.getStarCode());
@@ -378,7 +378,7 @@ public class DrawGiftService {
             heroPower = combatStatsUtilsService.getHeroPower(attributeSimple);
             userHero.setHeroPower((long) heroPower);
             // 初始化GAIA经济系统
-            fightCoreService.initTradeBalanceParameter();
+            fightCoreService.initTradeBalanceParameter(0);
             // 计算矿工数
             // 获取scale后的战力值
             BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(userHero.getHeroPower() * scale));
@@ -386,6 +386,12 @@ public class DrawGiftService {
             userHero.setOracle(CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1)));// 神谕值
             // 更新系统中保存的市场总鸡蛋
             sysConfigService.updateValueByKey(Constant.SysConfig.MARKET_EGGS.getValue(), CalculateTradeUtil.marketEggs.toString());
+            // 每次抽奖总战力累加
+            CalculateTradeUtil.totalPower = Arith.add(CalculateTradeUtil.totalPower, BigDecimal.valueOf(userHero.getHeroPower()));
+            // 每次抽奖副本资金池累加
+            BigDecimal dungeonFee = Arith.multiply(summonReq.getRealFee(), Constant.CashPoolScale._DUNGEON.getValue());// 获取该订单金额的75%
+            CalculateTradeUtil.FundPool = Arith.add(CalculateTradeUtil.FundPool, dungeonFee);
+
             userHeroAdds.add(userHero);
 
             // 存储英雄召唤返回集合
@@ -469,8 +475,8 @@ public class DrawGiftService {
                 userHeroFrag.setMintHash(summonReq.getTransactionHash());
                 userHeroFrag.setCreateTime(now);
                 userHeroFrag.setCreateTimeTs(now.getTime());
-                userHeroFrag.setNftId(Long.parseLong(tokenIds.get(i)));// NFT_tokenID
-                tokenIds.remove(i);// 删除当前位置的tokenID
+                userHeroFrag.setNftId(Long.parseLong(tokenIds.get(0)));// NFT_tokenID
+                tokenIds.remove(0);// 删除当前位置的tokenID
                 userHeroFragAdds.add(userHeroFrag);
                 j++;
             }
@@ -573,8 +579,8 @@ public class DrawGiftService {
             userEquipment.setEquipmentId(equipmentInfos.get(equipmentIndex).getEquipId());
             userEquipment.setUserId(user.getUserId());
             userEquipment.setStatus(Constant.enable);
-            userEquipment.setNftId(Long.parseLong(tokenIds.get(i)));// NFT_tokenID
-            tokenIds.remove(i);// 删除当前位置的tokenID
+            userEquipment.setNftId(Long.parseLong(tokenIds.get(0)));// NFT_tokenID
+            tokenIds.remove(0);// 删除当前位置的tokenID
 
             // 获取随机属性最大百分比
             Double eqAttMin = Constant.EquipStatsRange.MIN.getValue();
@@ -620,13 +626,18 @@ public class DrawGiftService {
             double equipPower = (health * 0.1) + (mana * 0.1) + attackDamage + attackSpell + ((armor + magicResist) * 4.5) + healthRegen * 0.1 + manaRegen * 0.3;
             userEquipment.setEquipPower((long) equipPower);
             // 初始化GAIA经济系统
-            fightCoreService.initTradeBalanceParameter();
+            fightCoreService.initTradeBalanceParameter(0);
             // 计算矿工数
             BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(userEquipment.getEquipPower() * scale));
             userEquipment.setMinter(minter);// 矿工数
             userEquipment.setOracle(CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1)));// 神谕值
             // 更新系统中保存的市场总鸡蛋
             sysConfigService.updateValueByKey(Constant.SysConfig.MARKET_EGGS.getValue(), CalculateTradeUtil.marketEggs.toString());
+            // 每次抽奖总战力累加
+            CalculateTradeUtil.totalPower = Arith.add(CalculateTradeUtil.totalPower, BigDecimal.valueOf(userEquipment.getEquipPower()));
+            // 每次抽奖副本资金池累加
+            BigDecimal dungeonFee = Arith.multiply(summonReq.getRealFee(), Constant.CashPoolScale._DUNGEON.getValue());// 获取该订单金额的75%
+            CalculateTradeUtil.FundPool = Arith.add(CalculateTradeUtil.FundPool, dungeonFee);
 
             userEquipment.setCreateTime(now);
             userEquipment.setCreateTimeTs(now.getTime());
@@ -674,8 +685,8 @@ public class DrawGiftService {
             userEquipmentFrag.setUserEquipmentFragId(equipmentFrags.get(equipmentFragIndex).getEquipmentFragId());
             userEquipmentFrag.setUserId(user.getUserId());
             userEquipmentFrag.setStatus(Constant.enable);
-            userEquipmentFrag.setNftId(Long.parseLong(tokenIds.get(i)));// NFT_tokenID
-            tokenIds.remove(i);// 删除当前位置的tokenID
+            userEquipmentFrag.setNftId(Long.parseLong(tokenIds.get(0)));// NFT_tokenID
+            tokenIds.remove(0);// 删除当前位置的tokenID
 
             // 如果战斗记录为空本次为召唤反之为副本产出
             if (combatRecord == null) {
@@ -898,8 +909,8 @@ public class DrawGiftService {
                 userExp.setMintHash(summonReq.getTransactionHash());
                 userExp.setCreateTime(now);
                 userExp.setCreateTimeTs(now.getTime());
-                userExp.setNftId(Long.parseLong(tokenIds.get(i)));// NFT_tokenID
-                tokenIds.remove(i);// 删除当前位置的tokenID
+                userExp.setNftId(Long.parseLong(tokenIds.get(0)));// NFT_tokenID
+                tokenIds.remove(0);// 删除当前位置的tokenID
                 userExpAdds.add(userExp);
                 j++;
             }

@@ -110,7 +110,7 @@ public class SysConfigController extends AbstractController {
 	@RequiresPermissions("sys:config:info")
 	public R getMinterScale(@RequestBody UserHeroInfoReq userHeroInfoReq){
 		// 初始化GAIA经济系统
-		fightCoreService.initTradeBalanceParameter();
+		fightCoreService.initTradeBalanceParameter(0);
 		BigDecimal scale = CalculateTradeUtil.calculateRateOfMinter(userHeroInfoReq.getCombatPower());
 		return R.ok().put("data", scale);
 	}

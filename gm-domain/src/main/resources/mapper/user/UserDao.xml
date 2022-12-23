@@ -40,7 +40,25 @@
         AND A.CURRENCY_TYPE = '1'
     </select>
 
-
+    <!--获取系统全部玩家物品总战力-->
+    <select id="getTotalPower" resultType="com.gm.modules.user.rsp.UserInfoRsp">
+        SELECT
+            HERO_POWER + EQUIP_POWER as POWER
+        FROM
+            (
+                SELECT
+                    IFNULL(SUM(HERO_POWER), 0) AS HERO_POWER
+                FROM
+                    gm_user_hero
+            )a
+        LEFT JOIN
+            (
+                SELECT
+                    IFNULL(SUM(EQUIP_POWER), 0) AS EQUIP_POWER
+                FROM
+                    gm_user_equipment
+            ) b on 1=1
+    </select>
     <!--获取玩家信息-->
     <select id="getPlayerInfo" resultType="com.gm.modules.user.rsp.UserInfoRsp">
         SELECT

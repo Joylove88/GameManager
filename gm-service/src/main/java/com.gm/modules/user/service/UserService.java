@@ -62,4 +62,10 @@ public interface UserService extends IService<UserEntity> {
 	List<UserInfoRsp> getPlayerInfo(Map<String, Object> map);
 
     Integer queryInviteNum(UserEntity user);
+
+	/**
+	 * 获取系统全部玩家物品总战力
+	 * @return
+	 */
+	UserInfoRsp getTotalPower();
 }

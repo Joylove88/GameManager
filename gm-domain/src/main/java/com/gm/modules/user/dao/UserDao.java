@@ -32,4 +32,10 @@ public interface UserDao extends BaseMapper<UserEntity> {
      * @return
      */
     List<UserInfoRsp> getPlayerInfo(Map<String, Object> map);
+
+    /**
+     * 获取系统全部玩家物品总战力
+     * @return
+     */
+    UserInfoRsp getTotalPower();
 }

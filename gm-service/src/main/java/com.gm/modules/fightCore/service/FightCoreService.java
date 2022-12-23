@@ -119,7 +119,7 @@ public class FightCoreService {
      * @param req
      */
     public FightInfoRsp initAttack(UserEntity user, FightInfoReq req) {
-        System.out.println("初始化战斗场景");
+        LOGGER.info("初始化战斗场景");
         // 重置全局经验值
         EXP = 0L;
         // 重置战斗状态
@@ -166,7 +166,7 @@ public class FightCoreService {
         }
 
         Long teamPower = teamConfig.getTeamPower() != null ? teamConfig.getTeamPower() : 0;// 队伍战力
-        System.out.println("加载英雄中...");
+        LOGGER.info("加载英雄中...");
         // 创建集合存储每个英雄的属性
         List<AttributeEntity> attributes = new ArrayList<>();
         // 获取英雄1
@@ -194,9 +194,9 @@ public class FightCoreService {
             AttributeEntity att = getHeroStats(teamConfig.getUserHero5Id());
             attributes.add(att);
         }
-        System.out.println("英雄加载完成");
+        LOGGER.info("英雄加载完成");
 
-        System.out.println("加载副本中...");
+        LOGGER.info("加载副本中...");
         // 获取副本信息
         GmDungeonConfigEntity dungeon = dungeonConfigDao.selectById(req.getDungeonId());
         if (dungeon == null){
@@ -223,9 +223,9 @@ public class FightCoreService {
         if (dungeonEvents == null) {
             throw new RRException("获取副本事件信息失败");
         }
-        System.out.println("副本加载完成");
+        LOGGER.info("副本加载完成");
 
-        System.out.println("加载怪物中...");
+        LOGGER.info("加载怪物中...");
         // 获取怪物信息
         Map<String,Object> monsterMap = new HashMap<>();
         monsterMap.put("STATUS", Constant.enable);
@@ -236,7 +236,7 @@ public class FightCoreService {
         } else {
             Collections.shuffle(monsterList);
         }
-        System.out.println("怪物加载完成");
+        LOGGER.info("怪物加载完成");
 
 
         // 扣除玩家体力
@@ -254,7 +254,7 @@ public class FightCoreService {
 
         // 开始战斗
         // 随机战斗副本，战斗描述
-        System.out.println("尊敬的领主指引[" + teamConfig.getTeamName() + "] 战力[" + teamPower + "] 进入[" + dungeon.getDungeonName() + "]");
+        LOGGER.info("尊敬的领主指引[" + teamConfig.getTeamName() + "] 战力[" + teamPower + "] 进入[" + dungeon.getDungeonName() + "]");
         setBattleProcess(new BattleDetailsRsp(null, dungeon.getDungeonName(),null, null,  null, null,
                 null, null, null,
                 "尊敬的领主指引[" + teamConfig.getTeamName() + "] 战力[{teamPower}] 进入[{name}]", Constant.enable, teamPower));
@@ -274,13 +274,13 @@ public class FightCoreService {
 
             String eventDescription = dungeonEvents.get(entry.getKey()).getEventDescription();
             long eventLevel = dungeonEvents.get(entry.getKey()).getEventLevel();
-            System.out.println("事件等级：" + eventLevel);
+            LOGGER.info("事件等级：" + eventLevel);
             eventDescription = eventDescription.replace("-","["  + dungeon.getDungeonName() + "]");
 
             setBattleProcess(new BattleDetailsRsp(null, null, null, null, null, null,
                     null, null, null, eventDescription, Constant.enable, null));
 
-            System.out.println(eventDescription);
+            LOGGER.info(eventDescription);
 
             // 事件等级5 为福利关卡 无需战斗 玩家直接胜利 // 惩罚关卡 无需战斗直接失败
             if ( eventLevel == 5 ) {
@@ -300,7 +300,7 @@ public class FightCoreService {
         Long fightNum = Constant.FTG / dungeon.getRequiresStamina();
         // 获取玩家矿工数量
         CalculateTradeUtil.miners = user.getTotalMinter();
-        System.out.println("获取当前玩家矿工数量: " +CalculateTradeUtil.miners);
+        LOGGER.info("获取当前玩家矿工数量: " +CalculateTradeUtil.miners);
         // 获取当日可产出金币数
         BigDecimal goldCoins = getCoinGold();
 
@@ -386,10 +386,10 @@ public class FightCoreService {
         // 玩家收益参数
         BigDecimal addMoney;
         // 经济平衡系统初始化方法
-        initTradeBalanceParameter();
+        initTradeBalanceParameter(1);
         // 出售/计算收益
-        System.out.println("marketEggs: " + CalculateTradeUtil.marketEggs);
-        System.out.println("miners: " + CalculateTradeUtil.miners);
+        LOGGER.info("marketEggs: " + CalculateTradeUtil.marketEggs);
+        LOGGER.info("miners: " + CalculateTradeUtil.miners);
         CalculateTradeUtil.sellEggs();
 
         // 可产出的金币
@@ -403,25 +403,34 @@ public class FightCoreService {
     /**
      * 初始化经济平衡系统参数
      */
-    public void initTradeBalanceParameter(){
-        System.out.println("初始化经济平衡系统......");
+    public void initTradeBalanceParameter(Integer type){
+        LOGGER.info("初始化经济平衡系统......");
 
         // 获取市场总鸡蛋数量
         String totalEggs = sysConfigService.getValue(Constant.SysConfig.MARKET_EGGS.getValue());
-        System.out.println("获取市场总鸡蛋数量: "+totalEggs);
+        LOGGER.info("获取市场总鸡蛋数量: "+totalEggs);
         CalculateTradeUtil.marketEggs = new BigDecimal(totalEggs);
 
         // 获取副本池金额
         String poolBalance = sysConfigService.getValue(Constant.CashPool._DUNGEON.getValue());
         CalculateTradeUtil.FundPool = new BigDecimal(poolBalance);
-        System.out.println("获取副本池金额: " + CalculateTradeUtil.FundPool);
+        LOGGER.info("获取副本池金额: " + CalculateTradeUtil.FundPool);
 
         // 玩家赚取总收入
         CalculateTradeUtil.totalPlayersGold = new BigDecimal(sysConfigService.getValue(Constant.SysConfig.PLAYERS_EARN_TOTAL_REVENUE.getValue()));
-        System.out.println("获取系统全部玩家赚取总收入: " + CalculateTradeUtil.totalPlayersGold);
+        LOGGER.info("获取系统全部玩家赚取总收入: " + CalculateTradeUtil.totalPlayersGold);
 
         // 重置矿工数
         CalculateTradeUtil.miners = BigDecimal.ZERO;
+
+        // 获取系统全部玩家物品总战力
+        UserInfoRsp userInfoRsp = userDao.getTotalPower();
+        CalculateTradeUtil.totalPower = userInfoRsp.getPower().equals(Constant.ZERO) ? BigDecimal.valueOf(300) : BigDecimal.valueOf(userInfoRsp.getPower());
+
+        // 如果类型为非副本战斗并副本池金额等于0 则给副本池赋值初始值68U
+        if(type == 0 && CalculateTradeUtil.FundPool.compareTo(BigDecimal.ZERO) == 0){
+            CalculateTradeUtil.FundPool = BigDecimal.valueOf(68);
+        }
     }
 
     /**
@@ -464,7 +473,7 @@ public class FightCoreService {
             long hHp = heros.get(initHero).getHp();
             // 英雄魔法值
             long hMP = heros.get(initHero).getMp();
-            System.out.println("[LV" + hLevel + " " + hName + " " + hStar + "★] 剩余HP: " + hHp);
+            LOGGER.info("[LV" + hLevel + " " + hName + " " + hStar + "★] 剩余HP: " + hHp);
             setBattleProcess(new BattleDetailsRsp(hLevel, hName, null, null, hStar, null, null, hHp, null,
                     "[LV{level} {name} {starCode}★] HP: " + hHp, Constant.enable, null));
             initHero++;
@@ -487,7 +496,7 @@ public class FightCoreService {
             long mlevel = monsters.get(initMoster).getMonsterLevel();
             // 获取当前怪物最大血量
             long mMaxHP = monsters.get(initMoster).getMonsterHealth();
-//            System.out.println("[LV" + mlevel + " " + mname + "] 剩余HP: " + mMaxHP);
+//            LOGGER.info("[LV" + mlevel + " " + mname + "] 剩余HP: " + mMaxHP);
 //            setBattleProcess(new BattleDetailsRsp(null, null, mlevel, mname, null, null, null, mMaxHP, null,
 //                    "[LV{mlevel} {mname}] HP: " + mMaxHP, Constant.disabled, null));
             initMoster++;
@@ -495,13 +504,13 @@ public class FightCoreService {
 
         int h = 1;// 回合数
         while (true){
-            System.out.println("英雄剩余数量：" + survivingHero);
-            System.out.println("怪物剩余数量：" + survivingMonster);
-            System.out.println("---------------第" + h + "回合---------------");
-            System.out.println("探索中...");
+            LOGGER.info("英雄剩余数量：" + survivingHero);
+            LOGGER.info("怪物剩余数量：" + survivingMonster);
+            LOGGER.info("---------------第" + h + "回合---------------");
+            LOGGER.info("探索中...");
             setBattleProcess(new BattleDetailsRsp(null, null, null, null, null, null,
                     null, null, null, "探索中...", Constant.enable, null));
-            System.out.println("怪物出现了,接近中...");
+            LOGGER.info("怪物出现了,接近中...");
             setBattleProcess(new BattleDetailsRsp(null,null, null, null, null, null, null, null, null,
                     "怪物出现了,接近中...", Constant.disabled, null));
             // 玩家攻击怪物
@@ -512,7 +521,7 @@ public class FightCoreService {
                 // 怪物全部死亡，玩家阵营胜利
                 if ( survivingMonster < 1) {
                     combatStatus = 2;
-                    System.out.println("怪物全部击杀 战斗胜利");
+                    LOGGER.info("怪物全部击杀 战斗胜利");
                     setBattleProcess(new BattleDetailsRsp(null, null, null, null, null, null,
                             null, null, null, "怪物全部击杀 战斗胜利", Constant.enable, null));
                     break;
@@ -527,7 +536,7 @@ public class FightCoreService {
                 // 英雄全部死亡，玩家阵营失败
                 if ( survivingHero < 1 ) {
                     combatStatus = 4;
-                    System.out.println("英雄全部被击杀 战斗失败");
+                    LOGGER.info("英雄全部被击杀 战斗失败");
                     setBattleProcess(new BattleDetailsRsp(null, null,null, null, null, null,
                             null, null, null, "英雄全部阵亡 战斗失败", Constant.enable, null));
                     break;
@@ -665,7 +674,7 @@ public class FightCoreService {
             // 低于当前释放技能所需MP 直接改为释放普攻
             double MPPerTime = hMaxMP * 0.2;
             if (hMP < MPPerTime) {
-                System.out.println("MP不足，释放普攻");
+                LOGGER.info("MP不足，释放普攻");
                 ras = 0;
             }
             // ras=5 攻击方式为技能
@@ -736,7 +745,7 @@ public class FightCoreService {
 
             monsters.get(attM).setMonsterHealth(mHP);
 
-            System.out.println(attContentLog);
+            LOGGER.info(attContentLog);
             setBattleProcess(new BattleDetailsRsp(hLevel, hName, mlevel, mname, hStar, skillName,
                     skillHarm[ras], mHP, null,
                     attContent, Constant.enable, null));
@@ -749,7 +758,7 @@ public class FightCoreService {
                     long addhp = addHP(mHP, mHPRegen);
                     mHP = addhp > mMaxHP ? mMaxHP : addhp; // 恢复后的HP
 
-                    System.out.println("[LV" + mlevel + " " + mname + "]" + "触发被动，恢复了" + mHPRegen + "HP，" + "剩余" + (mHP) + "HP");
+                    LOGGER.info("[LV" + mlevel + " " + mname + "]" + "触发被动，恢复了" + mHPRegen + "HP，" + "剩余" + (mHP) + "HP");
                     setBattleProcess(new BattleDetailsRsp(null, null, mlevel, mname, null, null,null, mHP, mHPRegen,
                             "[LV{mlevel} {mname}]触发被动，恢复了{HPRegen}HP，" + "剩余{HP}HP", Constant.disabled, null));
                 }
@@ -759,11 +768,11 @@ public class FightCoreService {
             if (mHP <= 0) {
                 survivingMonster--;
                 EXP = EXP + monsters.get(attM).getMonsterExp();
-                System.out.println("[LV" + hLevel + hName + " " + hStar + "★]" + "击杀了[LV" + mlevel + " " + mname + "]");
+                LOGGER.info("[LV" + hLevel + hName + " " + hStar + "★]" + "击杀了[LV" + mlevel + " " + mname + "]");
                 setBattleProcess(new BattleDetailsRsp(hLevel, hName, mlevel, mname, hStar, null, null, null, null,
                         "[LV{level} {name} {starCode}★]击杀了[LV{mlevel} {mname}]", Constant.disabled, null));
 
-                System.out.println("怪物剩余量: " + survivingMonster);
+                LOGGER.info("怪物剩余量: " + survivingMonster);
             }
         }
     }
@@ -846,7 +855,7 @@ public class FightCoreService {
                 skillName += "触发了[致命一击]";
             }
 
-            System.out.println("[LV" + mlevel + " " + mname + "]" + "释放" + skillName + "对[LV" + hLevel + " " + hName + " " + hStar + "★]造成" + skillHarm[ras] + "的伤害，[" + hName + "]剩余" + (hHP < 1 ? 0 : hHP) + "HP");
+            LOGGER.info("[LV" + mlevel + " " + mname + "]" + "释放" + skillName + "对[LV" + hLevel + " " + hName + " " + hStar + "★]造成" + skillHarm[ras] + "的伤害，[" + hName + "]剩余" + (hHP < 1 ? 0 : hHP) + "HP");
             setBattleProcess(new BattleDetailsRsp(hLevel, hName, mlevel, mname, hStar, skillName, skillHarm[ras], hHP, null,
                     "[LV{mlevel} {mname}]使用{skillName}对[LV{level} {name} {starCode}★]造成{dealDamage}的伤害，[{name}]剩余{HP}HP", Constant.disabled, null));
 
@@ -855,7 +864,7 @@ public class FightCoreService {
             // 玩家英雄死亡 血量为0
             if (hHP <= 0) {
                 survivingHero--;
-                System.out.println("[LV" + mlevel + " " + mname + "]" + "击杀了[LV" + hLevel + " " + hName + " " + hStar + "★]");
+                LOGGER.info("[LV" + mlevel + " " + mname + "]" + "击杀了[LV" + hLevel + " " + hName + " " + hStar + "★]");
                 setBattleProcess(new BattleDetailsRsp(hLevel, hName, null, null, hStar, null, null, null, null,
                         "[LV{mlevel} {mname}]击杀了[LV{level} {name} {starCode}★]", Constant.enable, null));
             }
@@ -907,7 +916,7 @@ public class FightCoreService {
         userHeroMap.put("userHeroId", id);
         UserHeroInfoRsp userHero = userHeroDao.getUserHeroByIdRsp(userHeroMap);
         if ( userHero == null ) {
-            System.out.println("英雄获取失败getUserHeroInfo");
+            LOGGER.info("英雄获取失败getUserHeroInfo");
         }
         return userHero;
     }
@@ -1098,7 +1107,7 @@ public class FightCoreService {
     public static void main(String[] args) {
         long currentTime = System.currentTimeMillis() + Constant.HOUR24;
         Date date = new Date(currentTime);
-        System.out.println(date);
+//        LOGGER.info(date);
 //        // 奖励玩家装备 随机概率
 //        int i =0;
 //        int num = 0;
@@ -1107,11 +1116,11 @@ public class FightCoreService {
 //            int backHp = rbhp.nextInt(99);
 //            if (backHp % 6 == 0) {
 //                num ++;
-//                System.out.println("您成功爆装备了");
+//                LOGGER.info("您成功爆装备了");
 //            }
 //            i++;
 //        }
-//        System.out.println(num);
+//        LOGGER.info(num);
 //        int j = 0 ;
 //        int num = 0;
 //        while (j < 1000){
@@ -1123,13 +1132,13 @@ public class FightCoreService {
 //            }
 ////            long ss = 20;
 ////            ss = (long) (ss * s);
-//            System.out.println(s);
-////            System.out.println(ss);
+//            LOGGER.info(s);
+////            LOGGER.info(ss);
 //            j++;
 //        }
-//        System.out.println(num);
+//        LOGGER.info(num);
 //        int rannum= (int)(Math.random()*(9999999-1000000 + 1))+ 1000000;
-//        System.out.println(Arith.UUID20());
+//        LOGGER.info(Arith.UUID20());
 
         int num = 0;
         int i =0;
@@ -1138,13 +1147,13 @@ public class FightCoreService {
             int rdEQ = rd.nextInt(99);
             if (rdEQ % 16 == 0) {
                 num++;
-                System.out.println("爆装备了");
+                LOGGER.info("爆装备了");
             }
             i++;
         }
 
 
-        System.out.println("爆装数量："+ num);
+        LOGGER.info("爆装数量："+ num);
 
     }
 }
