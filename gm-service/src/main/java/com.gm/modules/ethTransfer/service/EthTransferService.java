@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.utils.Convert;
@@ -73,6 +74,7 @@ public class EthTransferService {
      */
     private static String BUSD_ADDRESS;
 
+    @Transactional(rollbackFor = Exception.class)
     public List eth(String txHash, TransactionOrderEntity order, Optional<TransactionReceipt> receipt, SummonReq form) throws Exception {
         // 召唤集合
         List gifts = new ArrayList();
@@ -97,6 +99,8 @@ public class EthTransferService {
             int tokenNum = 0;
             // 类型1英雄，2装备，3道具
             String type = "";
+            // TOKENID集合
+            List<String> tokenIds = new ArrayList<>();
             // 获取生成的token数量
             if (receipt.get().getLogs().size() > 0) {
                 for (int j = 0; j < receipt.get().getLogs().size(); j++) {
@@ -107,12 +111,15 @@ public class EthTransferService {
                         if (NFT_HERO_ADDRESS.toLowerCase().equals(addressTo)) {// 英雄NFT
                             type = Constant.SummonType.HERO.getValue();
                             tokenNum++;
+                            tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
                         } else if (NFT_EQUIP_ADDRESS.toLowerCase().equals(addressTo)) {// 装备NFT
                             type = Constant.SummonType.EQUIPMENT.getValue();
                             tokenNum++;
+                            tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
                         } else if (NFT_EX_ADDRESS.toLowerCase().equals(addressTo)) {// 经验NFT
                             type = Constant.SummonType.EXPERIENCE.getValue();
                             tokenNum++;
+                            tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
                         } else if (BUSD_ADDRESS.toLowerCase().equals(addressTo)) {// 代币数量（费用+团队抽成）
                             Address tokenAddress = new Address(receipt.get().getLogs().get(j).getTopics().get(2));
                             String tokenNumHex = Numeric.toBigInt(receipt.get().getLogs().get(j).getData()).toString();
@@ -157,9 +164,6 @@ public class EthTransferService {
             map.put("orderFee", amount);
             map.put("realFee", rebateGoldCoins);
 
-            // 设置召唤次数
-            form.setSummonNum(tokenNum);
-
             // 设置物品类型
             if (type.equals(Constant.SummonType.HERO.getValue())) {
                 // 英雄召唤
@@ -175,7 +179,12 @@ public class EthTransferService {
             form.setCurType(Constant.CurrencyType._CRYPTO.getValue());
             // 设置交易HASH
             form.setTransactionHash(txHash);
+            // 设置召唤次数
+            form.setSummonNum(tokenNum);
+            // 设置NFT_tokenID
+            form.setTokenIds(tokenIds);
 
+            // 如果订单为空则创建新订单
             if (order == null) {
                 // 通过交易hash查找订单是否存在
                 TransactionOrderEntity orderEntity = transactionOrderService.getOrderHash(txHash);

@@ -31,9 +31,9 @@ public class UserHeroEntity implements Serializable {
 	 */
 	private Long userId;
 	/**
-	 * NFTID
+	 * NFT_TOKENID
 	 */
-	private BigDecimal nftId;
+	private Long nftId;
 	/**
 	 * 用户获得的英雄ID
 	 */

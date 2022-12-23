@@ -41,6 +41,7 @@ var vm = new Vue({
 		q:{
             paramKey: null
 		},
+        userHeroInfoReq: {},
 		showList: true,
 		title: null,
 		config: {}
@@ -108,6 +109,35 @@ var vm = new Vue({
 				}
 			});
 		},
+        getMinterScale: function () {
+            layer.open({
+                type: 1,
+                skin: 'layui-layer-lan',
+                title: "获取矿工比例",
+                area: ['700px', '250px'],
+                shadeClose: false,
+                content: jQuery("#getMinterScale"),
+                btn: ['使用','取消'],
+                btn1: function (index) {
+                    $.ajax({
+                        type: "POST",
+                        url: baseURL + "sys/config/getMinterScale",
+                        contentType: "application/json",
+                        data: JSON.stringify(vm.userHeroInfoReq),
+                        success: function(result){
+                            if(result.code == 0){
+                                layer.close(index);
+                                layer.msg(result.data, {icon: 1});
+                                layer.alert(result.data);
+                                $("#jqGrid").trigger("reloadGrid");
+                            }else{
+                                layer.alert(result.msg);
+                            }
+                        }
+                    });
+                }
+            });
+        },
 		reload: function (event) {
 			vm.showList = true;
 			var page = $("#jqGrid").jqGrid('getGridParam','page');

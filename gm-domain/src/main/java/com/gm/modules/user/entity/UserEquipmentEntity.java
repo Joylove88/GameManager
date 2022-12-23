@@ -35,9 +35,9 @@ public class UserEquipmentEntity implements Serializable {
 	 */
 	private Long userId;
 	/**
-	 * NFTID
+	 * NFT_TOKENID
 	 */
-	private BigDecimal nftId;
+	private Long nftId;
 	/**
 	 * 矿工数
 	 */

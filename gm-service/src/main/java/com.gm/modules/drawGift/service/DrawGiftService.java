@@ -95,6 +95,10 @@ public class DrawGiftService {
      */
     private static int quantity = 0;
     /**
+     * NFT_TOKENID集合
+     */
+    private List<String> tokenIds = new ArrayList<>();
+    /**
      * 初始化属性
      */
     private static AttributeSimpleEntity attributeSimple;
@@ -128,6 +132,8 @@ public class DrawGiftService {
         giftBoxEquipmentRsps = new ArrayList<>();
         // 初始化返回经验召唤集合
         giftBoxExpRsps = new ArrayList<>();
+        // 初始化NFT_TOKENID集合
+        tokenIds = form.getTokenIds();
         // 初始化响应集合
         List list = new ArrayList();
         Map<String, Object> proMap = new HashMap<>();
@@ -280,10 +286,10 @@ public class DrawGiftService {
      * @param prLv
      * @param giftBoxNum
      * @param user
-     * @param txHash
+     * @param summonReq
      * @return
      */
-    private void sendHeroForPlayer(int prLv, int giftBoxNum, UserEntity user, String txHash, SummonedEventDto summonedEventDto, Integer summonNum) {
+    private void sendHeroForPlayer(Integer prLv, Integer giftBoxNum, UserEntity user, SummonReq summonReq, SummonedEventDto summonedEventDto, Integer summonNum) {
         // 获取系统全部英雄
         List<HeroInfoEntity> heroInfos = heroInfoDao.getHeroInfoPro();
         // 获取星级及属性加成信息
@@ -345,11 +351,13 @@ public class DrawGiftService {
             userHero.setStatus(Constant.enable);
             userHero.setStatePlay(Constant.disabled);// 默认：未上阵
             userHero.setMintStatus(Constant.enable);
-            userHero.setMintHash(txHash);// 交易hash
+            userHero.setMintHash(summonReq.getTransactionHash());// 交易hash
             userHero.setScale(scale);// 矿工比例
             userHero.setCreateTime(now);// 召唤时间
             userHero.setCreateTimeTs(now.getTime());
-            userHero.setNftId(Arith.UUID20());// 生成NFT唯一编码
+            userHero.setNftId(Long.parseLong(tokenIds.get(i)));// NFT_tokenID
+            tokenIds.remove(i);
+
             // 设置星级
             userHero.setStarCode(attributeSimple.getStarCode());
             // 设置皮肤
@@ -406,7 +414,7 @@ public class DrawGiftService {
      * @param st
      * @param a
      */
-    private void getStarWithAttribute(StarInfoEntity starInfo, int st, AttributeSimpleEntity a) {
+    private void getStarWithAttribute(StarInfoEntity starInfo, Integer st, AttributeSimpleEntity a) {
         // 皮肤类型赋值
         skinType = st;
         // 星级属性赋值
@@ -419,11 +427,11 @@ public class DrawGiftService {
      *
      * @param giftBoxNum       盒子数量
      * @param user             玩家信息
-     * @param txHash           交易HASH
+     * @param summonReq           交易HASH
      * @param summonedEventDto 活动信息
      * @return
      */
-    private void sendHeroFlagForPlayer(int giftBoxNum, UserEntity user, String txHash, SummonedEventDto summonedEventDto) {
+    private void sendHeroFlagForPlayer(Integer giftBoxNum, UserEntity user, SummonReq summonReq, SummonedEventDto summonedEventDto) {
         // 获取系统全部英雄碎片信息
         List<HeroFragEntity> heroFrags = heroFragDao.getHeroFragPro();
         // 存储要添加的碎片集合
@@ -458,9 +466,11 @@ public class DrawGiftService {
                 userHeroFrag.setScale(scale);
                 userHeroFrag.setStatus(Constant.enable);
                 userHeroFrag.setMintStatus(Constant.enable);
-                userHeroFrag.setMintHash(txHash);
+                userHeroFrag.setMintHash(summonReq.getTransactionHash());
                 userHeroFrag.setCreateTime(now);
                 userHeroFrag.setCreateTimeTs(now.getTime());
+                userHeroFrag.setNftId(Long.parseLong(tokenIds.get(i)));// NFT_tokenID
+                tokenIds.remove(i);// 删除当前位置的tokenID
                 userHeroFragAdds.add(userHeroFrag);
                 j++;
             }
@@ -473,7 +483,7 @@ public class DrawGiftService {
             giftBoxHeroRsp.setHeroFragNum(flagNum);// 英雄碎片数量，如果为星级英雄 数量固定1
             giftBoxHeroRsp.setHeroType(Constant.FragType.FRAG.getValue());// 英雄类型：0星级英雄，1英雄碎片
             giftBoxHeroRsp.setSkinType(-1);// 皮肤类型
-            giftBoxHeroRsp.setBoxNum(giftBoxNum);
+
             giftBoxHeroRsps.add(giftBoxHeroRsp);
 
             i++;
@@ -504,31 +514,31 @@ public class DrawGiftService {
             ifFunction
                     .add(Constant.PrLv.PrLv1.getValue(), () ->
                             // 1级概率产出1-3碎片
-                            sendHeroFlagForPlayer(giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto)
+                            sendHeroFlagForPlayer(giftBoxNum, user, summonReq, summonedEventDto)
                     )
                     .add(Constant.PrLv.PrLv2.getValue(), () ->
                             // 2级概率产出1星英雄
-                            sendHeroForPlayer(Constant.PrLv.PrLv2.getValue(), giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto, summonReq.getSummonNum())
+                            sendHeroForPlayer(Constant.PrLv.PrLv2.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum())
                     )
                     .add(Constant.PrLv.PrLv3.getValue(), () ->
                             // 3级概率产出2星英雄
-                            sendHeroForPlayer(Constant.PrLv.PrLv3.getValue(), giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto, summonReq.getSummonNum())
+                            sendHeroForPlayer(Constant.PrLv.PrLv3.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum())
                     )
                     .add(Constant.PrLv.PrLv4.getValue(), () ->
                             // 4级概率产出3星英雄
-                            sendHeroForPlayer(Constant.PrLv.PrLv4.getValue(), giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto, summonReq.getSummonNum())
+                            sendHeroForPlayer(Constant.PrLv.PrLv4.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum())
                     )
                     .add(Constant.PrLv.PrLv5.getValue(), () ->
                             // 5级概率产出4星英雄
-                            sendHeroForPlayer(Constant.PrLv.PrLv5.getValue(), giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto, summonReq.getSummonNum())
+                            sendHeroForPlayer(Constant.PrLv.PrLv5.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum())
                     )
                     .add(Constant.PrLv.PrLv6.getValue(), () ->
                             // 6级概率产出5星英雄
-                            sendHeroForPlayer(Constant.PrLv.PrLv6.getValue(), giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto, summonReq.getSummonNum())
+                            sendHeroForPlayer(Constant.PrLv.PrLv6.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum())
                     )
                     .add(Constant.PrLv.PrLv7.getValue(), () ->
                             // 7级概率产出黄金1星英雄
-                            sendHeroForPlayer(Constant.PrLv.PrLv7.getValue(), giftBoxNum, user, summonReq.getTransactionHash(), summonedEventDto, summonReq.getSummonNum())
+                            sendHeroForPlayer(Constant.PrLv.PrLv7.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum())
                     );
             ifFunction.doIf(entry.getKey() + Constant.Quantity.Q1.getValue());
             //            LOGGER.info(gifts.get(entry.getKey()).getGmHeroStarId() + ", count=" + entry.getValue() + ", probability="
@@ -540,12 +550,11 @@ public class DrawGiftService {
      * 系统发放装备到玩家背包
      *
      * @param prLv         概率等级
-     * @param map          条件集合
+     * @param giftBoxNum   盒子数量
+     * @param summonReq    请求参数
      * @param combatRecord 战斗记录
      */
-    private void sendEquipmentForPlayer(int prLv, Map<String, Object> map, GmCombatRecordEntity combatRecord, UserEntity user, SummonedEventDto summonedEventDto) {
-        // 获取盒子数量
-        int giftBoxNum = Integer.parseInt(map.get("giftBoxNum").toString());
+    private void sendEquipmentForPlayer(Integer prLv, Integer giftBoxNum, SummonReq summonReq, GmCombatRecordEntity combatRecord, UserEntity user, SummonedEventDto summonedEventDto) {
         // 获取指定稀有度的装备
         Map<String, Object> infoMap = new HashMap<>();
         infoMap.put("STATUS", Constant.enable);
@@ -564,17 +573,16 @@ public class DrawGiftService {
             userEquipment.setEquipmentId(equipmentInfos.get(equipmentIndex).getEquipId());
             userEquipment.setUserId(user.getUserId());
             userEquipment.setStatus(Constant.enable);
-            // 生成NFT唯一编码
-            userEquipment.setNftId(Arith.UUID20());
+            userEquipment.setNftId(Long.parseLong(tokenIds.get(i)));// NFT_tokenID
+            tokenIds.remove(i);// 删除当前位置的tokenID
 
             // 获取随机属性最大百分比
             Double eqAttMin = Constant.EquipStatsRange.MIN.getValue();
             // 获取随机属性最小百分比
             Double eqAttMax = Constant.EquipStatsRange.MAX.getValue();
             // 如果战斗记录为空本次为召唤反之为副本产出
-            String txHash = null == map.get("txHash") ? null : map.get("txHash").toString();
-            userEquipment.setMintHash(txHash);
             if (combatRecord == null) {
+                userEquipment.setMintHash(summonReq.getTransactionHash());
                 userEquipment.setFromType(Constant.FromType.SUMMON.getValue());
                 userEquipment.setMintStatus(Constant.enable);
                 // 验证活动有效性 验证当前玩家召唤（购买）数量是否已达到限制数量
@@ -643,12 +651,11 @@ public class DrawGiftService {
      * 系统发放1数量的装备卷轴到玩家背包
      *
      * @param prLv         概率等级
-     * @param map          条件集合
+     * @param giftBoxNum   盒子数量
+     * @param summonReq    请求参数
      * @param combatRecord 战斗记录
      */
-    private void sendEquipmentFlagForPlayer(int prLv, Map<String, Object> map, GmCombatRecordEntity combatRecord, UserEntity user, SummonedEventDto summonedEventDto) {
-        // 获取盒子数量
-        int giftBoxNum = Integer.parseInt(map.get("giftBoxNum").toString());
+    private void sendEquipmentFlagForPlayer(Integer prLv, Integer giftBoxNum, SummonReq summonReq, GmCombatRecordEntity combatRecord, UserEntity user, SummonedEventDto summonedEventDto) {
         // 获取指定稀有度的装备卷轴
         Map<String, Object> fragMap = new HashMap<>();
         fragMap.put("status", Constant.enable);
@@ -667,10 +674,12 @@ public class DrawGiftService {
             userEquipmentFrag.setUserEquipmentFragId(equipmentFrags.get(equipmentFragIndex).getEquipmentFragId());
             userEquipmentFrag.setUserId(user.getUserId());
             userEquipmentFrag.setStatus(Constant.enable);
+            userEquipmentFrag.setNftId(Long.parseLong(tokenIds.get(i)));// NFT_tokenID
+            tokenIds.remove(i);// 删除当前位置的tokenID
+
             // 如果战斗记录为空本次为召唤反之为副本产出
-            String txHash = null == map.get("txHash") ? null : map.get("txHash").toString();
-            userEquipmentFrag.setMintHash(txHash);
             if (combatRecord == null) {
+                userEquipmentFrag.setMintHash(summonReq.getTransactionHash());
                 userEquipmentFrag.setFromType(Constant.FromType.SUMMON.getValue());
                 userEquipmentFrag.setMintStatus(Constant.enable);
                 // 验证活动有效性 验证当前玩家召唤（购买）数量是否已达到限制数量
@@ -712,52 +721,46 @@ public class DrawGiftService {
      * @param orignalRates
      */
     private void equipmentSummonPool(UserEntity user, SummonReq summonReq, GmCombatRecordEntity combatRecord, List<Double> orignalRates, SummonedEventDto summonedEventDto) {
-        Map<String, Object> map = new HashMap<>();
-        // 如果战斗记录为空本次为召唤反之为副本产出
-        if (combatRecord == null) {
-            map.put("txHash", summonReq.getTransactionHash());
-        }
         // 抽奖次数
         Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates, summonReq.getSummonNum());
         // 奖品发放
         for (Map.Entry<Integer, Integer> entry : count.entrySet()) {
             // 当前概率等级奖品的数量
             int giftBoxNum = entry.getValue();
-            map.put("giftBoxNum", giftBoxNum);
             // 使用万能策略模式
             UniversalStrategyModeTool<Integer> ifFunction = new UniversalStrategyModeTool<>(new HashMap<>());
             ifFunction
                     .add(Constant.PrLv.PrLv1.getValue(), () ->
                             // 1级概率产出白色装备
-                            sendEquipmentForPlayer(Constant.PrLv.PrLv1.getValue(), map, combatRecord, user, summonedEventDto)
+                            sendEquipmentForPlayer(Constant.PrLv.PrLv1.getValue(), giftBoxNum, summonReq, combatRecord, user, summonedEventDto)
                     )
                     .add(Constant.PrLv.PrLv2.getValue(), () ->
                             // 2级概率产出绿色卷轴*1
-                            sendEquipmentFlagForPlayer(Constant.PrLv.PrLv2.getValue(), map, combatRecord, user, summonedEventDto)
+                            sendEquipmentFlagForPlayer(Constant.PrLv.PrLv2.getValue(), giftBoxNum, summonReq, combatRecord, user, summonedEventDto)
                     )
                     .add(Constant.PrLv.PrLv3.getValue(), () ->
                             // 3级概率产出绿色装备
-                            sendEquipmentForPlayer(Constant.PrLv.PrLv2.getValue(), map, combatRecord, user, summonedEventDto)
+                            sendEquipmentForPlayer(Constant.PrLv.PrLv2.getValue(), giftBoxNum, summonReq, combatRecord, user, summonedEventDto)
                     )
                     .add(Constant.PrLv.PrLv4.getValue(), () ->
                             // 4级概率产出紫色卷轴*1
-                            sendEquipmentFlagForPlayer(Constant.PrLv.PrLv4.getValue(), map, combatRecord, user, summonedEventDto)
+                            sendEquipmentFlagForPlayer(Constant.PrLv.PrLv4.getValue(), giftBoxNum, summonReq, combatRecord, user, summonedEventDto)
                     )
                     .add(Constant.PrLv.PrLv5.getValue(), () ->
                             // 5级概率产出蓝色装备
-                            sendEquipmentForPlayer(Constant.PrLv.PrLv3.getValue(), map, combatRecord, user, summonedEventDto)
+                            sendEquipmentForPlayer(Constant.PrLv.PrLv3.getValue(), giftBoxNum, summonReq, combatRecord, user, summonedEventDto)
                     )
                     .add(Constant.PrLv.PrLv6.getValue(), () ->
                             // 6级概率产出紫色装备
-                            sendEquipmentForPlayer(Constant.PrLv.PrLv4.getValue(), map, combatRecord, user, summonedEventDto)
+                            sendEquipmentForPlayer(Constant.PrLv.PrLv4.getValue(), giftBoxNum, summonReq, combatRecord, user, summonedEventDto)
                     )
                     .add(Constant.PrLv.PrLv7.getValue(), () ->
                             // 7级概率产出橙色卷轴*1
-                            sendEquipmentFlagForPlayer(Constant.PrLv.PrLv5.getValue(), map, combatRecord, user, summonedEventDto)
+                            sendEquipmentFlagForPlayer(Constant.PrLv.PrLv5.getValue(), giftBoxNum, summonReq, combatRecord, user, summonedEventDto)
                     )
                     .add(Constant.PrLv.PrLv8.getValue(), () ->
                             // 8级概率产出橙色装备
-                            sendEquipmentForPlayer(Constant.PrLv.PrLv5.getValue(), map, combatRecord, user, summonedEventDto)
+                            sendEquipmentForPlayer(Constant.PrLv.PrLv5.getValue(), giftBoxNum, summonReq, combatRecord, user, summonedEventDto)
                     );
             ifFunction.doIf(entry.getKey() + Constant.Quantity.Q1.getValue());
 //            LOGGER.info(gifts.get(entry.getKey()).getEquipId() + ", count=" + entry.getValue() + ", probability="
@@ -816,33 +819,29 @@ public class DrawGiftService {
      * @return
      */
     private void expSummonPool(UserEntity user, SummonReq summonReq, List<Double> orignalRates) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("txHash", summonReq.getTransactionHash());
         Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates, summonReq.getSummonNum());
         // 奖品发放
         for (Map.Entry<Integer, Integer> entry : count.entrySet()) {
             // 当前概率等级奖品的数量
             int giftBoxNum = entry.getValue();
-            map.put("giftBoxNum", giftBoxNum);
-            map.put("userId", user.getUserId());
             // 使用万能策略模式
             UniversalStrategyModeTool<Integer> ifFunction = new UniversalStrategyModeTool<>(new HashMap<>());
             ifFunction
                     .add(Constant.PrLv.PrLv1.getValue(), () ->
                             // 1级概率产出随机1-10件
-                            sendExpPropForPlayer(Constant.PrLv.PrLv1.getValue(), map)
+                            sendExpPropForPlayer(Constant.PrLv.PrLv1.getValue(), giftBoxNum, summonReq, user)
                     )
                     .add(Constant.PrLv.PrLv2.getValue(), () ->
                             // 2级概率产出随机1-8件
-                            sendExpPropForPlayer(Constant.PrLv.PrLv2.getValue(), map)
+                            sendExpPropForPlayer(Constant.PrLv.PrLv2.getValue(), giftBoxNum, summonReq, user)
                     )
                     .add(Constant.PrLv.PrLv3.getValue(), () ->
                             // 3级概率产出随机1-4件
-                            sendExpPropForPlayer(Constant.PrLv.PrLv2.getValue(), map)
+                            sendExpPropForPlayer(Constant.PrLv.PrLv2.getValue(), giftBoxNum, summonReq, user)
                     )
                     .add(Constant.PrLv.PrLv4.getValue(), () ->
                             // 4级概率产出1件
-                            sendExpPropForPlayer(Constant.PrLv.PrLv4.getValue(), map)
+                            sendExpPropForPlayer(Constant.PrLv.PrLv4.getValue(), giftBoxNum, summonReq, user)
                     );
             ifFunction.doIf(entry.getKey() + Constant.Quantity.Q1.getValue());
 //            LOGGER.info(gifts.get(entry.getKey()).getEquipId() + ", count=" + entry.getValue() + ", probability="
@@ -852,13 +851,12 @@ public class DrawGiftService {
 
     /**
      * 系统发放经验道具至玩家背包
-     *
      * @param prLv
-     * @param map
+     * @param giftBoxNum
+     * @param summonReq
+     * @param user
      */
-    private void sendExpPropForPlayer(int prLv, Map<String, Object> map) {
-        // 获取盒子数量
-        int giftBoxNum = Integer.parseInt(map.get("giftBoxNum").toString());
+    private void sendExpPropForPlayer(Integer prLv, Integer giftBoxNum, SummonReq summonReq, UserEntity user) {
         // 获取系统全部经验信息
         Map<String, Object> expMap = new HashMap<>();
         expMap.put("status", Constant.enable);
@@ -891,16 +889,17 @@ public class DrawGiftService {
             int j = 0;
             while (j < expNum) {
                 // 开始发放经验至玩家背包
-                String txHash = null == map.get("txHash") ? null : map.get("txHash").toString();
                 UserExperiencePotionEntity userExp = new UserExperiencePotionEntity();
                 userExp.setExPotionId(exps.get(expsI).getExPotionId());
-                userExp.setUserId(Long.valueOf(map.get("userId").toString()));
+                userExp.setUserId(user.getUserId());
                 userExp.setUserExNum(Constant.Quantity.Q1.getValue());
                 userExp.setStatus(Constant.enable);
                 userExp.setMintStatus(Constant.enable);
-                userExp.setMintHash(txHash);
+                userExp.setMintHash(summonReq.getTransactionHash());
                 userExp.setCreateTime(now);
                 userExp.setCreateTimeTs(now.getTime());
+                userExp.setNftId(Long.parseLong(tokenIds.get(i)));// NFT_tokenID
+                tokenIds.remove(i);// 删除当前位置的tokenID
                 userExpAdds.add(userExp);
                 j++;
             }

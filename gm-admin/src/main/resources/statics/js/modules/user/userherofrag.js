@@ -3,7 +3,7 @@ $(function () {
         url: baseURL + 'user/userherofrag/list',
         datatype: "json",
         colModel: [			
-			{ label: 'userHeroFragId', name: 'userHeroFragId', index: 'USER_HERO_FRAG_ID', width: 50, key: true, hidden: true },
+			{ label: 'userHeroFragId', name: 'userHeroFragId', index: 'USER_HERO_FRAG_ID', width: 50, key: true},
             { label: '会员名称', name: 'userName', width: 80 },
             { label: '英雄名称', name: 'heroName', width: 80 },
 			{ label: '获得的碎片数量', name: 'userHeroFragNum', index: 'USER_HERO_FRAG_NUM', width: 80 },

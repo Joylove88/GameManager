@@ -13,6 +13,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 抽奖参数
@@ -51,5 +53,10 @@ public class SummonReq {
      * 实际支付金额
      */
     private BigDecimal realFee;
+
+    /**
+     * NFT_TOKENID
+     */
+    private List<String> tokenIds = new ArrayList<>();
 
 }

@@ -35,6 +35,10 @@ public class UserExperiencePotionEntity implements Serializable {
 	 */
 	private Long userId;
 	/**
+	 * NFT_TOKENID
+	 */
+	private Long nftId;
+	/**
 	 * 经验药水数量
 	 */
 	private Integer userExNum;

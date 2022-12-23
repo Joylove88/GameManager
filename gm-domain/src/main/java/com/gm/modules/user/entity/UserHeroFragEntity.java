@@ -34,6 +34,10 @@ public class UserHeroFragEntity implements Serializable {
 	 */
 	private Long userId;
 	/**
+	 * NFT_TOKENID
+	 */
+	private Long nftId;
+	/**
 	 * 玩家获得碎片数量
 	 */
 	private Integer userHeroFragNum;

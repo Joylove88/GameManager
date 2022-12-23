@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
+ * <p>
  * https://www.renren.io
- *
+ * <p>
  * 版权所有，侵权必究！
  */
 
@@ -42,97 +42,107 @@ import java.util.concurrent.ExecutionException;
  */
 @Component("ethBalanceListenTask")
 public class EthBalanceListenTask implements ITask {
-	private Logger logger = LoggerFactory.getLogger(getClass());
-	private static List<String> contracts = new ArrayList<>();  //代币合约地址列表,可以存放多个地址
-	private static Web3j web3j;
-	@Autowired
-	private SysConfigService sysConfigService;
-	@Autowired
-	private SysDictService sysDictService;
-	
-	@Override
-	public void run(String params){
-		logger.info("ethBalanceListenTask定时任务正在执行，参数为：{}", params);
-		try {
-			// 获取地址
-			JSONObject address = sysDictService.getContractsAddress("CONTRACTS", "ADDRESS");
-			contracts.add(address.getString("OWNER_ADDRESS").toLowerCase());
-			contracts.add(address.getString("BUSD_ADDRESS").toLowerCase());
-			// 开始链上监听
-			startReplayListen_ETH();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static List<String> contracts = new ArrayList<>();  //代币合约地址列表,可以存放多个地址
+    private static Web3j web3j;
+    @Autowired
+    private SysConfigService sysConfigService;
+    @Autowired
+    private SysDictService sysDictService;
+
+    @Override
+    public void run(String params) {
+        logger.info("ethBalanceListenTask定时任务正在执行，参数为：{}", params);
+        try {
+            // 获取地址
+            JSONObject address = sysDictService.getContractsAddress("CONTRACTS", "ADDRESS");
+            contracts.add(address.getString("OWNER_ADDRESS").toLowerCase());
+            contracts.add(address.getString("BUSD_ADDRESS").toLowerCase());
+            // 开始链上监听
+            startReplayListen_ETH();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
-	private static void run() throws Exception {
-		web3j = TransactionVerifyUtils.connect();
-	}
-	// 启动监听以太坊上的过往交易
-	private void startReplayListen_ETH() throws Exception {
-		run();
-		// 获取资金池余额
-		String code = getERC20Balance(web3j,contracts.get(0),contracts.get(1));
-		// 更新系统中保存的余额
-		sysConfigService.updateValueByKey(Constant.CashPool._MAIN.getValue(), code);
-	}
+    private static void run() throws Exception {
+        web3j = TransactionVerifyUtils.connect();
+    }
 
-	/**
-	 * 获取ERC-20 token指定地址余额
-	 *
-	 * @param address         查询地址
-	 * @param contractAddress 合约地址
-	 * @return
-	 * @throws ExecutionException
-	 * @throws InterruptedException
-	 */
-	public static String getERC20Balance(Web3j web3j, String address, String contractAddress) throws ExecutionException, InterruptedException {
-		String methodName = "balanceOf";
-		List<Type> inputParameters = new ArrayList<>();
-		List<TypeReference<?>> outputParameters = new ArrayList<>();
-		Address fromAddress = new Address(address);
-		inputParameters.add(fromAddress);
+    // 启动监听以太坊上的过往交易
+    private void startReplayListen_ETH() throws Exception {
+        run();
+        // 获取资金池余额
+        BigDecimal balanceValue = new BigDecimal(getERC20Balance(web3j, contracts.get(0), contracts.get(1)));
+        if (balanceValue.compareTo(BigDecimal.ZERO) == 1) {
+            // 更新系统中保存的余额
+            sysConfigService.updateValueByKey(Constant.CashPool._MAIN.getValue(), balanceValue.toString());
+        }
+    }
 
-		TypeReference<Uint256> typeReference = new TypeReference<Uint256>() {
-		};
-		outputParameters.add(typeReference);
-		Function function = new Function(methodName, inputParameters, outputParameters);
-		String data = FunctionEncoder.encode(function);
-		Transaction transaction = Transaction.createEthCallTransaction(address, contractAddress, data);
+    /**
+     * 获取ERC-20 token指定地址余额
+     *
+     * @param address         查询地址
+     * @param contractAddress 合约地址
+     * @return
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+    public static String getERC20Balance(Web3j web3j, String address, String contractAddress) throws ExecutionException, InterruptedException {
+        String methodName = "balanceOf";
+        List<Type> inputParameters = new ArrayList<>();
+        List<TypeReference<?>> outputParameters = new ArrayList<>();
+        Address fromAddress = new Address(address);
+        inputParameters.add(fromAddress);
 
-		EthCall ethCall;
-		BigDecimal balanceValue = BigDecimal.ZERO;
-		try {
-			ethCall = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST).send();
-			List<Type> results = FunctionReturnDecoder.decode(ethCall.getValue(), function.getOutputParameters());
-			BigDecimal value = BigDecimal.valueOf(0);
-			if (results != null && results.size() > 0) {
-				String s = String.valueOf(results.get(0).getValue());
-				value = new BigDecimal(s);
-			}
-			balanceValue = Convert.fromWei(value, Convert.Unit.ETHER);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return balanceValue.toString();
-	}
+        TypeReference<Uint256> typeReference = new TypeReference<Uint256>() {
+        };
+        outputParameters.add(typeReference);
+        Function function = new Function(methodName, inputParameters, outputParameters);
+        String data = FunctionEncoder.encode(function);
+        Transaction transaction = Transaction.createEthCallTransaction(address, contractAddress, data);
 
-	public static void main(String[] args) throws Exception {
+        EthCall ethCall;
+        BigDecimal balanceValue = BigDecimal.ZERO;
+        try {
+            ethCall = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST).send();
+            List<Type> results = FunctionReturnDecoder.decode(ethCall.getValue(), function.getOutputParameters());
+            BigDecimal value = BigDecimal.valueOf(0);
+            if (results != null && results.size() > 0) {
+                String s = String.valueOf(results.get(0).getValue());
+                value = new BigDecimal(s);
+            }
+            balanceValue = Convert.fromWei(value, Convert.Unit.ETHER);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return balanceValue.toString();
+    }
+
+    public static void main(String[] args) throws Exception {
+        run();
+        contracts.add("0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45");
+        contracts.add("0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee");
+        BigDecimal balanceValue = new BigDecimal(getERC20Balance(web3j, contracts.get(0), contracts.get(1)));
+        if (balanceValue.compareTo(BigDecimal.ZERO) == 1) {
+            System.out.println(balanceValue);
+        }
 //		String address = "0x25B15dE515eBBD047e026D64463801f044785cc6";
 //		String fromAddress = "0x1cabea67c565b5337e688894960839ef1D48b0cD";
-		Address fromAddress = new Address("0x000000000000000000000000000000000000000000000000002386f26fc10000");
-		System.out.println(fromAddress);
-		System.out.println( Convert.fromWei(Numeric.toBigInt("0x000000000000000000000000000000000000000000000000002386f26fc10000").toString(), Convert.Unit.ETHER));
+//        Address fromAddress = new Address("0x000000000000000000000000000000000000000000000000002386f26fc10000");
+//        System.out.println(fromAddress);
+//        System.out.println(Convert.fromWei(Numeric.toBigInt("0x000000000000000000000000000000000000000000000000002386f26fc10000").toString(), Convert.Unit.ETHER));
 //		contracts.add(Constant.ADDRESS.toLowerCase());
 //		contracts.add(Constant.BUSD_ADDRESS.toLowerCase());
 
 //		startReplayListen_ETH();
-		//获取起始区块号
+        //获取起始区块号
 //		startReplayListen_ETH(BigInteger.valueOf(17723527));
 //        startTransferListen_Token(BigInteger.valueOf(17720623));
 //        startTransactionListen_ETH();
-	}
+    }
 
 
 }

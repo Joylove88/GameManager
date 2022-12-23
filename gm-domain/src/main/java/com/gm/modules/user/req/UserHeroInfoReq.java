@@ -2,6 +2,8 @@ package com.gm.modules.user.req;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * 玩家英雄
  */
@@ -24,4 +26,8 @@ public class UserHeroInfoReq {
      */
     private String parentEquipChain;
 
+    /**
+     * 战斗力（后台获取矿工比例用）
+     */
+    private BigDecimal combatPower;
 }

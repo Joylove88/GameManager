@@ -10,15 +10,20 @@ package com.gm.modules.sys.controller;
 
 
 import com.gm.common.annotation.SysLog;
+import com.gm.common.utils.CalculateTradeUtil;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
+import com.gm.modules.fightCore.service.FightCoreService;
 import com.gm.modules.sys.entity.SysConfigEntity;
 import com.gm.modules.sys.service.SysConfigService;
+import com.gm.modules.user.req.UserHeroInfoReq;
+import com.gm.modules.user.rsp.UserHeroInfoRsp;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -31,6 +36,8 @@ import java.util.Map;
 public class SysConfigController extends AbstractController {
 	@Autowired
 	private SysConfigService sysConfigService;
+	@Autowired
+	private FightCoreService fightCoreService;
 	
 	/**
 	 * 所有配置列表
@@ -94,6 +101,18 @@ public class SysConfigController extends AbstractController {
 		sysConfigService.deleteBatch(ids);
 		
 		return R.ok();
+	}
+
+	/**
+	 * 获取矿工比例
+	 */
+	@RequestMapping("/getMinterScale")
+	@RequiresPermissions("sys:config:info")
+	public R getMinterScale(@RequestBody UserHeroInfoReq userHeroInfoReq){
+		// 初始化GAIA经济系统
+		fightCoreService.initTradeBalanceParameter();
+		BigDecimal scale = CalculateTradeUtil.calculateRateOfMinter(userHeroInfoReq.getCombatPower());
+		return R.ok().put("data", scale);
 	}
 
 }
