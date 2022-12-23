@@ -151,13 +151,13 @@ public class ApiMarketController {
      */
     @Login
     @PostMapping("getItemsOnMarket")
-    public R getItemsOnMarket(@LoginUser UserEntity user, @RequestParam Map<String, Object> params) {
+    public R getItemsOnMarket(@LoginUser UserEntity user) {
         Map<String, Object> map = new HashMap<>();
         //1.获取我的在售英雄
         List<UserHeroEntity> heroList = gmMarketOnlineService.queryUserOnMarketHero(user.getUserId());
         map.put("heroList", heroList);
         //2.获取我的在售英雄碎片
-        PageUtils heroFragList = gmMarketOnlineService.queryUserOnMarketHeroFrag(user.getUserId());
+        List<UserHeroFragEntity> heroFragList = gmMarketOnlineService.queryUserOnMarketHeroFrag(user.getUserId());
         map.put("heroFragList", heroFragList);
         //3.获取我的在售装备
 //        PageUtils page3 = userEquipmentService.queryUserOnMarketEquipment(user.getUserId());

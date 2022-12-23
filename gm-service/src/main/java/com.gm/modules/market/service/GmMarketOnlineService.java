@@ -6,6 +6,7 @@ import com.gm.modules.market.dto.PutOnMarketReq;
 import com.gm.modules.market.entity.GmMarketOnlineEntity;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
+import com.gm.modules.user.entity.UserHeroFragEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,6 @@ public interface GmMarketOnlineService extends IService<GmMarketOnlineEntity> {
      * @param userId
      * @return
      */
-    PageUtils queryUserOnMarketHeroFrag(Long userId);
+    List<UserHeroFragEntity> queryUserOnMarketHeroFrag(Long userId);
 }
 

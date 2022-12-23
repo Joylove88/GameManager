@@ -11,6 +11,8 @@ import com.gm.modules.market.entity.GmMarketOnlineEntity;
 import com.gm.modules.market.service.GmMarketOnlineService;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
+import com.gm.modules.user.entity.UserHeroFragEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,9 @@ import java.util.Map;
 @Service("gmMarketOnlineService")
 @Transactional
 public class GmMarketOnlineServiceImpl extends ServiceImpl<GmMarketOnlineDao, GmMarketOnlineEntity> implements GmMarketOnlineService {
+
+    @Autowired
+    private GmMarketOnlineDao gmMarketOnlineDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -49,13 +54,12 @@ public class GmMarketOnlineServiceImpl extends ServiceImpl<GmMarketOnlineDao, Gm
 
     @Override
     public List<UserHeroEntity> queryUserOnMarketHero(Long userId) {
-
-        return null;
+        return gmMarketOnlineDao.queryUserOnMarketHero(userId);
     }
 
     @Override
-    public PageUtils queryUserOnMarketHeroFrag(Long userId) {
-        return null;
+    public List<UserHeroFragEntity> queryUserOnMarketHeroFrag(Long userId) {
+        return gmMarketOnlineDao.queryUserOnMarketHeroFrag(userId);
     }
 
 }
