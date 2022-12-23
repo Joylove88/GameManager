@@ -149,13 +149,13 @@ public class EthTransferService {
             if (amount.compareTo(price) == -1) {
                 return null;
             }
-            BigDecimal rebateGoldCoins = tokenNum == Constant.Quantity.Q1.getValue() ? BigDecimal.valueOf(summonedEventDto.getOnePriceNew()) : BigDecimal.valueOf(summonedEventDto.getTenPriceNew());
+            BigDecimal rebateGoldCoins = amount.compareTo(price) != 0 ? Arith.subtract(amount, price) : price;
             map.put("userId", user.getUserId());
             map.put("from", address);
             map.put("gasUsed", receipt.get().getGasUsed());
             map.put("blockNumber", receipt.get().getBlockNumber());
             map.put("orderFee", amount);
-            map.put("realFee", Arith.subtract(amount, rebateGoldCoins));
+            map.put("realFee", rebateGoldCoins);
 
             // 设置召唤次数
             form.setSummonNum(tokenNum);

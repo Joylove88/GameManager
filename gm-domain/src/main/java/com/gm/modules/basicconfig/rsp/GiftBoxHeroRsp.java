@@ -39,5 +39,9 @@ public class GiftBoxHeroRsp implements Serializable {
 	 * 皮肤类型：0 原始皮肤,  1 黄金
 	 */
 	private Integer skinType;
+	/**
+	 * 抽奖数量
+	 */
+	private Integer boxNum;
 
 }

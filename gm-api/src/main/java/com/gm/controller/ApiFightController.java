@@ -121,6 +121,7 @@ public class ApiFightController {
                 teamConfig.setUserId(user.getUserId());
                 teamConfig.setStatus(Constant.ZERO_);// 默认未战斗
                 teamConfig.setTeamSolt(num);
+                teamConfig.setTeamMinter(BigDecimal.ZERO);
                 teamConfigService.save(teamConfig);
                 TeamInfoRsp rsp = new TeamInfoRsp();
                 BeanUtils.copyProperties(rsp, teamConfig);

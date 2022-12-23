@@ -93,7 +93,7 @@ public class GmUserVipLevelServiceImpl extends ServiceImpl<GmUserVipLevelDao, Gm
         GmUserVipLevelEntity fatherWillVipLevel = null;
         // 条件2.查询该用户父亲的所有儿子的累计消费金额,决定是否给父亲升级
         // 查询该用户父亲
-        if (user.getFatherId() != null) {
+        if (user.getFatherId() != null && user.getFatherId() != 0L) {
             UserEntity fatherUser = userService.queryByUserId(user.getFatherId());
             // 查询该用户父亲的消费等级
             GmUserVipLevelEntity fatherUserVipLevel = baseMapper.selectById(user.getVipLevelId());

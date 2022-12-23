@@ -387,6 +387,7 @@ public class DrawGiftService {
             giftBoxHeroRsp.setHeroFragNum(Constant.Quantity.Q1.getValue());// 英雄碎片数量，如果为星级英雄 数量固定1
             giftBoxHeroRsp.setHeroType(Constant.FragType.WHOLE.getValue());// 英雄类型：0星级英雄，1英雄碎片
             giftBoxHeroRsp.setStarCode(attributeSimple.getStarCode());// 英雄星级
+            giftBoxHeroRsp.setBoxNum(giftBoxNum);
             int skinType = prLv == Constant.PrLv.PrLv7.getValue() ? Constant.SkinType.GOLD.getValue() : Constant.SkinType.ORIGINAL.getValue();
             giftBoxHeroRsp.setSkinType(skinType);// 皮肤类型
             giftBoxHeroRsps.add(giftBoxHeroRsp);
@@ -472,6 +473,7 @@ public class DrawGiftService {
             giftBoxHeroRsp.setHeroFragNum(flagNum);// 英雄碎片数量，如果为星级英雄 数量固定1
             giftBoxHeroRsp.setHeroType(Constant.FragType.FRAG.getValue());// 英雄类型：0星级英雄，1英雄碎片
             giftBoxHeroRsp.setSkinType(-1);// 皮肤类型
+            giftBoxHeroRsp.setBoxNum(giftBoxNum);
             giftBoxHeroRsps.add(giftBoxHeroRsp);
 
             i++;
