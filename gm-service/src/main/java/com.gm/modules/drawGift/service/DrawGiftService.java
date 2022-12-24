@@ -696,7 +696,7 @@ public class DrawGiftService {
             // 开始发放卷轴至玩家背包
             double scale = user.getScale() * equipmentFrags.get(equipmentFragIndex).getScale();
             UserEquipmentFragEntity userEquipmentFrag = new UserEquipmentFragEntity();
-            userEquipmentFrag.setUserEquipmentFragId(equipmentFrags.get(equipmentFragIndex).getEquipmentFragId());
+            userEquipmentFrag.setEquipmentFragId(equipmentFrags.get(equipmentFragIndex).getEquipmentFragId());
             userEquipmentFrag.setUserId(user.getUserId());
             userEquipmentFrag.setStatus(Constant.enable);
 
