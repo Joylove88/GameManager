@@ -174,4 +174,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		);
 	}
 
+	@Override
+	public UserInfoRsp getTotalPower() {
+		return userDao.getTotalPower();
+	}
+
 }

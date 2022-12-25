@@ -266,7 +266,7 @@ public class ApiIncreaseCombatPowerController {
         BigDecimal newMinter = BigDecimal.ZERO;
         BigDecimal minterRate = CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1));
         // 初始GAIA系统
-        fightCoreService.initTradeBalanceParameter();
+        fightCoreService.initTradeBalanceParameter(0);
         if (userEquipId != null) {
             UserEquipmentEntity equip = userEquipmentService.getById(userEquipId);
             newOracle = Arith.divide((Arith.add(Arith.multiply(Arith.divide(hero.getOracle(), minterRate), BigDecimal.valueOf(hero.getHeroPower())),
