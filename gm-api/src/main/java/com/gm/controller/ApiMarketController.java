@@ -160,11 +160,14 @@ public class ApiMarketController {
         List<UserHeroFragEntity> heroFragList = gmMarketOnlineService.queryUserOnMarketHeroFrag(user.getUserId());
         map.put("heroFragList", heroFragList);
         //3.获取我的在售装备
-//        PageUtils page3 = userEquipmentService.queryUserOnMarketEquipment(user.getUserId());
+        List<UserEquipmentEntity> equipmentList = gmMarketOnlineService.queryUserOnMarketEquipment(user.getUserId());
+        map.put("equipmentList", equipmentList);
         //4.获取我的在售装备卷轴
-//        PageUtils page4 = userEquipmentFragService.queryUserOnMarketEquipmentFrag(user.getUserId());
+        List<UserEquipmentFragEntity> equipmentFragList = gmMarketOnlineService.queryUserOnMarketEquipmentFrag(user.getUserId());
+        map.put("equipmentFragList", equipmentFragList);
         //5.获取我的在售药水
-//        PageUtils page5 = userExperiencePotionService.queryUserOnMarketExperiencePotion(user.getUserId());
+        List<UserExperiencePotionEntity> experiencePotionList = gmMarketOnlineService.queryUserOnMarketExperiencePotion(user.getUserId());
+        map.put("experiencePotionList", experiencePotionList);
         return R.ok().put("data", map);
     }
 

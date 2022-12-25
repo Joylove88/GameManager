@@ -9,9 +9,7 @@ import com.gm.modules.market.dao.GmMarketOnlineDao;
 import com.gm.modules.market.dto.PutOnMarketReq;
 import com.gm.modules.market.entity.GmMarketOnlineEntity;
 import com.gm.modules.market.service.GmMarketOnlineService;
-import com.gm.modules.user.entity.UserEntity;
-import com.gm.modules.user.entity.UserHeroEntity;
-import com.gm.modules.user.entity.UserHeroFragEntity;
+import com.gm.modules.user.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +58,21 @@ public class GmMarketOnlineServiceImpl extends ServiceImpl<GmMarketOnlineDao, Gm
     @Override
     public List<UserHeroFragEntity> queryUserOnMarketHeroFrag(Long userId) {
         return gmMarketOnlineDao.queryUserOnMarketHeroFrag(userId);
+    }
+
+    @Override
+    public List<UserEquipmentEntity> queryUserOnMarketEquipment(Long userId) {
+        return gmMarketOnlineDao.queryUserOnMarketEquipment(userId);
+    }
+
+    @Override
+    public List<UserEquipmentFragEntity> queryUserOnMarketEquipmentFrag(Long userId) {
+        return gmMarketOnlineDao.queryUserOnMarketEquipmentFrag(userId);
+    }
+
+    @Override
+    public List<UserExperiencePotionEntity> queryUserOnMarketExperiencePotion(Long userId) {
+        return gmMarketOnlineDao.queryUserOnMarketExperiencePotion(userId);
     }
 
 }

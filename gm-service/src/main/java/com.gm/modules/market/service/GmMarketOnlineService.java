@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.market.dto.PutOnMarketReq;
 import com.gm.modules.market.entity.GmMarketOnlineEntity;
-import com.gm.modules.user.entity.UserEntity;
-import com.gm.modules.user.entity.UserHeroEntity;
-import com.gm.modules.user.entity.UserHeroFragEntity;
+import com.gm.modules.user.entity.*;
 
 import java.util.List;
 import java.util.Map;
@@ -42,5 +40,26 @@ public interface GmMarketOnlineService extends IService<GmMarketOnlineEntity> {
      * @return
      */
     List<UserHeroFragEntity> queryUserOnMarketHeroFrag(Long userId);
+
+    /**
+     * 查询用户的在售装备
+     * @param userId
+     * @return
+     */
+    List<UserEquipmentEntity> queryUserOnMarketEquipment(Long userId);
+
+    /**
+     * 查询用户的在售装备卷轴
+     * @param userId
+     * @return
+     */
+    List<UserEquipmentFragEntity> queryUserOnMarketEquipmentFrag(Long userId);
+
+    /**
+     * 查询用户的在售药水
+     * @param userId
+     * @return
+     */
+    List<UserExperiencePotionEntity> queryUserOnMarketExperiencePotion(Long userId);
 }
 
