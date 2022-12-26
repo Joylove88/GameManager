@@ -71,4 +71,50 @@ WHERE
 	a.USER_ID = #{userId}
 	AND a.STATUS = 0
     </select>
+
+	<select id="pageHeroMarket" resultType="com.gm.modules.user.entity.UserHeroEntity">
+		SELECT
+			b.*
+		FROM
+			gm_market_online a
+			LEFT JOIN gm_user_hero b ON a.GOODS_ID = b.USER_HERO_ID
+			${ew.customSqlSegment}
+	</select>
+
+	<select id="queryUserHeroFrag" resultType="com.gm.modules.user.entity.UserHeroFragEntity">
+		SELECT
+		b.*
+		FROM
+		gm_market_online a
+		LEFT JOIN gm_user_hero_frag b ON a.GOODS_ID = b.USER_HERO_FRAG_ID
+		${ew.customSqlSegment}
+	</select>
+
+	<select id="queryUserEquipment" resultType="com.gm.modules.user.entity.UserEquipmentEntity">
+		SELECT
+		b.*
+		FROM
+		gm_market_online a
+		LEFT JOIN gm_user_equipment b ON a.GOODS_ID = b.USER_EQUIPMENT_ID
+		${ew.customSqlSegment}
+	</select>
+
+	<select id="queryUserEquipmentFrag" resultType="com.gm.modules.user.entity.UserEquipmentFragEntity">
+		SELECT
+		b.*
+		FROM
+		gm_market_online a
+		LEFT JOIN gm_user_equipment_frag b ON a.GOODS_ID = b.USER_EQUIPMENT_FRAG_ID
+		${ew.customSqlSegment}
+	</select>
+
+	<select id="queryUserExperiencePotion" resultType="com.gm.modules.user.entity.UserExperiencePotionEntity">
+		SELECT
+		b.*
+		FROM
+		gm_market_online a
+		LEFT JOIN gm_user_experience_potion b ON a.GOODS_ID = b.USER_EX_POTION_ID
+		${ew.customSqlSegment}
+	</select>
+
 </mapper>

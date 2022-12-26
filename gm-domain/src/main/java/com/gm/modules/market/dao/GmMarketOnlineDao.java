@@ -1,6 +1,9 @@
 package com.gm.modules.market.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.gm.modules.market.entity.GmMarketOnlineEntity;
 import com.gm.modules.user.entity.*;
 import org.apache.ibatis.annotations.Mapper;
@@ -27,4 +30,14 @@ public interface GmMarketOnlineDao extends BaseMapper<GmMarketOnlineEntity> {
     List<UserEquipmentFragEntity> queryUserOnMarketEquipmentFrag(@Param("userId") Long userId);
 
     List<UserExperiencePotionEntity> queryUserOnMarketExperiencePotion(@Param("userId") Long userId);
+
+    IPage<UserHeroEntity> pageHeroMarket(IPage<UserHeroEntity> page, @Param(Constants.WRAPPER) QueryWrapper<UserHeroEntity> eq);
+
+    IPage<UserHeroFragEntity> pageHeroFragMarket(IPage<UserHeroFragEntity> page, @Param(Constants.WRAPPER) QueryWrapper<UserHeroFragEntity> eq);
+
+    IPage<UserEquipmentEntity> pageEquipmentMarket(IPage<UserEquipmentEntity> page, @Param(Constants.WRAPPER) QueryWrapper<UserEquipmentEntity> eq);
+
+    IPage<UserEquipmentFragEntity> pageEquipmentFragMarket(IPage<UserEquipmentFragEntity> page, @Param(Constants.WRAPPER) QueryWrapper<UserEquipmentFragEntity> eq);
+
+    IPage<UserExperiencePotionEntity> pageExperiencePotionMarket(IPage<UserExperiencePotionEntity> page, @Param(Constants.WRAPPER) QueryWrapper<UserExperiencePotionEntity> eq);
 }

@@ -86,8 +86,9 @@ public class ApiMarketController {
     // 2.上架市场接口
     // 3.我的在售物品接口
     // 4.下架市场商品接口
-    // 5.购买物品接口
-    // 6.交易记录接口
+    // 5.市场在售商品接口
+    // 6.购买物品接口
+    // 7.交易记录接口
 
     /**
      * 上架市场接口
@@ -169,6 +170,38 @@ public class ApiMarketController {
         List<UserExperiencePotionEntity> experiencePotionList = gmMarketOnlineService.queryUserOnMarketExperiencePotion(user.getUserId());
         map.put("experiencePotionList", experiencePotionList);
         return R.ok().put("data", map);
+    }
+
+    /**
+     * 市场在售物品接口
+     */
+//    @Login
+    @PostMapping("itemsOnMarket")
+    public R itemsOnMarket(@RequestParam Map<String, Object> params) {
+        String itemsType = (String) params.getOrDefault("itemsType", "99");
+        switch (itemsType) {
+            case "0":
+                //1.获取市场英雄
+                PageUtils page = gmMarketOnlineService.queryUserHero(params);
+                return R.ok().put("page", page);
+            case "1":
+                //2.获取市场英雄碎片
+                PageUtils page2 = gmMarketOnlineService.queryUserHeroFrag(params);
+                return R.ok().put("page", page2);
+            case "2":
+                //3.获取市场装备
+                PageUtils page3 = gmMarketOnlineService.queryUserEquipment(params);
+                return R.ok().put("page", page3);
+            case "3":
+                //4.获取市场装备卷轴
+                PageUtils page4 = gmMarketOnlineService.queryUserEquipmentFrag(params);
+                return R.ok().put("page", page4);
+            case "4":
+                //5.获取市场药水
+                PageUtils page5 = gmMarketOnlineService.queryUserExperiencePotion(params);
+                return R.ok().put("page", page5);
+        }
+        return R.ok();
     }
 
 }

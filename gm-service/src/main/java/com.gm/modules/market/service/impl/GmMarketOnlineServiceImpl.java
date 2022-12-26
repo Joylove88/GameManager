@@ -75,4 +75,54 @@ public class GmMarketOnlineServiceImpl extends ServiceImpl<GmMarketOnlineDao, Gm
         return gmMarketOnlineDao.queryUserOnMarketExperiencePotion(userId);
     }
 
+    @Override
+    public PageUtils queryUserHero(Map<String, Object> params) {
+        IPage<UserHeroEntity> page = gmMarketOnlineDao.pageHeroMarket(
+                new Query<UserHeroEntity>().getPage(params),
+                new QueryWrapper<UserHeroEntity>()
+                        .eq("a.GOODS_TYPE", 0)
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils queryUserHeroFrag(Map<String, Object> params) {
+        IPage<UserHeroFragEntity> page = gmMarketOnlineDao.pageHeroFragMarket(
+                new Query<UserHeroFragEntity>().getPage(params),
+                new QueryWrapper<UserHeroFragEntity>()
+                        .eq("a.GOODS_TYPE", 0)
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils queryUserEquipment(Map<String, Object> params) {
+        IPage<UserEquipmentEntity> page = gmMarketOnlineDao.pageEquipmentMarket(
+                new Query<UserEquipmentEntity>().getPage(params),
+                new QueryWrapper<UserEquipmentEntity>()
+                        .eq("a.GOODS_TYPE", 0)
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils queryUserEquipmentFrag(Map<String, Object> params) {
+        IPage<UserEquipmentFragEntity> page = gmMarketOnlineDao.pageEquipmentFragMarket(
+                new Query<UserEquipmentFragEntity>().getPage(params),
+                new QueryWrapper<UserEquipmentFragEntity>()
+                        .eq("a.GOODS_TYPE", 0)
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils queryUserExperiencePotion(Map<String, Object> params) {
+        IPage<UserExperiencePotionEntity> page = gmMarketOnlineDao.pageExperiencePotionMarket(
+                new Query<UserExperiencePotionEntity>().getPage(params),
+                new QueryWrapper<UserExperiencePotionEntity>()
+                        .eq("a.GOODS_TYPE", 0)
+        );
+        return new PageUtils(page);
+    }
+
 }

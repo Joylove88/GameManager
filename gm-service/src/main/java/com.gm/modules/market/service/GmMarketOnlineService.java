@@ -61,5 +61,15 @@ public interface GmMarketOnlineService extends IService<GmMarketOnlineEntity> {
      * @return
      */
     List<UserExperiencePotionEntity> queryUserOnMarketExperiencePotion(Long userId);
+
+    PageUtils queryUserHero(Map<String, Object> params);
+
+    PageUtils queryUserHeroFrag(Map<String, Object> params);
+
+    PageUtils queryUserEquipment(Map<String, Object> params);
+
+    PageUtils queryUserEquipmentFrag(Map<String, Object> params);
+
+    PageUtils queryUserExperiencePotion(Map<String, Object> params);
 }
 
