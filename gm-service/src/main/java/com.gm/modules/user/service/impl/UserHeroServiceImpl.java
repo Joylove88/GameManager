@@ -9,6 +9,7 @@ import com.gm.modules.user.dao.UserHeroDao;
 import com.gm.modules.user.entity.GmUserWithdrawEntity;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
+import com.gm.modules.user.rsp.UserHeroInfoMarketRsp;
 import com.gm.modules.user.rsp.UserHeroInfoNotAllRsp;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
 import com.gm.modules.user.service.UserHeroService;
@@ -67,9 +68,9 @@ public class UserHeroServiceImpl extends ServiceImpl<UserHeroDao, UserHeroEntity
 
     @Override
     public PageUtils queryUserHero(Long userId, Map<String, Object> params) {
-        IPage<UserHeroEntity> page = this.page(
-                new Query<UserHeroEntity>().getPage(params),
-                new QueryWrapper<UserHeroEntity>()
+        IPage<UserHeroInfoMarketRsp> page = userHeroDao.marketPage(
+                new Query<UserHeroInfoMarketRsp>().getPage(params),
+                new QueryWrapper<UserHeroInfoMarketRsp>()
                         .eq("A.USER_ID",userId)
                         .eq("A.STATUS",1)
 

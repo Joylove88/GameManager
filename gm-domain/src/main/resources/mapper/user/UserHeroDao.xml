@@ -164,4 +164,24 @@
             </if>
         </where>
     </select>
+
+    <select id="marketPage" resultType="com.gm.modules.user.rsp.UserHeroInfoMarketRsp">
+        SELECT
+        A.USER_HERO_ID,
+        A.EXPERIENCE_OBTAIN,
+        A.HERO_POWER,
+        B.HERO_NAME,
+        B.HERO_IMG_URL,
+        B.HERO_ICON_URL,
+        B.HERO_KEEL_URL,
+        B.HERO_DESCRIPTION,
+        F.LEVEL_CODE
+        FROM
+        GM_USER_HERO A
+        LEFT JOIN
+        GM_HERO_INFO B ON A.HERO_ID = B.HERO_ID
+        LEFT JOIN
+        GM_HERO_LEVEL F ON A.HERO_LEVEL_ID = F.HERO_LEVE_ID
+        ${ew.customSqlSegment}
+    </select>
 </mapper>

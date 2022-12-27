@@ -1,10 +1,15 @@
 package com.gm.modules.user.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.gm.modules.user.entity.UserHeroEntity;
+import com.gm.modules.user.rsp.UserHeroInfoMarketRsp;
 import com.gm.modules.user.rsp.UserHeroInfoNotAllRsp;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -47,4 +52,12 @@ public interface UserHeroDao extends BaseMapper<UserHeroEntity> {
 	 * @return
 	 */
 	UserHeroInfoRsp getUserHeroByIdRsp(Map<String, Object> map);
+
+	/**
+	 * 市场：我的物品列表
+	 * @param page
+	 * @param eq
+	 * @return
+	 */
+    IPage<UserHeroInfoMarketRsp> marketPage(IPage<UserHeroInfoMarketRsp> page, @Param(Constants.WRAPPER) QueryWrapper<UserHeroInfoMarketRsp> eq);
 }
