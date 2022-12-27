@@ -100,18 +100,8 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
     }
 
     @Override
-    public JSONObject updateEquipJson2(Long heroEquipId, List<EquipmentInfoEntity> equips, UserHeroInfoRsp rsp) {
+    public JSONObject updateEquipJson2(Long heroEquipId, EquipSynthesisItemEntity eqSIEs, List<EquipmentInfoEntity> equips, UserHeroInfoRsp rsp, List<UserHeroEquipmentWearRsp> wearList) {
         parentEquipChain = "";
-        // 获取该英雄已穿戴的装备
-        Map<String, Object> userWearMap = new HashMap<>();
-        userWearMap.put("status", Constant.enable);
-        userWearMap.put("userHeroId", rsp.getUserHeroId());
-        List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearDao.getUserWearEQ(userWearMap);
-        // 获取装备栏中的装备合成公式
-        EquipSynthesisItemEntity eqSIEs = equipSynthesisItemService.getEquipSyntheticFormula(heroEquipId);
-        if ( eqSIEs == null ) {
-            System.out.println("获取装备合成配方失败");
-        }
         //封装装备层级
         JSONObject jsonObject = new JSONObject();
         long fragNum = eqSIEs.getEquipFragNum();
@@ -125,9 +115,9 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
             if (eqSIEs.getEquipmentId().equals(equipId)) {
                 jsonObject.put("equipId", equipId);
                 jsonObject.put("equipName", equipName);
-                jsonObject.put("equipRareCode",equipRarecode);
-                jsonObject.put("equipImgUrl",equipImgUrl);
-                jsonObject.put("equipIconUrl",equipIconUrl);
+                jsonObject.put("equipRareCode", equipRarecode);
+                jsonObject.put("equipImgUrl", equipImgUrl);
+                jsonObject.put("equipIconUrl", equipIconUrl);
                 // 装备碎片名称封装
                 jsonObject.put("equipFragId", equipId);
                 jsonObject.put("equipFragNum", fragNum);
@@ -143,7 +133,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
         }
         // 装备合成项1,2,3,白色,蓝色装备封装
         jsonObject.put("children", equipItem(eqSIEs, equips, wearList));
-        System.out.println("=============data:"+jsonObject.toJSONString());
+        System.out.println("=============data:" + jsonObject.toJSONString());
         return jsonObject;
 
     }
@@ -151,7 +141,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
     @Override
     public List<EquipmentInfoEntity> queryList() {
         Map map = new HashMap();
-        map.put("status","1");
+        map.put("status", "1");
         return equipmentInfoDao.queryList(map);
     }
 
@@ -167,11 +157,12 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
 
     /**
      * 如果该装备状态为已激活则获取该装备属性
+     *
      * @return
      */
-    private JSONObject getEquipmentAttributes(JSONObject jsonObject, UserEquipmentEntity userEquipment){
+    private JSONObject getEquipmentAttributes(JSONObject jsonObject, UserEquipmentEntity userEquipment) {
         // 如果该装备状态为已激活则获取该装备属性
-        if ( userEquipment.getActivationState().equals(Constant.enable) ) {
+        if (userEquipment.getActivationState().equals(Constant.enable)) {
             jsonObject.put("equipPower", userEquipment.getEquipPower());
             jsonObject.put("equipHealth", userEquipment.getEquipHealth());
             jsonObject.put("equipMana", userEquipment.getEquipMana());
@@ -187,6 +178,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
 
     /**
      * 获取已穿戴/激活的装备状态
+     *
      * @param equipId
      * @param wearList
      * @param parentEquipChainID
@@ -197,13 +189,12 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
         UserEquipmentEntity userEquipment = new UserEquipmentEntity();
         userEquipment.setActivationState(activationState);
         // 循环已穿戴的装备
-        for ( UserHeroEquipmentWearRsp equipmentWearRsp : wearList ) {
+        for (UserHeroEquipmentWearRsp equipmentWearRsp : wearList) {
             // 如果已穿戴装备和英雄装备栏的装备ID相等说明该位置装备已激活
-            if ( equipmentWearRsp.getEquipmentId().equals(equipId) ) {
+            if (equipmentWearRsp.getEquipmentId().equals(equipId)) {
                 // 固定为第1or2or3层位置的装备
-                if ( StringUtils.isNotBlank(equipmentWearRsp.getParentEquipChain()) && (
-                        equipmentWearRsp.getParentEquipChain().equals(parentEquipChainID)
-                )) {
+                if (StringUtils.isNotBlank(equipmentWearRsp.getParentEquipChain()) &&
+                        equipmentWearRsp.getParentEquipChain().equals(parentEquipChainID)) {
                     // 获取已激活装备的属性
                     userEquipment = userEquipmentDao.selectById(equipmentWearRsp.getUserEquipId());
                     activationState = "1";
@@ -218,34 +209,35 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
 
     /**
      * 装备合成项1,2,3,白色,蓝色装备封装
+     *
      * @param eqSIEs
      * @param equips
      * @param wearList
      * @return
      */
-    private JSONArray equipItem(EquipSynthesisItemEntity eqSIEs,List<EquipmentInfoEntity> equips, List<UserHeroEquipmentWearRsp> wearList){
+    private JSONArray equipItem(EquipSynthesisItemEntity eqSIEs, List<EquipmentInfoEntity> equips, List<UserHeroEquipmentWearRsp> wearList) {
         String parentEquipChainID = "";
         // 装备合成项封装
-        List list = combatStatsUtilsService.getEquipItems(eqSIEs);
+        List<String> list = combatStatsUtilsService.getEquipItems(eqSIEs);
         JSONArray jsonArray = new JSONArray();
         // 如果合成公式不为空则进入
+        int EQI = 0;
         int i = 0;
-        while ( i < list.size() ) {
+        while (i < list.size()) {
             parentEquipChainID = "";
             // 获取合成公式是否包含多件装备
-            boolean b = list.get(i).toString().contains(",");
+            boolean b = list.get(i).contains(",");
             // 多件装备
-            if( b ){
-                String[] equipItems2 = list.get(i).toString().split(",");
-                int EQI = 0;
-                for( String e1 : equipItems2 ){
+            if (b) {
+                String[] equipItems2 = list.get(i).split(",");
+                for (String e1 : equipItems2) {
                     JSONObject jsonObject = getEquipJson(equips, wearList, Long.parseLong(e1), parentEquipChainID, null, EQI);
                     EQI++;
                     jsonArray.add(jsonObject);
                 }
             } else {// 单件装备
-                int EQI = 0;
-                JSONObject jsonObject = getEquipJson(equips, wearList, Long.parseLong(list.get(i).toString()), parentEquipChainID, null, EQI);
+                JSONObject jsonObject = getEquipJson(equips, wearList, Long.parseLong(list.get(i)), parentEquipChainID, null, EQI);
+                EQI++;
                 jsonArray.add(jsonObject);
             }
             i++;
@@ -255,35 +247,35 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
 
     /**
      * 可合成装备的配方
+     *
      * @param eqSIEs
      * @param equips
      * @param wearList
      * @param parentEquipChainID
      * @return
      */
-    private JSONArray equipItemChild(EquipSynthesisItemEntity eqSIEs,List<EquipmentInfoEntity> equips, List<UserHeroEquipmentWearRsp> wearList, String parentEquipChainID){
+    private JSONArray equipItemChild(EquipSynthesisItemEntity eqSIEs, List<EquipmentInfoEntity> equips, List<UserHeroEquipmentWearRsp> wearList, String parentEquipChainID) {
         String parentEquipChainIDC = "";
         // 装备合成项封装
-        List list = combatStatsUtilsService.getEquipItems(eqSIEs);
+        List<String> list = combatStatsUtilsService.getEquipItems(eqSIEs);
         JSONArray jsonArray = new JSONArray();
         // 如果合成公式不为空则进入
+        int EQI = 0;
         int i = 0;
-        while ( i < list.size() ) {
-            parentEquipChainIDC = "";
+        while (i < list.size()) {
             // 获取合成公式是否包含多件装备
-            boolean b = list.get(i).toString().contains(",");
+            boolean b = list.get(i).contains(",");
             // 多件装备
-            if( b ){
-                String[] equipItems2 = list.get(i).toString().split(",");
-                int EQI = 0;
-                for( String e1 : equipItems2 ){
+            if (b) {
+                String[] equipItems2 = list.get(i).split(",");
+                for (String e1 : equipItems2) {
                     JSONObject jsonObject = getEquipJson(equips, wearList, Long.parseLong(e1), parentEquipChainID, parentEquipChainIDC, EQI);
                     EQI++;
                     jsonArray.add(jsonObject);
                 }
             } else {// 单件装备
-                int EQI = 0;
-                JSONObject jsonObject = getEquipJson(equips, wearList, Long.parseLong(list.get(i).toString()), parentEquipChainID, parentEquipChainIDC, EQI);
+                JSONObject jsonObject = getEquipJson(equips, wearList, Long.parseLong(list.get(i)), parentEquipChainID, parentEquipChainIDC, EQI);
+                EQI++;
                 jsonArray.add(jsonObject);
             }
             i++;
@@ -295,50 +287,48 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
         // 装备卷轴数量
         long fragNum = 0L;
         JSONObject jsonObject = new JSONObject();
-        for ( EquipmentInfoEntity equip : equips ) {
-            long equipId = equip.getEquipId();
-            String equipName = equip.getEquipName();
-            String equipRarecode = equip.getEquipRarecode();
-            String equipImgUrl = equip.getEquipImgUrl();
-            String equipIconUrl = equip.getEquipIconUrl();
-            if ( eqId == equipId ) {
-                UserEquipmentEntity userEquipment = new UserEquipmentEntity();
-                jsonObject.put("equipId",equipId);
-                jsonObject.put("equipName",equipName);
-                jsonObject.put("equipImgUrl",equipImgUrl);
-                jsonObject.put("equipIconUrl",equipIconUrl);
-                jsonObject.put("equipRareCode",equipRarecode);
-                if ( parentEquipChainIDC != null ) {
-                    // 重构父级装备链(孙)
-                    parentEquipChainIDC = parentEquipChainID + ("-" + EQI + ":" + equipId);
-                    userEquipment = getActivationState(equipId, wearList, parentEquipChainIDC);
-                    jsonObject.put("status", userEquipment.getActivationState());
-                } else {
-                    // 重构父级装备链（儿）
-                    parentEquipChainID = parentEquipChain + ("-" + EQI + ":" +  equipId);
-                    userEquipment = getActivationState(equipId, wearList, parentEquipChainID);
-                    jsonObject.put("status", userEquipment.getActivationState());
-                }
+        int i = Integer.parseInt(eqId.toString());
+        i--;
+        long equipId = equips.get(i).getEquipId();
+        if (eqId == equipId) {
+            String equipName = equips.get(i).getEquipName();
+            String equipRarecode = equips.get(i).getEquipRarecode();
+            String equipImgUrl = equips.get(i).getEquipImgUrl();
+            String equipIconUrl = equips.get(i).getEquipIconUrl();
 
-                // 如果该装备状态为已激活则获取该装备属性
-                getEquipmentAttributes(jsonObject, userEquipment);
+            UserEquipmentEntity userEquipment = new UserEquipmentEntity();
+            jsonObject.put("equipId", equipId);
+            jsonObject.put("equipName", equipName);
+            jsonObject.put("equipImgUrl", equipImgUrl);
+            jsonObject.put("equipIconUrl", equipIconUrl);
+            jsonObject.put("equipRareCode", equipRarecode);
+            if (parentEquipChainIDC != null) {
+                // 重构父级装备链(孙)
+                parentEquipChainIDC = parentEquipChainID + ("-" + EQI + ":" + equipId);
+                userEquipment = getActivationState(equipId, wearList, parentEquipChainIDC);
+                jsonObject.put("status", userEquipment.getActivationState());
+            } else {
+                // 重构父级装备链（儿）
+                parentEquipChainID = parentEquipChain + ("-" + EQI + ":" + equipId);
+                userEquipment = getActivationState(equipId, wearList, parentEquipChainID);
+                jsonObject.put("status", userEquipment.getActivationState());
+            }
 
-                // 如果为可合成装备继续获取装备合成配方
-                if( equipRarecode.equals(Constant.RareCode._GREEN.getValue()) ||
-                        equipRarecode.equals(Constant.RareCode._PURPLE.getValue()) ||
-                        equipRarecode.equals(Constant.RareCode._ORANGE.getValue()) ){
-                    EquipSynthesisItemEntity eqSIEsChildren = equipSynthesisItemService.getEquipSyntheticFormula(equipId);
-                    if ( eqSIEsChildren == null ) {
-                        break;
-                    }
+            // 如果该装备状态为已激活则获取该装备属性
+            getEquipmentAttributes(jsonObject, userEquipment);
+
+            // 如果为可合成装备继续获取装备合成配方
+            if (equipRarecode.equals(Constant.RareCode._GREEN.getValue()) ||
+                    equipRarecode.equals(Constant.RareCode._PURPLE.getValue()) ||
+                    equipRarecode.equals(Constant.RareCode._ORANGE.getValue())) {
+                EquipSynthesisItemEntity eqSIEsChildren = equipSynthesisItemService.getEquipSyntheticFormula(equipId);
+                if (eqSIEsChildren != null) {
                     fragNum = eqSIEsChildren.getEquipFragNum();
                     jsonObject.put("children", equipItemChild(eqSIEsChildren, equips, wearList, parentEquipChainID));
-                    jsonObject.put("equipFragId",equipId);
-                    jsonObject.put("equipFragNum",fragNum);
-                    jsonObject.put("equipFragName",equipName + "卷轴碎片");
-                    break;
+                    jsonObject.put("equipFragId", equipId);
+                    jsonObject.put("equipFragNum", fragNum);
+                    jsonObject.put("equipFragName", equipName + "卷轴碎片");
                 }
-                break;
             }
         }
         return jsonObject;

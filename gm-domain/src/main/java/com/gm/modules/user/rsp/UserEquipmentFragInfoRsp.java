@@ -8,6 +8,14 @@ import lombok.Data;
 @Data
 public class UserEquipmentFragInfoRsp {
 	/**
+	 * ID
+	 */
+	private Long equipId;
+	/**
+	 * NFT_TOKENID
+	 */
+	private Long nftId;
+	/**
      * 装备名称
 	 */
 	private String equipName;

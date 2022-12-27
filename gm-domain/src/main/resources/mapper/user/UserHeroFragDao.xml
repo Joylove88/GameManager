@@ -23,6 +23,7 @@
             A.USER_HERO_FRAG_NUM,
             A.`STATUS`,
             A.CREATE_TIME,
+            A.NFT_ID,
             C.HERO_NAME,
             D.USER_NAME
         FROM
@@ -35,7 +36,7 @@
             GM_USER D ON A.USER_ID = D.USER_ID
 
         ${ew.customSqlSegment}
-        GROUP BY A.HERO_FRAG_ID , A.USER_ID , A.USER_HERO_FRAG_NUM , A.`STATUS` , A.CREATE_TIME , C.HERO_NAME , D.USER_NAME
+        GROUP BY A.HERO_FRAG_ID , A.USER_ID , A.USER_HERO_FRAG_NUM , A.`STATUS` , A.CREATE_TIME ,A.NFT_ID, C.HERO_NAME , D.USER_NAME
         ORDER BY A.CREATE_TIME DESC , A.USER_HERO_FRAG_NUM DESC
     </select>
 
@@ -44,6 +45,8 @@
         SELECT
             COUNT(*) AS HERO_FRAG_NUM,
             AVG(A.SCALE) SCALE,
+            A.NFT_ID,
+            B.HERO_INFO_ID,
             B.HERO_FRAG_ICON_URL,
             C.HERO_NAME
         FROM
@@ -63,7 +66,30 @@
                 AND C.HERO_ID = #{heroId}
             </if>
         </where>
-        GROUP BY B.HERO_FRAG_ICON_URL,C.HERO_NAME
+        GROUP BY A.NFT_ID, B.HERO_INFO_ID, B.HERO_FRAG_ICON_URL, C.HERO_NAME
+    </select>
+
+    <!--获取升星时玩家英雄的碎片数量-->
+    <select id="getUserAllHeroFragCount" resultType="com.gm.modules.user.rsp.UserHeroFragInfoRsp">
+        SELECT
+            COUNT(*) AS HERO_FRAG_NUM
+        FROM
+            GM_USER_HERO_FRAG A
+                LEFT JOIN
+            GM_HERO_FRAG B ON A.HERO_FRAG_ID = B.HERO_FRAG_ID
+                LEFT JOIN
+            GM_HERO_INFO C ON B.HERO_INFO_ID = C.HERO_ID
+        <where>
+            <if test="status != null and status != ''">
+                AND A.`STATUS` = #{status}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND A.USER_ID = #{userId}
+            </if>
+            <if test="heroId != null and heroId != ''">
+                AND C.HERO_ID = #{heroId}
+            </if>
+        </where>
     </select>
 
     <!--消耗英雄碎片升星-->

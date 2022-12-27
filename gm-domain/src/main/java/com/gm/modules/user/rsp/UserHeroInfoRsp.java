@@ -31,11 +31,11 @@ public class UserHeroInfoRsp {
 	/**
 	 * 英雄星级
 	 */
-	private String starCode;
+	private Integer starCode;
 	/**
 	 * 英雄等级编码
 	 */
-	private String gmLevelCode;
+	private String levelCode;
 	/**
 	 * 英雄图片地址
 	 */
@@ -52,6 +52,14 @@ public class UserHeroInfoRsp {
 	 * 晋级到下一级所需经验值
 	 */
 	private Long promotionExperience;
+	/**
+	 * 升级所需累计经验
+	 */
+	private Long experienceTotal;
+	/**
+	 * 累计获得的经验
+	 */
+	private Long experienceObtain;
 	/**
 	 * 当前等级获取的经验值
 	 */

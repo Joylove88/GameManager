@@ -7,6 +7,7 @@ import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.modules.basicconfig.dao.HeroSkillDao;
 import com.gm.modules.basicconfig.entity.HeroSkillEntity;
+import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
 import com.gm.modules.basicconfig.service.HeroSkillService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,11 @@ public class HeroSkillServiceImpl extends ServiceImpl<HeroSkillDao, HeroSkillEnt
     @Override
     public HeroSkillEntity getHeroSkill(Map<String, Object> map) {
         return heroSkillDao.getHeroSkill(map);
+    }
+
+    @Override
+    public HeroSkillRsp getHeroSkillRsp(Map<String, Object> map) {
+        return heroSkillDao.getHeroSkillRsp(map);
     }
 
 }

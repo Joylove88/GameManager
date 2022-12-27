@@ -34,4 +34,22 @@
             </if>
         </where>
     </select>
+    <!--获取英雄技能信息-->
+    <select id="getHeroSkillRsp" resultType="com.gm.modules.basicconfig.rsp.HeroSkillRsp">
+        SELECT
+            A.*
+        FROM
+            GM_HERO_SKILL A
+        <where>
+            <if test="status != null and status != ''">
+                AND A.STATUS = #{status}
+            </if>
+            <if test="heroId != null and heroId != ''">
+                AND A.HERO_ID = #{heroId}
+            </if>
+            <if test="skillStarCode != null and skillStarCode != ''">
+                AND A.SKILL_STAR_CODE = #{skillStarCode}
+            </if>
+        </where>
+    </select>
 </mapper>

@@ -62,9 +62,6 @@
             <if test="status != null and status != ''">
                 AND A.`STATUS` = #{status}
             </if>
-            <if test="statusB != null and statusB != ''">
-                AND B.`STATUS` = #{statusB}
-            </if>
             <if test="userHeroId != null and userHeroId != ''">
                 AND A.USER_HERO_ID = #{userHeroId}
             </if>

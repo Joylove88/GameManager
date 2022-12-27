@@ -89,7 +89,9 @@ public class CalculateTradeUtil {
 
     // 矿工兑换数量比例
     public static BigDecimal calculateRateOfMinter(BigDecimal userPower) {
-        BigDecimal eggsBought = calculateEggBuy(userPower, FundPool);
+        // 平衡法
+        BigDecimal newChangePower = Arith.divide(Arith.multiply(userPower, FundPool), totalPower);
+        BigDecimal eggsBought = calculateEggBuy(newChangePower, FundPool);
         return Arith.divide(eggsBought, CalculateTradeUtil.EGGS_TO_HATCH_1MINERS30);
     }
 

@@ -238,8 +238,8 @@ public class CombatStatsUtilsService {
      * @param eqSIEs
      * @return
      */
-    public List getEquipItems(EquipSynthesisItemEntity eqSIEs) {
-        List list = new ArrayList();
+    public List<String> getEquipItems(EquipSynthesisItemEntity eqSIEs) {
+        List<String> list = new ArrayList<>();
         if ( StringUtils.isNotBlank(eqSIEs.getEquipSynthesisItem1())) {
             list.add(eqSIEs.getEquipSynthesisItem1());
         }

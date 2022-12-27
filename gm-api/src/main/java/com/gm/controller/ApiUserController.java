@@ -140,15 +140,17 @@ public class ApiUserController {
         userHeroMap.put("status", Constant.enable);
         userHeroMap.put("userId", user.getUserId());
         List<UserHeroInfoRsp> heroList = userHeroService.getUserAllHero(userHeroMap);
+        // 获取该英雄已穿戴的装备
+        Map<String, Object> userWearMap = new HashMap<>();
+        userWearMap.put("status", Constant.enable);
+//        userWearMap.put("userHeroId", heroList.get(i).getUserHeroId());
+        List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearService.getUserWearEQ(userWearMap);
         int i = 0;
         while (i < heroList.size()) {
-            // 获取该英雄已穿戴的装备
-            Map<String, Object> userWearMap = new HashMap<>();
-            userWearMap.put("status", Constant.enable);
-            userWearMap.put("userHeroId", heroList.get(i).getUserHeroId());
-            List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearService.getUserWearEQ(userWearMap);
-            if (wearList.size() > 0) {
-                heroList.get(i).setWearEQList(wearList);
+            for (UserHeroEquipmentWearRsp wearRsp : wearList) {
+                if (heroList.get(i).getUserHeroId().equals(wearRsp.getUserHeroId())){
+                    heroList.get(i).setWearEQList(wearList);
+                }
             }
             i++;
         }
@@ -284,58 +286,56 @@ public class ApiUserController {
         // 获取英雄
         Map<String, Object> userHeroMap = new HashMap<>();
         userHeroMap.put("userHeroId", req.getUserHeroId());
-        UserHeroEntity userHero = userHeroService.getUserHeroById(userHeroMap);
-        if (userHero == null) {
-            System.out.println("获取玩家英雄失败");
-        }
-        UserHeroInfoRsp rsp = new UserHeroInfoRsp();
-        BeanUtils.copyProperties(rsp, userHero);
-
-        // 获取英雄等级信息
-        HeroLevelEntity heroLevel = heroLevelService.getById(userHero.getHeroLevelId());
-        if (heroLevel == null) {
-            throw new RRException(ErrorCode.EXP_GET_FAIL.getDesc());
+        UserHeroInfoRsp rsp = userHeroService.getUserHeroByIdRsp(userHeroMap);
+        if (rsp == null) {
+            throw new RRException("Failed to get player hero information!");
         }
 
         // 晋级到下一级所需经验值
-        rsp.setPromotionExperience(heroLevel.getPromotionExperience());
+        rsp.setPromotionExperience(rsp.getPromotionExperience());
         // 当前等级获取的经验值
-        rsp.setCurrentExp(ExpUtils.getCurrentExp(heroLevel.getExperienceTotal(), heroLevel.getPromotionExperience(), user.getExperienceObtain()));
+        rsp.setCurrentExp(ExpUtils.getCurrentExp(rsp.getExperienceTotal(), rsp.getPromotionExperience(), rsp.getExperienceObtain()));
 
         // 获取系统全部装备
         Map<String, Object> equipMap = new HashMap<>();
         equipMap.put("STATUS", Constant.enable);
         List<EquipmentInfoEntity> equipments = equipmentInfoService.getEquipmentInfos(equipMap);
-
         // 获取英雄装备栏
         Map<String, Object> heroEquipMap = new HashMap<>();
         heroEquipMap.put("status", Constant.enable);
         heroEquipMap.put("heroId", rsp.getHeroId());
         List<HeroEquipmentEntity> heroEquipments = heroEquipmentService.getHeroEquipments(heroEquipMap);
+        // 获取该英雄已穿戴的装备
+        Map<String, Object> userWearMap = new HashMap<>();
+        userWearMap.put("status", Constant.enable);
+        userWearMap.put("userHeroId", rsp.getUserHeroId());
+        List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearService.getUserWearEQ(userWearMap);
+        // 获取装备栏中的装备合成公式
+        Map<String, Object> eqSIEMap = new HashMap<>();
+        eqSIEMap.put("STATUS", Constant.enable);
+        List<EquipSynthesisItemEntity> eqSIEs = equipSynthesisItemService.getEquipSynthesisItemEntitys(eqSIEMap);
         JSONArray jsonArray = new JSONArray();
         for (HeroEquipmentEntity heroEquipment : heroEquipments) {
-            // 获取英雄已激活/未激活装备
-            jsonArray.add(equipmentInfoService.updateEquipJson2(heroEquipment.getEquipId(), equipments, rsp));
-
+            for (EquipSynthesisItemEntity eqSIE: eqSIEs){
+                if(heroEquipment.getEquipId().equals(eqSIE.getEquipmentId())){
+                    // 获取英雄已激活/未激活装备
+                    jsonArray.add(equipmentInfoService.updateEquipJson2(heroEquipment.getEquipId(), eqSIE, equipments, rsp, wearList));
+                }
+            }
         }
 
         // 获取英雄技能
         Map<String, Object> skillMap = new HashMap<>();
         skillMap.put("status", Constant.enable);
-        skillMap.put("heroId", userHero.getHeroId());
-        skillMap.put("skillStarCode", userHero.getStarCode());
-        HeroSkillEntity heroSkill = heroSkillService.getHeroSkill(skillMap);
-        if (heroSkill == null) {
-            System.out.println("英雄技能获取失败");
-        }
-        HeroSkillRsp skillRsp = new HeroSkillRsp();
-        BeanUtils.copyProperties(skillRsp, heroSkill);
+        skillMap.put("heroId", rsp.getHeroId());
+        skillMap.put("skillStarCode", rsp.getStarCode());
+        HeroSkillRsp skillRsp = heroSkillService.getHeroSkillRsp(skillMap);
         rsp.setHeroSkillRsp(skillRsp);
 
         // 获取当前星级+1
-        int starCode = userHero.getStarCode();
-        if (starCode < 5) {
-            starCode += 1;
+        int starCode = rsp.getStarCode();
+        if (starCode < Constant.StarLv.Lv5.getValue()) {
+            starCode += Constant.StarLv.Lv1.getValue();
         }
         // 获取当前阶段升星所需碎片
         StarInfoEntity starInfo = starInfoService.getOne(new QueryWrapper<StarInfoEntity>()
@@ -347,14 +347,14 @@ public class ApiUserController {
         Map<String, Object> heroFragMap = new HashMap<>();
         heroFragMap.put("userId", user.getUserId());
         heroFragMap.put("status", Constant.enable);
-        heroFragMap.put("heroId", userHero.getHeroId());
+        heroFragMap.put("heroId", rsp.getHeroId());
         List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(heroFragMap);
-
-        Map<String, Object> map = new HashMap();
-        map.put("heroInfo", rsp);
+        Integer fragNum = heroFragList.size() > 0 ? heroFragList.get(0).getHeroFragNum() : Constant.ZERO_I;
+        Map<String, Object> map = new HashMap<>();
+        map.put("info", rsp);
         map.put("equipments", jsonArray);
         map.put("upStarFragNum", starInfo.getUpStarFragNum());
-        map.put("heroFragNum", heroFragList.get(0).getHeroFragNum());
+        map.put("heroFragNum", fragNum);
         return R.ok().put("data", map);
     }
 

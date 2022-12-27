@@ -9,6 +9,7 @@
 package com.gm.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gm.annotation.Login;
 import com.gm.annotation.LoginUser;
 import com.gm.common.Constant.ErrorCode;
@@ -35,6 +36,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -99,6 +101,7 @@ public class ApiIncreaseCombatPowerController {
     @Login
     @PostMapping("equipment")
     @ApiOperation("英雄装备激活OR合成")
+    @Transactional(rollbackFor = Exception.class)
     public R equipment(@LoginUser UserEntity user, @RequestBody UserHeroInfoReq req) throws InvocationTargetException, IllegalAccessException {
         // 表单校验
         ValidatorUtils.validateEntity(req);
@@ -112,11 +115,11 @@ public class ApiIncreaseCombatPowerController {
         userEquipment.setUserEquipmentId(req.getUserEquipmentId());
         List<UserEquipInfoRsp> equipment = userEquipmentService.getUserEquip(userEquipment);
         if (equipment.size() == 0) {
-            throw new RRException("您未获得该装备或已激活");
+            throw new RRException("You do not have this equipment or it has been activated!");
         }
         for (UserEquipInfoRsp equipInfoRsp : equipment) {
             if (equipInfoRsp.getStatus().equals(Constant.used)) {
-                throw new RRException("该装备已使用");
+                throw new RRException("This equipment has been used!");
             }
         }
 
@@ -136,6 +139,13 @@ public class ApiIncreaseCombatPowerController {
         setUserEquip.setUpdateTime(now);
         setUserEquip.setUpdateTimeTs(now.getTime());
         userEquipmentService.updateById(setUserEquip);
+        boolean update = userEquipmentService.update(setUserEquip, new UpdateWrapper<UserEquipmentEntity>()
+                .eq("STATUS", Constant.enable)
+                .eq("USER_EQUIPMENT_ID", req.getUserEquipmentId())
+        );
+        if(!update){
+            throw new RRException("equipment activated!");
+        }
         // 穿戴表新增一条装备穿戴记录
         UserHeroEquipmentWearEntity userHeroEquipmentWear = new UserHeroEquipmentWearEntity();
         userHeroEquipmentWear.setHeroId(rsp.getHeroId());
@@ -264,27 +274,33 @@ public class ApiIncreaseCombatPowerController {
         UserHeroEntity hero = userHeroService.getById(userHeroId);
         BigDecimal newOracle = BigDecimal.ZERO;
         BigDecimal newMinter = BigDecimal.ZERO;
-        BigDecimal minterRate = CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1));
         // 初始GAIA系统
         fightCoreService.initTradeBalanceParameter(0);
+        BigDecimal minterRate = CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1));
         if (userEquipId != null) {
             UserEquipmentEntity equip = userEquipmentService.getById(userEquipId);
-            newOracle = Arith.divide((Arith.add(Arith.multiply(Arith.divide(hero.getOracle(), minterRate), BigDecimal.valueOf(hero.getHeroPower())),
-                    Arith.multiply(Arith.divide(equip.getOracle(), minterRate), BigDecimal.valueOf(equip.getEquipPower()))))
-                    , Arith.multiply(BigDecimal.valueOf(hero.getHeroPower() + equip.getEquipPower()), minterRate));
+            BigDecimal oracleRate = Arith.divide(hero.getOracle(), minterRate);
+            BigDecimal heroPowerChange = Arith.multiply(oracleRate, BigDecimal.valueOf(hero.getHeroPower()));
+            BigDecimal equipPowerChange = Arith.multiply(Arith.divide(equip.getOracle(), minterRate), BigDecimal.valueOf(equip.getEquipPower()));
+            newOracle =
+                    Arith.multiply(Arith.divide(Arith.add(heroPowerChange,equipPowerChange)
+                    , BigDecimal.valueOf(hero.getHeroPower() + equip.getEquipPower())),
+                            minterRate);
             newMinter = equip.getMinter();
         } else {
             // 获取英雄矿工数量
             CalculateTradeUtil.miners = hero.getMinter();
             System.out.println("获取当前玩家矿工数量: " + CalculateTradeUtil.miners);
             BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(changePower * scale));
-            newOracle = Arith.divide((Arith.add(Arith.multiply(Arith.divide(hero.getOracle(), minterRate), BigDecimal.valueOf(hero.getHeroPower())), BigDecimal.valueOf(changePower)))
-                    , Arith.multiply(BigDecimal.valueOf((hero.getHeroPower() + changePower)), minterRate));
+            newOracle = Arith.multiply(Arith.divide(Arith.add(Arith.multiply(Arith.divide(hero.getOracle(), minterRate), BigDecimal.valueOf(hero.getHeroPower())), BigDecimal.valueOf(changePower))
+                    , BigDecimal.valueOf((hero.getHeroPower() + changePower))), minterRate);
             newMinter = minter;
         }
 
-        hero.setMinter(Arith.add(hero.getMinter(), newMinter));
-        hero.setOracle(newOracle);
+        hero.setMinter(Arith.add(hero.getMinter(), newMinter));// 更新矿工
+        hero.setOracle(newOracle);// 更新神谕值
+        long newHeroPower = hero.getHeroPower() + changePower;// 获取英雄提升后的战力（英雄战力+本次操作改变的战力）
+        hero.setHeroPower(newHeroPower);// 更新战力
         userHeroService.updateById(hero);
 
         // 英雄已在队伍上阵
@@ -332,7 +348,7 @@ public class ApiIncreaseCombatPowerController {
         if (starCode < Constant.StarLv.Lv5.getValue()) {
             starCode += 1;
         } else {
-            throw new RRException("星级已满");
+            throw new RRException("full star!");
         }
 
         // 获取星级信息
@@ -413,11 +429,11 @@ public class ApiIncreaseCombatPowerController {
                 updateCombatPower(user, req.getUserHeroId(), null, changePower, scale);
             } catch (RRException e) {
                 e.printStackTrace();
-                throw new RRException("升星失败:" + e.getMsg());
+                throw new RRException("Star upgrade failed:" + e.getMsg());
             }
 
         } else {
-            throw new RRException("英雄碎片不足");
+            throw new RRException("Insufficient hero shards!");
         }
         Map<String, Object> map = new HashMap();
         map.put("changePower", changePower);
