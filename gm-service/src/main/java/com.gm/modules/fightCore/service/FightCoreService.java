@@ -916,7 +916,7 @@ public class FightCoreService {
         userHeroMap.put("userHeroId", id);
         UserHeroInfoRsp userHero = userHeroDao.getUserHeroByIdRsp(userHeroMap);
         if ( userHero == null ) {
-            LOGGER.info("英雄获取失败getUserHeroInfo");
+            LOGGER.info("Failed to get hero information");
         }
         return userHero;
     }
@@ -928,7 +928,7 @@ public class FightCoreService {
             rsp = teamConfigDao.getTeamInfo(teamParams);
         }
         if (rsp == null){
-            throw new RRException("获取队伍信息异常");
+            throw new RRException("Obtaining team information is abnormal!");
         }
 
         // 存储英雄集合

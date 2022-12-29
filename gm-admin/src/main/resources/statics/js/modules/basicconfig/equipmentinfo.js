@@ -31,14 +31,14 @@ $(function () {
             }
             },
             { label: '矿工兑换比例（增幅,削减）', name: 'scale', index: 'SCALE', width: 80 },
-			{ label: '初始生命值', name: 'equipHealth', index: 'EQUIP_HEALTH', width: 80 },
-			{ label: '初始法力值', name: 'equipMana', index: 'EQUIP_MANA', width: 80 },
-			{ label: '初始生命值恢复', name: 'equipHealthRegen', index: 'EQUIP_HEALTH_REGEN', width: 80 }, 			
-			{ label: '初始法力值恢复', name: 'equipManaRegen', index: 'EQUIP_MANA_REGEN', width: 80 }, 			
-			{ label: '初始护甲', name: 'equipArmor', index: 'EQUIP_ARMOR', width: 80 }, 			
-			{ label: '初始魔抗', name: 'equipMagicResist', index: 'EQUIP_MAGIC_RESIST', width: 80 }, 			
-			{ label: '初始攻击力', name: 'equipAttackDamage', index: 'EQUIP_ATTACK_DAMAGE', width: 80 }, 			
-			{ label: '初始法功', name: 'equipAttackSpell', index: 'EQUIP_ATTACK_SPELL', width: 80 },
+			{ label: '初始生命值', name: 'health', index: 'HEALTH', width: 80 },
+			{ label: '初始法力值', name: 'mana', index: 'MANA', width: 80 },
+			{ label: '初始生命值恢复', name: 'healthRegen', index: 'HEALTH_REGEN', width: 80 },
+			{ label: '初始法力值恢复', name: 'manaRegen', index: 'MANA_REGEN', width: 80 },
+			{ label: '初始护甲', name: 'armor', index: 'ARMOR', width: 80 },
+			{ label: '初始魔抗', name: 'magicResist', index: 'MAGIC_RESIST', width: 80 },
+			{ label: '初始攻击力', name: 'attackDamage', index: 'ATTACK_DAMAGE', width: 80 },
+			{ label: '初始法功', name: 'attackSpell', index: 'ATTACK_SPELL', width: 80 },
 			{ label: '创建人', name: 'createUser', index: 'CREATE_USER', width: 80 }, 			
 			{ label: '创建时间', name: 'createTime', index: 'CREATE_TIME', width: 80 }, 			
 			{ label: '修改人', name: 'updateUser', index: 'UPDATE_USER', width: 80 },
@@ -86,8 +86,8 @@ var vm = new Vue({
 			vm.showList = false;
 			vm.title = "新增";
 			vm.equipmentInfo = {equipRarecode : '1', status : 1,itemValuation: 0,
-                equipHealth: 0, equipMana: 0, equipHealthRegen: 0, equipManaRegen: 0,
-                equipArmor: 0,equipMagicResist: 0,equipAttackDamage: 0,equipAttackSpell: 0,
+                health: 0, mana: 0, healthRegen: 0, manaRegen: 0,
+                armor: 0, magicResist: 0, attackDamage: 0, attackSpell: 0,
             };
 		},
 		update: function (event) {

@@ -3,19 +3,6 @@
 
 <mapper namespace="com.gm.modules.user.dao.UserHeroDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.gm.modules.user.entity.UserHeroEntity" id="userHeroMap">
-        <result property="userHeroId" column="USER_HERO_ID"/>
-        <result property="userId" column="USER_ID"/>
-        <result property="heroStarId" column="HERO_STAR_ID"/>
-        <result property="status" column="STATUS"/>
-        <result property="heroLevelId" column="HERO_LEVEL_ID"/>
-        <result property="createTime" column="CREATE_TIME"/>
-        <result property="createTimeTs" column="CREATE_TIME_TS"/>
-        <result property="updateTime" column="UPDATE_TIME"/>
-        <result property="updateTimeTs" column="UPDATE_TIME_TS"/>
-    </resultMap>
-
     <select id="selectPage" resultType="com.gm.modules.user.entity.UserHeroEntity">
         SELECT
             A.*,
@@ -51,6 +38,8 @@
     <select id="getUserAllHero" resultType="com.gm.modules.user.rsp.UserHeroInfoRsp">
         SELECT
         A.USER_HERO_ID,
+        A.HERO_ID,
+        A.STAR_CODE,
         A.EXPERIENCE_OBTAIN,
         A.HERO_POWER,
         B.HERO_NAME,
@@ -136,7 +125,7 @@
             </if>
         </where>
     </select>
-    <!--获取玩家英雄指定的英雄-->
+    <!--获取玩家英雄指定的英雄信息-->
     <select id="getUserHeroByIdRsp" resultType="com.gm.modules.user.rsp.UserHeroInfoRsp">
         SELECT
         A.*,
@@ -145,9 +134,35 @@
         B.HERO_ICON_URL,
         B.HERO_KEEL_URL,
         B.HERO_DESCRIPTION,
-        F.LEVEL_CODE,
-        F.EXPERIENCE_TOTAL,
-        F.PROMOTION_EXPERIENCE
+        F.LEVEL_CODE
+        FROM
+        GM_USER_HERO A
+        LEFT JOIN
+        GM_HERO_INFO B ON B.HERO_ID = A.HERO_ID
+        LEFT JOIN
+        GM_HERO_LEVEL F ON A.HERO_LEVEL_ID = F.HERO_LEVE_ID
+        <where>
+            <if test="status != null and status != ''">
+                AND A.`STATUS` = #{status}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND A.USER_ID = #{userId}
+            </if>
+            <if test="userHeroId != null and userHeroId != ''">
+                AND A.USER_HERO_ID = #{userHeroId}
+            </if>
+        </where>
+    </select>
+    <!--获取玩家英雄指定的英雄详细信息-->
+    <select id="getUserHeroByIdDetailRsp" resultType="com.gm.modules.user.rsp.UserHeroInfoDetailRsp">
+        SELECT
+        A.*,
+        B.HERO_NAME,
+        B.HERO_IMG_URL,
+        B.HERO_ICON_URL,
+        B.HERO_KEEL_URL,
+        B.HERO_DESCRIPTION,
+        F.LEVEL_CODE
         FROM
         GM_USER_HERO A
         LEFT JOIN

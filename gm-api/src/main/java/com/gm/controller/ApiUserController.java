@@ -19,6 +19,7 @@ import com.gm.common.utils.*;
 import com.gm.common.validator.ValidatorUtils;
 import com.gm.common.web3Utils.TransactionVerifyUtils;
 import com.gm.modules.basicconfig.entity.*;
+import com.gm.modules.basicconfig.rsp.HeroLevelRsp;
 import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
 import com.gm.modules.basicconfig.service.*;
 import com.gm.modules.order.service.TransactionOrderService;
@@ -156,28 +157,27 @@ public class ApiUserController {
         }
         map.put("heroList", heroList);
 
-        // 获取英雄碎片
+        // 获取玩家所有的英雄碎片
         Map<String, Object> heroFragMap = new HashMap<>();
         heroFragMap.put("userId", user.getUserId());
         heroFragMap.put("status", Constant.enable);
         List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(heroFragMap);
         map.put("heroFragList", heroFragList);
 
-        // 获取装备
+        // 获取玩家所有的装备
         UserEquipmentEntity userEquipment = new UserEquipmentEntity();
         userEquipment.setStatus(Constant.enable);
         userEquipment.setUserId(user.getUserId());
         List<UserEquipInfoRsp> equipmentEntities = userEquipmentService.getUserEquip(userEquipment);
         map.put("equipList", equipmentEntities);
 
-        // 获取装备碎片
+        // 获取玩家所有的装备碎片
         List<UserEquipmentFragInfoRsp> equipmentFragEntities = userEquipmentFragService.getUserAllEquipFrag(user.getUserId());
         map.put("equipFragList", equipmentFragEntities);
 
-        // 获取消耗品
+        // 获取玩家所有的消耗品
         Map<String, Object> forUseMap = new HashMap<>();
-
-        // 获取经验道具
+        // 获取玩家所有的经验道具
         UserExperiencePotionEntity exp = new UserExperiencePotionEntity();
         exp.setUserId(user.getUserId());
         List<UserExpInfoRsp> expList = userExService.getUserEx(exp);
@@ -283,18 +283,26 @@ public class ApiUserController {
     public R getHeroDetail(@LoginUser UserEntity user, @RequestBody UserHeroInfoReq req) throws InvocationTargetException, IllegalAccessException {
         // 表单校验
         ValidatorUtils.validateEntity(req);
-        // 获取英雄
+        // 获取英雄详细信息
         Map<String, Object> userHeroMap = new HashMap<>();
         userHeroMap.put("userHeroId", req.getUserHeroId());
-        UserHeroInfoRsp rsp = userHeroService.getUserHeroByIdRsp(userHeroMap);
+        UserHeroInfoDetailRsp rsp = userHeroService.getUserHeroByIdDetailRsp(userHeroMap);
         if (rsp == null) {
             throw new RRException("Failed to get player hero information!");
         }
+        // 获取英雄下一个等级信息
+        Map<String, Object> heroLvMap = new HashMap<>();
+        int heroLv = rsp.getLevelCode() < 50 ? rsp.getLevelCode() + Constant.Quantity.Q1.getValue() : rsp.getLevelCode();
+        heroLvMap.put("levelCode",  heroLv);
+        HeroLevelRsp heroLvRsp = heroLevelService.getHeroLevelByLvCode(heroLvMap);
+        if (heroLvRsp == null) {
+            throw new RRException(ErrorCode.EXP_GET_FAIL.getDesc());
+        }
 
         // 晋级到下一级所需经验值
-        rsp.setPromotionExperience(rsp.getPromotionExperience());
+        rsp.setPromotionExperience(heroLvRsp.getPromotionExperience());
         // 当前等级获取的经验值
-        rsp.setCurrentExp(ExpUtils.getCurrentExp(rsp.getExperienceTotal(), rsp.getPromotionExperience(), rsp.getExperienceObtain()));
+        rsp.setCurrentExp(ExpUtils.getCurrentExp(heroLvRsp.getExperienceTotal(), heroLvRsp.getPromotionExperience(), rsp.getExperienceObtain()));
 
         // 获取系统全部装备
         Map<String, Object> equipMap = new HashMap<>();
@@ -348,10 +356,10 @@ public class ApiUserController {
         heroFragMap.put("userId", user.getUserId());
         heroFragMap.put("status", Constant.enable);
         heroFragMap.put("heroId", rsp.getHeroId());
-        List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(heroFragMap);
-        Integer fragNum = heroFragList.size() > 0 ? heroFragList.get(0).getHeroFragNum() : Constant.ZERO_I;
+        UserHeroFragInfoRsp heroFragCount = userHeroFragService.getUserAllHeroFragCount(heroFragMap);
+        Integer fragNum = null != heroFragCount ? heroFragCount.getHeroFragNum() : Constant.ZERO_I;
         Map<String, Object> map = new HashMap<>();
-        map.put("info", rsp);
+        map.put("heroInfo", rsp);
         map.put("equipments", jsonArray);
         map.put("upStarFragNum", starInfo.getUpStarFragNum());
         map.put("heroFragNum", fragNum);

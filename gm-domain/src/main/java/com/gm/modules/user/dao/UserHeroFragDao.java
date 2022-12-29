@@ -26,6 +26,13 @@ public interface UserHeroFragDao extends BaseMapper<UserHeroFragEntity> {
 	List<UserHeroFragInfoRsp> getUserAllHeroFrag(Map<String, Object> map);
 
     /**
+     * 获取升星时玩家英雄的碎片数量
+     * @param map
+     * @return
+     */
+    UserHeroFragInfoRsp getUserAllHeroFragCount(Map<String, Object> map);
+
+    /**
      * 消耗英雄碎片升星
      * @param map
      */

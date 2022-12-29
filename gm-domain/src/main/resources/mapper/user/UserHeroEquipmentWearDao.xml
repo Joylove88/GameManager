@@ -44,14 +44,14 @@
             B2.EQUIP_IMG_URL,
             B2.EQUIP_ICON_URL,
             B.EQUIP_POWER,
-            B.EQUIP_HEALTH,
-            B.EQUIP_HEALTH_REGEN,
-            B.EQUIP_MANA,
-            B.EQUIP_MANA_REGEN,
-            B.EQUIP_ARMOR,
-            B.EQUIP_MAGIC_RESIST,
-            B.EQUIP_ATTACK_DAMAGE,
-            B.EQUIP_ATTACK_SPELL
+            B.HEALTH,
+            B.HEALTH_REGEN,
+            B.MANA,
+            B.MANA_REGEN,
+            B.ARMOR,
+            B.MAGIC_RESIST,
+            B.ATTACK_DAMAGE,
+            B.ATTACK_SPELL
         FROM
             gm_user_hero_equipment_wear A
         LEFT JOIN

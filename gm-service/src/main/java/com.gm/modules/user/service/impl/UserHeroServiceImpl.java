@@ -9,6 +9,7 @@ import com.gm.modules.user.dao.UserHeroDao;
 import com.gm.modules.user.entity.GmUserWithdrawEntity;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
+import com.gm.modules.user.rsp.UserHeroInfoDetailRsp;
 import com.gm.modules.user.rsp.UserHeroInfoMarketRsp;
 import com.gm.modules.user.rsp.UserHeroInfoNotAllRsp;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
@@ -64,6 +65,11 @@ public class UserHeroServiceImpl extends ServiceImpl<UserHeroDao, UserHeroEntity
     @Override
     public UserHeroInfoRsp getUserHeroByIdRsp(Map<String, Object> map) {
         return userHeroDao.getUserHeroByIdRsp(map);
+    }
+
+    @Override
+    public UserHeroInfoDetailRsp getUserHeroByIdDetailRsp(Map<String, Object> map) {
+        return userHeroDao.getUserHeroByIdDetailRsp(map);
     }
 
     @Override

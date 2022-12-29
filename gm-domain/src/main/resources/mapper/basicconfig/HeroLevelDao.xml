@@ -14,5 +14,10 @@
         SELECT * FROM GM_HERO_LEVEL
         WHERE DELETED = '0'
     </select>
+    <!--获取指定英雄等级-->
+    <select id="getHeroLevelByLvCode" resultType="com.gm.modules.basicconfig.rsp.HeroLevelRsp">
+        SELECT * FROM GM_HERO_LEVEL
+        WHERE LEVEL_CODE = #{levelCode}
+    </select>
 
 </mapper>

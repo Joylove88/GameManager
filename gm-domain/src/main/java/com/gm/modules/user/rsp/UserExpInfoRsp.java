@@ -8,11 +8,11 @@ import lombok.Data;
 @Data
 public class UserExpInfoRsp {
 	/**
-	 * 经验药水数量
+	 * 经验数量
 	 */
 	private Long expNum;
 	/**
-	 * 经验药水名称
+	 * 经验名称
 	 */
 	private String expName;
 	/**
@@ -28,7 +28,7 @@ public class UserExpInfoRsp {
 	 */
 	private String expIconUrl;
 	/**
-	 * 药水描述
+	 * 经验描述
 	 */
 	private String expDescription;
 

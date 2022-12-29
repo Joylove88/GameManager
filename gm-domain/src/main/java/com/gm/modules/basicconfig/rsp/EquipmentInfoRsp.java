@@ -40,36 +40,36 @@ public class EquipmentInfoRsp implements Serializable {
 	 */
 	private String equipIconUrl;
 	/**
-	 * 初始生命值
+	 * 生命值
 	 */
-	private Long equipHealth;
+	private Long health;
 	/**
-	 * 初始法力值
+	 * 法力值
 	 */
-	private Long equipMana;
+	private Long mana;
 	/**
-	 * 初始生命值恢复
+	 * 生命值恢复
 	 */
-	private Long equipHealthRegen;
+	private Long healthRegen;
 	/**
-	 * 初始法力值恢复
+	 * 法力值恢复
 	 */
-	private Long equipManaRegen;
+	private Long manaRegen;
 	/**
-	 * 初始护甲
+	 * 护甲
 	 */
-	private Long equipArmor;
+	private Long armor;
 	/**
-	 * 初始魔抗
+	 * 魔抗
 	 */
-	private Long equipMagicResist;
+	private Long magicResist;
 	/**
-	 * 初始攻击力
+	 * 攻击力
 	 */
-	private Long equipAttackDamage;
+	private Long attackDamage;
 	/**
 	 * 法功
 	 */
-	private Long equipAttackSpell;
+	private Long attackSpell;
 
 }

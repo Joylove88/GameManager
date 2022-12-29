@@ -35,7 +35,7 @@ public class UserHeroInfoRsp {
 	/**
 	 * 英雄等级编码
 	 */
-	private String levelCode;
+	private Integer levelCode;
 	/**
 	 * 英雄图片地址
 	 */
@@ -49,31 +49,13 @@ public class UserHeroInfoRsp {
 	 */
 	private String heroKeelUrl;
 	/**
-	 * 晋级到下一级所需经验值
-	 */
-	private Long promotionExperience;
-	/**
-	 * 升级所需累计经验
-	 */
-	private Long experienceTotal;
-	/**
-	 * 累计获得的经验
-	 */
-	private Long experienceObtain;
-	/**
-	 * 当前等级获取的经验值
-	 */
-	private Long currentExp;
-	/**
 	 * 英雄描述
 	 */
 	private String heroDescription;
-
 	/**
 	 * 英雄已穿戴装备
 	 */
 	private List<UserHeroEquipmentWearRsp> wearEQList = new ArrayList<>();
-
 	/**
 	 * 英雄技能
 	 */

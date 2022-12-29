@@ -19,6 +19,7 @@ import com.gm.modules.user.dao.UserEquipmentDao;
 import com.gm.modules.user.dao.UserHeroEquipmentWearDao;
 import com.gm.modules.user.entity.UserEquipmentEntity;
 import com.gm.modules.user.rsp.UserHeroEquipmentWearRsp;
+import com.gm.modules.user.rsp.UserHeroInfoDetailRsp;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,7 +101,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
     }
 
     @Override
-    public JSONObject updateEquipJson2(Long heroEquipId, EquipSynthesisItemEntity eqSIEs, List<EquipmentInfoEntity> equips, UserHeroInfoRsp rsp, List<UserHeroEquipmentWearRsp> wearList) {
+    public JSONObject updateEquipJson2(Long heroEquipId, EquipSynthesisItemEntity eqSIEs, List<EquipmentInfoEntity> equips, UserHeroInfoDetailRsp rsp, List<UserHeroEquipmentWearRsp> wearList) {
         parentEquipChain = "";
         //封装装备层级
         JSONObject jsonObject = new JSONObject();
@@ -164,14 +165,14 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
         // 如果该装备状态为已激活则获取该装备属性
         if (userEquipment.getActivationState().equals(Constant.enable)) {
             jsonObject.put("equipPower", userEquipment.getEquipPower());
-            jsonObject.put("equipHealth", userEquipment.getEquipHealth());
-            jsonObject.put("equipMana", userEquipment.getEquipMana());
-            jsonObject.put("equipHealthRegen", userEquipment.getEquipHealthRegen());
-            jsonObject.put("equipManaRegen", userEquipment.getEquipManaRegen());
-            jsonObject.put("equipArmor", userEquipment.getEquipArmor());
-            jsonObject.put("equipMagicResist", userEquipment.getEquipMagicResist());
-            jsonObject.put("equipAttackDamage", userEquipment.getEquipAttackDamage());
-            jsonObject.put("equipAttackSpell", userEquipment.getEquipAttackSpell());
+            jsonObject.put("health", userEquipment.getHealth());
+            jsonObject.put("mana", userEquipment.getMana());
+            jsonObject.put("healthRegen", userEquipment.getHealthRegen());
+            jsonObject.put("manaRegen", userEquipment.getManaRegen());
+            jsonObject.put("armor", userEquipment.getArmor());
+            jsonObject.put("magicResist", userEquipment.getMagicResist());
+            jsonObject.put("attackDamage", userEquipment.getAttackDamage());
+            jsonObject.put("attackSpell", userEquipment.getAttackSpell());
         }
         return jsonObject;
     }

@@ -24,5 +24,12 @@ public interface HeroLevelService extends IService<HeroLevelEntity> {
      * @return
      */
     List<HeroLevelRsp> getHeroLevels();
+
+    /**
+     * 获取指定英雄等级
+     * @param map
+     * @return
+     */
+    HeroLevelRsp getHeroLevelByLvCode(Map<String, Object> map);
 }
 

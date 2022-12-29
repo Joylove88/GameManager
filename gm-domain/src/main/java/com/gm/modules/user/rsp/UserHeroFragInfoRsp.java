@@ -9,6 +9,14 @@ import sun.dc.pr.PRError;
 @Data
 public class UserHeroFragInfoRsp {
 	/**
+	 * 英雄ID
+	 */
+	private String heroInfoId;
+	/**
+	 * NFT_TOKENID
+	 */
+	private Long nftId;
+	/**
 	 * 英雄名称
 	 */
 	private String heroName;

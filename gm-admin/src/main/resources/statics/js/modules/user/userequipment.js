@@ -43,14 +43,14 @@ $(function () {
                     }
                 }
             },
-            { label: '初始生命值', name: 'equipHealth', index: 'EQUIP_HEALTH', width: 80 },
-            { label: '初始法力值', name: 'equipMana', index: 'EQUIP_MANA', width: 80 },
-            { label: '初始生命值恢复', name: 'equipHealthRegen', index: 'EQUIP_HEALTH_REGEN', width: 80 },
-            { label: '初始法力值恢复', name: 'equipManaRegen', index: 'EQUIP_MANA_REGEN', width: 80 },
-            { label: '初始护甲', name: 'equipArmor', index: 'EQUIP_ARMOR', width: 80 },
-            { label: '初始魔抗', name: 'equipMagicResist', index: 'EQUIP_MAGIC_RESIST', width: 80 },
-            { label: '初始攻击力', name: 'equipAttackDamage', index: 'EQUIP_ATTACK_DAMAGE', width: 80 },
-            { label: '初始法功', name: 'equipAttackSpell', index: 'EQUIP_ATTACK_SPELL', width: 80 },
+            { label: '生命值', name: 'health', index: 'HEALTH', width: 80 },
+            { label: '法力值', name: 'mana', index: 'MANA', width: 80 },
+            { label: '生命值恢复', name: 'healthRegen', index: 'HEALTH_REGEN', width: 80 },
+            { label: '法力值恢复', name: 'manaRegen', index: 'MANA_REGEN', width: 80 },
+            { label: '护甲', name: 'armor', index: 'ARMOR', width: 80 },
+            { label: '魔抗', name: 'magicResist', index: 'MAGIC_RESIST', width: 80 },
+            { label: '攻击力', name: 'attackDamage', index: 'ATTACK_DAMAGE', width: 80 },
+            { label: '法功', name: 'attackSpell', index: 'ATTACK_SPELL', width: 80 },
 			{ label: '创建时间', name: 'createTime', index: 'CREATE_TIME', width: 80, formatter: function (value, options, row) {
 			    return value;
             }

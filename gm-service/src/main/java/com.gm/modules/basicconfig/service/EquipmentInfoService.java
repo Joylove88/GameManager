@@ -7,6 +7,7 @@ import com.gm.modules.basicconfig.entity.EquipSynthesisItemEntity;
 import com.gm.modules.basicconfig.entity.EquipmentInfoEntity;
 import com.gm.modules.basicconfig.rsp.EquipmentInfoRsp;
 import com.gm.modules.user.rsp.UserHeroEquipmentWearRsp;
+import com.gm.modules.user.rsp.UserHeroInfoDetailRsp;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public interface EquipmentInfoService extends IService<EquipmentInfoEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     boolean updateEquipJson(Long[] equipIds);
-    JSONObject updateEquipJson2(Long heroEquipId, EquipSynthesisItemEntity eqSIEs, List<EquipmentInfoEntity> equips, UserHeroInfoRsp rsp, List<UserHeroEquipmentWearRsp> wearList);
+    JSONObject updateEquipJson2(Long heroEquipId, EquipSynthesisItemEntity eqSIEs, List<EquipmentInfoEntity> equips, UserHeroInfoDetailRsp rsp, List<UserHeroEquipmentWearRsp> wearList);
 
     List<EquipmentInfoEntity> queryList();
 

@@ -1,11 +1,7 @@
 package com.gm.modules.user.rsp;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -66,34 +62,34 @@ public class UserHeroEquipmentWearRsp implements Serializable {
 	/**
 	 * 生命值
 	 */
-	private Long equipHealth;
+	private Long health;
 	/**
 	 * 法力值
 	 */
-	private Long equipMana;
+	private Long mana;
 	/**
 	 * 生命值恢复
 	 */
-	private Long equipHealthRegen;
+	private Long healthRegen;
 	/**
 	 * 法力值恢复
 	 */
-	private Long equipManaRegen;
+	private Long manaRegen;
 	/**
 	 * 护甲
 	 */
-	private Long equipArmor;
+	private Long armor;
 	/**
 	 * 魔抗
 	 */
-	private Long equipMagicResist;
+	private Long magicResist;
 	/**
 	 * 攻击力
 	 */
-	private Long equipAttackDamage;
+	private Long attackDamage;
 	/**
 	 * 法功
 	 */
-	private Long equipAttackSpell;
+	private Long attackSpell;
 
 }

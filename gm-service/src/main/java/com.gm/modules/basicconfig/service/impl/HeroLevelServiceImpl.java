@@ -35,4 +35,9 @@ public class HeroLevelServiceImpl extends ServiceImpl<HeroLevelDao, HeroLevelEnt
         return heroLevelDao.getHeroLevels();
     }
 
+    @Override
+    public HeroLevelRsp getHeroLevelByLvCode(Map<String, Object> map) {
+        return heroLevelDao.getHeroLevelByLvCode(map);
+    }
+
 }

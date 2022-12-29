@@ -159,14 +159,14 @@ public class CombatStatsUtilsService {
             }
 
             // 将全部已穿戴装备属性累加
-            health = health + (userEquipment.getEquipHealth() != null ? userEquipment.getEquipHealth() : 0);//装备初始生命值
-            mana = mana + (userEquipment.getEquipMana() != null ? userEquipment.getEquipMana() : 0);//装备初始法力值
-            healthRegen = healthRegen + (userEquipment.getEquipHealthRegen() != null ? userEquipment.getEquipHealthRegen() : 0);//装备初始生命值恢复
-            manaRegen = manaRegen + (userEquipment.getEquipManaRegen() != null ? userEquipment.getEquipManaRegen() : 0);//装备初始法力值恢复
-            armor = armor + (userEquipment.getEquipArmor() != null ? userEquipment.getEquipArmor() : 0);//装备初始护甲
-            magicResist = magicResist + (userEquipment.getEquipMagicResist() != null ? userEquipment.getEquipMagicResist() : 0);//装备初始魔抗
-            attackDamage = attackDamage + (userEquipment.getEquipAttackDamage() != null ? userEquipment.getEquipAttackDamage() : 0);//装备初始攻击力
-            attackSpell = attackSpell + (userEquipment.getEquipAttackSpell() != null ? userEquipment.getEquipAttackSpell() : 0);//装备初始法功
+            health = health + (userEquipment.getHealth() != null ? userEquipment.getHealth() : 0);//装备初始生命值
+            mana = mana + (userEquipment.getMana() != null ? userEquipment.getMana() : 0);//装备初始法力值
+            healthRegen = healthRegen + (userEquipment.getHealthRegen() != null ? userEquipment.getHealthRegen() : 0);//装备初始生命值恢复
+            manaRegen = manaRegen + (userEquipment.getManaRegen() != null ? userEquipment.getManaRegen() : 0);//装备初始法力值恢复
+            armor = armor + (userEquipment.getArmor() != null ? userEquipment.getArmor() : 0);//装备初始护甲
+            magicResist = magicResist + (userEquipment.getMagicResist() != null ? userEquipment.getMagicResist() : 0);//装备初始魔抗
+            attackDamage = attackDamage + (userEquipment.getAttackDamage() != null ? userEquipment.getAttackDamage() : 0);//装备初始攻击力
+            attackSpell = attackSpell + (userEquipment.getAttackSpell() != null ? userEquipment.getAttackSpell() : 0);//装备初始法功
         }
 
         // 将统计的已穿戴装备属性存入到战斗属性表

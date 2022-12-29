@@ -326,6 +326,7 @@ public class ApiIncreaseCombatPowerController {
     @Login
     @PostMapping("upgradeStar")
     @ApiOperation("英雄升星")
+    @Transactional(rollbackFor = Exception.class)
     public R upgradeStar(@LoginUser UserEntity user, @RequestBody UserHeroInfoReq req) {
         // 表单校验
         ValidatorUtils.validateEntity(req);
@@ -342,7 +343,7 @@ public class ApiIncreaseCombatPowerController {
         heroFragMap.put("userId", user.getUserId());
         heroFragMap.put("status", Constant.enable);
         heroFragMap.put("heroId", userHero.getHeroId());
-        List<UserHeroFragInfoRsp> heroFragList = userHeroFragService.getUserAllHeroFrag(heroFragMap);
+        UserHeroFragInfoRsp heroFragCount = userHeroFragService.getUserAllHeroFragCount(heroFragMap);
         // 获取当前星级+1
         int starCode = userHero.getStarCode();
         if (starCode < Constant.StarLv.Lv5.getValue()) {
@@ -382,7 +383,7 @@ public class ApiIncreaseCombatPowerController {
         // 初始化升星后英雄战力
         long upPower = 0;
         // 先校验玩家背包英雄碎片是否足够本次升星操作
-        if (heroFragList.get(0).getHeroFragNum() >= nextStarFragNum) {
+        if (heroFragCount.getHeroFragNum() >= nextStarFragNum) {
             try {
                 // 获取英雄初始属性
                 HeroInfoEntity heroInfo = heroInfoService.getById(userHero.getHeroId());
@@ -404,7 +405,7 @@ public class ApiIncreaseCombatPowerController {
                 changePower = upPower - nowPower;
 
                 // 获取英雄碎片的SCALE的平均值
-                Double scale = heroFragList.get(0).getScale();
+                Double scale = heroFragCount.getScale();
                 // 消耗英雄碎片
                 heroFragMap.put("heroFragNum", nextStarFragNum);
                 userHeroFragService.depleteHeroFrag(heroFragMap);

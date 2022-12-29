@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
+import com.gm.modules.user.rsp.UserHeroInfoDetailRsp;
 import com.gm.modules.user.rsp.UserHeroInfoNotAllRsp;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
 
@@ -44,11 +45,20 @@ public interface UserHeroService extends IService<UserHeroEntity> {
     UserHeroEntity getUserHeroById(Map<String, Object> map);
 
     /**
-     * 获取玩家英雄指定的英雄
+     * 获取玩家英雄指定的英雄信息
+     *
      * @param map
      * @return
      */
     UserHeroInfoRsp getUserHeroByIdRsp(Map<String, Object> map);
+
+    /**
+     * 获取玩家英雄指定的英雄详细信息
+     *
+     * @param map
+     * @return
+     */
+    UserHeroInfoDetailRsp getUserHeroByIdDetailRsp(Map<String, Object> map);
 
     /**
      * 我的英雄列表，分页

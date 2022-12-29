@@ -620,22 +620,22 @@ public class DrawGiftService {
 
             // 随机装备属性
             Double rap = Arith.randomWithinRangeHundred(eqAttMax, eqAttMin);
-            long health = (long) (equipmentInfos.get(equipmentIndex).getEquipHealth() * rap);// 初始生命值
-            long mana = (long) (equipmentInfos.get(equipmentIndex).getEquipMana() * rap);// 初始法力值
-            double healthRegen = (equipmentInfos.get(equipmentIndex).getEquipHealthRegen() * rap);// 初始生命值恢复
-            double manaRegen = (equipmentInfos.get(equipmentIndex).getEquipManaRegen() * rap);// 初始法力值恢复
-            long armor = (long) (equipmentInfos.get(equipmentIndex).getEquipArmor() * rap);// 初始护甲
-            long magicResist = (long) (equipmentInfos.get(equipmentIndex).getEquipMagicResist() * rap);// 初始魔抗
-            long attackDamage = (long) (equipmentInfos.get(equipmentIndex).getEquipAttackDamage() * rap);// 初始攻击力
-            long attackSpell = (long) (equipmentInfos.get(equipmentIndex).getEquipAttackSpell() * rap);// 初始法攻
-            userEquipment.setEquipHealth(health);
-            userEquipment.setEquipMana(mana);
-            userEquipment.setEquipHealthRegen(healthRegen);
-            userEquipment.setEquipManaRegen(manaRegen);
-            userEquipment.setEquipArmor(armor);
-            userEquipment.setEquipMagicResist(magicResist);
-            userEquipment.setEquipAttackDamage(attackDamage);
-            userEquipment.setEquipAttackSpell(attackSpell);
+            long health = (long) (equipmentInfos.get(equipmentIndex).getHealth() * rap);// 初始生命值
+            long mana = (long) (equipmentInfos.get(equipmentIndex).getMana() * rap);// 初始法力值
+            double healthRegen = (equipmentInfos.get(equipmentIndex).getHealthRegen() * rap);// 初始生命值恢复
+            double manaRegen = (equipmentInfos.get(equipmentIndex).getManaRegen() * rap);// 初始法力值恢复
+            long armor = (long) (equipmentInfos.get(equipmentIndex).getArmor() * rap);// 初始护甲
+            long magicResist = (long) (equipmentInfos.get(equipmentIndex).getMagicResist() * rap);// 初始魔抗
+            long attackDamage = (long) (equipmentInfos.get(equipmentIndex).getAttackDamage() * rap);// 初始攻击力
+            long attackSpell = (long) (equipmentInfos.get(equipmentIndex).getAttackSpell() * rap);// 初始法攻
+            userEquipment.setHealth(health);
+            userEquipment.setMana(mana);
+            userEquipment.setHealthRegen(healthRegen);
+            userEquipment.setManaRegen(manaRegen);
+            userEquipment.setArmor(armor);
+            userEquipment.setMagicResist(magicResist);
+            userEquipment.setAttackDamage(attackDamage);
+            userEquipment.setAttackSpell(attackSpell);
             // 更新装备战力
             double equipPower = (health * 0.1) + (mana * 0.1) + attackDamage + attackSpell + ((armor + magicResist) * 4.5) + healthRegen * 0.1 + manaRegen * 0.3;
             userEquipment.setEquipPower((long) equipPower);

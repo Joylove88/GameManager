@@ -46,44 +46,34 @@ public class UserEquipInfoRsp {
 	/**
 	 * 生命值
 	 */
-	private Long equipHealth;
+	private Long health;
 	/**
 	 * 法力值
 	 */
-	private Long equipMana;
+	private Long mana;
 	/**
 	 * 生命值恢复
 	 */
-	private Long equipHealthRegen;
+	private Long healthRegen;
 	/**
 	 * 法力值恢复
 	 */
-	private Long equipManaRegen;
+	private Long manaRegen;
 	/**
 	 * 护甲
 	 */
-	private Long equipArmor;
+	private Long armor;
 	/**
 	 * 魔抗
 	 */
-	private Long equipMagicResist;
+	private Long magicResist;
 	/**
 	 * 攻击力
 	 */
-	private Long equipAttackDamage;
+	private Long attackDamage;
 	/**
 	 * 法功
 	 */
-	private Long equipAttackSpell;
-
-	/**
-	 * 0:装备, 1:装备卷轴\碎片
-	 */
-	private Long equipType;
-
-	/**
-	 * 装备卷轴\碎片数量 默认1
-	 */
-	private Long equipFragNum;
+	private Long attackSpell;
 
 }

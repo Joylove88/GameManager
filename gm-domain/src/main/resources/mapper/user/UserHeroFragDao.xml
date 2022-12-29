@@ -44,7 +44,6 @@
     <select id="getUserAllHeroFrag" resultType="com.gm.modules.user.rsp.UserHeroFragInfoRsp">
         SELECT
             COUNT(*) AS HERO_FRAG_NUM,
-            AVG(A.SCALE) SCALE,
             A.NFT_ID,
             B.HERO_INFO_ID,
             B.HERO_FRAG_ICON_URL,
@@ -72,7 +71,8 @@
     <!--获取升星时玩家英雄的碎片数量-->
     <select id="getUserAllHeroFragCount" resultType="com.gm.modules.user.rsp.UserHeroFragInfoRsp">
         SELECT
-            COUNT(*) AS HERO_FRAG_NUM
+            COUNT(*) AS HERO_FRAG_NUM,
+            AVG(A.SCALE) SCALE
         FROM
             GM_USER_HERO_FRAG A
                 LEFT JOIN

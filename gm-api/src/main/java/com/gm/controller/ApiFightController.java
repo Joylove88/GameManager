@@ -39,6 +39,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -81,6 +82,7 @@ public class ApiFightController {
     @Login
     @PostMapping("attck")
     @ApiOperation("开始战斗")
+    @Transactional(rollbackFor = Exception.class)
     public R attck(@LoginUser UserEntity user, @RequestBody FightInfoReq req) throws Exception {
 
         LOGGER.info("战斗准备阶段：队伍上下阵操作");
@@ -98,6 +100,7 @@ public class ApiFightController {
     @Login
     @PostMapping("claim")
     @ApiOperation("点击战斗结果领取奖励")
+    @Transactional(rollbackFor = Exception.class)
     public R claim(@LoginUser UserEntity user, @RequestBody FightInfoReq req) throws Exception {
         FightClaimRsp fightClaimRsp = fightCoreService.claim(user, req.getCombatId());
         return R.ok().put("claims", fightClaimRsp);
@@ -321,6 +324,7 @@ public class ApiFightController {
     @Login
     @PostMapping("heroesChangeTeam")
     @ApiOperation("英雄上阵下阵操作")
+    @Transactional(rollbackFor = Exception.class)
     public R heroesChangeTeam(@LoginUser UserEntity user, @RequestBody FightInfoReq req) throws Exception {
         setTeamHero(user, req);
         return R.ok();
@@ -394,7 +398,7 @@ public class ApiFightController {
                 // 校验玩家英雄合法性
                 boolean bl = userHeros.stream().anyMatch(a -> a.getUserHeroId().equals(userHeroId));
                 if (!bl) {
-                    throw new RRException("您不是此英雄的归属者!英雄编码：" + userHeroId);
+                    throw new RRException("This hero does not belong to you! Hero ID:" + userHeroId);
                 }
                 set.add(userHeroId);
                 list.add(userHeroId);
@@ -403,7 +407,7 @@ public class ApiFightController {
         }
         // 开始校验
         if (set.size() != list.size()) {
-            throw new RRException("英雄重复上阵!");
+            throw new RRException("Heroes play repeatedly!");
         }
         return userHeros;
     }
@@ -467,7 +471,7 @@ public class ApiFightController {
         params.put("userId", user.getUserId());
         List<TeamInfoRsp> teamInfos = teamConfigService.getTeamInfoList(params);
         if (teamInfos.size() == 0) {
-            throw new RRException("英雄上下阵时获取队伍信息失败!");
+            throw new RRException("Failed to get team information when heroes go to battle!");
         }
         // 校验英雄是否已在其他队伍上阵
         theHeroIsExistedOtherTeam(teamInfos, heroIdMap, req.getTeamId());

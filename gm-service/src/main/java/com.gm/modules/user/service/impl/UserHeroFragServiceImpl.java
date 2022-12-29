@@ -48,6 +48,11 @@ public class UserHeroFragServiceImpl extends ServiceImpl<UserHeroFragDao, UserHe
     }
 
     @Override
+    public UserHeroFragInfoRsp getUserAllHeroFragCount(Map<String, Object> map) {
+        return userHeroFragDao.getUserAllHeroFragCount(map);
+    }
+
+    @Override
     public void depleteHeroFrag(Map<String, Object> map) {
         Date now = new Date();
         map.put("updateTime", now.getTime());

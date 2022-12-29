@@ -65,35 +65,35 @@ public class EquipmentInfoEntity implements Serializable {
 	/**
 	 * 初始生命值
 	 */
-	private Long equipHealth;
+	private Long health;
 	/**
 	 * 初始法力值
 	 */
-	private Long equipMana;
+	private Long mana;
 	/**
 	 * 初始生命值恢复
 	 */
-	private Double equipHealthRegen;
+	private Double healthRegen;
 	/**
 	 * 初始法力值恢复
 	 */
-	private Double equipManaRegen;
+	private Double manaRegen;
 	/**
 	 * 初始护甲
 	 */
-	private Long equipArmor;
+	private Long armor;
 	/**
 	 * 初始魔抗
 	 */
-	private Long equipMagicResist;
+	private Long magicResist;
 	/**
 	 * 初始攻击力
 	 */
-	private Long equipAttackDamage;
+	private Long attackDamage;
 	/**
 	 * 法功
 	 */
-	private Long equipAttackSpell;
+	private Long attackSpell;
 	/**
 	 * 创建人
 	 */
