@@ -16,9 +16,13 @@ import java.math.BigDecimal;
  * @author Mark sunlightcs@gmail.com
  */
 public class Constant {
-    /** 超级管理员ID */
+    /**
+     * 超级管理员ID
+     */
     public static final int SUPER_ADMIN = 1;
-    /** 数据权限过滤 */
+    /**
+     * 数据权限过滤
+     */
     public static final String SQL_FILTER = "sql_filter";
     //前端类型
     public static final String USER_AGENT = "User-Agent";
@@ -36,31 +40,31 @@ public class Constant {
     public static final String EVENT_NAME = "Transfer(address,address,uint256)";
 
     /**
-     *  0long
+     * 0long
      */
     public static final Long ZERO = 0L;
     /**
-     *  0int
+     * 0int
      */
     public static final int ZERO_I = 0;
     /**
-     *  0d
+     * 0d
      */
     public static final Double ZERO_D = 0d;
     /**
-     *  0字符串
+     * 0字符串
      */
     public static final String ZERO_ = "0";
     /**
-     *  1字符串
+     * 1字符串
      */
     public static final String ONE_ = "1";
     /**
-     *  玩家默认最大体力值
+     * 玩家默认最大体力值
      */
     public static final Long FTG = 60L;
     /**
-     *  英雄属性稀释
+     * 英雄属性稀释
      */
     public static final Double HERO_ATTRIBUTE_RATE = 0.1;
 //    /**
@@ -128,23 +132,23 @@ public class Constant {
      */
     public static final String ORDER = "order";
     /**
-     *  升序
+     * 升序
      */
     public static final String ASC = "asc";
     /**
-     *  启用状态
+     * 启用状态
      */
     public static final String enable = "1";
     /**
-     *  禁用or待处理状态
+     * 禁用or待处理状态
      */
     public static final String disabled = "0";
     /**
-     *  失败状态
+     * 失败状态
      */
     public static final String failed = "2";
     /**
-     *  已使用状态
+     * 已使用状态
      */
     public static final String used = "2";
 
@@ -573,6 +577,28 @@ public class Constant {
         private String value;
 
         FromType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 英雄职业
+     */
+    public enum HeroRole {
+        Warrior("Warrior"),
+        Mage("Mage"),
+        Assassin("Assassin"),
+        Archer("Archer"),
+        Tank("Tank"),
+        Support("Support");
+
+        private String value;
+
+        HeroRole(String value) {
             this.value = value;
         }
 

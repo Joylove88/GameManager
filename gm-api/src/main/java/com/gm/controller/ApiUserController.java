@@ -290,6 +290,30 @@ public class ApiUserController {
         if (rsp == null) {
             throw new RRException("Failed to get player hero information!");
         }
+        // 设置英雄职业
+        String[] heroRole = rsp.getHeroRole().split(",");
+        for(String role : heroRole){
+            switch (role){
+                case "00" :
+                    rsp.getRoles().add(Constant.HeroRole.Warrior.getValue());
+                    break;
+                case "01" :
+                    rsp.getRoles().add(Constant.HeroRole.Mage.getValue());
+                    break;
+                case "02" :
+                    rsp.getRoles().add(Constant.HeroRole.Assassin.getValue());
+                    break;
+                case "03" :
+                    rsp.getRoles().add(Constant.HeroRole.Tank.getValue());
+                    break;
+                case "04" :
+                    rsp.getRoles().add(Constant.HeroRole.Support.getValue());
+                    break;
+                case "05" :
+                    rsp.getRoles().add(Constant.HeroRole.Archer.getValue());
+                    break;
+            }
+        }
         // 获取英雄下一个等级信息
         Map<String, Object> heroLvMap = new HashMap<>();
         int heroLv = rsp.getLevelCode() < 50 ? rsp.getLevelCode() + Constant.Quantity.Q1.getValue() : rsp.getLevelCode();

@@ -158,6 +158,7 @@
         SELECT
         A.*,
         B.HERO_NAME,
+        B.HERO_TYPE AS HERO_ROLE,
         B.HERO_IMG_URL,
         B.HERO_ICON_URL,
         B.HERO_KEEL_URL,

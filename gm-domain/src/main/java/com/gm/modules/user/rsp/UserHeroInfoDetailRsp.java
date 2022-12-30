@@ -28,6 +28,10 @@ public class UserHeroInfoDetailRsp {
      */
     private String heroName;
     /**
+     * 英雄职业
+     */
+    private String heroRole;
+    /**
      * 英雄战力
      */
     private Long heroPower;
@@ -103,6 +107,10 @@ public class UserHeroInfoDetailRsp {
      * 英雄技能
      */
     private HeroSkillRsp heroSkillRsp = null;
+    /**
+     * 英雄角色
+     */
+    private List<String> roles = new ArrayList<>();
 
 
 }

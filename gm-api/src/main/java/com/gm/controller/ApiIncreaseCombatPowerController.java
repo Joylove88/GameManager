@@ -138,7 +138,6 @@ public class ApiIncreaseCombatPowerController {
         setUserEquip.setUserId(user.getUserId());
         setUserEquip.setUpdateTime(now);
         setUserEquip.setUpdateTimeTs(now.getTime());
-        userEquipmentService.updateById(setUserEquip);
         boolean update = userEquipmentService.update(setUserEquip, new UpdateWrapper<UserEquipmentEntity>()
                 .eq("STATUS", Constant.enable)
                 .eq("USER_EQUIPMENT_ID", req.getUserEquipmentId())
