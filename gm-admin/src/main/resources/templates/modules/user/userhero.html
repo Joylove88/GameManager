@@ -87,16 +87,16 @@
 
 
 
-    <!--使用经验药水-->
+    <!--使用经验道具-->
     <div id="useExD" style="display: none;">
         <div style="padding: 10px 10px 10px 10px;">
             <form class="form-horizontal" style="width: 100%">
                 <div class="form-group">
-                    <div class="col-sm-2 control-label">经验药水类型</div>
+                    <div class="col-sm-2 control-label">经验道具类型</div>
                     <div class="col-sm-10">
                         <div class="radio radio-info radio-inline" v-for="userEx in userExList">
-                            <input type="radio" :id="userEx.exPotionRarecode" :value="userEx.exPotionRarecode" name="status" v-model="userExInfo.exPotionRarecode">
-                            <label :for="userEx.exPotionRarecode"> {{userEx.exPotionName}} -已拥有: {{userEx.userExNum}}</label>
+                            <input type="radio" :id="userEx.rarecode" :value="userEx.rarecode" name="status" v-model="userExInfo.rarecode">
+                            <label :for="userEx.rarecode"> {{userEx.expName}} -已拥有: {{userEx.userExNum}}</label>
                         </div>
                     </div>
                 </div>

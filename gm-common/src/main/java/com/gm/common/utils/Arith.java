@@ -57,14 +57,22 @@ public class Arith {
     /**
      * 获取范围内随机数 十分位
      */
-    public static Double randomWithinRangeTen(Double max, Double min){
+    public static Double randomWithinRangeTen(Double min, Double max){
         int pow = (int) Math.pow(10, 1); // 用于提取指定小数位
         return Math.floor((Math.random() * (max - min) + min) * pow) / pow;
     }
     /**
      * 获取范围内随机数 百分位
      */
-    public static Double randomWithinRangeHundred(Double max, Double min){
+    public static Double randomWithinRangeHundred(Double min, Double max){
+        int pow = (int) Math.pow(100, 1); // 用于提取指定小数位
+        Double n = Math.floor((Math.random() * (max - min) + min) * pow) / pow;
+        return n;
+    }
+    /**
+     * 获取范围内随机数 百分位(大于1返回1)
+     */
+    public static Double randomWithinRangeHundredEquip(Double min, Double max){
         int pow = (int) Math.pow(100, 1); // 用于提取指定小数位
         Double n = Math.floor((Math.random() * (max - min) + min) * pow) / pow;
         n = n > 1 ? 1 : n;
@@ -82,14 +90,15 @@ public class Arith {
     public static void main(String[] args) {
         int i = 0;
         int n = 0;
-        while (i<300){
-            double num = randomWithinRangeHundred(0.65,1.01);
+        while (i<100){
+            double num = randomWithinRangeHundred(50.0, 101.8);
             System.out.println(num);
-            if(num == 1.0){
+            if(num >= 100){
                 n++;
             }
             i++;
         }
+        System.out.println(Math.round(90 * 0.03 * 1));
         System.out.println(n);
     }
 }

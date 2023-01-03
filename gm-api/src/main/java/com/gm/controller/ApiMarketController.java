@@ -36,7 +36,7 @@ public class ApiMarketController {
     @Autowired
     private UserEquipmentFragService userEquipmentFragService;// 用户装备碎片
     @Autowired
-    private UserExperiencePotionService userExperiencePotionService;// 用户药水
+    private UserExperienceService userExperienceService;// 用户经验道具
     @Autowired
     private GmMarketOnlineService gmMarketOnlineService;
 
@@ -73,11 +73,11 @@ public class ApiMarketController {
 //                List<UserEquipmentFragEntity> userEquipmentFragEntityList = userEquipmentFragService.queryUserEquipmentFrag(user);
 //                return R.ok().put("data", userEquipmentFragEntityList);
             case "4":
-                //5.获取我的药水
-                PageUtils page5 = userExperiencePotionService.queryUserExperiencePotion(user.getUserId(), params);
+                //5.获取我的经验道具
+                PageUtils page5 = userExperienceService.queryUserExperience(user.getUserId(), params);
                 return R.ok().put("page", page5);
-//                List<UserExperiencePotionEntity> userExperiencePotionEntityList = userExperiencePotionService.queryUserExperiencePotion(user);
-//                return R.ok().put("data", userExperiencePotionEntityList);
+//                List<UserExperienceEntity> userExperienceEntityList = userExperienceService.queryUserExperience(user);
+//                return R.ok().put("data", userExperienceEntityList);
         }
         return R.ok();
     }
@@ -98,7 +98,7 @@ public class ApiMarketController {
     public R putOnMarket(@LoginUser UserEntity user, @RequestBody PutOnMarketReq putOnMarketReq) {
         // 1. 查询该物品
         // 2.上架，插入市场一条数据
-        switch (putOnMarketReq.getItemsType()) {//物品类型（0：英雄，1：英雄碎片，2：装备，3：装备卷轴，4：药水）
+        switch (putOnMarketReq.getItemsType()) {//物品类型（0：英雄，1：英雄碎片，2：装备，3：装备卷轴，4：经验道具）
             case "0":
                 Map<String, Object> userHeroMap = new HashMap<>();
                 userHeroMap.put("status", Constant.enable);
@@ -136,9 +136,9 @@ public class ApiMarketController {
                 gmMarketOnlineService.putOnMarket(user, putOnMarketReq);
                 break;
             case "4":
-                UserExperiencePotionEntity userExperiencePotion = userExperiencePotionService.getUserExperiencePotionById(user.getUserId(), putOnMarketReq.getItemsId());
-                if (userExperiencePotion == null) {
-                    throw new RRException("user experience potion not exit");
+                UserExperienceEntity userExperience = userExperienceService.getUserExperienceById(user.getUserId(), putOnMarketReq.getItemsId());
+                if (userExperience == null) {
+                    throw new RRException("user experience not exit");
                 }
                 // 上架
                 gmMarketOnlineService.putOnMarket(user, putOnMarketReq);
@@ -166,9 +166,9 @@ public class ApiMarketController {
         //4.获取我的在售装备卷轴
         List<UserEquipmentFragEntity> equipmentFragList = gmMarketOnlineService.queryUserOnMarketEquipmentFrag(user.getUserId());
         map.put("equipmentFragList", equipmentFragList);
-        //5.获取我的在售药水
-        List<UserExperiencePotionEntity> experiencePotionList = gmMarketOnlineService.queryUserOnMarketExperiencePotion(user.getUserId());
-        map.put("experiencePotionList", experiencePotionList);
+        //5.获取我的在售经验道具
+        List<UserExperienceEntity> experienceList = gmMarketOnlineService.queryUserOnMarketExperience(user.getUserId());
+        map.put("experienceList", experienceList);
         return R.ok().put("data", map);
     }
 
@@ -197,8 +197,8 @@ public class ApiMarketController {
                 PageUtils page4 = gmMarketOnlineService.queryUserEquipmentFrag(params);
                 return R.ok().put("page", page4);
             case "4":
-                //5.获取市场药水
-                PageUtils page5 = gmMarketOnlineService.queryUserExperiencePotion(params);
+                //5.获取市场经验道具
+                PageUtils page5 = gmMarketOnlineService.queryUserExperience(params);
                 return R.ok().put("page", page5);
         }
         return R.ok();

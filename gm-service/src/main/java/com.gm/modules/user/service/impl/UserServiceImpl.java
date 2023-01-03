@@ -76,7 +76,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		userRegister.setCreateTimeTs(now.getTime());
 		userRegister.setUserName(user.getAddress());
 		userRegister.setAddress(user.getAddress());
-		userRegister.setUserLevelId(1L);
+		userRegister.setUserLevelId(1);
 		userRegister.setFtg(Constant.FTG);
 		userRegister.setScale(1D);
 		userRegister.setTotalPower(Constant.ZERO);

@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class GetItemsReq {
     /**
-     * 物品类型（0：英雄，1：英雄碎片，2：装备，3：装备卷轴，4：药水）
+     * 物品类型（0：英雄，1：英雄碎片，2：装备，3：装备卷轴，4：经验道具）
      */
 //    @NotBlank(message = "itemsType can not null")
     private String itemsType;
@@ -23,7 +23,7 @@ public class GetItemsReq {
      */
     private String equipRarecode;
     /**
-     * 药水稀有度(1:白色,2:绿色,3:蓝色,4:紫色)
+     * 经验道具稀有度(1:白色,2:绿色,3:蓝色,4:紫色)
      */
     private String exEquipRarecode;
 }

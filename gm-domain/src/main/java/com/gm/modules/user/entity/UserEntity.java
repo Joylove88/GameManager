@@ -61,7 +61,7 @@ public class UserEntity implements Serializable {
 	/**
 	 * 用户级别
 	 */
-	private Long userLevelId;
+	private Integer userLevelId;
 	/**
 	 * 累计获得的经验
 	 */

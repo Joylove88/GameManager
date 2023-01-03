@@ -42,6 +42,7 @@
         A.STAR_CODE,
         A.EXPERIENCE_OBTAIN,
         A.HERO_POWER,
+        A.GROWTH_RATE,
         B.HERO_NAME,
         B.HERO_IMG_URL,
         B.HERO_ICON_URL,
@@ -72,6 +73,7 @@
         A.USER_HERO_ID,
         A.EXPERIENCE_OBTAIN,
         A.HERO_POWER,
+        A.GROWTH_RATE,
         A.MINTER,
         B.HERO_NAME,
         B.HERO_IMG_URL,
@@ -183,11 +185,47 @@
         </where>
     </select>
 
+    <!--获取玩家英雄指定的英雄详细信息加英雄成长属性值-->
+    <select id="getUserHeroByIdDetailWithGrowRsp" resultType="com.gm.modules.user.rsp.UserHeroInfoDetailWithGrowRsp">
+        SELECT
+        A.*,
+        B.HERO_NAME,
+        B.HERO_DESCRIPTION,
+        B.SCALE AS SCALE_I,
+        B.GROW_HEALTH,
+        B.GROW_MANA,
+        B.GROW_HEALTH_REGEN,
+        B.GROW_MANA_REGEN,
+        B.GROW_ARMOR,
+        B.GROW_MAGIC_RESIST,
+        B.GROW_ATTACK_DAMAGE,
+        B.GROW_ATTACK_SPELL,
+        F.LEVEL_CODE
+        FROM
+        GM_USER_HERO A
+        LEFT JOIN
+        GM_HERO_INFO B ON B.HERO_ID = A.HERO_ID
+        LEFT JOIN
+        GM_HERO_LEVEL F ON A.HERO_LEVEL_ID = F.HERO_LEVE_ID
+        <where>
+            <if test="status != null and status != ''">
+                AND A.`STATUS` = #{status}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND A.USER_ID = #{userId}
+            </if>
+            <if test="userHeroId != null and userHeroId != ''">
+                AND A.USER_HERO_ID = #{userHeroId}
+            </if>
+        </where>
+    </select>
+
     <select id="marketPage" resultType="com.gm.modules.user.rsp.UserHeroInfoMarketRsp">
         SELECT
         A.USER_HERO_ID,
         A.EXPERIENCE_OBTAIN,
         A.HERO_POWER,
+        A.GROWTH_RATE,
         B.HERO_NAME,
         B.HERO_IMG_URL,
         B.HERO_ICON_URL,

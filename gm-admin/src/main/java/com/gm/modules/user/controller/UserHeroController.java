@@ -3,16 +3,17 @@ package com.gm.modules.user.controller;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
-import com.gm.modules.user.entity.UserExperiencePotionEntity;
+import com.gm.modules.user.entity.UserExperienceEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
 import com.gm.modules.user.rsp.UserExpInfoRsp;
-import com.gm.modules.user.service.UserExperiencePotionService;
+import com.gm.modules.user.service.UserExperienceService;
 import com.gm.modules.user.service.UserHeroService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public class UserHeroController {
     @Autowired
     private UserHeroService userHeroService;
     @Autowired
-    private UserExperiencePotionService userExService;
+    private UserExperienceService userExService;
 
     /**
      * 列表
@@ -90,21 +91,21 @@ public class UserHeroController {
     }
 
     /**
-     * 获取玩家拥有的经验药水
+     * 获取玩家拥有的经验道具
      */
     @RequestMapping("/getUserExs")
     @RequiresPermissions("user:userhero:list")
-    public R getUserExs(@RequestBody UserExperiencePotionEntity userExperiencePotionEntity){
-        List<UserExpInfoRsp> list = userExService.getUserEx(userExperiencePotionEntity);
+    public R getUserExs(@RequestBody UserExperienceEntity userExperienceEntity){
+        List<UserExpInfoRsp> list = userExService.getUserExp(new HashMap<>());
         return R.ok().put("list",list);
     }
     /**
-     * 对玩家英雄使用经验药水
+     * 对玩家英雄使用经验道具
      */
     @RequestMapping("/userHeroUseEx")
     @RequiresPermissions("user:userhero:list")
-    public R useEx(@RequestBody UserExperiencePotionEntity userExperiencePotionEntity){
-        userExService.userHeroUseEx(null, null);
+    public R useEx(@RequestBody UserExperienceEntity userExperienceEntity){
+        userExService.userHeroUseExp(null, null);
         return R.ok();
     }
 }

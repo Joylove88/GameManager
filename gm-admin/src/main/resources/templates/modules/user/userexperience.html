@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>玩家经验药水信息表</title>
+    <title>玩家经验道具信息</title>
 		<#include "/header.html">
 </head>
 <body>
@@ -9,10 +9,10 @@
     <div v-show="showList">
         <div class="grid-btn">
             <div class="form-group col-sm-2" style="padding-left: 0;">
-                <input type="text" class="form-control" v-model="q.userName" @keyup.enter="query" placeholder="会员名称">
+                <input type="text" class="form-control" v-model="q.userName" @keyup.enter="query" placeholder="玩家名称">
             </div>
             <div class="form-group col-sm-2">
-                <input type="text" class="form-control" v-model="q.exPotionName" @keyup.enter="query" placeholder="经验药水名称">
+                <input type="text" class="form-control" v-model="q.expName" @keyup.enter="query" placeholder="经验道具名称">
             </div>
             <div class="form-group col-sm-1">
                 <select class="form-control" v-model="q.status">
@@ -23,7 +23,7 @@
                 </select>
             </div>
             <div class="form-group col-sm-1">
-                <select class="form-control" v-model="q.exPotionRarecode">
+                <select class="form-control" v-model="q.rareCode">
                     <option value="">全部</option>
                     <option value="4">紫色</option>
                     <option value="3">蓝色</option>
@@ -33,15 +33,15 @@
             </div>
 
             <a class="btn btn-default" @click="query">查询</a>
-			<#if shiro.hasPermission("user:userexperiencepotion:save")>
+			<#if shiro.hasPermission("user:userexperience:save")>
             <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
 			</#if>
-			<#if shiro.hasPermission("user:userexperiencepotion:update")>
+			<#if shiro.hasPermission("user:userexperience:update")>
             <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
 			</#if>
-			<#if shiro.hasPermission("user:userexperiencepotion:delete")>
-            <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
-			</#if>
+			<!--<#if shiro.hasPermission("user:userexperience:delete")>-->
+            <!--<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>-->
+			<!--</#if>-->
         </div>
         <table id="jqGrid"></table>
         <div id="jqGridPager"></div>
@@ -53,7 +53,7 @@
 											                    <div class="form-group">
                         <div class="col-sm-2 control-label">状态('0':禁用，'1':未使用，'2':已使用)</div>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" v-model="userExperiencePotion.status" placeholder="状态('0':禁用，'1':未使用，'2':已使用)"/>
+                            <input type="text" class="form-control" v-model="userExperience.status" placeholder="状态('0':禁用，'1':未使用，'2':已使用)"/>
                         </div>
                     </div>
 							            <div class="form-group">
@@ -65,6 +65,6 @@
     </div>
 </div>
 
-<script src="${request.contextPath}/statics/js/modules/user/userexperiencepotion.js?_${.now?long}"></script>
+<script src="${request.contextPath}/statics/js/modules/user/userexperience.js?_${.now?long}"></script>
 </body>
 </html>

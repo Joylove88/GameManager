@@ -84,7 +84,7 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
             fundsAccountingService.setCashPoolAdd(Constant.CashPool._TEAM.getValue(), teamFee);
         }
         order.setCurrencyType(form.getCurType());// 货币类型('0':金币，'1':加密货币)
-        order.setSummonType(form.getSummonType());// 召唤类型('1':英雄，'2':装备，'3':药水)
+        order.setSummonType(form.getSummonType());// 召唤类型('1':英雄，'2':装备，'3':经验道具)
         order.setSummonNum(form.getSummonNum());// 召唤次数
         order.setCreateTime(date);
         order.setCreateTimeTs(date.getTime());

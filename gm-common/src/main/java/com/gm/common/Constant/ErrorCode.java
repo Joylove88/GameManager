@@ -13,16 +13,19 @@ public enum ErrorCode {
 	SIGN_ADDRESS_EXCEPTION(104,"address exception!"),
 	SIGN_MSG_EXCEPTION(105,"msg exception!"),
 	SIGN_SIGNEDMSG_EXCEPTION(106,"signedmsg exception!"),
-	SIGN_HASH_EXCEPTION(107,"transaction hash exception!"),
-	EXP_NUM_NOT_NULL(108,"Please select the amount of experience potion!"),//请选择经验药水的数量
-	EXP_RARE_NOT_NULL(108,"Please select the type of experience potion!"),//请选择经验药水的种类
-	ADDRESS_HAS_EXIST(109,"address already exists!"),//地址已存在
-	INVITE_ADDRESS_NOT_EXIST(110,"invite address not exists!"),//上级地址不存在
-	WITHDRAW_OVER_TIMES(111,"24 hours only once!"),//24小时只能提现一次
-	WITHDRAW_OVER_MONEY(112,"withdraw over!"),//提现超额
-	WITHDRAW_UPDATE_ACCOUNT_FAIL(113,"withdraw update account fail!"),//提现更新账户失败
-	WITHDRAW_INSERT_FAIL(114,"withdraw insert fail!"),//提现插入失败
-	WITHDRAW_INSERT_BALANCE_DETAIL_FAIL(115,"withdraw insert balance detail fail!"),//提现插入账变明细失败
+	SIGN_HASH_EXCEPTION(107,"Transaction hash exception!"),
+	USER_HERO_GET_FAIL(54,"Failed to get player hero information!"),//获取玩家英雄信息失败
+	USER_HERO_ID_ERROR(55,"The player's hero ID is exception!"),//玩家英雄ID异常
+	EXP_NUM_NOT_NULL(108,"Please select the amount of experience!"),//请选择经验道具的数量
+	EXP_NUM_INSUFFICIENT(108,"Insufficient experience props!"),//经验道具不足
+	EXP_RARE_NOT_NULL(109,"Please select the type of experience!"),//请选择经验道具的种类
+	ADDRESS_HAS_EXIST(110,"address already exists!"),//地址已存在
+	INVITE_ADDRESS_NOT_EXIST(111,"invite address not exists!"),//上级地址不存在
+	WITHDRAW_OVER_TIMES(112,"24 hours only once!"),//24小时只能提现一次
+	WITHDRAW_OVER_MONEY(113,"withdraw over!"),//提现超额
+	WITHDRAW_UPDATE_ACCOUNT_FAIL(114,"withdraw update account fail!"),//提现更新账户失败
+	WITHDRAW_INSERT_FAIL(115,"withdraw insert fail!"),//提现插入失败
+	WITHDRAW_INSERT_BALANCE_DETAIL_FAIL(116,"withdraw insert balance detail fail!"),//提现插入账变明细失败
 	REQUEST_PARAMETER_DATA_EXCEPTION(999,"Request parameter data exception!"),//请求参数数据异常
 
 

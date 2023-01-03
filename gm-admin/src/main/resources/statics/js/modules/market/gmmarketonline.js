@@ -5,7 +5,7 @@ $(function () {
         colModel: [			
 			{ label: 'id', name: 'id', index: 'ID', width: 50, key: true },
 			{ label: '售卖者', name: 'userId', index: 'USER_ID', width: 80 }, 			
-			{ label: '物品类型（0：英雄，1：英雄碎片，2：装备，3：装备卷轴，4：药水）', name: 'goodsType', index: 'GOODS_TYPE', width: 80 }, 			
+			{ label: '物品类型（0：英雄，1：英雄碎片，2：装备，3：装备卷轴，4：经验道具）', name: 'goodsType', index: 'GOODS_TYPE', width: 80 },
 			{ label: '商品ID', name: 'goodsId', index: 'GOODS_ID', width: 80 }, 			
 			{ label: '状态(0：上架，1：已售，2：下架)', name: 'status', index: 'STATUS', width: 80 }, 			
 			{ label: '售卖价格', name: 'sellPrice', index: 'SELL_PRICE', width: 80 }, 			

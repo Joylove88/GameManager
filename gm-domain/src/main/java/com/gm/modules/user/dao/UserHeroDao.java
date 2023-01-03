@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.gm.modules.user.entity.UserHeroEntity;
-import com.gm.modules.user.rsp.UserHeroInfoDetailRsp;
-import com.gm.modules.user.rsp.UserHeroInfoMarketRsp;
-import com.gm.modules.user.rsp.UserHeroInfoNotAllRsp;
-import com.gm.modules.user.rsp.UserHeroInfoRsp;
+import com.gm.modules.user.rsp.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -63,6 +60,14 @@ public interface UserHeroDao extends BaseMapper<UserHeroEntity> {
      * @return
      */
     UserHeroInfoDetailRsp getUserHeroByIdDetailRsp(Map<String, Object> map);
+
+    /**
+     * 获取玩家英雄指定的英雄详细信息加英雄成长属性值
+     *
+     * @param map
+     * @return
+     */
+    UserHeroInfoDetailWithGrowRsp getUserHeroByIdDetailWithGrowRsp(Map<String, Object> map);
 
     /**
      * 市场：我的物品列表

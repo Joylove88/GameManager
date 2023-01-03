@@ -66,7 +66,7 @@ public class Constant {
     /**
      * 英雄属性稀释
      */
-    public static final Double HERO_ATTRIBUTE_RATE = 0.1;
+    public static final Double HERO_ATTRIBUTE_RATE = 1.0;
 //    /**
 //     * 所有权
 //     */
@@ -277,12 +277,12 @@ public class Constant {
     }
 
     /**
-     * 召唤类型('1':英雄，'2':装备，'3':药水)
+     * 召唤类型('1':英雄，'2':装备，'3':经验道具)
      */
     public enum SummonType {
         HERO("1"),//英雄
         EQUIPMENT("2"),//装备
-        EXPERIENCE("3");//药水
+        EXPERIENCE("3");//经验道具
         private String value;
 
         SummonType(String value) {
@@ -621,6 +621,24 @@ public class Constant {
         }
 
         public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 成长率增幅
+     */
+    public enum GRI {
+        L(0.9),// 低
+        H(1.8);// 高
+
+        private double value;
+
+        GRI(double value) {
+            this.value = value;
+        }
+
+        public double getValue() {
             return value;
         }
     }

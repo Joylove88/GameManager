@@ -32,7 +32,7 @@ $(function () {
             { label: '修改时间', name: 'updateTime', index: 'UPDATE_TIME', width: 80},
             {label: '操作', name: '', align: 'center', width: 60, formatter: function (value, options, row) {
                 var html = '';
-                    html += '<i class="fa fa-solid fa-flask" onclick="vm.useEx(\''+row.userId+'\',\''+row.userHeroId+'\');" style="color: #1e84c5;cursor: pointer;line-height: 18px;font-size:20px;"><span style="display:none">使用经验药水</span></i>';
+                    html += '<i class="fa fa-solid fa-flask" onclick="vm.useEx(\''+row.userId+'\',\''+row.userHeroId+'\');" style="color: #1e84c5;cursor: pointer;line-height: 18px;font-size:20px;"><span style="display:none">使用经验道具</span></i>';
                 return html;
             }}
         ],
@@ -172,12 +172,12 @@ var vm = new Vue({
             });
         },
         useEx: function (userId,userHeroId) {
-		    vm.userExInfo = {userExNum: 0,exPotionRarecode: 1};
+		    vm.userExInfo = {userExNum: 0,rareCode: 1};
 		    vm.getUserExs(userId);
             layer.open({
                 type: 1,
                 skin: 'layui-layer-lan',
-                title: "使用经验药水",
+                title: "使用经验道具",
                 area: ['700px', '250px'],
                 shadeClose: false,
                 content: jQuery("#useExD"),

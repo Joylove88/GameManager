@@ -1,16 +1,12 @@
 package com.gm.modules.user.rsp;
 
-import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 玩家英雄
  */
 @Data
-public class UserHeroInfoDetailRsp {
+public class UserHeroInfoDetailWithGrowRsp {
     /**
      * ID
      */
@@ -36,6 +32,14 @@ public class UserHeroInfoDetailRsp {
      */
     private Long heroPower;
     /**
+     * 玩家英雄的矿工兑换比例（增幅,削减）
+     */
+    private Double scale;
+    /**
+     * 基础英雄的矿工兑换比例（增幅,削减）
+     */
+    private Double scaleI;
+    /**
      * 英雄星级
      */
     private Integer starCode;
@@ -47,18 +51,6 @@ public class UserHeroInfoDetailRsp {
      * 成长率
      */
     private Double growthRate;
-    /**
-     * 英雄图片地址
-     */
-    private String heroImgUrl;
-    /**
-     * 英雄图标地址
-     */
-    private String heroIconUrl;
-    /**
-     * 英雄龙骨地址
-     */
-    private String heroKeelUrl;
     /**
      * 晋级到下一级所需经验值
      */
@@ -108,21 +100,37 @@ public class UserHeroInfoDetailRsp {
      */
     private Long attackSpell;
     /**
-     * 玩家背包中的英雄碎片数量
+     * 成长属性-生命值
      */
-    private Integer shardNum;
+    private Long growHealth;
     /**
-     * 升星所需碎片数量
+     * 成长属性-法力值
      */
-    private Integer upStarShardNum;
+    private Long growMana;
     /**
-     * 英雄技能
+     * 成长属性-生命值恢复
      */
-    private HeroSkillRsp heroSkillRsp = null;
+    private Double growHealthRegen;
     /**
-     * 英雄角色
+     * 成长属性-法力值恢复
      */
-    private List<String> roles = new ArrayList<>();
+    private Double growManaRegen;
+    /**
+     * 成长属性-护甲
+     */
+    private Long growArmor;
+    /**
+     * 成长属性-魔抗
+     */
+    private Long growMagicResist;
+    /**
+     * 成长属性-攻击力
+     */
+    private Long growAttackDamage;
+    /**
+     * 成长属性-法攻
+     */
+    private Long growAttackSpell;
 
 
 }

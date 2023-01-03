@@ -71,8 +71,8 @@ public class GmMarketOnlineServiceImpl extends ServiceImpl<GmMarketOnlineDao, Gm
     }
 
     @Override
-    public List<UserExperiencePotionEntity> queryUserOnMarketExperiencePotion(Long userId) {
-        return gmMarketOnlineDao.queryUserOnMarketExperiencePotion(userId);
+    public List<UserExperienceEntity> queryUserOnMarketExperience(Long userId) {
+        return gmMarketOnlineDao.queryUserOnMarketExperience(userId);
     }
 
     @Override
@@ -116,10 +116,10 @@ public class GmMarketOnlineServiceImpl extends ServiceImpl<GmMarketOnlineDao, Gm
     }
 
     @Override
-    public PageUtils queryUserExperiencePotion(Map<String, Object> params) {
-        IPage<UserExperiencePotionEntity> page = gmMarketOnlineDao.pageExperiencePotionMarket(
-                new Query<UserExperiencePotionEntity>().getPage(params),
-                new QueryWrapper<UserExperiencePotionEntity>()
+    public PageUtils queryUserExperience(Map<String, Object> params) {
+        IPage<UserExperienceEntity> page = gmMarketOnlineDao.pageExperienceMarket(
+                new Query<UserExperienceEntity>().getPage(params),
+                new QueryWrapper<UserExperienceEntity>()
                         .eq("a.GOODS_TYPE", 0)
         );
         return new PageUtils(page);

@@ -17,4 +17,8 @@ public class ExpUtils {
         System.out.println(exp);
         return exp;
     }
+
+    public static void main(String[] args) {
+        System.out.println(getCurrentExp(2340L, 270L, 2341L));
+    }
 }

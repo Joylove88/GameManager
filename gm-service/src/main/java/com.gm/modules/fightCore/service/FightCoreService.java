@@ -171,27 +171,27 @@ public class FightCoreService {
         List<AttributeEntity> attributes = new ArrayList<>();
         // 获取英雄1
         if(teamConfig.getUserHero1Id() != null && !teamConfig.getUserHero1Id().equals(0L)){
-            AttributeEntity att = getHeroStats(teamConfig.getUserHero1Id());
+            AttributeEntity att = combatStatsUtilsService.getHeroBasicStats(teamConfig.getUserHero1Id());
             attributes.add(att);
         }
         // 获取英雄2
         if(teamConfig.getUserHero2Id() != null && !teamConfig.getUserHero2Id().equals(0L)){
-            AttributeEntity att = getHeroStats(teamConfig.getUserHero2Id());
+            AttributeEntity att = combatStatsUtilsService.getHeroBasicStats(teamConfig.getUserHero2Id());
             attributes.add(att);
         }
         // 获取英雄3
         if(teamConfig.getUserHero3Id() != null && !teamConfig.getUserHero3Id().equals(0L)){
-            AttributeEntity att = getHeroStats(teamConfig.getUserHero3Id());
+            AttributeEntity att = combatStatsUtilsService.getHeroBasicStats(teamConfig.getUserHero3Id());
             attributes.add(att);
         }
         // 获取英雄4
         if(teamConfig.getUserHero4Id() != null && !teamConfig.getUserHero4Id().equals(0L)){
-            AttributeEntity att = getHeroStats(teamConfig.getUserHero4Id());
+            AttributeEntity att = combatStatsUtilsService.getHeroBasicStats(teamConfig.getUserHero4Id());
             attributes.add(att);
         }
         // 获取英雄5
         if(teamConfig.getUserHero5Id() != null && !teamConfig.getUserHero5Id().equals(0L)){
-            AttributeEntity att = getHeroStats(teamConfig.getUserHero5Id());
+            AttributeEntity att = combatStatsUtilsService.getHeroBasicStats(teamConfig.getUserHero5Id());
             attributes.add(att);
         }
         LOGGER.info("英雄加载完成");
@@ -879,36 +879,6 @@ public class FightCoreService {
      */
     private long addHP(long HP, long HpRegen){
         return HP + HpRegen;
-    }
-
-    /**
-     * 通过玩家英雄的等级、星级、装备获取该英雄的全部属性
-     * @param id
-     * @return
-     */
-    private AttributeEntity getHeroStats(long id){
-        AttributeEntity attribute = new AttributeEntity();
-
-        UserHeroEntity userHero = userHeroDao.selectOne(new QueryWrapper<UserHeroEntity>()
-                .eq("STATUS", Constant.enable)
-                .eq("USER_HERO_ID", id)// 玩家英雄ID
-        );
-        if(userHero == null){
-            throw new RRException("英雄已销毁或已售出");
-        }
-
-        Map<String,Object> map = new HashMap<>();
-        map.put("heroStarId",userHero.getHeroStarId());
-        map.put("heroLevelId",userHero.getHeroLevelId());
-        map.put("userHeroId",userHero.getUserHeroId());
-
-        // 通过玩家英雄的等级、星级、装备获取该英雄的全部属性
-        attribute = combatStatsUtilsService.getHeroBasicStats(map);
-        if(attribute == null){
-            throw new RRException("获取英雄属性失败" + userHero.getHeroId());
-        }
-
-        return attribute;
     }
 
     private UserHeroInfoRsp getUserHeroInfo(long id){

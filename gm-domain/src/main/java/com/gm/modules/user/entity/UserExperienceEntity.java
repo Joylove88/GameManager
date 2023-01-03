@@ -10,26 +10,26 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 玩家经验药水信息表
+ * 玩家经验道具信息表
  * 
  * @author Axiang
  * @email Axiang@gmail.com
  * @date 2022-02-20 19:47:36
  */
 @Data
-@TableName("GM_USER_EXPERIENCE_POTION")
-public class UserExperiencePotionEntity implements Serializable {
+@TableName("GM_USER_EXPERIENCE")
+public class UserExperienceEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 
 	 */
 	@TableId
-	private Long userExPotionId;
+	private Long id;
 	/**
-	 * 经验药水ID
+	 * 经验道具ID
 	 */
-	private Long exPotionId;
+	private Long expId;
 	/**
 	 * 用户ID
 	 */
@@ -39,9 +39,9 @@ public class UserExperiencePotionEntity implements Serializable {
 	 */
 	private Long nftId;
 	/**
-	 * 经验药水数量
+	 * 经验道具数量
 	 */
-	private Integer userExNum;
+	private Integer expNum;
 	/**
 	 * 铸造HASH
 	 */
@@ -74,11 +74,11 @@ public class UserExperiencePotionEntity implements Serializable {
 	@TableField(exist = false)
 	private String userName;
 	@TableField(exist = false)
-	private String exPotionName;
+	private String expName;
 	@TableField(exist = false)
-	private String exPotionRareCode;
+	private String rareCode;
 	@TableField(exist = false)
-	private Long exValue;
+	private Long exp;
 	@TableField(exist = false)
 	private String userHeroId;
 

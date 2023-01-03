@@ -37,6 +37,10 @@ public class UserHeroInfoRsp {
 	 */
 	private Integer levelCode;
 	/**
+	 * 成长率
+	 */
+	private Double growthRate;
+	/**
 	 * 英雄图片地址
 	 */
 	private String heroImgUrl;

@@ -35,7 +35,7 @@ public class SummonReq {
     @ApiModelProperty(value = "召唤次数")
     private Integer summonNum;
     /**
-     * 召唤类型('1':英雄，'2':装备，'3':药水)
+     * 召唤类型('1':英雄，'2':装备，'3':经验道具)
      */
     private String summonType;
     /**

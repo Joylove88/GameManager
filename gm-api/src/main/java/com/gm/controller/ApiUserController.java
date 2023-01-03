@@ -22,6 +22,7 @@ import com.gm.modules.basicconfig.entity.*;
 import com.gm.modules.basicconfig.rsp.HeroLevelRsp;
 import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
 import com.gm.modules.basicconfig.service.*;
+import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
 import com.gm.modules.order.service.TransactionOrderService;
 import com.gm.modules.user.entity.*;
 import com.gm.modules.user.req.UseWithdrawReq;
@@ -78,7 +79,7 @@ public class ApiUserController {
     @Autowired
     private UserEquipmentFragService userEquipmentFragService;
     @Autowired
-    private UserExperiencePotionService userExService;
+    private UserExperienceService userExpService;
     @Autowired
     private HeroEquipmentService heroEquipmentService;
     @Autowired
@@ -98,7 +99,9 @@ public class ApiUserController {
     @Autowired
     private GmUserVipLevelService gmUserVipLevelService;
     @Autowired
-    private UserExperiencePotionService userExperiencePotionService;
+    private UserExperienceService userExperienceService;
+    @Autowired
+    private CombatStatsUtilsService combatStatsUtilsService;
     @Autowired
     private TransactionOrderService transactionOrderService;
 
@@ -176,14 +179,15 @@ public class ApiUserController {
         map.put("equipFragList", equipmentFragEntities);
 
         // 获取玩家所有的消耗品
-        Map<String, Object> forUseMap = new HashMap<>();
-        // 获取玩家所有的经验道具
-        UserExperiencePotionEntity exp = new UserExperiencePotionEntity();
-        exp.setUserId(user.getUserId());
-        List<UserExpInfoRsp> expList = userExService.getUserEx(exp);
-        forUseMap.put("expList", expList);
+        Map<String, Object> propsMap = new HashMap<>();
 
-        map.put("consumables", forUseMap);
+        // 获取玩家所有的经验道具
+        Map<String, Object> expMap = new HashMap<>();
+        expMap.put("userId", user.getUserId());
+        List<UserExpInfoRsp> expList = userExpService.getUserExp(expMap);
+        propsMap.put("expList", expList);
+
+        map.put("consumables", propsMap);
         return R.ok(map);
     }
 
@@ -284,49 +288,10 @@ public class ApiUserController {
         // 表单校验
         ValidatorUtils.validateEntity(req);
         // 获取英雄详细信息
-        Map<String, Object> userHeroMap = new HashMap<>();
-        userHeroMap.put("userHeroId", req.getUserHeroId());
-        UserHeroInfoDetailRsp rsp = userHeroService.getUserHeroByIdDetailRsp(userHeroMap);
+        UserHeroInfoDetailRsp rsp = combatStatsUtilsService.getHeroInfoDetail(user, req.getUserHeroId());
         if (rsp == null) {
             throw new RRException("Failed to get player hero information!");
         }
-        // 设置英雄职业
-        String[] heroRole = rsp.getHeroRole().split(",");
-        for(String role : heroRole){
-            switch (role){
-                case "00" :
-                    rsp.getRoles().add(Constant.HeroRole.Warrior.getValue());
-                    break;
-                case "01" :
-                    rsp.getRoles().add(Constant.HeroRole.Mage.getValue());
-                    break;
-                case "02" :
-                    rsp.getRoles().add(Constant.HeroRole.Assassin.getValue());
-                    break;
-                case "03" :
-                    rsp.getRoles().add(Constant.HeroRole.Tank.getValue());
-                    break;
-                case "04" :
-                    rsp.getRoles().add(Constant.HeroRole.Support.getValue());
-                    break;
-                case "05" :
-                    rsp.getRoles().add(Constant.HeroRole.Archer.getValue());
-                    break;
-            }
-        }
-        // 获取英雄下一个等级信息
-        Map<String, Object> heroLvMap = new HashMap<>();
-        int heroLv = rsp.getLevelCode() < 50 ? rsp.getLevelCode() + Constant.Quantity.Q1.getValue() : rsp.getLevelCode();
-        heroLvMap.put("levelCode",  heroLv);
-        HeroLevelRsp heroLvRsp = heroLevelService.getHeroLevelByLvCode(heroLvMap);
-        if (heroLvRsp == null) {
-            throw new RRException(ErrorCode.EXP_GET_FAIL.getDesc());
-        }
-
-        // 晋级到下一级所需经验值
-        rsp.setPromotionExperience(heroLvRsp.getPromotionExperience());
-        // 当前等级获取的经验值
-        rsp.setCurrentExp(ExpUtils.getCurrentExp(heroLvRsp.getExperienceTotal(), heroLvRsp.getPromotionExperience(), rsp.getExperienceObtain()));
 
         // 获取系统全部装备
         Map<String, Object> equipMap = new HashMap<>();
@@ -356,37 +321,9 @@ public class ApiUserController {
             }
         }
 
-        // 获取英雄技能
-        Map<String, Object> skillMap = new HashMap<>();
-        skillMap.put("status", Constant.enable);
-        skillMap.put("heroId", rsp.getHeroId());
-        skillMap.put("skillStarCode", rsp.getStarCode());
-        HeroSkillRsp skillRsp = heroSkillService.getHeroSkillRsp(skillMap);
-        rsp.setHeroSkillRsp(skillRsp);
-
-        // 获取当前星级+1
-        int starCode = rsp.getStarCode();
-        if (starCode < Constant.StarLv.Lv5.getValue()) {
-            starCode += Constant.StarLv.Lv1.getValue();
-        }
-        // 获取当前阶段升星所需碎片
-        StarInfoEntity starInfo = starInfoService.getOne(new QueryWrapper<StarInfoEntity>()
-                .eq("STAR_CODE", starCode)
-
-        );
-
-        // 获取玩家背包中的英雄碎片
-        Map<String, Object> heroFragMap = new HashMap<>();
-        heroFragMap.put("userId", user.getUserId());
-        heroFragMap.put("status", Constant.enable);
-        heroFragMap.put("heroId", rsp.getHeroId());
-        UserHeroFragInfoRsp heroFragCount = userHeroFragService.getUserAllHeroFragCount(heroFragMap);
-        Integer fragNum = null != heroFragCount ? heroFragCount.getHeroFragNum() : Constant.ZERO_I;
         Map<String, Object> map = new HashMap<>();
         map.put("heroInfo", rsp);
         map.put("equipments", jsonArray);
-        map.put("upStarFragNum", starInfo.getUpStarFragNum());
-        map.put("heroFragNum", fragNum);
         return R.ok().put("data", map);
     }
 

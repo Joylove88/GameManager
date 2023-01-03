@@ -125,7 +125,7 @@ public class UserHeroFragController {
     }
 
     /**
-     * 经验药水模拟抽奖
+     * 经验道具模拟抽奖
      */
     @RequestMapping("/testEXDrawStart")
     public R testEXDrawStart(@RequestBody Integer summonNum) throws Exception {

@@ -56,11 +56,11 @@ public interface GmMarketOnlineService extends IService<GmMarketOnlineEntity> {
     List<UserEquipmentFragEntity> queryUserOnMarketEquipmentFrag(Long userId);
 
     /**
-     * 查询用户的在售药水
+     * 查询用户的在售经验道具
      * @param userId
      * @return
      */
-    List<UserExperiencePotionEntity> queryUserOnMarketExperiencePotion(Long userId);
+    List<UserExperienceEntity> queryUserOnMarketExperience(Long userId);
 
     PageUtils queryUserHero(Map<String, Object> params);
 
@@ -70,6 +70,6 @@ public interface GmMarketOnlineService extends IService<GmMarketOnlineEntity> {
 
     PageUtils queryUserEquipmentFrag(Map<String, Object> params);
 
-    PageUtils queryUserExperiencePotion(Map<String, Object> params);
+    PageUtils queryUserExperience(Map<String, Object> params);
 }
 

@@ -6,9 +6,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
-import com.gm.modules.basicconfig.dao.ExperiencePotionDao;
-import com.gm.modules.basicconfig.entity.ExperiencePotionEntity;
-import com.gm.modules.basicconfig.service.ExperiencePotionService;
+import com.gm.modules.basicconfig.dao.ExperienceDao;
+import com.gm.modules.basicconfig.entity.ExperienceEntity;
+import com.gm.modules.basicconfig.service.ExperienceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,25 +17,25 @@ import java.util.List;
 import java.util.Map;
 
 
-@Service("experiencePotionService")
-public class ExperiencePotionServiceImpl extends ServiceImpl<ExperiencePotionDao, ExperiencePotionEntity> implements ExperiencePotionService {
+@Service("experienceService")
+public class ExperienceServiceImpl extends ServiceImpl<ExperienceDao, ExperienceEntity> implements ExperienceService {
     @Autowired
-    private ExperiencePotionDao experiencePotionDao;
+    private ExperienceDao experienceDao;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
-        IPage<ExperiencePotionEntity> page = this.page(
-                new Query<ExperiencePotionEntity>().getPage(params),
-                new QueryWrapper<ExperiencePotionEntity>()
+        IPage<ExperienceEntity> page = this.page(
+                new Query<ExperienceEntity>().getPage(params),
+                new QueryWrapper<ExperienceEntity>()
         );
 
         return new PageUtils(page);
     }
 
     @Override
-    public List<ExperiencePotionEntity> getExpInfos() {
+    public List<ExperienceEntity> getExpInfos() {
         Map<String, Object> map = new HashMap<>();
         map.put("status", Constant.enable);
-        return experiencePotionDao.getExpInfos(map);
+        return experienceDao.getExpInfos(map);
     }
 
 }

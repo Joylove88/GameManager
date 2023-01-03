@@ -1,13 +1,11 @@
 $(function () {
     $("#jqGrid").jqGrid({
-        url: baseURL + 'user/userexperiencepotion/list',
+        url: baseURL + 'basicconfig/experience/list',
         datatype: "json",
         colModel: [			
-			{ label: 'gmUserExPotionId', name: 'gmUserExPotionId', index: 'GM_USER_EX_POTION_ID', width: 50, key: true },
-			{ label: '会员名称', name: 'userName', width: 80 },
-            { label: '经验药水名称', name: 'exPotionName', width: 80 },
-            { label: '经验值', name: 'exValue', width: 80 },
-            { label: '经验药水稀有度', name: 'exPotionRareCode', width: 80, formatter: function (value, options, row) {
+			{ label: 'id', name: 'id', index: 'ID', width: 50, key: true },
+			{ label: '经验道具名称', name: 'expName', index: 'EXP_NAME', width: 80 },
+			{ label: '经验道具稀有度', name: 'rareCode', index: 'RARE_CODE', width: 80, formatter: function (value, options, row) {
                 var erc = '';
                 if (value == '1') {
                     erc = '白色';
@@ -21,19 +19,20 @@ $(function () {
                 return erc;
             }
             },
-            { label: '经验药水数量', name: 'userExNum', width: 80 },
-            { label: '状态', name: 'status', index: 'STATUS', width: 80, formatter: function (value, options, row) {
+			{ label: '经验值', name: 'exp', index: 'EXP', width: 80 },
+			{ label: '经验道具描述', name: 'description', index: 'DESCRIPTION', width: 80 },
+			{ label: '状态', name: 'status', index: 'STATUS', width: 80, formatter: function (value, options, row) {
                 if (value == '0') {
                     return '<span class="label badge-danger" style="background-color: #ed5565;">禁用</span>';//禁用
                 } else if (value == '1') {
-                    return '<span class="label label-info">未使用</span>';//启用
-                } else if (value == '2')  {
-                    return '<span class="label label-info" style="background-color: #ddd;">已消耗</span>';//已消耗
+                    return '<span class="label label-info">正常</span>';//启用
                 }
             }
             },
+			{ label: '创建人', name: 'createUser', index: 'CREATE_USER', width: 80 }, 			
 			{ label: '创建时间', name: 'createTime', index: 'CREATE_TIME', width: 80 }, 			
-			{ label: '修改时间', name: 'updateTime', index: 'UPDATE_TIME', width: 80 },
+			{ label: '修改人', name: 'updateUser', index: 'UPDATE_USER', width: 80 },
+			{ label: '修改时间', name: 'updateTime', index: 'UPDATE_TIME', width: 80 }, 			
         ],
 		viewrecords: true,
         height: 385,
@@ -67,13 +66,7 @@ var vm = new Vue({
 	data:{
 		showList: true,
 		title: null,
-        q: {
-            exPotionName: '',
-            userName: '',
-            status: '',
-            exPotionRarecode: ''
-        },
-		userExperiencePotion: {}
+		experience: {}
 	},
 	methods: {
 		query: function () {
@@ -82,26 +75,26 @@ var vm = new Vue({
 		add: function(){
 			vm.showList = false;
 			vm.title = "新增";
-			vm.userExperiencePotion = {};
+			vm.experience = {status: '1'};
 		},
 		update: function (event) {
-			var gmUserExPotionId = getSelectedRow();
-			if(gmUserExPotionId == null){
+			var id = getSelectedRow();
+			if(id == null){
 				return ;
 			}
 			vm.showList = false;
             vm.title = "修改";
             
-            vm.getInfo(gmUserExPotionId)
+            vm.getInfo(id)
 		},
 		saveOrUpdate: function (event) {
 		    $('#btnSaveOrUpdate').button('loading').delay(1000).queue(function() {
-                var url = vm.userExperiencePotion.gmUserExPotionId == null ? "user/userexperiencepotion/save" : "user/userexperiencepotion/update";
+                var url = vm.experience.id == null ? "basicconfig/experience/save" : "basicconfig/experience/update";
                 $.ajax({
                     type: "POST",
                     url: baseURL + url,
                     contentType: "application/json",
-                    data: JSON.stringify(vm.userExperiencePotion),
+                    data: JSON.stringify(vm.experience),
                     success: function(r){
                         if(r.code === 0){
                              layer.msg("操作成功", {icon: 1});
@@ -118,8 +111,8 @@ var vm = new Vue({
 			});
 		},
 		del: function (event) {
-			var gmUserExPotionIds = getSelectedRows();
-			if(gmUserExPotionIds == null){
+			var ids = getSelectedRows();
+			if(ids == null){
 				return ;
 			}
 			var lock = false;
@@ -130,9 +123,9 @@ var vm = new Vue({
                     lock = true;
 		            $.ajax({
                         type: "POST",
-                        url: baseURL + "user/userexperiencepotion/delete",
+                        url: baseURL + "basicconfig/experience/delete",
                         contentType: "application/json",
-                        data: JSON.stringify(gmUserExPotionIds),
+                        data: JSON.stringify(ids),
                         success: function(r){
                             if(r.code == 0){
                                 layer.msg("操作成功", {icon: 1});
@@ -146,16 +139,15 @@ var vm = new Vue({
              }, function(){
              });
 		},
-		getInfo: function(gmUserExPotionId){
-			$.get(baseURL + "user/userexperiencepotion/info/"+gmUserExPotionId, function(r){
-                vm.userExperiencePotion = r.userExperiencePotion;
+		getInfo: function(id){
+			$.get(baseURL + "basicconfig/experience/info/"+id, function(r){
+                vm.experience = r.experience;
             });
 		},
 		reload: function (event) {
 			vm.showList = true;
 			var page = $("#jqGrid").jqGrid('getGridParam','page');
-			$("#jqGrid").jqGrid('setGridParam',{
-                postData: {'status' : vm.q.status, 'exPotionName' : vm.q.exPotionName, 'userName' : vm.q.userName, 'exPotionRarecode' : vm.q.exPotionRarecode},
+			$("#jqGrid").jqGrid('setGridParam',{ 
                 page:page
             }).trigger("reloadGrid");
 		}

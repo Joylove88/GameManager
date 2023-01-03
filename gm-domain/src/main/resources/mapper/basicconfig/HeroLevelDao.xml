@@ -6,7 +6,7 @@
     <!--通过玩家英雄经验值匹配英雄等级信息-->
     <select id="getHeroLevel" resultType="com.gm.modules.basicconfig.entity.HeroLevelEntity">
         SELECT * FROM GM_HERO_LEVEL
-        WHERE DELETED = '0' AND EXPERIENCE_TOTAL &lt;= #{experienceTotal}
+        WHERE DELETED = '0' AND EXPERIENCE_TOTAL &lt;= #{experienceTotal} AND LEVEL_CODE &gt;= #{heroLv}
         ORDER BY LEVEL_CODE DESC
     </select>
     <!--获取英雄等级表-->

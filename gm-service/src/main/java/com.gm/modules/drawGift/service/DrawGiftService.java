@@ -2,9 +2,8 @@ package com.gm.modules.drawGift.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.gm.common.exception.RRException;
 import com.gm.common.utils.*;
-import com.gm.modules.basicconfig.dao.ExperiencePotionDao;
+import com.gm.modules.basicconfig.dao.ExperienceDao;
 import com.gm.modules.basicconfig.dao.HeroFragDao;
 import com.gm.modules.basicconfig.dao.HeroInfoDao;
 import com.gm.modules.basicconfig.dao.ProbabilityDao;
@@ -67,13 +66,13 @@ public class DrawGiftService {
     @Autowired
     private EquipmentFragService equipmentFragService;
     @Autowired
-    private ExperiencePotionDao experiencePotionDao;
+    private ExperienceDao experienceDao;
     @Autowired
     private UserEquipmentService userEquipmentService;
     @Autowired
     private UserEquipmentFragService userEquipmentFragService;
     @Autowired
-    private UserExperiencePotionService userExperiencePotionService;
+    private UserExperienceService userExperienceService;
     @Autowired
     private CombatStatsUtilsService combatStatsUtilsService;
     @Autowired
@@ -308,34 +307,76 @@ public class DrawGiftService {
             int heroIndex = randomHeroIndex.nextInt(heroInfos.size());
             // 获取英雄初始属性
             attributeSimple = combatStatsUtilsService.getHeroAttribute(heroInfos.get(heroIndex), 1.0);
-            // 使用万能策略模式计算各星级属性
-            UniversalStrategyModeTool<Integer> ifFunction = new UniversalStrategyModeTool<>(new HashMap<>());
-            ifFunction
-                    .add(Constant.PrLv.PrLv2.getValue(), () ->
-                            // 1星英雄属性
-                            getStarWithAttribute(starInfos.get(0), Constant.SkinType.ORIGINAL.getValue(), attributeSimple)
-                    )
-                    .add(Constant.PrLv.PrLv3.getValue(), () ->
-                            // 2星英雄属性
-                            getStarWithAttribute(starInfos.get(1), Constant.SkinType.ORIGINAL.getValue(), attributeSimple)
-                    )
-                    .add(Constant.PrLv.PrLv4.getValue(), () ->
-                            // 3星英雄属性
-                            getStarWithAttribute(starInfos.get(2), Constant.SkinType.ORIGINAL.getValue(), attributeSimple)
-                    )
-                    .add(Constant.PrLv.PrLv5.getValue(), () ->
-                            // 4星英雄属性
-                            getStarWithAttribute(starInfos.get(3), Constant.SkinType.ORIGINAL.getValue(), attributeSimple)
-                    )
-                    .add(Constant.PrLv.PrLv6.getValue(), () ->
-                            // 5星英雄属性
-                            getStarWithAttribute(starInfos.get(4), Constant.SkinType.ORIGINAL.getValue(), attributeSimple)
-                    )
-                    .add(Constant.PrLv.PrLv7.getValue(), () ->
-                            // 黄金1星英雄属性
-                            getStarWithAttribute(starInfos.get(0), Constant.SkinType.GOLD.getValue(), attributeSimple)
-                    );
-            ifFunction.doIf(prLv);
+            // 英雄星级
+            Integer starCode = starInfos.get(0).getStarCode();// 默认1星
+            // 星级成长属性加成
+            Double starBuff = starInfos.get(0).getStarBuff();// 默认1星属性加成
+            // 成长率范围-最小
+            Double GRMIN = 1d;
+            // 成长率范围-最大
+            Double GRMAX = starBuff + Constant.GRI.L.getValue();
+            // 成长率
+            Double growthRate = 1d;
+            switch (prLv) {
+                case 2:
+                    // 1星英雄 设置成长率范围
+                    // 生成随机成长率
+                    growthRate = Arith.randomWithinRangeHundred(GRMIN, GRMAX);
+                    growthRate = growthRate > starBuff ? starBuff : growthRate;
+                    break;
+                case 3:
+                    // 2星英雄 设置成长率范围
+                    starCode = starInfos.get(1).getStarCode();
+                    starBuff = starInfos.get(1).getStarBuff();
+                    // 最小值取上一个星级的加成
+                    GRMIN = starInfos.get(0).getStarBuff();
+                    GRMAX = starBuff + Constant.GRI.L.getValue();
+                    // 生成随机成长率
+                    growthRate = Arith.randomWithinRangeHundred(GRMIN, GRMAX);
+                    growthRate = growthRate > starBuff ? starBuff : growthRate;
+                    break;
+                case 4:
+                    // 3星英雄 设置成长率范围
+                    starCode = starInfos.get(2).getStarCode();
+                    starBuff = starInfos.get(2).getStarBuff();
+                    // 最小值取上一个星级的加成
+                    GRMIN = starInfos.get(1).getStarBuff();
+                    GRMAX = starBuff + Constant.GRI.L.getValue();
+                    // 生成随机成长率
+                    growthRate = Arith.randomWithinRangeHundred(GRMIN, GRMAX);
+                    growthRate = growthRate > starBuff ? starBuff : growthRate;
+                    break;
+                case 5:
+                    // 4星英雄 设置成长率范围
+                    starCode = starInfos.get(3).getStarCode();
+                    starBuff = starInfos.get(3).getStarBuff();
+                    // 最小值取上一个星级的加成
+                    GRMIN = starInfos.get(2).getStarBuff();
+                    GRMAX = starBuff + Constant.GRI.H.getValue();
+                    // 生成随机成长率
+                    growthRate = Arith.randomWithinRangeHundred(GRMIN, GRMAX);
+                    growthRate = growthRate > starBuff ? starBuff : growthRate;
+                    break;
+                case 6:
+                    // 5星英雄 设置成长率范围
+                    starCode = starInfos.get(4).getStarCode();
+                    starBuff = starInfos.get(4).getStarBuff();
+                    // 最小值取上一个星级的加成
+                    GRMIN = starInfos.get(3).getStarBuff();
+                    GRMAX = starBuff + Constant.GRI.H.getValue();
+                    // 生成随机成长率
+                    growthRate = Arith.randomWithinRangeHundred(GRMIN, GRMAX);
+                    growthRate = growthRate > starBuff ? starBuff : growthRate;
+                    break;
+                case 7:
+                    // 黄金1星英雄 设置成长率范围
+                    // 生成随机成长率
+                    growthRate = Arith.randomWithinRangeHundred(GRMIN, GRMAX);
+                    growthRate = growthRate > starBuff ? starBuff : growthRate;
+                    // 设置皮肤类型为黄金
+                    skinType = Constant.SkinType.GOLD.getValue();
+                    break;
+            }
 
             // 开始发放英雄至玩家背包
             double scale = user.getScale() * heroInfos.get(heroIndex).getScale();
@@ -356,13 +397,15 @@ public class DrawGiftService {
             userHero.setCreateTime(now);// 召唤时间
             userHero.setCreateTimeTs(now.getTime());
             LOGGER.info("heroTokenIds: " + tokenIds);
-            if (summonReq.getCurType().equals(Constant.CurrencyType._CRYPTO.getValue())){
+            if (summonReq.getCurType().equals(Constant.CurrencyType._CRYPTO.getValue())) {
                 userHero.setNftId(Long.parseLong(tokenIds.get(0)));// NFT_tokenID
                 tokenIds.remove(0);
             }
 
+            // 设置成长率
+            userHero.setGrowthRate(growthRate);
             // 设置星级
-            userHero.setStarCode(attributeSimple.getStarCode());
+            userHero.setStarCode(starCode);
             // 设置皮肤
             userHero.setSkinType(skinType);
             // ===玩家英雄赋予属性===
@@ -403,7 +446,7 @@ public class DrawGiftService {
             giftBoxHeroRsp.setHeroIconUrl(heroInfos.get(heroIndex).getHeroIconUrl());// 英雄图标
             giftBoxHeroRsp.setHeroFragNum(Constant.Quantity.Q1.getValue());// 英雄碎片数量，如果为星级英雄 数量固定1
             giftBoxHeroRsp.setHeroType(Constant.FragType.WHOLE.getValue());// 英雄类型：0星级英雄，1英雄碎片
-            giftBoxHeroRsp.setStarCode(attributeSimple.getStarCode());// 英雄星级
+            giftBoxHeroRsp.setStarCode(starCode);// 英雄星级
             giftBoxHeroRsp.setBoxNum(giftBoxNum);
             int skinType = prLv == Constant.PrLv.PrLv7.getValue() ? Constant.SkinType.GOLD.getValue() : Constant.SkinType.ORIGINAL.getValue();
             giftBoxHeroRsp.setSkinType(skinType);// 皮肤类型
@@ -413,22 +456,6 @@ public class DrawGiftService {
         if (userHeroAdds.size() > 0) {
             userHeroService.saveBatch(userHeroAdds);
         }
-    }
-
-    /**
-     * 通过星级百分比计算对应的属性
-     * 获取皮肤类型
-     *
-     * @param starInfo
-     * @param st
-     * @param a
-     */
-    private void getStarWithAttribute(StarInfoEntity starInfo, Integer st, AttributeSimpleEntity a) {
-        // 皮肤类型赋值
-        skinType = st;
-        // 星级属性赋值
-        attributeSimple = new AttributeSimpleEntity(starInfo.getStarBuff(), starInfo.getStarCode(), a.getHp(), a.getMp(), a.getHpRegen(), a.getMpRegen(),
-                a.getArmor(), a.getMagicResist(), a.getAttackDamage(), a.getAttackSpell());
     }
 
     /**
@@ -619,7 +646,7 @@ public class DrawGiftService {
             userEquipment.setScale(scale);// 矿工比例
 
             // 随机装备属性
-            Double rap = Arith.randomWithinRangeHundred(eqAttMax, eqAttMin);
+            Double rap = Arith.randomWithinRangeHundredEquip(eqAttMin, eqAttMax);
             long health = (long) (equipmentInfos.get(equipmentIndex).getHealth() * rap);// 初始生命值
             long mana = (long) (equipmentInfos.get(equipmentIndex).getMana() * rap);// 初始法力值
             double healthRegen = (equipmentInfos.get(equipmentIndex).getHealthRegen() * rap);// 初始生命值恢复
@@ -891,9 +918,9 @@ public class DrawGiftService {
         // 获取系统全部经验信息
         Map<String, Object> expMap = new HashMap<>();
         expMap.put("status", Constant.enable);
-        List<ExperiencePotionEntity> exps = experiencePotionDao.getExpInfos(expMap);
+        List<ExperienceEntity> exps = experienceDao.getExpInfos(expMap);
         // 存储要添加的经验的集合
-        List<UserExperiencePotionEntity> userExpAdds = new ArrayList<>();
+        List<UserExperienceEntity> userExpAdds = new ArrayList<>();
         int i = 0;
         while (i < giftBoxNum) {
             int expsI = prLv - 1;
@@ -920,10 +947,10 @@ public class DrawGiftService {
             int j = 0;
             while (j < expNum) {
                 // 开始发放经验至玩家背包
-                UserExperiencePotionEntity userExp = new UserExperiencePotionEntity();
-                userExp.setExPotionId(exps.get(expsI).getExPotionId());
+                UserExperienceEntity userExp = new UserExperienceEntity();
+                userExp.setExpId(exps.get(expsI).getId());
                 userExp.setUserId(user.getUserId());
-                userExp.setUserExNum(Constant.Quantity.Q1.getValue());
+                userExp.setExpNum(Constant.Quantity.Q1.getValue());
                 userExp.setStatus(Constant.enable);
                 userExp.setMintStatus(Constant.enable);
                 userExp.setMintHash(summonReq.getTransactionHash());
@@ -941,18 +968,18 @@ public class DrawGiftService {
 
             // 存储经验召唤返回集合
             GiftBoxExpRsp giftBoxExpRsp = new GiftBoxExpRsp();
-            giftBoxExpRsp.setExpName(exps.get(expsI).getExPotionName());// 经验名称
+            giftBoxExpRsp.setExpName(exps.get(expsI).getExpName());// 经验道具名称
             giftBoxExpRsp.setExpNum(expNum);// 经验数量
-            giftBoxExpRsp.setExpRare(Integer.valueOf(exps.get(expsI).getExPotionRareCode()));// 经验稀有度(1:白色,2:绿色,3:蓝色,4:紫色)
-            giftBoxExpRsp.setExpValue(exps.get(expsI).getExValue());// 经验值
-            giftBoxExpRsp.setExpIconUrl(exps.get(expsI).getExIconUrl());// 图标地址
-            giftBoxExpRsp.setExpDescription(exps.get(expsI).getExDescription());// 经验描述
+            giftBoxExpRsp.setExpRare(exps.get(expsI).getRareCode());// 经验道具稀有度(1:白色,2:绿色,3:蓝色,4:紫色)
+            giftBoxExpRsp.setExp(exps.get(expsI).getExp());// 经验值
+            giftBoxExpRsp.setIconUrl(exps.get(expsI).getIconUrl());// 图标地址
+            giftBoxExpRsp.setDescription(exps.get(expsI).getDescription());// 经验描述
             giftBoxExpRsps.add(giftBoxExpRsp);
             i++;
         }
         // 批量插入
         if (userExpAdds.size() > 0) {
-            userExperiencePotionService.saveBatch(userExpAdds);
+            userExperienceService.saveBatch(userExpAdds);
         }
     }
 

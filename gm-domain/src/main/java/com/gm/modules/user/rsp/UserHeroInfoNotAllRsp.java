@@ -26,6 +26,10 @@ public class UserHeroInfoNotAllRsp {
 	 */
 	private BigDecimal minter;
 	/**
+	 * 成长率
+	 */
+	private Double growthRate;
+	/**
 	 * 英雄星级
 	 */
 	private String starCode;

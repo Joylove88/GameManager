@@ -61,12 +61,12 @@ WHERE
 	AND a.STATUS = 0
     </select>
 
-    <select id="queryUserOnMarketExperiencePotion" resultType="com.gm.modules.user.entity.UserExperiencePotionEntity">
+    <select id="queryUserOnMarketExperience" resultType="com.gm.modules.user.entity.UserExperienceEntity">
 SELECT
 	b.*
 FROM
 	gm_market_online a
-	LEFT JOIN gm_user_experience_potion b ON a.GOODS_ID = b.USER_EX_POTION_ID
+	LEFT JOIN gm_user_experience b ON a.GOODS_ID = b.ID
 WHERE
 	a.USER_ID = #{userId}
 	AND a.STATUS = 0
@@ -108,12 +108,12 @@ WHERE
 		${ew.customSqlSegment}
 	</select>
 
-	<select id="queryUserExperiencePotion" resultType="com.gm.modules.user.entity.UserExperiencePotionEntity">
+	<select id="queryUserExperience" resultType="com.gm.modules.user.entity.UserExperienceEntity">
 		SELECT
 		b.*
 		FROM
 		gm_market_online a
-		LEFT JOIN gm_user_experience_potion b ON a.GOODS_ID = b.USER_EX_POTION_ID
+		LEFT JOIN gm_user_experience b ON a.GOODS_ID = b.ID
 		${ew.customSqlSegment}
 	</select>
 

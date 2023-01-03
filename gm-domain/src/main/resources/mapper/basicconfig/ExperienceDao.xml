@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.gm.modules.basicconfig.dao.ExperiencePotionDao">
+<mapper namespace="com.gm.modules.basicconfig.dao.ExperienceDao">
 
-    <select id="getExpInfos" resultType="com.gm.modules.basicconfig.entity.ExperiencePotionEntity">
+    <select id="getExpInfos" resultType="com.gm.modules.basicconfig.entity.ExperienceEntity">
         SELECT
         A.*
         FROM
-        GM_EXPERIENCE_POTION A
+        GM_EXPERIENCE A
         <where>
             <if test="status != null and status != ''">
                 AND A.`STATUS` = #{status}
             </if>
         </where>
-        ORDER BY A.EX_POTION_RARE_CODE
+        ORDER BY A.RARE_CODE
     </select>
 </mapper>

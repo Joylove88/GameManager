@@ -30,7 +30,7 @@ public class GmMarketOnlineEntity implements Serializable {
 	 */
 	private Long userId;
 	/**
-	 * 物品类型（0：英雄，1：英雄碎片，2：装备，3：装备卷轴，4：药水）
+	 * 物品类型（0：英雄，1：英雄碎片，2：装备，3：装备卷轴，4：经验道具）
 	 */
 	private String goodsType;
 	/**

@@ -8,5 +8,8 @@ import lombok.Data;
 @Data
 public class UserHeroInfoMarketRsp extends UserHeroFragInfoRsp {
 
-
+    /**
+     * 成长率
+     */
+    private Double growthRate;
 }

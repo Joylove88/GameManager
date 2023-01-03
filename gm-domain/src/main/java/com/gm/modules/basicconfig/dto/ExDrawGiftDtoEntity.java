@@ -14,12 +14,12 @@ import java.io.Serializable;
 @Data
 public class ExDrawGiftDtoEntity implements Serializable {
 	/**
-	 * 经验药水id
+	 * 经验道具id
 	 */
 	private Long exId;
 
 	/**
-	 * 药水稀有度
+	 * 经验道具稀有度
 	 */
 	private String exRare;
 
@@ -29,22 +29,22 @@ public class ExDrawGiftDtoEntity implements Serializable {
 	private Double pron;
 
 	/**
-	 * 经验药水数量
+	 * 经验道具数量
 	 */
 	private Long exNum;
 
 	/**
-	 * 经验药水名称
+	 * 经验道具名称
 	 */
 	private String exName;
 
 	/**
-	 * 经验图标地址
+	 *经验道具图标地址
 	 */
 	private String exIconUrl;
 
 	/**
-	 * 药水描述
+	 * 经验道具描述
 	 */
 	private String exDescription;
 

@@ -8,9 +8,13 @@ import lombok.Data;
 @Data
 public class UserExpInfoRsp {
 	/**
+	 * NFT_TOKENID
+	 */
+	private Long nftId;
+	/**
 	 * 经验数量
 	 */
-	private Long expNum;
+	private Integer expNum;
 	/**
 	 * 经验名称
 	 */
@@ -18,18 +22,18 @@ public class UserExpInfoRsp {
 	/**
 	 * 经验值
 	 */
-	private Long expValue;
+	private Long exp;
 	/**
-	 * 药水稀有度(1:白色,2:绿色,3:蓝色,4:紫色)
+	 * 经验道具稀有度(1:白色,2:绿色,3:蓝色,4:紫色)
 	 */
 	private String expRare;
 	/**
-	 * 经验图标地址
+	 * 经验道具图标地址
 	 */
-	private String expIconUrl;
+	private String iconUrl;
 	/**
-	 * 经验描述
+	 * 经验道具描述
 	 */
-	private String expDescription;
+	private String description;
 
 }

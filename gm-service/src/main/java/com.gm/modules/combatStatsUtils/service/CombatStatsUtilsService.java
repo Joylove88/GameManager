@@ -1,16 +1,32 @@
 package com.gm.modules.combatStatsUtils.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
+import com.gm.common.utils.Arith;
+import com.gm.common.utils.CalculateTradeUtil;
 import com.gm.common.utils.Constant;
+import com.gm.common.utils.ExpUtils;
 import com.gm.modules.basicconfig.dao.*;
 import com.gm.modules.basicconfig.dto.AttributeEntity;
 import com.gm.modules.basicconfig.dto.AttributeSimpleEntity;
 import com.gm.modules.basicconfig.entity.*;
+import com.gm.modules.basicconfig.rsp.HeroLevelRsp;
+import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
+import com.gm.modules.basicconfig.rsp.TeamInfoRsp;
+import com.gm.modules.basicconfig.service.*;
+import com.gm.modules.fightCore.service.FightCoreService;
 import com.gm.modules.user.dao.*;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserEquipmentEntity;
+import com.gm.modules.user.entity.UserHeroEntity;
 import com.gm.modules.user.entity.UserHeroEquipmentWearEntity;
+import com.gm.modules.user.rsp.UserHeroFragInfoRsp;
+import com.gm.modules.user.rsp.UserHeroInfoDetailRsp;
+import com.gm.modules.user.rsp.UserHeroInfoDetailWithGrowRsp;
+import com.gm.modules.user.service.UserEquipmentService;
+import com.gm.modules.user.service.UserHeroFragService;
+import com.gm.modules.user.service.UserHeroService;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -19,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,94 +51,65 @@ import java.util.Map;
 public class CombatStatsUtilsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CombatStatsUtilsService.class);
     @Autowired
-    private HeroStarDao heroStarDao;
+    private StarInfoService starInfoService;
     @Autowired
     private UserHeroEquipmentWearDao userHeroEquipmentWearDao;
     @Autowired
-    private HeroLevelDao heroLevelDao;
+    private UserHeroService userHeroService;
     @Autowired
-    private HeroInfoDao heroInfoDao;
+    private UserHeroFragService userHeroFragService;
     @Autowired
-    private HeroSkillDao heroSkillDao;
+    private HeroLevelService heroLevelService;
     @Autowired
-    private StarInfoDao starInfoDao;
+    private HeroSkillService heroSkillService;
     @Autowired
-    private UserEquipmentDao userEquipmentDao;
+    private GmTeamConfigService teamConfigService;
+    @Autowired
+    private FightCoreService fightCoreService;
+    @Autowired
+    private UserEquipmentService userEquipmentService;
 
     // 获取英雄属性和已激活的装备属性
-    public AttributeEntity getHeroBasicStats(Map<String,Object> map) {
+    public AttributeEntity getHeroBasicStats(Long userHeroId) {
         AttributeEntity attribute = new AttributeEntity();
-
-        Object heroStarId = map.get("heroStarId");
-        // 获取星级英雄方法
-        HeroStarEntity heroStar = heroStarDao.selectOne(new QueryWrapper<HeroStarEntity>()
-                .eq("STATUS", Constant.enable)
-                .eq("HERO_STAR_ID", heroStarId)// 星级英雄编码
-        );
-        if(heroStar == null) {
-            throw new RRException("官方已停用改英雄,英雄编码为:" + heroStarId);
+        // 获取玩家英雄详细信息
+        Map<String, Object> userHeroMap = new HashMap<>();
+        userHeroMap.put("userHeroId", userHeroId);
+        UserHeroInfoDetailRsp userHero = userHeroService.getUserHeroByIdDetailRsp(userHeroMap);
+        if(userHero == null) {
+            throw new RRException(ErrorCode.USER_HERO_GET_FAIL.getDesc() + "-ID: " + userHeroId);
         }
-
-        // 获取星级
-        StarInfoEntity starInfo = starInfoDao.selectById(heroStar.getGmStarId());
-        if(starInfo == null){
-            throw new RRException("获取星级信息失败");
-        }
-        attribute.setHeroStar(starInfo.getStarCode());
-
-        // 获取英雄信息
-        HeroInfoEntity heroInfo = heroInfoDao.selectById(heroStar.getGmHeroId());
-        if (heroInfo == null){
-            throw new RRException("获取英雄信息失败");
-        }
-        attribute.setHeroName(heroInfo.getHeroName());
+        attribute.setHeroStar(userHero.getStarCode());
+        attribute.setHeroName(userHero.getHeroName());
 
         // 获取英雄技能信息
-        HeroSkillEntity heroSkill = heroSkillDao.selectOne(new QueryWrapper<HeroSkillEntity>()
-                .eq("STATUS", Constant.enable)
-                .eq("HERO_STAR_ID", heroStarId)// 星级英雄编码
-        );
-        if (heroSkill == null) {
-            throw new RRException("获取英雄技能信息失败");
-        }
-        attribute.setSkillName(heroSkill.getSkillName());
-        attribute.setSkillType(heroSkill.getSkillType());
-        attribute.setSkillSolt(heroSkill.getSkillSolt());
-        attribute.setSkillStarLevel(heroSkill.getSkillStarCode());
-        attribute.setSkillFixedDamage(heroSkill.getSkillFixedDamage());
-        attribute.setSkillDescription(heroSkill.getSkillDescription());
-        attribute.setSkillDamageBonusHero(heroSkill.getSkillDamageBonusHero());
-        attribute.setSkillDamageBonusEquip(heroSkill.getSkillDamageBonusEquip());
+        // 获取英雄技能
+        Map<String, Object> skillMap = new HashMap<>();
+        skillMap.put("status", Constant.enable);
+        skillMap.put("heroId", userHero.getHeroId());
+        skillMap.put("skillStarCode", userHero.getStarCode());
+        HeroSkillRsp skillRsp = heroSkillService.getHeroSkillRsp(skillMap);
+        attribute.setSkillName(skillRsp.getSkillName());
+        attribute.setSkillType(skillRsp.getSkillType());
+        attribute.setSkillSolt(skillRsp.getSkillSolt());
+        attribute.setSkillStarLevel(skillRsp.getSkillStarLevel());
+        attribute.setSkillFixedDamage(skillRsp.getSkillFixedDamage());
+        attribute.setSkillDescription(skillRsp.getSkillDescription());
+        attribute.setSkillDamageBonusHero(skillRsp.getSkillDamageBonusHero());
+        attribute.setSkillDamageBonusEquip(skillRsp.getSkillDamageBonusEquip());
 
-        // 1.获取英雄当前等级
-        HeroLevelEntity heroLevel = heroLevelDao.selectOne(new QueryWrapper<HeroLevelEntity>()
-                .eq("HERO_LEVE_ID", map.get("heroLevelId"))
-        );
-        long level = heroLevel.getLevelCode();
+        long level = userHero.getLevelCode();
         attribute.setHeroLevel(level);
 
         // 2.获取英雄成长属性并统计当前级别的属性
-        long health = heroStar.getGmHealth();
-        long mana = heroStar.getGmMana();
-        double healthRegen = heroStar.getGmHealthRegen();
-        double manaRegen = heroStar.getGmManaRegen();
-        long armor = heroStar.getGmArmor();
-        long magicResist = heroStar.getGmMagicResist();
-        long attackDamage = heroStar.getGmAttackDamage();
-        long attackSpell = heroStar.getGmAttackSpell();
-
-        // 如果英雄等级大于1级进行成长属性值累加
-        level = level - 1; // 默认1级 成长值计算去掉1级 从2级开始计算
-        if (level > 0) {
-            health = health + (heroStar.getGmGrowHealth() * level);// 成长生命值
-            mana = mana + (heroStar.getGmGrowMana() * level);// 成长法力值
-            healthRegen = healthRegen + (heroStar.getGmGrowHealthRegen() * level);// 成长生命值恢复
-            manaRegen = manaRegen + (heroStar.getGmGrowManaRegen() * level);// 成长法力值恢复
-            armor = armor + (heroStar.getGmGrowArmor() * level);// 成长护甲
-            magicResist = magicResist + (heroStar.getGmGrowMagicResist() * level);// 成长魔抗
-            attackDamage = attackDamage + (heroStar.getGmGrowAttackDamage() * level);// 成长攻击力
-            attackSpell = attackSpell + (heroStar.getGmGrowAttackSpell() * level);// 成长法功
-        }
+        long health = userHero.getHealth();
+        long mana = userHero.getMana();
+        double healthRegen = userHero.getHealthRegen();
+        double manaRegen = userHero.getManaRegen();
+        long armor = userHero.getArmor();
+        long magicResist = userHero.getMagicResist();
+        long attackDamage = userHero.getAttackDamage();
+        long attackSpell = userHero.getAttackSpell();
 
         attribute.setHp(health);
         attribute.setMp(mana);
@@ -135,7 +123,7 @@ public class CombatStatsUtilsService {
         // 3.获取该英雄身上全部穿戴装备的属性
         Map<String, Object> equipmentWearMap = new HashMap<>();
         equipmentWearMap.put("STATUS", Constant.enable);
-        equipmentWearMap.put("USER_HERO_ID", map.get("userHeroId"));
+        equipmentWearMap.put("USER_HERO_ID", userHeroId);
         List<UserHeroEquipmentWearEntity> equipmentWears = userHeroEquipmentWearDao.selectByMap(equipmentWearMap);
 
         health = 0;
@@ -149,7 +137,7 @@ public class CombatStatsUtilsService {
 
         for (UserHeroEquipmentWearEntity equipmentWear_ : equipmentWears){
             // 获取玩家拥有的装备
-            UserEquipmentEntity userEquipment = userEquipmentDao.selectOne(new QueryWrapper<UserEquipmentEntity>()
+            UserEquipmentEntity userEquipment = userEquipmentService.getOne(new QueryWrapper<UserEquipmentEntity>()
                     .eq("STATUS", Constant.enable)
                     .eq("USER_EQUIPMENT_ID", equipmentWear_.getUserEquipId())
             );
@@ -204,17 +192,28 @@ public class CombatStatsUtilsService {
         long magicResist = Math.round(heroInfo.getMagicResist() * Constant.HERO_ATTRIBUTE_RATE);// 初始魔抗
         long attackDamage = Math.round(heroInfo.getAttackDamage() * Constant.HERO_ATTRIBUTE_RATE);// 初始攻击力
         long attackSpell = Math.round(heroInfo.getAttackSpell() * Constant.HERO_ATTRIBUTE_RATE);// 初始法功
-//            long growHp = Math.round(heroInfos.get(heroIndex).getGmGrowHealth() * Constant.HERO_ATTRIBUTE_RATE);//成长属性-生命值
-//            long growMp = Math.round(heroInfos.get(heroIndex).getGmGrowMana() * Constant.HERO_ATTRIBUTE_RATE);//成长属性-法力值
-//            double growHpRegen = Math.round(heroInfos.get(heroIndex).getGmGrowHealthRegen() * Constant.HERO_ATTRIBUTE_RATE);//成长属性-生命值恢复
-//            double growMpRegen = Math.round(heroInfos.get(heroIndex).getGmGrowManaRegen() * Constant.HERO_ATTRIBUTE_RATE);//成长属性-法力值恢复
-//            long growArmor = Math.round(heroInfos.get(heroIndex).getGmGrowArmor() * Constant.HERO_ATTRIBUTE_RATE);//成长属性-护甲
-//            long growMagicResist = Math.round(heroInfos.get(heroIndex).getGmGrowMagicResist() * Constant.HERO_ATTRIBUTE_RATE);//成长属性-魔抗
-//            long growAttackDamage = Math.round(heroInfos.get(heroIndex).getGmGrowAttackDamage() * Constant.HERO_ATTRIBUTE_RATE);//成长属性-攻击力
-//            long growAttackSpell = Math.round(heroInfos.get(heroIndex).getGmGrowAttackSpell() * Constant.HERO_ATTRIBUTE_RATE);//成长属性-法功
-        return new AttributeSimpleEntity(starBuff, Constant.StarLv.Lv1.getValue(), hp, mp, hpRegen,
+        return new AttributeSimpleEntity(hp, mp, hpRegen,
                 mpRegen, armor, magicResist, attackDamage, attackSpell);
     }
+
+    /**
+     * 获取英雄升级后的属性
+     * @param heroInfo
+     * @return
+     */
+    public AttributeSimpleEntity getHeroAttributeWithLv(UserHeroInfoDetailWithGrowRsp heroInfo, Integer Lv){
+        long hp = Math.round(heroInfo.getGrowHealth() * Lv);// 成长生命值
+        long mp = Math.round(heroInfo.getGrowMana() * Lv);// 成长法力值
+        double hpRegen = Math.round(heroInfo.getGrowHealthRegen() * Lv);// 成长生命值恢复
+        double mpRegen = Math.round(heroInfo.getGrowManaRegen() * Lv);// 成长法力值恢复
+        long armor = Math.round(heroInfo.getGrowArmor() * Lv);// 成长护甲
+        long magicResist = Math.round(heroInfo.getGrowMagicResist() * Lv);// 成长魔抗
+        long attackDamage = Math.round(heroInfo.getGrowAttackDamage() * Lv);// 成长攻击力
+        long attackSpell = Math.round(heroInfo.getGrowAttackSpell() * Lv);// 成长法功
+        return new AttributeSimpleEntity(hp, mp, hpRegen,
+                mpRegen, armor, magicResist, attackDamage, attackSpell);
+    }
+
 
     /**
      * 获取英雄升星后增加的属性
@@ -229,7 +228,7 @@ public class CombatStatsUtilsService {
         long magicResist = attributeStarPlus.getMagicResist() - attributeStar.getMagicResist();// 增加的魔抗
         long attackDamage = attributeStarPlus.getAttackDamage() - attributeStar.getAttackDamage();// 增加的攻击力
         long attackSpell = attributeStarPlus.getAttackSpell() - attributeStar.getAttackSpell();// 增加的法功
-        return new AttributeSimpleEntity(1.0, Constant.StarLv.Lv1.getValue(), hp, mp, hpRegen,
+        return new AttributeSimpleEntity(hp, mp, hpRegen,
                 mpRegen, armor, magicResist, attackDamage, attackSpell);
     }
 
@@ -258,5 +257,147 @@ public class CombatStatsUtilsService {
         return list;
     }
 
+    /**
+     * 更新战力(判断该英雄是否在上阵中, 只有上阵中的英雄更新战力及矿工)
+     *
+     * @param user
+     * @param userHeroId
+     * @param changePower
+     */
+    public void updateCombatPower(UserEntity user, Long userHeroId, Long userEquipId, Long changePower, Double scale) {
+        // 获取队伍
+        Map<String, Object> teamParams = new HashMap<>();
+        teamParams.put("userId", user.getUserId());
+        teamParams.put("userHeroId", userHeroId);
+        List<TeamInfoRsp> teamInfoRsps = teamConfigService.getTeamInfoList(teamParams);
+
+//        (30 / 60 * 68 + 60 / 60 * 10) / （68 + 10) * 60;
+        // 获取玩家英雄信息
+        UserHeroEntity hero = userHeroService.getById(userHeroId);
+        BigDecimal newOracle = BigDecimal.ZERO;
+        BigDecimal newMinter = BigDecimal.ZERO;
+        // 初始GAIA系统
+        fightCoreService.initTradeBalanceParameter(0);
+        BigDecimal minterRate = CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1));
+        if (userEquipId != null) {
+            UserEquipmentEntity equip = userEquipmentService.getById(userEquipId);
+            BigDecimal oracleRate = Arith.divide(hero.getOracle(), minterRate);
+            BigDecimal heroPowerChange = Arith.multiply(oracleRate, BigDecimal.valueOf(hero.getHeroPower()));
+            BigDecimal equipPowerChange = Arith.multiply(Arith.divide(equip.getOracle(), minterRate), BigDecimal.valueOf(equip.getEquipPower()));
+            newOracle =
+                    Arith.multiply(Arith.divide(Arith.add(heroPowerChange,equipPowerChange)
+                            , BigDecimal.valueOf(hero.getHeroPower() + equip.getEquipPower())),
+                            minterRate);
+            newMinter = equip.getMinter();
+        } else {
+            // 获取英雄矿工数量
+            CalculateTradeUtil.miners = hero.getMinter();
+            System.out.println("获取当前玩家矿工数量: " + CalculateTradeUtil.miners);
+            BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(changePower * scale));
+            newOracle = Arith.multiply(Arith.divide(Arith.add(Arith.multiply(Arith.divide(hero.getOracle(), minterRate), BigDecimal.valueOf(hero.getHeroPower())), BigDecimal.valueOf(changePower))
+                    , BigDecimal.valueOf((hero.getHeroPower() + changePower))), minterRate);
+            newMinter = minter;
+        }
+
+        hero.setMinter(Arith.add(hero.getMinter(), newMinter));// 更新矿工
+        hero.setOracle(newOracle);// 更新神谕值
+        long newHeroPower = hero.getHeroPower() + changePower;// 获取英雄提升后的战力（英雄战力+本次操作改变的战力）
+        hero.setHeroPower(newHeroPower);// 更新战力
+        userHeroService.updateById(hero);
+
+        // 英雄已在队伍上阵
+        if (teamInfoRsps.size() > 0) {
+            for (TeamInfoRsp teamInfoRsp : teamInfoRsps) {
+                // 获取队伍旧战力值
+                long oldPower = teamInfoRsp.getTeamPower();
+                // 获取最新队伍战力（队伍战力+本次操作改变的战力）
+                long newPower = teamInfoRsp.getTeamPower() + changePower;
+                // 获取最新队伍矿工数量（队伍矿工数+本次操作改变的矿工数）
+                BigDecimal newTeanMinter = Arith.add(teamInfoRsp.getTeamMinter(), newMinter);
+
+                // 获取队伍旧矿工数
+                BigDecimal oldMinter = teamInfoRsp.getTeamMinter();
+                GmTeamConfigEntity team = new GmTeamConfigEntity();
+                team.setId(teamInfoRsp.getId());
+                fightCoreService.updateCombat(changePower, oldPower, newPower, user, team, newMinter, oldMinter, newTeanMinter);
+            }
+        }
+
+    }
+
+
+    public UserHeroInfoDetailRsp getHeroInfoDetail(UserEntity user, Long userHeroId){
+        // 获取英雄详细信息
+        Map<String, Object> userHeroMap = new HashMap<>();
+        userHeroMap.put("userHeroId", userHeroId);
+        UserHeroInfoDetailRsp rsp = userHeroService.getUserHeroByIdDetailRsp(userHeroMap);
+        // 设置英雄职业
+        String[] heroRole = rsp.getHeroRole().split(",");
+        for(String role : heroRole){
+            switch (role){
+                case "00" :
+                    rsp.getRoles().add(Constant.HeroRole.Warrior.getValue());
+                    break;
+                case "01" :
+                    rsp.getRoles().add(Constant.HeroRole.Mage.getValue());
+                    break;
+                case "02" :
+                    rsp.getRoles().add(Constant.HeroRole.Assassin.getValue());
+                    break;
+                case "03" :
+                    rsp.getRoles().add(Constant.HeroRole.Tank.getValue());
+                    break;
+                case "04" :
+                    rsp.getRoles().add(Constant.HeroRole.Support.getValue());
+                    break;
+                case "05" :
+                    rsp.getRoles().add(Constant.HeroRole.Archer.getValue());
+                    break;
+            }
+        }
+        // 获取英雄下一个等级信息
+        Map<String, Object> heroLvMap = new HashMap<>();
+        int heroLv = rsp.getLevelCode() < 50 ? rsp.getLevelCode() + Constant.Quantity.Q1.getValue() : rsp.getLevelCode();
+        heroLvMap.put("levelCode",  heroLv);
+        HeroLevelRsp heroLvRsp = heroLevelService.getHeroLevelByLvCode(heroLvMap);
+        if (heroLvRsp == null) {
+            throw new RRException(ErrorCode.EXP_GET_FAIL.getDesc());
+        }
+
+        // 晋级到下一级所需经验值
+        rsp.setPromotionExperience(heroLvRsp.getPromotionExperience());
+        // 当前等级获取的经验值
+        rsp.setCurrentExp(ExpUtils.getCurrentExp(heroLvRsp.getExperienceTotal(), heroLvRsp.getPromotionExperience(), rsp.getExperienceObtain()));
+
+        // 获取英雄技能
+        Map<String, Object> skillMap = new HashMap<>();
+        skillMap.put("status", Constant.enable);
+        skillMap.put("heroId", rsp.getHeroId());
+        skillMap.put("skillStarCode", rsp.getStarCode());
+        HeroSkillRsp skillRsp = heroSkillService.getHeroSkillRsp(skillMap);
+        rsp.setHeroSkillRsp(skillRsp);
+
+        // 获取当前星级+1
+        int starCode = rsp.getStarCode();
+        if (starCode < Constant.StarLv.Lv5.getValue()) {
+            starCode += Constant.StarLv.Lv1.getValue();
+        }
+        // 获取当前阶段升星所需碎片
+        StarInfoEntity starInfo = starInfoService.getOne(new QueryWrapper<StarInfoEntity>()
+                .eq("STAR_CODE", starCode)
+
+        );
+
+        // 获取玩家背包中的英雄碎片
+        Map<String, Object> heroFragMap = new HashMap<>();
+        heroFragMap.put("userId", user.getUserId());
+        heroFragMap.put("status", Constant.enable);
+        heroFragMap.put("heroId", rsp.getHeroId());
+        UserHeroFragInfoRsp heroFragCount = userHeroFragService.getUserAllHeroFragCount(heroFragMap);
+        Integer shardNum = null != heroFragCount ? heroFragCount.getHeroFragNum() : Constant.ZERO_I;
+        rsp.setShardNum(shardNum);
+        rsp.setUpStarShardNum(starInfo.getUpStarFragNum());
+        return rsp;
+    }
 }
 

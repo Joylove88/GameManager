@@ -29,7 +29,7 @@ public interface GmMarketOnlineDao extends BaseMapper<GmMarketOnlineEntity> {
 
     List<UserEquipmentFragEntity> queryUserOnMarketEquipmentFrag(@Param("userId") Long userId);
 
-    List<UserExperiencePotionEntity> queryUserOnMarketExperiencePotion(@Param("userId") Long userId);
+    List<UserExperienceEntity> queryUserOnMarketExperience(@Param("userId") Long userId);
 
     IPage<UserHeroEntity> pageHeroMarket(IPage<UserHeroEntity> page, @Param(Constants.WRAPPER) QueryWrapper<UserHeroEntity> eq);
 
@@ -39,5 +39,5 @@ public interface GmMarketOnlineDao extends BaseMapper<GmMarketOnlineEntity> {
 
     IPage<UserEquipmentFragEntity> pageEquipmentFragMarket(IPage<UserEquipmentFragEntity> page, @Param(Constants.WRAPPER) QueryWrapper<UserEquipmentFragEntity> eq);
 
-    IPage<UserExperiencePotionEntity> pageExperiencePotionMarket(IPage<UserExperiencePotionEntity> page, @Param(Constants.WRAPPER) QueryWrapper<UserExperiencePotionEntity> eq);
+    IPage<UserExperienceEntity> pageExperienceMarket(IPage<UserExperienceEntity> page, @Param(Constants.WRAPPER) QueryWrapper<UserExperienceEntity> eq);
 }

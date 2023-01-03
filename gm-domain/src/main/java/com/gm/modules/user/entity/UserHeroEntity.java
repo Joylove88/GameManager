@@ -59,6 +59,10 @@ public class UserHeroEntity implements Serializable {
 	 */
 	private Double scale;
 	/**
+	 * 成长率
+	 */
+	private Double growthRate;
+	/**
 	 * 皮肤类型0普通1黄金...
 	 */
 	private Integer skinType;
