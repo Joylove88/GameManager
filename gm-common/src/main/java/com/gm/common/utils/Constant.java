@@ -630,7 +630,8 @@ public class Constant {
      */
     public enum GRI {
         L(0.9),// 低
-        H(1.8);// 高
+        H(1.8),// 高
+        O(100.0);// 其他
 
         private double value;
 

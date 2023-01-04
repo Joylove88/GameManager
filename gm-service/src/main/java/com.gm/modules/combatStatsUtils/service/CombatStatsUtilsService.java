@@ -202,14 +202,14 @@ public class CombatStatsUtilsService {
      * @return
      */
     public AttributeSimpleEntity getHeroAttributeWithLv(UserHeroInfoDetailWithGrowRsp heroInfo, Integer Lv){
-        long hp = Math.round(heroInfo.getGrowHealth() * Lv);// 成长生命值
-        long mp = Math.round(heroInfo.getGrowMana() * Lv);// 成长法力值
-        double hpRegen = Math.round(heroInfo.getGrowHealthRegen() * Lv);// 成长生命值恢复
-        double mpRegen = Math.round(heroInfo.getGrowManaRegen() * Lv);// 成长法力值恢复
-        long armor = Math.round(heroInfo.getGrowArmor() * Lv);// 成长护甲
-        long magicResist = Math.round(heroInfo.getGrowMagicResist() * Lv);// 成长魔抗
-        long attackDamage = Math.round(heroInfo.getGrowAttackDamage() * Lv);// 成长攻击力
-        long attackSpell = Math.round(heroInfo.getGrowAttackSpell() * Lv);// 成长法功
+        long hp = Math.round(heroInfo.getGrowHealth() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长生命值
+        long mp = Math.round(heroInfo.getGrowMana() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长法力值
+        double hpRegen = Math.round(heroInfo.getGrowHealthRegen() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长生命值恢复
+        double mpRegen = Math.round(heroInfo.getGrowManaRegen() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长法力值恢复
+        long armor = Math.round(heroInfo.getGrowArmor() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长护甲
+        long magicResist = Math.round(heroInfo.getGrowMagicResist() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长魔抗
+        long attackDamage = Math.round(heroInfo.getGrowAttackDamage() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长攻击力
+        long attackSpell = Math.round(heroInfo.getGrowAttackSpell() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长法功
         return new AttributeSimpleEntity(hp, mp, hpRegen,
                 mpRegen, armor, magicResist, attackDamage, attackSpell);
     }
