@@ -5,6 +5,7 @@ import com.gm.common.utils.PageUtils;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
 import com.gm.modules.user.rsp.UserHeroInfoDetailRsp;
+import com.gm.modules.user.rsp.UserHeroInfoDetailWithGrowRsp;
 import com.gm.modules.user.rsp.UserHeroInfoNotAllRsp;
 import com.gm.modules.user.rsp.UserHeroInfoRsp;
 
@@ -59,6 +60,14 @@ public interface UserHeroService extends IService<UserHeroEntity> {
      * @return
      */
     UserHeroInfoDetailRsp getUserHeroByIdDetailRsp(Map<String, Object> map);
+
+    /**
+     * 获取玩家英雄指定的英雄详细信息加英雄成长属性值
+     *
+     * @param map
+     * @return
+     */
+    UserHeroInfoDetailWithGrowRsp getUserHeroByIdDetailWithGrowRsp(Map<String, Object> map);
 
     /**
      * 我的英雄列表，分页

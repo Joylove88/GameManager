@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
+import com.gm.common.utils.Arith;
 import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
@@ -13,8 +14,6 @@ import com.gm.modules.basicconfig.dao.ExperienceDao;
 import com.gm.modules.basicconfig.dao.HeroInfoDao;
 import com.gm.modules.basicconfig.dao.HeroLevelDao;
 import com.gm.modules.basicconfig.dto.AttributeSimpleEntity;
-import com.gm.modules.basicconfig.entity.ExperienceEntity;
-import com.gm.modules.basicconfig.entity.HeroInfoEntity;
 import com.gm.modules.basicconfig.entity.HeroLevelEntity;
 import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
 import com.gm.modules.user.dao.UserExperienceDao;
@@ -23,10 +22,9 @@ import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserExperienceEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
 import com.gm.modules.user.req.UseExpPropReq;
+import com.gm.modules.user.rsp.UserExpInfoDetailRsp;
 import com.gm.modules.user.rsp.UserExpInfoRsp;
-import com.gm.modules.user.rsp.UserHeroInfoDetailRsp;
 import com.gm.modules.user.rsp.UserHeroInfoDetailWithGrowRsp;
-import com.gm.modules.user.rsp.UserHeroInfoRsp;
 import com.gm.modules.user.service.UserExperienceService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +75,11 @@ public class UserExperienceServiceImpl extends ServiceImpl<UserExperienceDao, Us
     }
 
     @Override
+    public List<UserExpInfoDetailRsp> getUserExpDetail(Map<String, Object> map) {
+        return userExperienceDao.getUserExpDetail(map);
+    }
+
+    @Override
     public List<UserExperienceEntity> getUnusedExpFromPlayers(Map<String, Object> map) {
         return userExperienceDao.getUnusedExpFromPlayers(map);
     }
@@ -107,10 +110,12 @@ public class UserExperienceServiceImpl extends ServiceImpl<UserExperienceDao, Us
         // 获取玩家背包的全部经验道具
         Map<String, Object> expMap = new HashMap<>();
         expMap.put("userId", user.getUserId());
-        List<UserExpInfoRsp> expList = userExperienceDao.getUserExp(expMap);
+        List<UserExpInfoDetailRsp> expList = userExperienceDao.getUserExpDetail(expMap);
 
         // 本次使用的经验道具累计的经验值
         Long expTotal = Constant.ZERO;
+        // SCALE
+        Double scale = Constant.ZERO_D;
         int i = 0;
         while (i < useExpPropReq.getExpList().size()) {
             // 获取使用数量
@@ -131,8 +136,9 @@ public class UserExperienceServiceImpl extends ServiceImpl<UserExperienceDao, Us
             }
 
             // 通过请求的经验道具稀有度匹配系统中的经验道具
-            for (UserExpInfoRsp expInfo : expList) {
+            for (UserExpInfoDetailRsp expInfo : expList) {
                 if (expInfo.getExpRare().equals(expRare)) {
+                    scale += expInfo.getScale();
                     // 先校验玩家背包是否有足够的经验道具
                     if (expInfo.getExpNum() < useNum) {
                         throw new RRException(ErrorCode.EXP_NUM_INSUFFICIENT.getDesc());
@@ -158,7 +164,7 @@ public class UserExperienceServiceImpl extends ServiceImpl<UserExperienceDao, Us
         expTotal = expTotal + userHero.getExperienceObtain();
         // 通过玩家英雄经验值匹配英雄等级信息
         Map<String, Object> heroLvMap = new HashMap<>();
-        heroLvMap.put("heroLv", expTotal);
+        heroLvMap.put("heroLv", userHero.getLevelCode());
         heroLvMap.put("experienceTotal", expTotal);
         List<HeroLevelEntity> levels = heroLevelDao.getHeroLevel(heroLvMap);
         // 获取最大等级限制(英雄等级不能超过账号10级)
@@ -188,8 +194,8 @@ public class UserExperienceServiceImpl extends ServiceImpl<UserExperienceDao, Us
             attribute = combatStatsUtilsService.getHeroAttributeWithLv(userHero, lv);
             // 获取本次升级增加的战力
             long changePower = combatStatsUtilsService.getHeroPower(attribute);
-            // 增加玩家英雄战力
-            userHeroUp.setHeroPower(changePower);
+            // 最新战力
+            long newPower = userHero.getHeroPower() + changePower;
             // 增加玩家英雄属性
             userHeroUp.setHealth(userHero.getHealth() + attribute.getHp());// 累加生命值
             userHeroUp.setMana(userHero.getMana() + attribute.getMp());// 累加法力值
@@ -199,10 +205,16 @@ public class UserExperienceServiceImpl extends ServiceImpl<UserExperienceDao, Us
             userHeroUp.setMagicResist(userHero.getMagicResist() + attribute.getMagicResist());// 累加魔抗
             userHeroUp.setAttackDamage(userHero.getAttackDamage() + attribute.getAttackDamage());// 累加攻击力
             userHeroUp.setAttackSpell(userHero.getAttackSpell() + attribute.getAttackSpell());// 累加法功
-            // 获取英雄碎片的SCALE平均值
-            Double scale = user.getScale() * userHero.getScaleI();
-            // 更新战力及矿工
-            combatStatsUtilsService.updateCombatPower(user, userHeroId, null, changePower, scale);
+            // 获取经验道具scale平均值
+            scale = scale / (i + Constant.Quantity.Q1.getValue());
+            // 计算新的scale
+            scale = user.getScale() * (((userHero.getScale() * userHero.getHeroPower()) + (scale * changePower)) / (userHero.getHeroPower() + changePower));
+            // 增加玩家英雄战力
+            userHeroUp.setHeroPower(newPower);
+            // 更新矿工、神谕值以及队伍战力、矿工，玩家战力、矿工
+            UserHeroInfoDetailWithGrowRsp rsp = combatStatsUtilsService.updateCombatPower(user, userHero, null, changePower, scale);
+            userHeroUp.setMinter(Arith.add(userHero.getMinter(), rsp.getMinter()));
+            userHeroUp.setOracle(rsp.getOracle());
         }
         userHeroUp.setUserHeroId(userHeroId);
         userHeroUp.setHeroLevelId(newLvId);

@@ -2,6 +2,7 @@ package com.gm.modules.user.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gm.modules.user.entity.UserHeroFragEntity;
+import com.gm.modules.user.rsp.UserHeroFragInfoDetailRsp;
 import com.gm.modules.user.rsp.UserHeroFragInfoRsp;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -30,7 +31,7 @@ public interface UserHeroFragDao extends BaseMapper<UserHeroFragEntity> {
      * @param map
      * @return
      */
-    UserHeroFragInfoRsp getUserAllHeroFragCount(Map<String, Object> map);
+    UserHeroFragInfoDetailRsp getUserAllHeroFragCount(Map<String, Object> map);
 
     /**
      * 消耗英雄碎片升星

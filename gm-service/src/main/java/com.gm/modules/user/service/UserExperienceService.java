@@ -5,6 +5,7 @@ import com.gm.common.utils.PageUtils;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserExperienceEntity;
 import com.gm.modules.user.req.UseExpPropReq;
+import com.gm.modules.user.rsp.UserExpInfoDetailRsp;
 import com.gm.modules.user.rsp.UserExpInfoRsp;
 
 import java.util.List;
@@ -27,6 +28,13 @@ public interface UserExperienceService extends IService<UserExperienceEntity> {
      * @return
      */
     List<UserExpInfoRsp> getUserExp(Map<String, Object> map);
+
+    /**
+     * 获取玩家经验道具全部参数
+     * @param map
+     * @return
+     */
+    List<UserExpInfoDetailRsp> getUserExpDetail(Map<String, Object> map);
 
     /**
      * 获取玩家未使用的经验道具

@@ -24,6 +24,10 @@ public class UserEquipmentFragInfoRsp {
 	 */
 	private String equipRarecode;
 	/**
+	 * 装备描述
+	 */
+	private String description;
+	/**
      * 装备碎片数量
 	 */
 	private Long equipFragNum;

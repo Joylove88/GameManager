@@ -12,28 +12,27 @@ package com.gm.controller;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gm.annotation.Login;
 import com.gm.annotation.LoginUser;
-import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
 import com.gm.common.utils.Arith;
-import com.gm.common.utils.CalculateTradeUtil;
 import com.gm.common.utils.Constant;
 import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
-import com.gm.modules.basicconfig.dto.AttributeSimpleEntity;
-import com.gm.modules.basicconfig.entity.*;
+import com.gm.modules.basicconfig.entity.EquipSynthesisItemEntity;
+import com.gm.modules.basicconfig.entity.StarInfoEntity;
 import com.gm.modules.basicconfig.rsp.HeroLevelRsp;
-import com.gm.modules.basicconfig.rsp.TeamInfoRsp;
 import com.gm.modules.basicconfig.service.*;
 import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
-import com.gm.modules.fightCore.service.FightCoreService;
-import com.gm.modules.user.entity.*;
+import com.gm.modules.sys.service.SysDictService;
+import com.gm.modules.user.entity.UserEntity;
+import com.gm.modules.user.entity.UserEquipmentEntity;
+import com.gm.modules.user.entity.UserHeroEntity;
+import com.gm.modules.user.entity.UserHeroEquipmentWearEntity;
 import com.gm.modules.user.req.UseExpPropReq;
 import com.gm.modules.user.req.UserHeroInfoReq;
 import com.gm.modules.user.rsp.*;
 import com.gm.modules.user.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,8 +41,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 战力提升接口
@@ -77,56 +78,44 @@ public class ApiIncreaseCombatPowerController {
     @Autowired
     private ExperienceService experienceService;
 
+
     @Login
     @PostMapping("equipment")
     @ApiOperation("英雄装备激活OR合成")
     @Transactional(rollbackFor = Exception.class)
     public R equipment(@LoginUser UserEntity user, @RequestBody UserHeroInfoReq req) throws InvocationTargetException, IllegalAccessException {
+        // 校验该功能是否开放
+        combatStatsUtilsService.isOpen();
         // 表单校验
         ValidatorUtils.validateEntity(req);
         // 获取英雄
-        UserHeroEntity userHero = getUserHero(req.getUserHeroId());
-        UserHeroInfoRsp rsp = new UserHeroInfoRsp();
-        BeanUtils.copyProperties(rsp, userHero);
+        UserHeroInfoDetailWithGrowRsp userHero = combatStatsUtilsService.getUserHero(req.getUserHeroId());
+        // 初始化玩家英雄信息
+        UserHeroInfoDetailRsp rsp;
         // 获取玩家装备信息
-        UserEquipmentEntity userEquipment = new UserEquipmentEntity();
-        userEquipment.setUserId(user.getUserId());
-        userEquipment.setUserEquipmentId(req.getUserEquipmentId());
-        List<UserEquipInfoRsp> equipment = userEquipmentService.getUserEquip(userEquipment);
-        if (equipment.size() == 0) {
+        Map<String, Object> userEquipMap = new HashMap<>();
+        userEquipMap.put("status", Constant.enable);
+        userEquipMap.put("userId", user.getUserId());
+        userEquipMap.put("userEquipmentId", req.getUserEquipmentId());
+        UserEquipInfoDetailRsp equipment = userEquipmentService.getUserEquipById(userEquipMap);
+        if (equipment == null) {
             throw new RRException("You do not have this equipment or it has been activated!");
         }
-        for (UserEquipInfoRsp equipInfoRsp : equipment) {
-            if (equipInfoRsp.getStatus().equals(Constant.used)) {
-                throw new RRException("This equipment has been used!");
-            }
+
+        if (equipment.getStatus().equals(Constant.used)) {
+            throw new RRException("This equipment has been used!");
         }
 
         // ===============校验子级装备是否已激活START===============
-        verifyEquipment(req, equipment.get(0).getEquipmentId());
+        verifyEquipment(req, equipment.getEquipmentId());
         // ===============校验子级装备是否已激活END===============
-
 
         // 装备战力
         long equpPower = 0;
         Date now = new Date();
-        // 更新玩家装备状态为已穿戴/激活
-        UserEquipmentEntity setUserEquip = new UserEquipmentEntity();
-        setUserEquip.setUserEquipmentId(req.getUserEquipmentId());
-        setUserEquip.setStatus(Constant.used);
-        setUserEquip.setUserId(user.getUserId());
-        setUserEquip.setUpdateTime(now);
-        setUserEquip.setUpdateTimeTs(now.getTime());
-        boolean update = userEquipmentService.update(setUserEquip, new UpdateWrapper<UserEquipmentEntity>()
-                .eq("STATUS", Constant.enable)
-                .eq("USER_EQUIPMENT_ID", req.getUserEquipmentId())
-        );
-        if (!update) {
-            throw new RRException("equipment activated!");
-        }
         // 穿戴表新增一条装备穿戴记录
         UserHeroEquipmentWearEntity userHeroEquipmentWear = new UserHeroEquipmentWearEntity();
-        userHeroEquipmentWear.setHeroId(rsp.getHeroId());
+        userHeroEquipmentWear.setHeroId(userHero.getHeroId());
         userHeroEquipmentWear.setUserHeroId(req.getUserHeroId());
         userHeroEquipmentWear.setUserEquipId(req.getUserEquipmentId());
         userHeroEquipmentWear.setParentEquipChain(req.getParentEquipChain());
@@ -141,11 +130,40 @@ public class ApiIncreaseCombatPowerController {
         userHeroEquipmentWearService.save(userHeroEquipmentWear);
 
         // 获取该装备战力（本次变化的战力）
-        equpPower = equipment.get(0).getEquipPower();
-        combatStatsUtilsService.updateCombatPower(user, req.getUserHeroId(), setUserEquip.getUserEquipmentId(), equpPower, null);
+        equpPower = equipment.getEquipPower();
+        // 计算新的scale
+        Double scale = user.getScale() * (((userHero.getScale() * userHero.getHeroPower()) + (equipment.getScale() * equpPower)) / (userHero.getHeroPower() + equpPower));
+        // 更新玩家装备状态为已穿戴/激活
+        UserEquipmentEntity setUserEquip = new UserEquipmentEntity();
+        setUserEquip.setUserEquipmentId(req.getUserEquipmentId());
+        setUserEquip.setStatus(Constant.used);
+        setUserEquip.setUserId(user.getUserId());
+        setUserEquip.setUpdateTime(now);
+        setUserEquip.setUpdateTimeTs(now.getTime());
+        boolean update = userEquipmentService.update(setUserEquip, new UpdateWrapper<UserEquipmentEntity>()
+                .eq("STATUS", Constant.enable)
+                .eq("USER_EQUIPMENT_ID", req.getUserEquipmentId())
+        );
+        if (!update) {
+            throw new RRException("equipment activated!");
+        }
+        // 更新矿工、神谕值以及队伍战力、矿工，玩家战力、矿工
+        UserHeroInfoDetailWithGrowRsp rspI = combatStatsUtilsService.updateCombatPower(user, userHero, null, equpPower, scale);
+        // 更新英雄scale和矿工和神谕值
+        UserHeroEntity userHeroUp = new UserHeroEntity();
+        userHeroUp.setScale(scale);
+        userHeroUp.setHeroPower(userHero.getHeroPower() + equpPower);
+        userHeroUp.setUserHeroId(userHero.getUserHeroId());
+        userHeroUp.setOracle(rspI.getOracle());
+        userHeroUp.setMinter(Arith.add(userHero.getMinter(), rspI.getMinter()));
+        userHeroUp.setUpdateTime(now);
+        userHeroUp.setUpdateTimeTs(now.getTime());
+        userHeroService.updateById(userHeroUp);
 
-        Map<String, Object> map = new HashMap();
-        map.put("changePower", equpPower);
+        // 装备激活成功后重新获取英雄详细信息并返回
+        rsp = combatStatsUtilsService.getHeroInfoDetail(user, req.getUserHeroId());
+        Map<String, Object> map = new HashMap<>();
+        map.put("heroInfo", rsp);
         return R.ok().put("data", map);
     }
 
@@ -187,12 +205,12 @@ public class ApiIncreaseCombatPowerController {
             List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearService.getUserWearEQ(userWearMap);
             for (UserHeroEquipmentWearRsp equipmentWearRsp : wearList) {
                 if (equipmentWearRsp.getUserEquipId().equals(req.getUserEquipmentId())) {
-                    throw new RRException("该装备已使用");
+                    throw new RRException("This equipment has been used!");
                 }
             }
             // 开始校验：该装备合成公式的下级装备数量 是否与已激活装备数量相同 如果相同则校验通过
             if (equipNum != wearList.size()) {
-                throw new RRException("请先激活下层全部装备");
+                throw new RRException("Please activate other parts of this equipment first!");
             }
         }
     }
@@ -210,38 +228,22 @@ public class ApiIncreaseCombatPowerController {
         // 表单校验
         ValidatorUtils.validateEntity(req);
         // 获取英雄
-        UserHeroEntity userHero = getUserHero(req.getUserHeroId());
 
         return R.ok().put("data", null);
     }
 
-    /**
-     * 校验英雄
-     *
-     * @param userHeroId
-     * @return
-     */
-    private UserHeroEntity getUserHero(Long userHeroId) {
-        // 获取英雄
-        Map<String, Object> userHeroMap = new HashMap<>();
-        userHeroMap.put("status", Constant.enable);
-        userHeroMap.put("userHeroId", userHeroId);
-        UserHeroEntity userHero = userHeroService.getUserHeroById(userHeroMap);
-        if (userHero == null) {
-            throw new RRException(ErrorCode.USER_HERO_GET_FAIL.getDesc() + "+ID: " + userHeroId);
-        }
-        return userHero;
-    }
 
     @Login
     @PostMapping("upgradeStar")
     @ApiOperation("英雄升星")
     @Transactional(rollbackFor = Exception.class)
     public R upgradeStar(@LoginUser UserEntity user, @RequestBody UserHeroInfoReq req) {
+        // 校验该功能是否开放
+        combatStatsUtilsService.isOpen();
         // 表单校验
         ValidatorUtils.validateEntity(req);
         // 获取玩家英雄
-        UserHeroEntity userHero = getUserHero(req.getUserHeroId());
+        UserHeroInfoDetailWithGrowRsp userHero = combatStatsUtilsService.getUserHero(req.getUserHeroId());
         // 初始化玩家英雄信息
         UserHeroInfoDetailRsp rsp;
         // 获取玩家背包中的英雄碎片
@@ -249,7 +251,7 @@ public class ApiIncreaseCombatPowerController {
         heroFragMap.put("userId", user.getUserId());
         heroFragMap.put("status", Constant.enable);
         heroFragMap.put("heroId", userHero.getHeroId());
-        UserHeroFragInfoRsp heroFragCount = userHeroFragService.getUserAllHeroFragCount(heroFragMap);
+        UserHeroFragInfoDetailRsp heroFragCount = userHeroFragService.getUserAllHeroFragCount(heroFragMap);
         // 获取当前星级+1
         int starCode = userHero.getStarCode();
         if (starCode < Constant.StarLv.Lv5.getValue()) {
@@ -297,7 +299,7 @@ public class ApiIncreaseCombatPowerController {
         } else {
             throw new RRException("Insufficient hero shards!");
         }
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap<>();
         map.put("heroInfo", rsp);
         return R.ok().put("data", map);
     }
@@ -316,6 +318,8 @@ public class ApiIncreaseCombatPowerController {
     @ApiOperation("使用经验道具")
     @Transactional(rollbackFor = Exception.class)
     public R useExpProps(@LoginUser UserEntity user, @RequestBody UseExpPropReq useExpPropReq) {
+        // 校验该功能是否开放
+        combatStatsUtilsService.isOpen();
         // 表单校验
         ValidatorUtils.validateEntity(useExpPropReq);
         userExService.userHeroUseExp(user, useExpPropReq);

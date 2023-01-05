@@ -6,7 +6,7 @@ import lombok.Data;
  * 玩家装备
  */
 @Data
-public class UserEquipInfoRsp {
+public class UserEquipInfoDetailRsp {
     /**
 	 * 玩家装备id
 	 */
@@ -16,6 +16,10 @@ public class UserEquipInfoRsp {
 	 */
 	private Long equipmentId;
 	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
+	/**
      * 装备名称
 	 */
 	private String equipName;
@@ -23,10 +27,6 @@ public class UserEquipInfoRsp {
      * 装备稀有度(1:白色,2:绿色,3:蓝色,4:紫色,5:橙色)
 	 */
 	private String equipRarecode;
-	/**
-	 * 装备描述
-	 */
-	private String description;
 	/**
 	 * 状态('0':禁用，'1':未激活, '2':已激活)
 	 */

@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
+ * <p>
  * https://www.renren.io
- *
+ * <p>
  * 版权所有，侵权必究！
  */
 
@@ -23,11 +23,12 @@ import javax.validation.constraints.NotBlank;
 @ApiModel(value = "验签类")
 public class SignIn {
     @ApiModelProperty(value = "钱包地址")
-    @NotBlank(message="User wallet address cannot be empty")
+    @NotBlank(message = "User wallet address cannot be empty")
     private String address;
     private String msg;
     private String signedMsg;
     private String clientIp;
     private String userAgent;
+    private String inviteAddress;
 
 }

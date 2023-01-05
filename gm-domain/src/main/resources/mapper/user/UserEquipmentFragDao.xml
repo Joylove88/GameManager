@@ -14,6 +14,7 @@
             A.FROM_TYPE,
             C.EQUIP_NAME,
             C.EQUIP_RARECODE,
+            C.DESCRIPTION,
             D.USER_NAME
         FROM
             GM_USER_EQUIPMENT_FRAG A
@@ -37,6 +38,7 @@
             B.EQUIPMENT_ID AS EQUIP_ID,
             B.EQUIP_FRAG_ICON_URL,
             C.EQUIP_NAME,
+            C.DESCRIPTION,
             C.EQUIP_RARECODE
         FROM
             GM_USER_EQUIPMENT_FRAG A

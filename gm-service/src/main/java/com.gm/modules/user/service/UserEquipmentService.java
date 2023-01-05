@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserEquipmentEntity;
+import com.gm.modules.user.rsp.UserEquipInfoDetailRsp;
 import com.gm.modules.user.rsp.UserEquipInfoRsp;
 
 import java.util.List;
@@ -28,6 +29,13 @@ public interface UserEquipmentService extends IService<UserEquipmentEntity> {
     List<UserEquipInfoRsp> getUserEquip(UserEquipmentEntity userEquipmentEntity);
 
     /**
+     * 获取玩家指定装备
+     * @param map
+     * @return
+     */
+    UserEquipInfoDetailRsp getUserEquipById(Map<String, Object> map);
+
+    /**
      * 获取我的装备，分页
      * @param userId
      * @param params
@@ -37,7 +45,7 @@ public interface UserEquipmentService extends IService<UserEquipmentEntity> {
 
     /**
      * 查询用户的装备
-     * @param userEquipmentMap
+     * @param userEquipmentId
      * @return
      */
     UserEquipmentEntity getUserEquipmentById(Long userId ,Long userEquipmentId);

@@ -3,6 +3,7 @@ package com.gm.modules.user.rsp;
 import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +44,10 @@ public class UserHeroInfoDetailRsp {
      * 英雄等级编码
      */
     private Integer levelCode;
+    /**
+     * 神谕值
+     */
+    private BigDecimal oracle;
     /**
      * 成长率
      */

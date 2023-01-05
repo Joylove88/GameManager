@@ -29,6 +29,32 @@
     <select id="getUserExp" resultType="com.gm.modules.user.rsp.UserExpInfoRsp">
         SELECT
             count(*) AS EXP_NUM,
+            AVG(A.SCALE) SCALE,
+            A.NFT_ID,
+            B.EXP_NAME,
+            B.RARE_CODE AS EXP_RARE,
+            B.EXP,
+            B.ICON_URL,
+            B.DESCRIPTION
+        FROM
+            GM_USER_EXPERIENCE A
+        LEFT JOIN
+            GM_EXPERIENCE B ON A.EXP_ID = B.ID
+        <where>
+            <if test="userId != null and userId != ''">
+                AND A.`STATUS` = '1'
+                AND A.USER_ID = #{userId}
+            </if>
+        </where>
+        GROUP BY  A.NFT_ID, B.EXP_NAME, B.RARE_CODE, B.EXP, B.ICON_URL, B.DESCRIPTION
+        ORDER BY B.RARE_CODE
+    </select>
+
+    <!--获取玩家未使用的经验道具统计-->
+    <select id="getUserExpDetail" resultType="com.gm.modules.user.rsp.UserExpInfoDetailRsp">
+        SELECT
+            count(*) AS EXP_NUM,
+            AVG(A.SCALE) SCALE,
             A.NFT_ID,
             B.EXP_NAME,
             B.RARE_CODE AS EXP_RARE,

@@ -55,6 +55,10 @@ public class EquipmentInfoEntity implements Serializable {
 	 */
 	private String equipIconUrl;
 	/**
+	 * 装备描述
+	 */
+	private String description;
+	/**
 	 * 装备合成公式json
 	 */
 	private String equipJson;
