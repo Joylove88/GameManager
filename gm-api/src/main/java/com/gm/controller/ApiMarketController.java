@@ -45,7 +45,7 @@ public class ApiMarketController {
      */
     @Login
     @PostMapping("getItems")
-    public R getItems(@LoginUser UserEntity user, @RequestParam Map<String, Object> params) {
+    public R getItems(@LoginUser UserEntity user, @RequestBody Map<String, Object> params) {
         String itemsType = (String) params.getOrDefault("itemsType", "99");
         switch (itemsType) {
             case "0":
@@ -177,7 +177,7 @@ public class ApiMarketController {
      */
 //    @Login
     @PostMapping("itemsOnMarket")
-    public R itemsOnMarket(@RequestParam Map<String, Object> params) {
+    public R itemsOnMarket(@RequestBody Map<String, Object> params) {
         String itemsType = (String) params.getOrDefault("itemsType", "99");
         switch (itemsType) {
             case "0":

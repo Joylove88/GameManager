@@ -256,7 +256,7 @@ public class ApiLoginController {
         if (b) {
             map.put("withdrawStatus", "1");// 已经有申请提现中订单
         }
-        if (userAgentRebateWithdraw.compareTo(BigDecimal.ZERO) == -1) {
+        if (userAgentRebateWithdraw.compareTo(BigDecimal.ZERO) >= -1) {
             map.put("withdrawStatus", "2");// 可提现额度不足
         }
         GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(userEntity);
@@ -290,7 +290,7 @@ public class ApiLoginController {
         if (b) {
             map.put("withdrawStatus", "1");// 已经有申请提现中订单
         }
-        if (userFightingWithdraw.compareTo(BigDecimal.ZERO) == -1) {
+        if (userFightingWithdraw.compareTo(BigDecimal.ZERO) > -1) {
             map.put("withdrawStatus", "2");// 可提现额度不足
         }
         GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(userEntity);
