@@ -28,6 +28,32 @@
             A.*,
             B.EQUIP_NAME,
             B.EQUIP_RARECODE,
+            B.DESCRIPTION,
+            B.EQUIP_LEVEL,
+            B.EQUIP_IMG_URL,
+            B.EQUIP_ICON_URL
+        FROM
+            GM_USER_EQUIPMENT A
+        LEFT JOIN
+            GM_EQUIPMENT_INFO B ON A.EQUIPMENT_ID = B.EQUIP_ID
+        <where>
+            <if test="status != null and status != ''">
+                AND A.STATUS = #{status}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND A.USER_ID = #{userId}
+            </if>
+            <if test="userEquipmentId != null and userEquipmentId != ''">
+                AND A.USER_EQUIPMENT_ID = #{userEquipmentId}
+            </if>
+        </where>
+    </select>
+    <!--获取玩家指定装备-->
+    <select id="getUserEquipById" resultType="com.gm.modules.user.rsp.UserEquipInfoDetailRsp">
+        SELECT
+            A.*,
+            B.EQUIP_NAME,
+            B.EQUIP_RARECODE,
             B.EQUIP_LEVEL,
             B.EQUIP_IMG_URL,
             B.EQUIP_ICON_URL

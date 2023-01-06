@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gm.common.utils.PageUtils;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroFragEntity;
+import com.gm.modules.user.rsp.UserHeroFragInfoDetailRsp;
 import com.gm.modules.user.rsp.UserHeroFragInfoRsp;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public interface UserHeroFragService extends IService<UserHeroFragEntity> {
      * @param map
      * @return
      */
-    UserHeroFragInfoRsp getUserAllHeroFragCount(Map<String, Object> map);
+    UserHeroFragInfoDetailRsp getUserAllHeroFragCount(Map<String, Object> map);
 
     /**
      * 消耗英雄碎片升星

@@ -10,6 +10,7 @@ import com.gm.modules.user.dao.UserEquipmentDao;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserEquipmentEntity;
 import com.gm.modules.user.entity.UserHeroFragEntity;
+import com.gm.modules.user.rsp.UserEquipInfoDetailRsp;
 import com.gm.modules.user.rsp.UserEquipInfoRsp;
 import com.gm.modules.user.service.UserEquipmentService;
 import org.apache.commons.lang.StringUtils;
@@ -45,6 +46,11 @@ public class UserEquipmentServiceImpl extends ServiceImpl<UserEquipmentDao, User
     @Override
     public List<UserEquipInfoRsp> getUserEquip(UserEquipmentEntity userEquipmentEntity) {
         return userEquipmentDao.getUserEquip(userEquipmentEntity);
+    }
+
+    @Override
+    public UserEquipInfoDetailRsp getUserEquipById(Map<String, Object> map) {
+        return userEquipmentDao.getUserEquipById(map);
     }
 
     @Override

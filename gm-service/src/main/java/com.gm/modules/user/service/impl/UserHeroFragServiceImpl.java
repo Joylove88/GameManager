@@ -10,6 +10,7 @@ import com.gm.modules.user.dao.UserHeroFragDao;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
 import com.gm.modules.user.entity.UserHeroFragEntity;
+import com.gm.modules.user.rsp.UserHeroFragInfoDetailRsp;
 import com.gm.modules.user.rsp.UserHeroFragInfoRsp;
 import com.gm.modules.user.service.UserHeroFragService;
 import org.apache.commons.lang.StringUtils;
@@ -48,7 +49,7 @@ public class UserHeroFragServiceImpl extends ServiceImpl<UserHeroFragDao, UserHe
     }
 
     @Override
-    public UserHeroFragInfoRsp getUserAllHeroFragCount(Map<String, Object> map) {
+    public UserHeroFragInfoDetailRsp getUserAllHeroFragCount(Map<String, Object> map) {
         return userHeroFragDao.getUserAllHeroFragCount(map);
     }
 

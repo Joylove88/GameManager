@@ -39,6 +39,10 @@ public class UserExperienceEntity implements Serializable {
 	 */
 	private Long nftId;
 	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
+	/**
 	 * 经验道具数量
 	 */
 	private Integer expNum;

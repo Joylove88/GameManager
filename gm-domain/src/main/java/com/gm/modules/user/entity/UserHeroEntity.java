@@ -119,6 +119,10 @@ public class UserHeroEntity implements Serializable {
 	 */
 	private String status;
 	/**
+	 * 是否绑定('0':否，'1':是)
+	 */
+	private String isBind;
+	/**
 	 * 上阵状态('0':未上阵，'1':上阵中)
 	 */
 	private String statePlay;

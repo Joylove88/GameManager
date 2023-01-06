@@ -88,6 +88,8 @@ public class UserEquipmentFragEntity implements Serializable {
 	@TableField(exist = false)
 	private String equipName;
 	@TableField(exist = false)
+	private String description;
+	@TableField(exist = false)
 	private String equipRarecode;
 	@TableField(exist = false)
 	private String equipFragIconUrl;

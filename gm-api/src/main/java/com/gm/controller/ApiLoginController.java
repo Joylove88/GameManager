@@ -105,7 +105,7 @@ public class ApiLoginController {
                 throw new RRException(ErrorCode.SIGN_SIGNEDMSG_EXCEPTION.getDesc());
             }
             // 检测用户是否存在
-            UserEntity userEntity = userService.queryByAddress(signIn.getAddress());
+            UserEntity userEntity = userService.queryByAddress(signIn.getAddress().toLowerCase());
             if (userEntity != null) {
 
                 // 检测签名日期是否在用户登陆日志内存在 （防止黑客攻击）
@@ -150,17 +150,27 @@ public class ApiLoginController {
             } else {
                 // 用户不存在则执行自动注册
                 UserEntity userRegister = new UserEntity();
+                if (StringUtils.isNotBlank(signIn.getInviteAddress())) {
+                    UserEntity userInviteEntity = userService.queryByAddress(signIn.getInviteAddress().toLowerCase());
+                    userRegister.setFatherId(userInviteEntity.getUserId());
+                }
                 userRegister.setSignDate(signDate);
                 userRegister.setAddress(signIn.getAddress().toLowerCase());
                 userService.userRegister(userRegister);
-                UserEntity userRe = userService.queryByAddress(signIn.getAddress());
+                UserEntity userRe = userService.queryByAddress(signIn.getAddress().toLowerCase());
                 map = login(signIn, userRe);
             }
         }
         return R.ok(map);
     }
 
-    private Map login(SignIn signIn, UserEntity userEntity) {
+    /**
+     * 验签功能
+     * @param signIn
+     * @param userEntity
+     * @return
+     */
+    private Map<String, Object> login(SignIn signIn, UserEntity userEntity) {
         Map<String, Object> map = new HashMap<>();
         // 进行验签 通过后返回TOKEN
         Boolean result = MetaMaskUtil.validate(signIn.getSignedMsg(), signIn.getMsg(), signIn.getAddress());
@@ -193,11 +203,11 @@ public class ApiLoginController {
         // 1.表单校验
         ValidatorUtils.validateEntity(form);
         // 2.校验两个地址
-        UserEntity userEntity = userService.queryByAddress(form.getAddress());
+        UserEntity userEntity = userService.queryByAddress(form.getAddress().toLowerCase());
         if (userEntity != null) {
             throw new RRException(ErrorCode.ADDRESS_HAS_EXIST.getDesc());
         }
-        UserEntity userInviteEntity = userService.queryByAddress(form.getInviteAddress());
+        UserEntity userInviteEntity = userService.queryByAddress(form.getInviteAddress().toLowerCase());
         if (userInviteEntity == null) {
             throw new RRException(ErrorCode.INVITE_ADDRESS_NOT_EXIST.getDesc());
         }

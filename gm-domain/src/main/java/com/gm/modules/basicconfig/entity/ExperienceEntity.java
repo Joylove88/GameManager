@@ -37,6 +37,10 @@ public class ExperienceEntity implements Serializable {
 	 */
 	private Long exp;
 	/**
+	 * 矿工兑换比例（增幅,削减）
+	 */
+	private Double scale;
+	/**
 	 * 经验道具描述
 	 */
 	private String description;

@@ -2,6 +2,8 @@ package com.gm.modules.user.rsp;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * 玩家英雄
  */
@@ -31,6 +33,14 @@ public class UserHeroInfoDetailWithGrowRsp {
      * 英雄战力
      */
     private Long heroPower;
+    /**
+     * 矿工数
+     */
+    private BigDecimal minter;
+    /**
+     * 神谕值
+     */
+    private BigDecimal oracle;
     /**
      * 玩家英雄的矿工兑换比例（增幅,削减）
      */
