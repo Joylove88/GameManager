@@ -94,10 +94,10 @@ public class ApiLoginController {
         String clientIp = IPUtils.getIpAddr(request);
         signIn.setClientIp(clientIp);
         Map<String, Object> map = new HashMap<>();
-        if (StringUtils.isNotBlank(signIn.getAddress().toLowerCase())) {
+        if (StringUtils.isNotBlank(signIn.getAddress())) {
 
             // Address安全校验 防止注入攻击;
-            if (ValidatorUtils.securityVerify(signIn.getAddress().toLowerCase())) {
+            if (ValidatorUtils.securityVerify(signIn.getAddress())) {
                 throw new RRException(ErrorCode.SIGN_ADDRESS_EXCEPTION.getDesc());
             }
             // signedMsg安全校验 防止注入攻击;
@@ -150,7 +150,7 @@ public class ApiLoginController {
             } else {
                 // 用户不存在则执行自动注册
                 UserEntity userRegister = new UserEntity();
-                if (StringUtils.isNotBlank(signIn.getInviteAddress().toLowerCase())) {
+                if (StringUtils.isNotBlank(signIn.getInviteAddress())) {
                     UserEntity userInviteEntity = userService.queryByAddress(signIn.getInviteAddress().toLowerCase());
                     userRegister.setFatherId(userInviteEntity.getUserId());
                 }

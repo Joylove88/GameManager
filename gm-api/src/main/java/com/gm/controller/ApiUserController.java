@@ -245,9 +245,11 @@ public class ApiUserController {
             }
             i++;
         }
-        rsp = list.get(0);
-        rsp.setMrCoins(mrCoins);
-        rsp.setMrCoinsAgent(mrCoinsAgent);
+        if(list.size() > 0){
+            rsp = list.get(0);
+            rsp.setMrCoins(mrCoins);
+            rsp.setMrCoinsAgent(mrCoinsAgent);
+        }
         return rsp;
     }
 
@@ -294,9 +296,13 @@ public class ApiUserController {
         }
 
         // 获取系统全部装备
-        Map<String, Object> equipMap = new HashMap<>();
-        equipMap.put("STATUS", Constant.enable);
-        List<EquipmentInfoEntity> equipments = equipmentInfoService.getEquipmentInfos(equipMap);
+        List<EquipmentInfoEntity> equipments = equipmentInfoService.getEquipmentInfos(new HashMap<>());
+        for (int i = 0; i< equipments.size(); i++){
+            if(equipments.get(i).getStatus().equals(Constant.disabled)){
+                equipments.get(i).setEquipName("");
+                equipments.get(i).setDescription("mysterious equipment");
+            }
+        }
         // 获取英雄装备栏
         Map<String, Object> heroEquipMap = new HashMap<>();
         heroEquipMap.put("status", Constant.enable);
