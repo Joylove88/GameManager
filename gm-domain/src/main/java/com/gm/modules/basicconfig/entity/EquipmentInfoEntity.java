@@ -45,7 +45,7 @@ public class EquipmentInfoEntity implements Serializable {
 	/**
 	 * 装备等级
 	 */
-	private Long equipLevel;
+	private Integer equipLevel;
 	/**
 	 * 装备图片地址
 	 */

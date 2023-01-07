@@ -23,6 +23,7 @@ import com.gm.modules.basicconfig.rsp.HeroLevelRsp;
 import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
 import com.gm.modules.basicconfig.service.*;
 import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
+import com.gm.modules.fightCore.service.FightCoreService;
 import com.gm.modules.order.service.TransactionOrderService;
 import com.gm.modules.user.entity.*;
 import com.gm.modules.user.req.UseWithdrawReq;
@@ -101,6 +102,8 @@ public class ApiUserController {
     @Autowired
     private UserExperienceService userExperienceService;
     @Autowired
+    private FightCoreService fightCoreService;
+    @Autowired
     private CombatStatsUtilsService combatStatsUtilsService;
     @Autowired
     private TransactionOrderService transactionOrderService;
@@ -138,6 +141,8 @@ public class ApiUserController {
     @PostMapping("getUserProps")
     @ApiOperation("获取玩家背包信息")
     public R getUserProps(@LoginUser UserEntity user) {
+        // 初始GAIA系统
+        fightCoreService.initTradeBalanceParameter(0);
         Map<String, Object> map = new HashMap<>();
         // 获取玩家英雄信息和穿戴的装备信息
         Map<String, Object> userHeroMap = new HashMap<>();
@@ -172,6 +177,12 @@ public class ApiUserController {
         userEquipment.setStatus(Constant.enable);
         userEquipment.setUserId(user.getUserId());
         List<UserEquipInfoRsp> equipmentEntities = userEquipmentService.getUserEquip(userEquipment);
+        // 矿工兑换数量比例
+        BigDecimal minterRate = CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1));
+        for (int e = 0; e < equipmentEntities.size(); e++){
+            BigDecimal newOracle = BigDecimal.valueOf(Arith.multiply(Arith.divide(equipmentEntities.get(e).getOracle(), minterRate), BigDecimal.valueOf(100)).intValue());
+            equipmentEntities.get(e).setOracle(newOracle);
+        }
         map.put("equipList", equipmentEntities);
 
         // 获取玩家所有的装备碎片
@@ -290,7 +301,7 @@ public class ApiUserController {
         // 表单校验
         ValidatorUtils.validateEntity(req);
         // 获取英雄详细信息
-        UserHeroInfoDetailRsp rsp = combatStatsUtilsService.getHeroInfoDetail(user, req.getUserHeroId());
+        UserHeroInfoDetailRsp rsp = combatStatsUtilsService.getHeroInfoDetail(user, req.getUserHeroId(), Constant.disabled);
         if (rsp == null) {
             throw new RRException("Failed to get player hero information!");
         }

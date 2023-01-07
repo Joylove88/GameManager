@@ -2,6 +2,8 @@ package com.gm.modules.user.rsp;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * 玩家装备
  */
@@ -23,6 +25,10 @@ public class UserEquipInfoRsp {
      * 装备稀有度(1:白色,2:绿色,3:蓝色,4:紫色,5:橙色)
 	 */
 	private String equipRarecode;
+	/**
+	 * 神谕值
+	 */
+	private BigDecimal oracle;
 	/**
 	 * 装备描述
 	 */

@@ -34,7 +34,7 @@ public class UserEquipInfoDetailRsp {
 	/**
      * 装备等级
 	 */
-	private Long equipLevel;
+	private Integer equipLevel;
 	/**
 	 * 装备图片地址
 	 */

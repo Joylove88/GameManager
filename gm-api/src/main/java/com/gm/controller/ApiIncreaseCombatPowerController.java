@@ -106,9 +106,9 @@ public class ApiIncreaseCombatPowerController {
             throw new RRException("This equipment has been used!");
         }
 
-        // ===============校验子级装备是否已激活START===============
-        verifyEquipment(req, equipment.getEquipmentId());
-        // ===============校验子级装备是否已激活END===============
+        // ===============校验子级装备是否已激活,装备等级是否超出英雄等级限制START===============
+        verifyEquipment(req, userHero, equipment);
+        // ===============校验子级装备是否已激活,装备等级是否超出英雄等级限制制END===============
 
         // 装备战力
         long equpPower = 0;
@@ -161,21 +161,25 @@ public class ApiIncreaseCombatPowerController {
         userHeroService.updateById(userHeroUp);
 
         // 装备激活成功后重新获取英雄详细信息并返回
-        rsp = combatStatsUtilsService.getHeroInfoDetail(user, req.getUserHeroId());
+        rsp = combatStatsUtilsService.getHeroInfoDetail(user, req.getUserHeroId(), Constant.enable);
         Map<String, Object> map = new HashMap<>();
         map.put("heroInfo", rsp);
         return R.ok().put("data", map);
     }
 
     /**
-     * 校验子级装备是否已激活（子级装备激活后才可激活父级装备）
-     *
+     * 校验子级装备是否已激活（子级装备激活后才可激活父级装备）,装备等级是否超出英雄等级限制
      * @param req
-     * @param equipmentId
+     * @param userHero
+     * @param equipment
      */
-    private void verifyEquipment(UserHeroInfoReq req, Long equipmentId) {
+    private void verifyEquipment(UserHeroInfoReq req, UserHeroInfoDetailWithGrowRsp userHero, UserEquipInfoDetailRsp equipment) {
+        // 验证等级限制
+        if (equipment.getEquipLevel() > userHero.getStarCode()) {
+            throw new RRException("The hero level is lower than the equipment level and cannot be activated!");
+        }
         // 获取该装备的合成公式
-        EquipSynthesisItemEntity eqSIEs = equipSynthesisItemService.getEquipSyntheticFormula(equipmentId);
+        EquipSynthesisItemEntity eqSIEs = equipSynthesisItemService.getEquipSyntheticFormula(equipment.getEquipmentId());
         // 如果合成公式不为空说明为可合成装备 只有可合成装备才进行校验
         if (eqSIEs != null) {
             // 封装该装备合成公式
@@ -290,7 +294,7 @@ public class ApiIncreaseCombatPowerController {
                 userHeroUp.setUpdateTimeTs(now.getTime());
                 userHeroService.updateById(userHeroUp);
                 // 升星成功后重新获取英雄详细信息并返回
-                rsp = combatStatsUtilsService.getHeroInfoDetail(user, req.getUserHeroId());
+                rsp = combatStatsUtilsService.getHeroInfoDetail(user, req.getUserHeroId(), Constant.enable);
             } catch (RRException e) {
                 e.printStackTrace();
                 throw new RRException("Star upgrade failed:" + e.getMsg());
@@ -324,7 +328,7 @@ public class ApiIncreaseCombatPowerController {
         ValidatorUtils.validateEntity(useExpPropReq);
         userExService.userHeroUseExp(user, useExpPropReq);
         // 升级成功后重新获取英雄详细信息并返回
-        UserHeroInfoDetailRsp rsp = combatStatsUtilsService.getHeroInfoDetail(user, useExpPropReq.getUserHeroId());
+        UserHeroInfoDetailRsp rsp = combatStatsUtilsService.getHeroInfoDetail(user, useExpPropReq.getUserHeroId(), Constant.enable);
         Map<String, Object> map = new HashMap<>();
         map.put("heroInfo", rsp);
         return R.ok().put("data", map);

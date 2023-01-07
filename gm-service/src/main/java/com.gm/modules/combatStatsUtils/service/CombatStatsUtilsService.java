@@ -282,7 +282,11 @@ public class CombatStatsUtilsService {
         teamParams.put("userHeroId", userHero.getUserHeroId());
         List<TeamInfoRsp> teamInfoRsps = teamConfigService.getTeamInfoList(teamParams);
 
-//        (30 / 60 * 68 + 60 / 60 * 10) / （68 + 10) * 60;
+//      (30 / 60 * 68 + 60 / 60 * 10) / （68 + 10) * 60;
+//      更新后的英雄神谕值：(68 + 80) / 68 * 1 = 2.176470588235294
+//      更新后的英雄神谕比: 2.176470588235294 / 2 = 108.8235294117647%
+//      更新后的英雄矿工数：68 + 80 = 148
+
         BigDecimal newOracle = BigDecimal.ZERO;
         BigDecimal newMinter = BigDecimal.ZERO;
         // 初始GAIA系统
@@ -291,22 +295,26 @@ public class CombatStatsUtilsService {
         BigDecimal minterRate = CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1));
         if (userEquipId != null) {
             UserEquipmentEntity equip = userEquipmentService.getById(userEquipId);
-            BigDecimal oracleRate = Arith.divide(userHero.getOracle(), minterRate);
-            BigDecimal heroPowerChange = Arith.multiply(oracleRate, BigDecimal.valueOf(userHero.getHeroPower()));
-            BigDecimal equipPowerChange = Arith.multiply(Arith.divide(equip.getOracle(), minterRate), BigDecimal.valueOf(equip.getEquipPower()));
-            newOracle =
-                    Arith.multiply(Arith.divide(Arith.add(heroPowerChange, equipPowerChange)
-                            , BigDecimal.valueOf(userHero.getHeroPower() + equip.getEquipPower())),
-                            minterRate);
+            // 英雄矿工
+            BigDecimal heroMinter = userHero.getMinter();
+            // 装备矿工
+            BigDecimal equipMinter = equip.getMinter();
+            // 英雄的神谕值
+            BigDecimal heroOracle = userHero.getOracle();
+            newOracle = Arith.multiply(Arith.divide(Arith.add(heroMinter, equipMinter), heroOracle), heroOracle);
             newMinter = equip.getMinter();
         } else {
             // 获取英雄矿工数量
             CalculateTradeUtil.miners = userHero.getMinter();
             System.out.println("获取当前玩家矿工数量: " + CalculateTradeUtil.miners);
-            BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(changePower * scale));
-            newOracle = Arith.multiply(Arith.divide(Arith.add(Arith.multiply(Arith.divide(userHero.getOracle(), minterRate), BigDecimal.valueOf(userHero.getHeroPower())), BigDecimal.valueOf(changePower))
-                    , BigDecimal.valueOf((userHero.getHeroPower() + changePower))), minterRate);
-            newMinter = minter;
+            // 英雄矿工
+            BigDecimal heroMinter = userHero.getMinter();
+            // 新增的矿工
+            BigDecimal changeMinter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(changePower * scale));
+            // 英雄的神谕值
+            BigDecimal heroOracle = userHero.getOracle();
+            newOracle = Arith.multiply(Arith.divide(Arith.add(heroMinter, changeMinter), heroOracle), heroOracle);
+            newMinter = changeMinter;
         }
 
         // 英雄已在队伍上阵
@@ -340,7 +348,7 @@ public class CombatStatsUtilsService {
      * @param userHeroId
      * @return
      */
-    public UserHeroInfoDetailRsp getHeroInfoDetail(UserEntity user, Long userHeroId) {
+    public UserHeroInfoDetailRsp getHeroInfoDetail(UserEntity user, Long userHeroId, String type) {
         // 获取英雄详细信息
         Map<String, Object> userHeroMap = new HashMap<>();
         userHeroMap.put("userHeroId", userHeroId);
@@ -417,6 +425,7 @@ public class CombatStatsUtilsService {
         // 矿工兑换数量比例
         BigDecimal minterRate = CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1));
         BigDecimal newOracle = BigDecimal.valueOf(Arith.multiply(Arith.divide(rsp.getOracle(), minterRate), BigDecimal.valueOf(100)).intValue());
+        // 按当前市场行情计算神谕值
         rsp.setOracle(newOracle);
         return rsp;
     }

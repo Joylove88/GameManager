@@ -109,6 +109,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
         for (EquipmentInfoEntity equip1 : equips) {
             long equipId = equip1.getEquipId();
             String equipName = equip1.getEquipName();
+            Integer equipLevel = equip1.getEquipLevel();
             String equipRarecode = equip1.getEquipRarecode();
             String equipImgUrl = equip1.getEquipImgUrl();
             String equipIconUrl = equip1.getEquipIconUrl();
@@ -116,13 +117,14 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
             if (eqSIEs.getEquipmentId().equals(equipId)) {
                 jsonObject.put("equipId", equipId);
                 jsonObject.put("equipName", equipName);
+                jsonObject.put("equipLevel", equipLevel);
                 jsonObject.put("equipRareCode", equipRarecode);
                 jsonObject.put("equipImgUrl", equipImgUrl);
                 jsonObject.put("equipIconUrl", equipIconUrl);
                 // 装备碎片名称封装
                 jsonObject.put("equipFragId", equipId);
                 jsonObject.put("equipFragNum", fragNum);
-                jsonObject.put("equipFragName", equipName + "卷轴碎片");
+                jsonObject.put("equipFragName", equipName + " reel");
                 parentEquipChain = heroEquipId.toString();
                 // 获取已穿戴/激活的装备状态
                 UserEquipmentEntity userEquipment = getActivationState(equipId, wearList, parentEquipChain);
@@ -134,7 +136,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
         }
         // 装备合成项1,2,3,白色,蓝色装备封装
         jsonObject.put("children", equipItem(eqSIEs, equips, wearList));
-        System.out.println("=============data:" + jsonObject.toJSONString());
+//        System.out.println("=============data:" + jsonObject.toJSONString());
         return jsonObject;
 
     }
@@ -293,6 +295,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
         long equipId = equips.get(i).getEquipId();
         if (eqId == equipId) {
             String equipName = equips.get(i).getEquipName();
+            Integer equipLevel = equips.get(i).getEquipLevel();
             String equipRarecode = equips.get(i).getEquipRarecode();
             String equipImgUrl = equips.get(i).getEquipImgUrl();
             String equipIconUrl = equips.get(i).getEquipIconUrl();
@@ -300,6 +303,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
             UserEquipmentEntity userEquipment = new UserEquipmentEntity();
             jsonObject.put("equipId", equipId);
             jsonObject.put("equipName", equipName);
+            jsonObject.put("equipLevel", equipLevel);
             jsonObject.put("equipImgUrl", equipImgUrl);
             jsonObject.put("equipIconUrl", equipIconUrl);
             jsonObject.put("equipRareCode", equipRarecode);
@@ -328,7 +332,7 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
                     jsonObject.put("children", equipItemChild(eqSIEsChildren, equips, wearList, parentEquipChainID));
                     jsonObject.put("equipFragId", equipId);
                     jsonObject.put("equipFragNum", fragNum);
-                    jsonObject.put("equipFragName", equipName + "卷轴碎片");
+                    jsonObject.put("equipFragName", equipName + " reel");
                 }
             }
         }
