@@ -26,11 +26,9 @@ import com.gm.modules.user.dao.UserHeroEquipmentWearDao;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserEquipmentEntity;
 import com.gm.modules.user.entity.UserHeroEquipmentWearEntity;
-import com.gm.modules.user.rsp.UserHeroFragInfoDetailRsp;
-import com.gm.modules.user.rsp.UserHeroFragInfoRsp;
-import com.gm.modules.user.rsp.UserHeroInfoDetailRsp;
-import com.gm.modules.user.rsp.UserHeroInfoDetailWithGrowRsp;
+import com.gm.modules.user.rsp.*;
 import com.gm.modules.user.service.UserEquipmentService;
+import com.gm.modules.user.service.UserHeroEquipmentWearService;
 import com.gm.modules.user.service.UserHeroFragService;
 import com.gm.modules.user.service.UserHeroService;
 import org.apache.commons.lang.StringUtils;
@@ -75,6 +73,8 @@ public class CombatStatsUtilsService {
     private UserEquipmentService userEquipmentService;
     @Autowired
     private SysDictService sysDictService;
+    @Autowired
+    private UserHeroEquipmentWearService userHeroEquipmentWearService;
 
     // 获取英雄属性和已激活的装备属性
     public AttributeEntity getHeroBasicStats(Long userHeroId) {
@@ -353,6 +353,9 @@ public class CombatStatsUtilsService {
         Map<String, Object> userHeroMap = new HashMap<>();
         userHeroMap.put("userHeroId", userHeroId);
         UserHeroInfoDetailRsp rsp = userHeroService.getUserHeroByIdDetailRsp(userHeroMap);
+        if (rsp == null) {
+            throw new RRException(ErrorCode.USER_HERO_GET_FAIL.getDesc());
+        }
         // 设置英雄职业
         String[] heroRole = rsp.getHeroRole().split(",");
         for (String role : heroRole) {
@@ -419,6 +422,16 @@ public class CombatStatsUtilsService {
         Integer shardNum = null != heroFragCount ? heroFragCount.getHeroFragNum() : Constant.ZERO_I;
         rsp.setShardNum(shardNum);
         rsp.setUpStarShardNum(starInfo.getUpStarFragNum());
+
+        // 战力提升后响应已穿戴装备信息
+        if (type.equals(Constant.enable)) {
+            // 获取该英雄已穿戴的装备
+            Map<String, Object> userWearMap = new HashMap<>();
+            userWearMap.put("status", Constant.enable);
+            userWearMap.put("userHeroId", userHeroId);
+            List<UserHeroEquipmentWearRsp> wearList = userHeroEquipmentWearService.getUserWearEQ(userWearMap);
+            rsp.setWearEQList(wearList);
+        }
 
         // 初始GAIA系统
         fightCoreService.initTradeBalanceParameter(0);

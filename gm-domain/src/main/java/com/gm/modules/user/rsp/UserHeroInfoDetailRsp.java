@@ -132,6 +132,10 @@ public class UserHeroInfoDetailRsp {
      * 英雄角色
      */
     private List<String> roles = new ArrayList<>();
+    /**
+     * 英雄已穿戴装备
+     */
+    private List<UserHeroEquipmentWearRsp> wearEQList = new ArrayList<>();
 
 
 }
