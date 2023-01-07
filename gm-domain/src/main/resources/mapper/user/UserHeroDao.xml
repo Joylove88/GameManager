@@ -43,6 +43,7 @@
         A.EXPERIENCE_OBTAIN,
         A.HERO_POWER,
         A.GROWTH_RATE,
+        A.SKIN_TYPE,
         B.HERO_NAME,
         B.HERO_IMG_URL,
         B.HERO_ICON_URL,

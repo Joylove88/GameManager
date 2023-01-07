@@ -13,6 +13,18 @@
         ORDER BY A.CREATE_TIME DESC, A.UPDATE_TIME DESC
     </select>
 
+    <!--获取玩家订单-->
+    <select id="pageOrder" resultType="com.gm.modules.order.rsp.TransactionOrderRsp">
+        SELECT
+        A.*
+        FROM
+        GM_TRANSACTION_ORDER A
+
+        ${ew.customSqlSegment}
+
+        ORDER BY CREATE_TIME DESC
+    </select>
+
     <select id="queryTotalMoneyByUserId" resultType="double">
         SELECT IFNULL(sum(REAL_FEE),0) FROM GM_TRANSACTION_ORDER WHERE USER_ID = #{userId} AND CURRENCY_TYPE = '1' AND STATUS = '1'
     </select>

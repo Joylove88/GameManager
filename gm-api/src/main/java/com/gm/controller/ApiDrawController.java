@@ -16,6 +16,7 @@ import com.gm.annotation.LoginUser;
 import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
 import com.gm.common.utils.Constant;
+import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.R;
 import com.gm.common.validator.ValidatorUtils;
 import com.gm.common.web3Utils.TransactionVerifyUtils;
@@ -195,11 +196,14 @@ public class ApiDrawController {
         return R.ok().put("giftBoxs", giftBoxs);
     }
 
-    @PostMapping("getNFTURL")
-    @ApiOperation("英雄召唤")
-    public String getNFTURL(@RequestBody String id) {
-
-        return "";
+    @Login
+    @PostMapping("getSummonedRecord")
+    @ApiOperation("获取召唤记录")
+    public R getSummonedRecord(@LoginUser UserEntity user) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", user.getUserId().toString());
+        PageUtils page = transactionOrderService.queryUserOrder(map);
+        return R.ok().put("page", page);
     }
 
 
