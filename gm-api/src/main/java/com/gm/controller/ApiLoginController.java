@@ -266,16 +266,16 @@ public class ApiLoginController {
         if (b) {
             map.put("withdrawStatus", "1");// 已经有申请提现中订单
         }
-        if (userAgentRebateWithdraw.compareTo(BigDecimal.ZERO) >= -1) {
+        if (userAgentRebateWithdraw.compareTo(new BigDecimal(gmUserVipLevel.getWithdrawHandlingFee())) < 1) {
             map.put("withdrawStatus", "2");// 可提现额度不足
         }
-        GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(userEntity);
-        if (lastWithdraw != null) {
-            Date date = DateUtils.addDateHours(lastWithdraw.getCreateTime(), 24);// 上次提现时间加24小时，然后和当前时间做比较
-            if (date.after(new Date())) {// 24小时只能发起一次提现
-                map.put("withdrawStatus", "3");// 24小时只能发起一笔
-            }
-        }
+//        GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(userEntity.getUserId());
+//        if (lastWithdraw != null) {
+//            Date date = DateUtils.addDateHours(lastWithdraw.getCreateTime(), 24);// 上次提现时间加24小时，然后和当前时间做比较
+//            if (date.after(new Date())) {// 24小时只能发起一次提现
+//                map.put("withdrawStatus", "3");// 24小时只能发起一笔
+//            }
+//        }
         return R.ok(map);
     }
 
@@ -300,10 +300,10 @@ public class ApiLoginController {
         if (b) {
             map.put("withdrawStatus", "1");// 已经有申请提现中订单
         }
-        if (userFightingWithdraw.compareTo(BigDecimal.ZERO) > -1) {
+        if (userFightingWithdraw.compareTo(new BigDecimal(gmUserVipLevel.getWithdrawHandlingFee())) < 1) {
             map.put("withdrawStatus", "2");// 可提现额度不足
         }
-        GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(userEntity);
+        GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(userEntity.getUserId());
         if (lastWithdraw != null) {
             Date date = DateUtils.addDateHours(lastWithdraw.getCreateTime(), 24);// 上次提现时间加24小时，然后和当前时间做比较
             if (date.after(new Date())) {// 24小时只能发起一次提现

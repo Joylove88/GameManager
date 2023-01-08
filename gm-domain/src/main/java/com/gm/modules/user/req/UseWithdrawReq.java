@@ -21,12 +21,12 @@ public class UseWithdrawReq {
     @NotBlank(message = "withdraw type must 0 or 1")
     private String withdrawType;
     /**
-     * 提现手续费
-     */
-    private BigDecimal withdrawHandlingFee;
-    /**
      * 提现金额
      */
     private BigDecimal withdrawMoney;
+    /**
+     * 提现申请扣除gas费
+     */
+    private BigDecimal applyWithdrawGas;
 
 }

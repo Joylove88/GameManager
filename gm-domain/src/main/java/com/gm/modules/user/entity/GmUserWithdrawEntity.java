@@ -85,5 +85,16 @@ public class GmUserWithdrawEntity implements Serializable {
      * 提现手续费
      */
     private BigDecimal serviceFee;
-
+    /**
+     * 提现申请交易哈希
+     */
+    private String applyWithdrawHash;
+    /**
+     * 提现申请扣除gas费
+     */
+    private BigDecimal applyWithdrawGas;
+    /**
+     * 提现申请备注
+     */
+    private String applyRemark;
 }

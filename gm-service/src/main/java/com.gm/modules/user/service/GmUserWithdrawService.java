@@ -19,9 +19,9 @@ public interface GmUserWithdrawService extends IService<GmUserWithdrawEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
 
-    GmUserWithdrawEntity lastWithdraw(UserEntity user);
+    GmUserWithdrawEntity lastWithdraw(Long userId);
 
-    void withdraw(UserEntity user, GmUserVipLevelEntity gmUserVipLevel,UseWithdrawReq useWithdrawReq) throws ExecutionException, InterruptedException, IOException;
+//    void withdraw(UserEntity user, GmUserVipLevelEntity gmUserVipLevel,UseWithdrawReq useWithdrawReq) throws ExecutionException, InterruptedException, IOException;
 
     boolean haveApplyWithdrawOrder(Long userId);
 
@@ -31,10 +31,35 @@ public interface GmUserWithdrawService extends IService<GmUserWithdrawEntity> {
 
     void checkFail(GmUserWithdrawEntity gmUserWithdraw, Long userId);
 
+    /**
+     * 根据订单状态查询订单
+     * @param status
+     * @return
+     */
     List<GmUserWithdrawEntity> queryOrderByStatus(Integer status);
 
+    /**
+     * 转账
+     * @param gmUserWithdrawEntity
+     * @throws IOException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     void transfer(GmUserWithdrawEntity gmUserWithdrawEntity) throws IOException, ExecutionException, InterruptedException;
 
     void confirmTransfer(GmUserWithdrawEntity gmUserWithdrawEntity) throws IOException;
+
+    /**
+     * 客户申请提现
+     * @param user
+     * @param useWithdrawReq
+     */
+    void applyWithdraw(UserEntity user, UseWithdrawReq useWithdrawReq);
+
+    /**
+     * 对提现订单进行校验
+     * @param gmUserWithdrawEntity
+     */
+    void withdrawApplyVerify(GmUserWithdrawEntity gmUserWithdrawEntity);
 }
 

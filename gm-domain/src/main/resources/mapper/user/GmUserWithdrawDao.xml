@@ -20,6 +20,10 @@
         <result property="confirmTime" column="CONFIRM_TIME"/>
         <result property="checkTimeTs" column="CHECK_TIME_TS"/>
         <result property="confirmTimeTs" column="CONFIRM_TIME_TS"/>
+        <result property="serviceFee" column="SERVICE_FEE"/>
+        <result property="applyWithdrawHash" column="APPLY_WITHDRAW_HASH"/>
+        <result property="applyWithdrawGas" column="APPLY_WITHDRAW_GAS"/>
+        <result property="applyRemark" column="APPLY_REMARK"/>
     </resultMap>
 
 

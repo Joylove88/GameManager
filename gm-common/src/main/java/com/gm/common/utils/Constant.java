@@ -668,12 +668,14 @@ public class Constant {
      * 提现状态（0：申请提现，1：审核通过，2：审核失败，3:提现中，4：提现成功，5：提现失败）
      */
     public enum WithdrawStatus {
-        APPLY(0),
-        CHECK_SUCCESS(1),
-        CHECK_FAIL(2),
-        ING(3),
-        SUCCESS(4),
-        FAIL(5);
+        APPLY(0),// 申请提现
+        VERIFY_SUCCESS(1),// 校验通过
+        VERIFY_FAIL(2),// 校验失败
+        CHECK_SUCCESS(3),// 审核通过
+        CHECK_FAIL(4),// 审核失败
+        ING(5),// 提现中
+        SUCCESS(6),// 提现成功
+        FAIL(7);// 提现失败
 
         private int value;
 

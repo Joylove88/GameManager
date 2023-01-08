@@ -370,32 +370,26 @@ public class ApiUserController {
         BigDecimal twoBigDecimal = Convert.fromWei(Numeric.toBigInt("0x" + two).toString(), Convert.Unit.ETHER);
         BigDecimal thereBigDecimal = Convert.fromWei(Numeric.toBigInt("0x" + there).toString(), Convert.Unit.ETHER);
         useWithdrawReq.setWithdrawMoney(thereBigDecimal);
-        // 1.查询该会员上次提现时间
-        GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(user);
-        if (lastWithdraw != null) {
-            Date date = DateUtils.addDateHours(lastWithdraw.getCreateTime(), 24);// 上次提现时间加24小时，然后和当前时间做比较
-            if (date.after(new Date())) {// 24小时只能发起一次提现
-                throw new RRException(ErrorCode.WITHDRAW_OVER_TIMES.getDesc());
-            }
-        }
-        // 2.查询该会员消费等级
-        GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.getById(user.getVipLevelId());
-        // 3.查询该会员当前余额
-        UserAccountEntity userAccountEntity = userAccountService.queryByUserIdAndCur(user.getUserId(), useWithdrawReq.getWithdrawType());
-        if (userAccountEntity.getBalance() * gmUserVipLevel.getWithdrawLimit() < thereBigDecimal.doubleValue()) {
-            // 提现超额
-            throw new RRException(ErrorCode.WITHDRAW_OVER_MONEY.getDesc());
-        }
-        useWithdrawReq.setWithdrawHandlingFee(new BigDecimal(gmUserVipLevel.getWithdrawHandlingFee()));
-        try {
-            gmUserWithdrawService.withdraw(user, gmUserVipLevel, useWithdrawReq);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        useWithdrawReq.setApplyWithdrawGas(twoBigDecimal);
+//        // 1.查询该会员上次提现时间
+//        GmUserWithdrawEntity lastWithdraw = gmUserWithdrawService.lastWithdraw(user);
+//        if (lastWithdraw != null) {
+//            Date date = DateUtils.addDateHours(lastWithdraw.getCreateTime(), 24);// 上次提现时间加24小时，然后和当前时间做比较
+//            if (date.after(new Date())) {// 24小时只能发起一次提现
+//                throw new RRException(ErrorCode.WITHDRAW_OVER_TIMES.getDesc());
+//            }
+//        }
+//        // 2.查询该会员消费等级
+//        GmUserVipLevelEntity gmUserVipLevel = gmUserVipLevelService.getById(user.getVipLevelId());
+//        // 3.查询该会员当前余额
+//        UserAccountEntity userAccountEntity = userAccountService.queryByUserIdAndCur(user.getUserId(), useWithdrawReq.getWithdrawType());
+//        if (userAccountEntity.getBalance() * gmUserVipLevel.getWithdrawLimit() < thereBigDecimal.doubleValue()) {
+//            // 提现超额
+//            throw new RRException(ErrorCode.WITHDRAW_OVER_MONEY.getDesc());
+//        }
+//        useWithdrawReq.setWithdrawHandlingFee(new BigDecimal(gmUserVipLevel.getWithdrawHandlingFee()));
+            gmUserWithdrawService.applyWithdraw(user,useWithdrawReq);
+//            gmUserWithdrawService.withdraw(user, gmUserVipLevel, useWithdrawReq);
         return R.ok();
     }
 
