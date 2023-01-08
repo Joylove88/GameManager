@@ -1,17 +1,13 @@
 package com.gm.modules.order.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gm.modules.order.entity.TransactionOrderEntity;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gm.modules.order.rsp.TransactionOrderRsp;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * 抽奖订单
@@ -29,7 +25,7 @@ public interface TransactionOrderDao extends BaseMapper<TransactionOrderEntity> 
      * @param eq
      * @return
      */
-    IPage<TransactionOrderRsp> pageOrder(IPage<TransactionOrderEntity> page, @Param(Constants.WRAPPER) QueryWrapper<TransactionOrderEntity> eq);
+    IPage<TransactionOrderRsp> pageOrder(IPage<TransactionOrderRsp> page, @Param(Constants.WRAPPER) QueryWrapper<TransactionOrderRsp> eq);
 
     /**
      * 根据用户ID查询该用户消费总额

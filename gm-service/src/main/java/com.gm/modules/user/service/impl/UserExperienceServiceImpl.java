@@ -75,11 +75,6 @@ public class UserExperienceServiceImpl extends ServiceImpl<UserExperienceDao, Us
     }
 
     @Override
-    public List<UserExpInfoDetailRsp> getUserExpDetail(Map<String, Object> map) {
-        return userExperienceDao.getUserExpDetail(map);
-    }
-
-    @Override
     public List<UserExperienceEntity> getUnusedExpFromPlayers(Map<String, Object> map) {
         return userExperienceDao.getUnusedExpFromPlayers(map);
     }
@@ -110,12 +105,13 @@ public class UserExperienceServiceImpl extends ServiceImpl<UserExperienceDao, Us
         // 获取玩家背包的全部经验道具
         Map<String, Object> expMap = new HashMap<>();
         expMap.put("userId", user.getUserId());
-        List<UserExpInfoDetailRsp> expList = userExperienceDao.getUserExpDetail(expMap);
+        List<UserExpInfoDetailRsp> expList = userExperienceDao.getUserExpDetailForUpgrade(expMap);
 
         // 本次使用的经验道具累计的经验值
         Long expTotal = Constant.ZERO;
         // SCALE
         Double scale = Constant.ZERO_D;
+        int scaleI = 0;
         int i = 0;
         while (i < useExpPropReq.getExpList().size()) {
             // 获取使用数量
@@ -139,6 +135,7 @@ public class UserExperienceServiceImpl extends ServiceImpl<UserExperienceDao, Us
             for (UserExpInfoDetailRsp expInfo : expList) {
                 if (expInfo.getExpRare().equals(expRare)) {
                     scale += expInfo.getScale();
+                    scaleI ++;
                     // 先校验玩家背包是否有足够的经验道具
                     if (expInfo.getExpNum() < useNum) {
                         throw new RRException(ErrorCode.EXP_NUM_INSUFFICIENT.getDesc());
@@ -176,10 +173,10 @@ public class UserExperienceServiceImpl extends ServiceImpl<UserExperienceDao, Us
         for (HeroLevelEntity heroLv : levels) {
             // 如新等级超过最大等级限制则将新等级设置为最大等级并设置经验溢出
             if (newLv > maxLv && heroLv.getLevelCode().equals(maxLv)) {
-                // 设置新等级
+                // 设置新等级ID
                 newLvId = heroLv.getHeroLeveId();
                 // 设置经验溢出
-                expTotal = levels.get(0).getExperienceTotal();
+                expTotal = heroLv.getExperienceTotal();
             }
         }
 
@@ -206,7 +203,7 @@ public class UserExperienceServiceImpl extends ServiceImpl<UserExperienceDao, Us
             userHeroUp.setAttackDamage(userHero.getAttackDamage() + attribute.getAttackDamage());// 累加攻击力
             userHeroUp.setAttackSpell(userHero.getAttackSpell() + attribute.getAttackSpell());// 累加法功
             // 获取经验道具scale平均值
-            scale = scale / (i + Constant.Quantity.Q1.getValue());
+            scale = scale / scaleI;
             // 计算新的scale
             scale = user.getScale() * (((userHero.getScale() * userHero.getHeroPower()) + (scale * changePower)) / (userHero.getHeroPower() + changePower));
             // 增加玩家英雄战力

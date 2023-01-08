@@ -26,11 +26,11 @@ public interface UserExperienceDao extends BaseMapper<UserExperienceEntity> {
     List<UserExpInfoRsp> getUserExp(Map<String, Object> map);
 
     /**
-     * 获取玩家经验道具全部参数
+     * 获取玩家未使用的经验道具统计 升级用
      * @param map
      * @return
      */
-    List<UserExpInfoDetailRsp> getUserExpDetail(Map<String, Object> map);
+    List<UserExpInfoDetailRsp> getUserExpDetailForUpgrade(Map<String, Object> map);
 
     /**
      * 获取玩家未使用的经验道具

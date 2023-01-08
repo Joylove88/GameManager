@@ -21,6 +21,7 @@ import com.gm.modules.basicconfig.service.HeroLevelService;
 import com.gm.modules.basicconfig.service.HeroSkillService;
 import com.gm.modules.basicconfig.service.StarInfoService;
 import com.gm.modules.fightCore.service.FightCoreService;
+import com.gm.modules.sys.service.SysConfigService;
 import com.gm.modules.sys.service.SysDictService;
 import com.gm.modules.user.dao.UserHeroEquipmentWearDao;
 import com.gm.modules.user.entity.UserEntity;
@@ -73,6 +74,8 @@ public class CombatStatsUtilsService {
     private UserEquipmentService userEquipmentService;
     @Autowired
     private SysDictService sysDictService;
+    @Autowired
+    private SysConfigService sysConfigService;
     @Autowired
     private UserHeroEquipmentWearService userHeroEquipmentWearService;
 
@@ -315,6 +318,8 @@ public class CombatStatsUtilsService {
             BigDecimal heroOracle = userHero.getOracle();
             newOracle = Arith.multiply(Arith.divide(Arith.add(heroMinter, changeMinter), heroOracle), heroOracle);
             newMinter = changeMinter;
+            // 更新系统中保存的市场总鸡蛋
+            sysConfigService.updateValueByKey(Constant.SysConfig.MARKET_EGGS.getValue(), CalculateTradeUtil.marketEggs.toString());
         }
 
         // 英雄已在队伍上阵
@@ -337,6 +342,7 @@ public class CombatStatsUtilsService {
         UserHeroInfoDetailWithGrowRsp rsp = new UserHeroInfoDetailWithGrowRsp();
         rsp.setMinter(Arith.add(userHero.getMinter(), newMinter));// 更新矿工
         rsp.setOracle(newOracle);// 更新神谕值
+
         return rsp;
     }
 
@@ -437,6 +443,7 @@ public class CombatStatsUtilsService {
         fightCoreService.initTradeBalanceParameter(0);
         // 矿工兑换数量比例
         BigDecimal minterRate = CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1));
+        LOGGER.info("minterRate=========================: " + minterRate);
         BigDecimal newOracle = BigDecimal.valueOf(Arith.multiply(Arith.divide(rsp.getOracle(), minterRate), BigDecimal.valueOf(100)).intValue());
         // 按当前市场行情计算神谕值
         rsp.setOracle(newOracle);

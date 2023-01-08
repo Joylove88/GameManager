@@ -22,7 +22,6 @@ import com.gm.modules.basicconfig.entity.StarInfoEntity;
 import com.gm.modules.basicconfig.rsp.HeroLevelRsp;
 import com.gm.modules.basicconfig.service.*;
 import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
-import com.gm.modules.sys.service.SysDictService;
 import com.gm.modules.user.entity.UserEntity;
 import com.gm.modules.user.entity.UserEquipmentEntity;
 import com.gm.modules.user.entity.UserHeroEntity;
@@ -175,7 +174,7 @@ public class ApiIncreaseCombatPowerController {
      */
     private void verifyEquipment(UserHeroInfoReq req, UserHeroInfoDetailWithGrowRsp userHero, UserEquipInfoDetailRsp equipment) {
         // 验证等级限制
-        if (equipment.getEquipLevel() > userHero.getStarCode()) {
+        if (equipment.getEquipLevel() > userHero.getLevelCode()) {
             throw new RRException("The hero level is lower than the equipment level and cannot be activated!");
         }
         // 获取该装备的合成公式

@@ -74,10 +74,10 @@ public class TransactionVerifyUtils {
 	}
 
 	public static void main(String[] args) {
-		Optional<TransactionReceipt> receipt = isVerify(connect(),"0x7586154595b996d6fad912e59b2f7ab0720cdd34134f3d1876e06811b66710be");
+		Optional<TransactionReceipt> receipt = isVerify(connect(),"0xe0f8414688e3f436e793859780630bf45aec24f68f18efe6666f6626255ee30c");
 		System.out.println(receipt);
 		String BUSD_ADDRESS = "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee";
-		String CAPITAL_POOL_ADDRESS = "0xb2bF67468170f1b8F32f29011c2E9ab302D80749";
+		String CAPITAL_POOL_ADDRESS = "0xa2294B906829eD5c2d18618BC724c13889a6173d";
 		String TEAM_ADDRESS = "0x2A3Ee1e41A8A11546C5732CFB447b752c9F09618";
 		BigDecimal amount = BigDecimal.valueOf(0L);// 资金池
 		BigDecimal amountTeam = BigDecimal.valueOf(0L);// 团队抽成
@@ -109,6 +109,7 @@ public class TransactionVerifyUtils {
 						} else if (BUSD_ADDRESS.toLowerCase().equals(addressTo)) {// 代币数量（费用+团队抽成）
 							Address tokenAddress = new Address(receipt.get().getLogs().get(j).getTopics().get(2));
 							String tokenNumHex = Numeric.toBigInt(receipt.get().getLogs().get(j).getData()).toString();
+							System.out.println(tokenNumHex);
 							if (CAPITAL_POOL_ADDRESS.toLowerCase().equals(tokenAddress.toString())) {// 资金池
 								amount = Arith.add(amount, Convert.fromWei(tokenNumHex, Convert.Unit.ETHER));
 							} else if (TEAM_ADDRESS.toLowerCase().equals(tokenAddress.toString())) {// 团队抽成

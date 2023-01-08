@@ -2,7 +2,6 @@ package com.gm.modules.order.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gm.common.utils.Arith;
 import com.gm.common.utils.Constant;
@@ -163,11 +162,10 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
     }
 
     @Override
-    public PageUtils queryUserOrder(Map<String, Object> params) {
-        String userId = (String) params.get("userId");
+    public PageUtils queryUserOrder(Long userId, Map<String, Object> params) {
         IPage<TransactionOrderRsp> page = transactionOrderDao.pageOrder(
-                new Query<TransactionOrderEntity>().getPage(params),
-                new QueryWrapper<TransactionOrderEntity>()
+                new Query<TransactionOrderRsp>().getPage(params),
+                new QueryWrapper<TransactionOrderRsp>()
                         .eq("A.USER_ID", userId)
         );
         return new PageUtils(page);

@@ -37,7 +37,7 @@ public interface TransactionOrderService extends IService<TransactionOrderEntity
      * @param params
      * @return
      */
-    PageUtils queryUserOrder(Map<String, Object> params);
+    PageUtils queryUserOrder(Long userId, Map<String, Object> params);
 
     /**
      * 根据用户ID查询该用户消费总额

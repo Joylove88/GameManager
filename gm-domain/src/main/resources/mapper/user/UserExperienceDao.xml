@@ -28,73 +28,70 @@
     <!--获取玩家未使用的经验道具统计-->
     <select id="getUserExp" resultType="com.gm.modules.user.rsp.UserExpInfoRsp">
         SELECT
-            count(*) AS EXP_NUM,
-            AVG(A.SCALE) SCALE,
-            A.NFT_ID,
-            B.EXP_NAME,
-            B.RARE_CODE AS EXP_RARE,
-            B.EXP,
-            B.ICON_URL,
-            B.DESCRIPTION
+        count(*) AS EXP_NUM,
+        AVG(A.SCALE) SCALE,
+        A.NFT_ID,
+        B.EXP_NAME,
+        B.RARE_CODE AS EXP_RARE,
+        B.EXP,
+        B.ICON_URL,
+        B.DESCRIPTION
         FROM
-            GM_USER_EXPERIENCE A
+        GM_USER_EXPERIENCE A
         LEFT JOIN
-            GM_EXPERIENCE B ON A.EXP_ID = B.ID
+        GM_EXPERIENCE B ON A.EXP_ID = B.ID
         <where>
             <if test="userId != null and userId != ''">
                 AND A.`STATUS` = '1'
                 AND A.USER_ID = #{userId}
             </if>
         </where>
-        GROUP BY  A.NFT_ID, B.EXP_NAME, B.RARE_CODE, B.EXP, B.ICON_URL, B.DESCRIPTION
+        GROUP BY A.NFT_ID, B.EXP_NAME, B.RARE_CODE, B.EXP, B.ICON_URL, B.DESCRIPTION
         ORDER BY B.RARE_CODE
     </select>
 
-    <!--获取玩家未使用的经验道具统计-->
-    <select id="getUserExpDetail" resultType="com.gm.modules.user.rsp.UserExpInfoDetailRsp">
+    <!--获取玩家未使用的经验道具统计 升级用-->
+    <select id="getUserExpDetailForUpgrade" resultType="com.gm.modules.user.rsp.UserExpInfoDetailRsp">
         SELECT
-            count(*) AS EXP_NUM,
-            AVG(A.SCALE) SCALE,
-            A.NFT_ID,
-            B.EXP_NAME,
-            B.RARE_CODE AS EXP_RARE,
-            B.EXP,
-            B.ICON_URL,
-            B.DESCRIPTION
+        count(*) AS EXP_NUM,
+        AVG(A.SCALE) SCALE,
+        B.EXP_NAME,
+        B.RARE_CODE AS EXP_RARE,
+        B.EXP
         FROM
-            GM_USER_EXPERIENCE A
+        GM_USER_EXPERIENCE A
         LEFT JOIN
-            GM_EXPERIENCE B ON A.EXP_ID = B.ID
+        GM_EXPERIENCE B ON A.EXP_ID = B.ID
         <where>
             <if test="userId != null and userId != ''">
                 AND A.`STATUS` = '1'
                 AND A.USER_ID = #{userId}
             </if>
         </where>
-        GROUP BY  A.NFT_ID, B.EXP_NAME, B.RARE_CODE, B.EXP, B.ICON_URL, B.DESCRIPTION
+        GROUP BY B.EXP_NAME, B.RARE_CODE, B.EXP
         ORDER BY B.RARE_CODE
     </select>
 
     <!--获取玩家未使用的经验道具-->
     <select id="getUnusedExpFromPlayers" resultType="com.gm.modules.user.entity.UserExperienceEntity">
         SELECT
-            A.*,
-            B.EXP_NAME,
-            B.RARE_CODE,
-            B.EXP
+        A.*,
+        B.EXP_NAME,
+        B.RARE_CODE,
+        B.EXP
         FROM
-          GM_USER_EXPERIENCE A
+        GM_USER_EXPERIENCE A
         LEFT JOIN
-            GM_EXPERIENCE B ON A.EXP_ID = B.ID
+        GM_EXPERIENCE B ON A.EXP_ID = B.ID
         <where>
-                AND A.`STATUS` = '1'
+            AND A.`STATUS` = '1'
 
             <if test="userId != null and userId != ''">
                 AND A.USER_ID = #{userId}
             </if>
 
             <if test="rareCode != null and rareCode != ''">
-              AND B.RARE_CODE = #{rareCode}
+                AND B.RARE_CODE = #{rareCode}
             </if>
         </where>
     </select>

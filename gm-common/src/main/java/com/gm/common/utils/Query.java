@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gm.common.xss.SQLFilter;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -72,5 +73,13 @@ public class Query<T> {
         }
 
         return page;
+    }
+
+
+    public static void main(String[] args) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("page", "1");
+        map.put("limit", "10");
+        System.out.println(Long.parseLong((String)map.get(Constant.PAGE)));
     }
 }

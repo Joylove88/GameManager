@@ -426,6 +426,7 @@ public class FightCoreService {
         // 获取系统全部玩家物品总战力
         UserInfoRsp userInfoRsp = userDao.getTotalPower();
         CalculateTradeUtil.totalPower = userInfoRsp.getPower().equals(Constant.ZERO) ? BigDecimal.valueOf(300) : BigDecimal.valueOf(userInfoRsp.getPower());
+        LOGGER.info("获取系统全部玩家物品总战力: " + CalculateTradeUtil.totalPower);
 
         // 如果类型为非副本战斗并副本池金额等于0 则给副本池赋值初始值68U
         if(type == 0 && CalculateTradeUtil.FundPool.compareTo(BigDecimal.ZERO) == 0){

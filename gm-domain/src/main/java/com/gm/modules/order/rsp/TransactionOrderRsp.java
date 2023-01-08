@@ -55,6 +55,6 @@ public class TransactionOrderRsp implements Serializable {
 	/**
 	 * 创建时间
 	 */
-	private Date createTime;
+	private Long createTimeTs;
 
 }

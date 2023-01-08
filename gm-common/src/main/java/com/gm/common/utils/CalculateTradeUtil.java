@@ -131,13 +131,14 @@ public class CalculateTradeUtil {
     }
 
     public static void main(String[] args) {
-//        BigDecimal rate = BigDecimal.valueOf(1);
-//        BigDecimal power = BigDecimal.valueOf(355);
-//        marketEggs = new BigDecimal("1803875022.049365");
-//        System.out.println("marketEggs:"+marketEggs);
-//        FundPool = BigDecimal.valueOf(9999.646475);
-//        System.out.println("FundPool:"+FundPool);
-//        System.out.println("oracle:"+calculateRateOfMinter(rate));
+        BigDecimal rate = BigDecimal.valueOf(1);
+        BigDecimal power = BigDecimal.valueOf(355);
+        marketEggs = new BigDecimal("3580015032.915562");
+        System.out.println("marketEggs:"+marketEggs);
+        FundPool = BigDecimal.valueOf(14.490000);
+        totalPower = BigDecimal.valueOf(236027);
+        System.out.println("FundPool:"+FundPool);
+        System.out.println("oracle:"+calculateRateOfMinter(rate));
 //        System.out.println("minter:"+updateMiner(power));
 //        System.out.println("minter1:"+calculateRateOfMinter(rate));
 //        FundPool = BigDecimal.valueOf(68);
@@ -153,20 +154,20 @@ public class CalculateTradeUtil {
 //        System.out.println("FundPool: " + FundPool);
 //        System.out.println("marketEggs: " + marketEggs);
 //        System.out.println("totalPower: " + totalPower);
-        List<String> list = new ArrayList<>();
-        int i = 0;
-        while (i< 10){
-            list.add(i+1+"");
-            i++;
-        }
-
-        int j = 0 ;
-        while (j<3){
-            System.out.println(list.get(0));
-            list.remove(0);
-            j++;
-        }
-        System.out.println(list);
+//        List<String> list = new ArrayList<>();
+//        int i = 0;
+//        while (i< 10){
+//            list.add(i+1+"");
+//            i++;
+//        }
+//
+//        int j = 0 ;
+//        while (j<3){
+//            System.out.println(list.get(0));
+//            list.remove(0);
+//            j++;
+//        }
+//        System.out.println(list);
 //        eggsBought = calculateTrade(BigDecimal.valueOf(1000), BigDecimal.valueOf(1), marketEggs);
 //        hatchEggs(BigDecimal.valueOf(1000));
 //        System.out.println("eggsBought: " +eggsBought);
@@ -174,6 +175,7 @@ public class CalculateTradeUtil {
 //        System.out.println("marketEggs: " +marketEggs);
 //        FundPool = BigDecimal.valueOf(1);
 //        System.out.println("scale: " +calculateRateOfMinter(BigDecimal.valueOf(1000)));
+
 
     }
 }

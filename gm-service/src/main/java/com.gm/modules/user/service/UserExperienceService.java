@@ -30,13 +30,6 @@ public interface UserExperienceService extends IService<UserExperienceEntity> {
     List<UserExpInfoRsp> getUserExp(Map<String, Object> map);
 
     /**
-     * 获取玩家经验道具全部参数
-     * @param map
-     * @return
-     */
-    List<UserExpInfoDetailRsp> getUserExpDetail(Map<String, Object> map);
-
-    /**
      * 获取玩家未使用的经验道具
      * @param map
      * @return

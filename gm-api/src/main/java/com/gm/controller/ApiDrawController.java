@@ -199,10 +199,8 @@ public class ApiDrawController {
     @Login
     @PostMapping("getSummonedRecord")
     @ApiOperation("获取召唤记录")
-    public R getSummonedRecord(@LoginUser UserEntity user) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("userId", user.getUserId().toString());
-        PageUtils page = transactionOrderService.queryUserOrder(map);
+    public R getSummonedRecord(@LoginUser UserEntity user, @RequestBody Map<String, Object> params) {
+        PageUtils page = transactionOrderService.queryUserOrder(user.getUserId(), params);
         return R.ok().put("page", page);
     }
 

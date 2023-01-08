@@ -3,7 +3,7 @@
 
 <mapper namespace="com.gm.modules.user.dao.UserHeroFragDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.gm.modules.user.entity.UserHeroFragEntity" id="userHeroFragMap">
         <result property="gmUserHeroFragId" column="GM_USER_HERO_FRAG_ID"/>
         <result property="heroFragId" column="HERO_FRAG_ID"/>
@@ -43,18 +43,18 @@
     <!--获取玩家英雄碎片-->
     <select id="getUserAllHeroFrag" resultType="com.gm.modules.user.rsp.UserHeroFragInfoRsp">
         SELECT
-            COUNT(*) AS HERO_FRAG_NUM,
-            A.NFT_ID,
-            B.HERO_INFO_ID,
-            B.HERO_FRAG_ICON_URL,
-            C.HERO_NAME,
-            C.HERO_DESCRIPTION
+        COUNT(*) AS HERO_FRAG_NUM,
+        A.NFT_ID,
+        B.HERO_INFO_ID,
+        B.HERO_FRAG_ICON_URL,
+        C.HERO_NAME,
+        C.HERO_DESCRIPTION
         FROM
-            GM_USER_HERO_FRAG A
-                LEFT JOIN
-            GM_HERO_FRAG B ON A.HERO_FRAG_ID = B.HERO_FRAG_ID
-                LEFT JOIN
-            GM_HERO_INFO C ON B.HERO_INFO_ID = C.HERO_ID
+        GM_USER_HERO_FRAG A
+        LEFT JOIN
+        GM_HERO_FRAG B ON A.HERO_FRAG_ID = B.HERO_FRAG_ID
+        LEFT JOIN
+        GM_HERO_INFO C ON B.HERO_INFO_ID = C.HERO_ID
         <where>
             <if test="status != null and status != ''">
                 AND A.`STATUS` = #{status}
@@ -72,14 +72,14 @@
     <!--获取升星时玩家英雄的碎片数量-->
     <select id="getUserAllHeroFragCount" resultType="com.gm.modules.user.rsp.UserHeroFragInfoDetailRsp">
         SELECT
-            COUNT(*) AS HERO_FRAG_NUM,
-            AVG(A.SCALE) SCALE
+        COUNT(*) AS HERO_FRAG_NUM,
+        AVG(A.SCALE) SCALE
         FROM
-            GM_USER_HERO_FRAG A
-                LEFT JOIN
-            GM_HERO_FRAG B ON A.HERO_FRAG_ID = B.HERO_FRAG_ID
-                LEFT JOIN
-            GM_HERO_INFO C ON B.HERO_INFO_ID = C.HERO_ID
+        GM_USER_HERO_FRAG A
+        LEFT JOIN
+        GM_HERO_FRAG B ON A.HERO_FRAG_ID = B.HERO_FRAG_ID
+        LEFT JOIN
+        GM_HERO_INFO C ON B.HERO_INFO_ID = C.HERO_ID
         <where>
             <if test="status != null and status != ''">
                 AND A.`STATUS` = #{status}
@@ -102,30 +102,30 @@
             UPDATE_TIME_TS = #{updateTimeTs},
         </set>
         WHERE
-        GM_USER_HERO_FRAG_ID IN (
-            SELECT
-            GM_USER_HERO_FRAG_ID
-            FROM
-            (
-            SELECT
-            A.USER_HERO_FRAG_ID
-            FROM
-            GM_USER_HERO_FRAG A
-            LEFT JOIN GM_HERO_FRAG B ON A.HERO_FRAG_ID = B.HERO_FRAG_ID
-            LEFT JOIN GM_HERO_INFO C ON B.HERO_INFO_ID = C.HERO_ID
-            <where>
-                <if test="status != null and status != ''">
-                    AND A.`STATUS` = #{status}
-                </if>
-                <if test="userId != null and userId != ''">
-                    AND A.USER_ID = #{userId}
-                </if>
-                <if test="heroId != null and heroId != ''">
-                    AND C.HERO_ID = #{heroId}
-                </if>
-            </where>
-            LIMIT #{heroFragNum}
-            ) AS TT
+        USER_HERO_FRAG_ID IN (
+        SELECT
+        USER_HERO_FRAG_ID
+        FROM
+        (
+        SELECT
+        A.USER_HERO_FRAG_ID
+        FROM
+        GM_USER_HERO_FRAG A
+        LEFT JOIN GM_HERO_FRAG B ON A.HERO_FRAG_ID = B.HERO_FRAG_ID
+        LEFT JOIN GM_HERO_INFO C ON B.HERO_INFO_ID = C.HERO_ID
+        <where>
+            <if test="status != null and status != ''">
+                AND A.`STATUS` = #{status}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND A.USER_ID = #{userId}
+            </if>
+            <if test="heroId != null and heroId != ''">
+                AND C.HERO_ID = #{heroId}
+            </if>
+        </where>
+        LIMIT #{heroFragNum}
+        ) AS TT
         );
     </update>
 </mapper>
