@@ -3,8 +3,7 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://141.164.43.34:3306/gamemanager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
-#      url: jdbc:mysql://127.0.0.1:3306/gamemanager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      url: jdbc:mysql://127.0.0.1:3306/gamemanager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
       username: root
       password: we&68YDryuH$@JDHSFdhfj(@abc1
       initial-size: 10
@@ -48,3 +47,13 @@ spring:
 #      url: jdbc:postgresql://localhost:5432/renren_security
 #      username: gm
 #      password: 123456
+
+withdraw:
+  # 出款发起地址
+  payerWalletAddress: "0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45"
+  # 出款发起地址秘钥
+  payerWalletAddressKey: "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDBYqbjz0N7+p0Ly0YYpioSg35UYjiBkMkyBccMXvllvmh8oA/KvP9xVt38/pEEOvUoQvVf5SZFKZEz4mZnHQD8Sbwq4Z2p71qt7J8MQcMs6Qn4d+u3Kg0LtY48/jOPoI4UByNXx0UFhVO2mIG8GjItBwcXfbDSLbZOzAc4kTCl7Vp7y3L7pSVKdRRlWavRsQ7T22YRXWZTlS6F1Lb6LocruZ+ZrlwFBWKe9hI5x0pcLM5fo6TAq6KbxPdpQ12fW1qLJt1cstrl91KJd3v96eTcLVG20+BA6VQfh6jg+wufOOtzJwWtiUi4Sgw1QXqecuxQBqI+3YCCRPOxTGu7bZ/vAgMBAAECggEAEnUG9rE+gKO/v3NsQkgBtfik4wro17zo5wRUJiMebI6KzHI+b5wwSTIAR/hIAP5bjbcuUjO9vlYkTK5sFaVYBbxH4FPeR2zX28e8ul/AcBXh5LwVXEsAKcDvTXT5mNi7FsBDqEoVlVxPTBssLrbVWSTVkXFmofjI8KZafhSlbwCYk1B6eTwbKKTHfZQIOsjx8fzirLW15WRQkORowgO1Uiz9h5QbbLWngTkAqzUBLna333KxgHhKcD53It/0KsRj9Z1LCfaMzAwmeRF9SLDYhIpzM07XcDurP+ZG3VY7DB8fHM5dIbeTD4kzCUdrdz1RyrN75kuNeb7e5/NVlKq0GQKBgQD81ldnuRWl+PObhB5AxhHCBwQA+gxsNrEpcSsSLLo2nm/3Ps4W/WP48g+hSVfINTbXkAof8pc1PSyPXSdPXnHj/dP4OUrp/SAnQaGClz8RvNq5NK+WzjmwPcdUmRsymmdoUvKb/JsjtJZrWZ9p+8HMbwGQeLBHKiZDheXcD70+swKBgQDDze2bS3V+D1QzflSYpVaAXwpc9o8J8pAz2iNAwk2Vb+4djCBckgsUBQllweomyIu0AsbJT4AR1ZMm9YOZlNS5YtS7A3/ksFJ2KyW6HsC2VazkUMghDLtd1QBZXx4AIYBign4Vn4xWaL2M3akn5WmAI5jfxSKNJqpjHF7YW4A31QKBgQDrq2K3VMa/+MghGkoUuErPHzj1LB2uNGB4L3slKrm7tXzJ6imxNikcX4yAGtwOysM+tI0rcDTPNCE31G2SxobEK9GLmuOgLQfub3d7QT1RbEY3wcs1dy5Af6UvzrKSPWfLzx1ClneJFYfrshMsd7URuBquLkCpZLlb0RALSkRsjwKBgH7yckyu/bv/QD4qd7qH569O7y8ag96VLz0O/rAryZVLfnwVr52U6i3OnislMCR4/Wp2Kl+2dXgamk81+l6Gieyv0PB28mJYlv4aN1mWOqd8oJ1eaoJS+N97C8Dl1FONZOl5ZTmruZcETXCY/eTp7h6v9ZuO+jm9ida8PBnWKSkJAoGAVBkOYpOAkj2MfNTFENSOmnlsQuPUX5QoUVJtYsciG48/h2eZd86XI5siW2U16QlIgbZ3V3WS0OngTNoRq/BYhKNhUgnmNRsfmRMUwBEw0nuk0Ckk21+/Z89ICGRY+5ypat8Aa4XJNY+BzQITcb/8lAVugmAgs3hcMMenufcYXng="
+  # busd合约地址
+  busdTokenAddress: "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee"
+  # 资金池地址
+  fundPoolAddress: "0xb2bF67468170f1b8F32f29011c2E9ab302D80749"

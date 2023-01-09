@@ -6,11 +6,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gm.common.Constant.ErrorCode;
 import com.gm.common.exception.RRException;
-import com.gm.common.utils.Arith;
-import com.gm.common.utils.Constant;
-import com.gm.common.utils.PageUtils;
-import com.gm.common.utils.Query;
+import com.gm.common.utils.*;
 import com.gm.common.web3Utils.TransactionVerifyUtils;
+import com.gm.modules.sys.service.SysConfigService;
 import com.gm.modules.user.dao.GmUserWithdrawDao;
 import com.gm.modules.user.entity.*;
 import com.gm.modules.user.req.UseWithdrawReq;
@@ -65,6 +63,8 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
     private UserBalanceDetailService userBalanceDetailService;
     @Autowired
     private GmUserVipLevelService gmUserVipLevelService;
+    @Autowired
+    private SysConfigService sysConfigService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -266,14 +266,16 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
     }
 
     @Override
-    public void transfer(GmUserWithdrawEntity gmUserWithdrawEntity) throws IOException, ExecutionException, InterruptedException {
+    public void transfer(GmUserWithdrawEntity gmUserWithdrawEntity) throws Exception {
+        String PAYER_KEY = sysConfigService.getValue("PAYER_KEY");
+        String key = RSAUtils.decryptByPrivateKey(PAYER_KEY, payerWalletAddressKey);
         // 1.查询用户
         UserEntity userEntity = userService.queryByUserId(gmUserWithdrawEntity.getUserId());
         // 2.调用智能合约进行转账
         //发送方地址
         String from = payerWalletAddress;
         //发送方私钥
-        String privateKey = payerWalletAddressKey;
+        String privateKey = key;
         //接收者地址
         String to = userEntity.getAddress();
         //出款合约地址
