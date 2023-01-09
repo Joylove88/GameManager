@@ -181,9 +181,9 @@ public class RSAUtils {
 //        boolean b = RSAVerify(data, publicKey, rsaSign);
 //        System.out.println(b);
 //
-        String publicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwWKm489De/qdC8tGGKYqEoN+VGI4gZDJMgXHDF75Zb5ofKAPyrz/cVbd/P6RBDr1KEL1X+UmRSmRM+JmZx0A/Em8KuGdqe9areyfDEHDLOkJ+HfrtyoNC7WOPP4zj6COFAcjV8dFBYVTtpiBvBoyLQcHF32w0i22TswHOJEwpe1ae8ty+6UlSnUUZVmr0bEO09tmEV1mU5UuhdS2+i6HK7mfma5cBQVinvYSOcdKXCzOX6OkwKuim8T3aUNdn1taiybdXLLa5fdSiXd7/enk3C1RttPgQOlUH4eo4PsLnzjrcycFrYlIuEoMNUF6nnLsUAaiPt2AgkTzsUxru22f7wIDAQAB";
-        String encryptByPublicKey = encryptByPublicKey("f94a3b8f8b5b7d6ed5a8a77a60252de6adc867629bfe2316b495c05e15017e54", publicKey);
-        System.out.println(encryptByPublicKey);
+//        String publicKey = "";
+//        String encryptByPublicKey = encryptByPublicKey("", publicKey);
+//        System.out.println(encryptByPublicKey);
 //        String decryptByPrivateKey = decryptByPrivateKey("ZjsJvB8Z3S4Bw5971Zq7JdaUvFpbMbHqsLfo8KmbtWl4lKaE1mKBBEBgWcWqDLzOUJ4gkwJoFRCpPBomtsJNbX+pNN6trcG8mGXVdjxrtWUsi9d60Vibl0O9Ds43CEwRCQCjQW7vWa3h76kJuQRdt4HeHwzc/ZrPBEsSrk7oz4xRCQBnI55GRLZsvlQZLfQwWfO8QiHOWUFVj9vrg2aVHiflY6QX5LddgE1F+9uUqzUnKnDKHLdY50bcc9AmB1GDi8NwjZolDUaCQ9kf3bTCy+rJOuw/v5RDB8ETGUi7VPM9V4teFAtrRRIawSMQ+Wu0NwecxIVl+3QT7gP6uzNaUg==", privateKey);
 //        System.out.println(decryptByPrivateKey);
 

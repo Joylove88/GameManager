@@ -3,9 +3,9 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://192.168.3.188:3306/gamemanager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      url: jdbc:mysql://127.0.0.1:3306/gamemanager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
       username: root
-      password: 123456
+      password: we&68YDryuH$@JDHSFdhfj(@abc1
       initial-size: 10
       max-active: 100
       min-idle: 10
@@ -32,18 +32,3 @@ spring:
         wall:
           config:
             multi-statement-allow: true
-
-
-##多数据源的配置，需要引用renren-dynamic-datasource
-#dynamic:
-#  datasource:
-#    slave1:
-#      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-#      url: jdbc:sqlserver://localhost:1433;DatabaseName=renren_security
-#      username: sa
-#      password: 123456
-#    slave2:
-#      driver-class-name: org.postgresql.Driver
-#      url: jdbc:postgresql://localhost:5432/renren_security
-#      username: gm
-#      password: 123456

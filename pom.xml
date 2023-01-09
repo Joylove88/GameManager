@@ -269,9 +269,9 @@
 
         <profile>
             <!-- 测试 -->
-            <id>test</id>
+            <id>prod</id>
             <properties>
-                <environment>test</environment>
+                <environment>prod</environment>
             </properties>
         </profile>
 

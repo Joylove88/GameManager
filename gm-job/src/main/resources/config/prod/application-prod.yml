@@ -1,0 +1,44 @@
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/gamemanager_prod?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
+      username: root
+      password: we&68YDryuH$@JDHSFdhfj(@abc1
+      initial-size: 10
+      max-active: 100
+      min-idle: 10
+      max-wait: 60000
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      #Oracle需要打开注释
+      #validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        #login-username: admin
+        #login-password: admin
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: false
+        wall:
+          config:
+            multi-statement-allow: true
+
+withdraw:
+  # 出款发起地址
+  payerWalletAddress: "0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45"
+  # 出款发起地址秘钥
+  payerWalletAddressKey: "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCnN5ZKfUaGEnzdZe/3GHQeWvIw61vtGbPEudCtDG3Su27+dFQ0u49RRrpxQikbsCARF0/r02ToDLXgCjJ7WSnHq7WirpoFLZcM4CmEQ/AHqr4VRAiykRIu+SvZZTheeghpzV2zzYYXNosinJxJ+dXkdCjh9WTJ+qE/5AG6Qw9drP9FxPXIInlad7VrSFAcu3JOhUIqsHSlQ6q3lkAObrY/kVfLEcM0/bSyS++yt7G4XYezO2DDJrjLT/Y64Ai2o7mMxSVZmEPWwYnuz2R1Wk0FvIJHBVKtp5DEH5dv3EJsaluHlTO4448M+jd6bmv0/KPy3XmTRqFsFGQTImnJllbhAgMBAAECggEAPjfXqvW8BOziGvrv86/cnOLYFM2uEaWrlvpQo+LpBi0JmpIsNsbHB8XaX4PvicbZ16Il8ahhdlosXiVNLUo62nmQhuySkHSrLHZH3Ffu+ttUCNOcrNx/uIyr/SLFe5nKgZuRTvKc/wwjbwh4uqnEJVH3WEQXcXPZBc3Pur9y+zZj8D+Eq938jfUQY51ECKP8WhyDqHABNctCOtNgaeTuiAcsL9pcqfZ3UVNtEU3Wd6B5H0V7tgZJ2Y8f06r6IlUW3bfejZpVjRfQplaORE9nJXeqvTXrlBwVsQLDZk6CPqCrqu4HvBInJZUSOb4Ls8ZUVNYFNr4nL/eWoIF6KG19xQKBgQD4Ac5mz/eTc5Q8VeM35KPzFxxcZQGuOH7uEACM8dh16ARo8EH/jzOwi421W1N97ihzXggCkmjijKAEMiJuscl0GZUJs581TOA16XWEGjRKBPsJ8vsHrecyO+O3QT6Z2aXxcCAAD28un/9anOm+wSGpwFuVppnko2S48WfrVwpN7wKBgQCsmzhHRdOnMkfSese6u60+gREicS+PmDdDHYwcu1aDDxArYy2c/Vfdn/rJyCoo61cozp39CMDyGS1ik+BHipkbRR0lMmC0V/UGkCrZLTjZ72TB/D8yJjsosjN+aT00iN5HbjqlY3QR5sn2wYbt1OtXzvrvST6Z2C8ZwDrm0nZ4LwKBgH4JnPWPF0juYhVPqMvM/K0bv6QNCQ+bUpZ1t3HprpItOaCDCWdxRVmhcoEKSqIjGJeY4AU+luMbiG7Zc7pBzBmerqlhibWyvfdoD/r0vkInydTCkWTTsj1LRmzpUYEqpTTQQNMHBP/y+/j26auxxwPX6DNjma4ig5uhw6hMccYtAoGBAIHv99Xvwv3C5D6XH3R7hFfhYbzD6EH5HODxhWC7xsyyskF3UAc20MaOgIUWomZbhCm8IUMzK80VFw12tQgmVkwpI1+1JQeej155eUg0uu+VQAyokAp4rWBdhlZLcz/xKSQs3wlSbTZsvu17ks/H0cMwlcc9JFs8W3jPNYg+N+ERAoGAIEl+R/XzICGdQKyWtQ74Xp2v7LTdA0z3mHvb/JylEPRUun0m0A8+OBaJI+BhR8tA9sgewqnasP4oIV9aj5I+rL9+dl4eFcgL1cx6m2uZo/7sRn01k/VuAT0mFO1A+ptKJQxwsIu+r6ZaH8zE5KOAR16Iy9aRUhjmHM7jhUIB/uM="
+  # busd合约地址
+  busdTokenAddress: "0xe9e7cea3dedca5984780bafc599bd69add087d56"
+  # 资金池地址
+  fundPoolAddress: "0x482435b52fD280E7E9A6Dc6CB591366050ddcd02"
