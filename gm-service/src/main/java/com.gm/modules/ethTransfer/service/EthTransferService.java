@@ -78,7 +78,7 @@ public class EthTransferService {
     /**
      * 经验合约地址
      */
-    @Value("${contractAddress.nftExAddress:#{null}}")
+    @Value("${contractAddress.nftExpAddress:#{null}}")
     private String nftExpAddress;
 
     @Transactional(rollbackFor = Exception.class)
