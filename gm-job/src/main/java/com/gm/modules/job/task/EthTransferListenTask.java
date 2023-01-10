@@ -81,6 +81,8 @@ public class EthTransferListenTask implements ITask {
     @Value("${contractAddress.nftExpAddress:#{null}}")
     private String nftExpAddress;
 
+    private int blockNum = Constant.ZERO_I;
+
     @Override
     public void run(String params) {
         logger.info("ethTransferListenTask定时任务正在执行，参数为：{}", params);
@@ -165,8 +167,12 @@ public class EthTransferListenTask implements ITask {
                         }
                         // 监听以太坊上是否有系统生成地址的交易
                         callBack_ETH(txHash, fromAddress, toAddress, value, timestamp);
+                    }
+
+                    if (blockNum != block_EthMissSub){
                         // 系统设置保存区块号
                         setBlock_Num(block_EthMissSub);
+                        blockNum = block_EthMissSub;
                     }
                     // 如果当前执行的区块号等于获取的最新区块号 将停止运行。
                     if (block_EthMissSub == finalCurrentBlockNum.intValue()) {
@@ -192,6 +198,7 @@ public class EthTransferListenTask implements ITask {
 
     // 更新系统中保存的区块号
     private void setBlock_Num(int blockNum) {
+        System.out.println("update-blockNum : " + blockNum);
         sysConfigService.updateValueByKey(Constant.SysConfig.BLOCK_NUMBER.getValue(), String.valueOf(blockNum));
     }
 }
