@@ -63,8 +63,8 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
     private GmUserVipLevelService gmUserVipLevelService;
     @Autowired
     private SysConfigService sysConfigService;
-
-    private Web3j web3j = new TransactionVerifyUtils().connect();
+    @Autowired
+    private TransactionVerifyUtils transactionVerifyUtils;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -267,6 +267,7 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
 
     @Override
     public void transfer(GmUserWithdrawEntity gmUserWithdrawEntity) throws Exception {
+        Web3j web3j = transactionVerifyUtils.connect();
         String PAYER_KEY = sysConfigService.getValue("PAYER_KEY");
         String key = RSAUtils.decryptByPrivateKey(PAYER_KEY, payerWalletAddressKey);
         // 1.查询用户
@@ -330,6 +331,7 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
 
     @Override
     public void confirmTransfer(GmUserWithdrawEntity gmUserWithdrawEntity) throws IOException {
+        Web3j web3j = transactionVerifyUtils.connect();
         EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(gmUserWithdrawEntity.getWithdrawHash()).send();
         Optional<TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
         if (transactionReceipt.isPresent()) {

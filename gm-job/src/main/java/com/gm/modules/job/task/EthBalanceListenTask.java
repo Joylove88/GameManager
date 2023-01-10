@@ -55,6 +55,8 @@ public class EthBalanceListenTask implements ITask {
     private SysConfigService sysConfigService;
     @Autowired
     private SysDictService sysDictService;
+    @Autowired
+    private TransactionVerifyUtils transactionVerifyUtils;
 
     @Override
     public void run(String params) {
@@ -71,8 +73,8 @@ public class EthBalanceListenTask implements ITask {
     }
 
 
-    private static void run() throws Exception {
-        web3j = new TransactionVerifyUtils().connect();
+    private void run() throws Exception {
+        web3j = transactionVerifyUtils.connect();
     }
 
     // 启动监听以太坊上的过往交易

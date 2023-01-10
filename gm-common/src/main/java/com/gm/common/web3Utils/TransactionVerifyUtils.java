@@ -1,84 +1,75 @@
 /**
  * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
+ * <p>
  * https://www.renren.io
- *
+ * <p>
  * 版权所有，侵权必究！
  */
 
 package com.gm.common.web3Utils;
 
-import com.gm.common.utils.Arith;
-import com.gm.common.utils.Constant;
-import com.gm.common.utils.EthTransferListenUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.web3j.abi.datatypes.Address;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.utils.Convert;
-import org.web3j.utils.Numeric;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
+@Component
 public class TransactionVerifyUtils {
-	@Value("${contractAddress.networks:#{null}}")
-	private String networks;
+    @Value("${contractAddress.networks:#{null}}")
+    private String networks;
 
-	// 链接链上
-	public Web3j connect(){
-		System.out.println("Connecting to binanceScan");
-		Web3j web3 = Web3j.build(new HttpService(networks));
-		System.out.println("Successfuly connected to Ethereum");
-		return web3;
-	}
+    // 链接链上
+    public Web3j connect() {
+        System.out.println("Connecting to binanceScan");
+        Web3j web3 = Web3j.build(new HttpService(networks));
+        System.out.println("Successfuly connected to Ethereum");
+        return web3;
+    }
 
-	//监听链上交易信息
-	public static Optional<TransactionReceipt> isVerify(Web3j web3,String transactionHash) {
-		String status = "0";
-		// Wait for transaction to be mined
-		Optional<TransactionReceipt> transactionReceipt = null;
-		try {
-			// 定义次数
-			int i = 0;
-			do {
-				System.out.println("checking if transaction " + transactionHash + " is mined....");
-				EthGetTransactionReceipt ethGetTransactionReceiptResp = web3.ethGetTransactionReceipt(transactionHash).send();
-				transactionReceipt = ethGetTransactionReceiptResp.getTransactionReceipt();
+    //监听链上交易信息
+    public static Optional<TransactionReceipt> isVerify(Web3j web3, String transactionHash) {
+        String status = "0";
+        // Wait for transaction to be mined
+        Optional<TransactionReceipt> transactionReceipt = null;
+        try {
+            // 定义次数
+            int i = 0;
+            do {
+                System.out.println("checking if transaction " + transactionHash + " is mined....");
+                EthGetTransactionReceipt ethGetTransactionReceiptResp = web3.ethGetTransactionReceipt(transactionHash).send();
+                transactionReceipt = ethGetTransactionReceiptResp.getTransactionReceipt();
 
-				i++;
-				Thread.sleep(3000); // Retry after 10 sec
-			} while(!transactionReceipt.isPresent() && i < 3);
-			if (transactionReceipt != null){
-				System.out.println("transactionHash:" + transactionReceipt.get().getTransactionHash() + ","+
-						"\ntransactionIndex:" + transactionReceipt.get().getTransactionIndex() +
-						"\nblockHash:" + transactionReceipt.get().getBlockHash() +
-						"\nblockNumber:" + transactionReceipt.get().getBlockNumber() +
-						"\ncumulativeGasUsed:" + transactionReceipt.get().getCumulativeGasUsed() +
-						"\ngasUsed:" + transactionReceipt.get().getGasUsed() +
-						"\ncontractAddress:" + transactionReceipt.get().getContractAddress() +
-						"\nroot:" + transactionReceipt.get().getRoot() +
-						"\nstatus:" + transactionReceipt.get().getStatus() +
-						"\nfrom:" + transactionReceipt.get().getFrom() +
-						"\nto:" + transactionReceipt.get().getTo() +
-						"\nlogsBloom:" + transactionReceipt.get().getLogsBloom() +
-						"\nlogs:" + transactionReceipt.get().getLogs().toString()
-				);
-			}
+                i++;
+                Thread.sleep(3000); // Retry after 10 sec
+            } while (!transactionReceipt.isPresent() && i < 3);
+            if (transactionReceipt != null) {
+                System.out.println("transactionHash:" + transactionReceipt.get().getTransactionHash() + "," +
+                        "\ntransactionIndex:" + transactionReceipt.get().getTransactionIndex() +
+                        "\nblockHash:" + transactionReceipt.get().getBlockHash() +
+                        "\nblockNumber:" + transactionReceipt.get().getBlockNumber() +
+                        "\ncumulativeGasUsed:" + transactionReceipt.get().getCumulativeGasUsed() +
+                        "\ngasUsed:" + transactionReceipt.get().getGasUsed() +
+                        "\ncontractAddress:" + transactionReceipt.get().getContractAddress() +
+                        "\nroot:" + transactionReceipt.get().getRoot() +
+                        "\nstatus:" + transactionReceipt.get().getStatus() +
+                        "\nfrom:" + transactionReceipt.get().getFrom() +
+                        "\nto:" + transactionReceipt.get().getTo() +
+                        "\nlogsBloom:" + transactionReceipt.get().getLogsBloom() +
+                        "\nlogs:" + transactionReceipt.get().getLogs().toString()
+                );
+            }
 
-		} catch(Exception ex) {
-			throw new RuntimeException("Error whilst sending json-rpc requests", ex);
-		}
-		return transactionReceipt;
-	}
+        } catch (Exception ex) {
+            throw new RuntimeException("Error whilst sending json-rpc requests", ex);
+        }
+        return transactionReceipt;
+    }
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 //		Optional<TransactionReceipt> receipt = isVerify(connect(),"0xe0f8414688e3f436e793859780630bf45aec24f68f18efe6666f6626255ee30c");
 //		System.out.println(receipt);
 //		String BUSD_ADDRESS = "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee";
@@ -132,5 +123,5 @@ public class TransactionVerifyUtils {
 //		System.out.println(tokenIds.get(0));
 //		byte[] hash = Hash.sha3(String.valueOf("Transfer(address,address,uint256)").getBytes());
 //		System.out.println(Numeric.toHexString(hash));
-	}
+    }
 }

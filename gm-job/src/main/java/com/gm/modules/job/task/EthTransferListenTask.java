@@ -63,6 +63,8 @@ public class EthTransferListenTask implements ITask {
     private SysDictService sysDictService;
     @Autowired
     private EthTransferService ethTransferService;
+    @Autowired
+    private TransactionVerifyUtils transactionVerifyUtils;
     /**
      * 英雄合约地址
      */
@@ -98,8 +100,8 @@ public class EthTransferListenTask implements ITask {
     }
 
 
-    private static void run() throws Exception {
-        web3j = new TransactionVerifyUtils().connect();
+    private void run() throws Exception {
+        web3j = transactionVerifyUtils.connect();
 
     }
 

@@ -107,6 +107,8 @@ public class ApiUserController {
     private CombatStatsUtilsService combatStatsUtilsService;
     @Autowired
     private TransactionOrderService transactionOrderService;
+    @Autowired
+    private TransactionVerifyUtils transactionVerifyUtils;
 
     @Login
     @PostMapping("getUserHeroInfo")
@@ -351,7 +353,7 @@ public class ApiUserController {
         // 表单校验
         ValidatorUtils.validateEntity(useWithdrawReq);
         // 根据交易哈希查询交易
-        Web3j web3j = new TransactionVerifyUtils().connect();
+        Web3j web3j = transactionVerifyUtils.connect();
         EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(useWithdrawReq.getRefundHash()).send();
         Optional<TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
         if (!transactionReceipt.isPresent()) {
