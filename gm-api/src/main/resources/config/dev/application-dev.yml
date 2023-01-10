@@ -4,8 +4,7 @@ spring:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
 #      url: jdbc:mysql://139.180.186.187:3306/gamemanager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
-      url: jdbc:mysql://localhost:3306/gamemanager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
-#      url: jdbc:mysql://127.0.0.1:3306/gamemanager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      url: jdbc:mysql://127.0.0.1:3306/gamemanager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
       username: root
       password: we&68YDryuH$@JDHSFdhfj(@abc1
 #      password: 123456
