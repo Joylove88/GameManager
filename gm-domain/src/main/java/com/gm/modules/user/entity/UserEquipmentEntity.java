@@ -53,7 +53,7 @@ public class UserEquipmentEntity implements Serializable {
 	/**
 	 * 装备战力
 	 */
-	private Long equipPower;
+	private Double equipPower;
 	/**
 	 * 铸造HASH
 	 */
@@ -77,11 +77,11 @@ public class UserEquipmentEntity implements Serializable {
 	/**
 	 * 生命值
 	 */
-	private Long health;
+	private Double health;
 	/**
 	 * 法力值
 	 */
-	private Long mana;
+	private Double mana;
 	/**
 	 * 生命值恢复
 	 */
@@ -93,19 +93,19 @@ public class UserEquipmentEntity implements Serializable {
 	/**
 	 * 护甲
 	 */
-	private Long armor;
+	private Double armor;
 	/**
 	 * 魔抗
 	 */
-	private Long magicResist;
+	private Double magicResist;
 	/**
 	 * 攻击力
 	 */
-	private Long attackDamage;
+	private Double attackDamage;
 	/**
 	 * 法功
 	 */
-	private Long attackSpell;
+	private Double attackSpell;
 	/**
 	 * 创建时间
 	 */

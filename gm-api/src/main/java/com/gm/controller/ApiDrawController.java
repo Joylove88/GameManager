@@ -114,7 +114,7 @@ public class ApiDrawController {
             transactionOrderService.addOrder(user, null, form);
         } else {// 订单不为空说明是二次请求 验证成功后执行核心业务
             // 校验用户是否链上交易成功
-            receipt = TransactionVerifyUtils.isVerify(TransactionVerifyUtils.connect(), form.getTransactionHash());
+            receipt = TransactionVerifyUtils.isVerify(new TransactionVerifyUtils().connect(), form.getTransactionHash());
             giftBoxs = ethTransferService.eth(form.getTransactionHash(), order, receipt, form);
         }
         return R.ok().put("giftBoxs", giftBoxs);

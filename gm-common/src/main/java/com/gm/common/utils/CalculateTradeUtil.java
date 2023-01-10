@@ -12,7 +12,8 @@ public class CalculateTradeUtil {
     public static BigDecimal EGGS_TO_HATCH_1MINERS = BigDecimal.valueOf(86400);
     public static BigDecimal EGGS_TO_HATCH_1MINERS30 = BigDecimal.valueOf(86400 * 30);
     private static BigDecimal PSN = BigDecimal.valueOf(10000);
-    private static BigDecimal PSNH = BigDecimal.valueOf(5000);
+    private static BigDecimal PSNH = BigDecimal.valueOf(5000000);
+    private static BigDecimal PSNS = BigDecimal.valueOf(1);
 
     // 初始市场总鸡蛋数量
     public static BigDecimal marketEggs = BigDecimal.valueOf(864000000);
@@ -79,8 +80,7 @@ public class CalculateTradeUtil {
     // 更新矿工
     public static BigDecimal updateMiner(BigDecimal changePower) {
         // 平衡法
-        BigDecimal newChangePower = Arith.divide(Arith.multiply(changePower, FundPool), totalPower);
-        totalPower = Arith.add(totalPower, changePower);
+        BigDecimal newChangePower = Arith.divide(changePower, PSNS);
         // 如果改变的值为0 则跳出
         if (changePower.compareTo(BigDecimal.valueOf(0)) == 0) return BigDecimal.valueOf(0);
         eggsBought = calculateEggBuy(newChangePower.abs(), FundPool);
@@ -90,7 +90,7 @@ public class CalculateTradeUtil {
     // 矿工兑换数量比例
     public static BigDecimal calculateRateOfMinter(BigDecimal userPower) {
         // 平衡法
-        BigDecimal newChangePower = Arith.divide(Arith.multiply(userPower, FundPool), totalPower);
+        BigDecimal newChangePower = Arith.divide(userPower, PSNS);
         BigDecimal eggsBought = calculateEggBuy(newChangePower, FundPool);
         return Arith.divide(eggsBought, CalculateTradeUtil.EGGS_TO_HATCH_1MINERS30);
     }
@@ -131,14 +131,21 @@ public class CalculateTradeUtil {
     }
 
     public static void main(String[] args) {
-        BigDecimal rate = BigDecimal.valueOf(1);
+        BigDecimal rate = BigDecimal.valueOf(5000);
         BigDecimal power = BigDecimal.valueOf(355);
-        marketEggs = new BigDecimal("3580015032.915562");
+        marketEggs = new BigDecimal("2356060901.982144");
         System.out.println("marketEggs:"+marketEggs);
-        FundPool = BigDecimal.valueOf(14.490000);
-        totalPower = BigDecimal.valueOf(236027);
+        FundPool = BigDecimal.valueOf(16422.000000);
+//        totalPower = BigDecimal.valueOf(31873);
         System.out.println("FundPool:"+FundPool);
-        System.out.println("oracle:"+calculateRateOfMinter(rate));
+        BigDecimal minterRate = calculateRateOfMinter(rate);
+        BigDecimal newMiner = updateMiner(rate);
+        System.out.println("minterRate:"+ minterRate);
+        System.out.println("newMiner:"+ newMiner);
+        System.out.println("marketEggs:"+ marketEggs);
+//        BigDecimal newOracle = BigDecimal.valueOf(Arith.multiply(Arith.divide(BigDecimal.valueOf(0.04551000), minterRate), BigDecimal.valueOf(100)).intValue());
+//        System.out.println("newOracle:"+newOracle);
+//        System.out.println();
 //        System.out.println("minter:"+updateMiner(power));
 //        System.out.println("minter1:"+calculateRateOfMinter(rate));
 //        FundPool = BigDecimal.valueOf(68);

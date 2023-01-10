@@ -79,7 +79,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		userRegister.setUserLevelId(1);
 		userRegister.setFtg(Constant.FTG);
 		userRegister.setScale(1D);
-		userRegister.setTotalPower(Constant.ZERO);
+		userRegister.setTotalPower(Constant.ZERO_D);
 		userRegister.setTotalMinter(BigDecimal.ZERO);
 		userRegister.setExperienceObtain(Constant.ZERO);
 		userRegister.setUserType(Constant.ZERO_);

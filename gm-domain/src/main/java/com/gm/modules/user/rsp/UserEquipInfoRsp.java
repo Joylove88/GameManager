@@ -64,11 +64,11 @@ public class UserEquipInfoRsp {
 	/**
 	 * 生命值恢复
 	 */
-	private Long healthRegen;
+	private Double healthRegen;
 	/**
 	 * 法力值恢复
 	 */
-	private Long manaRegen;
+	private Double manaRegen;
 	/**
 	 * 护甲
 	 */

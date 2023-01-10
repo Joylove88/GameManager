@@ -3,7 +3,9 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://127.0.0.1:3306/gamemanager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
+#      url: jdbc:mysql://139.180.186.187:3306/gamemanager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
+      url: jdbc:mysql://localhost:3306/gamemanager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
+#      url: jdbc:mysql://127.0.0.1:3306/gamemanager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
       username: root
       password: we&68YDryuH$@JDHSFdhfj(@abc1
 #      password: 123456
@@ -33,3 +35,23 @@ spring:
         wall:
           config:
             multi-statement-allow: true
+
+contractAddress:
+  # 出款发起地址
+  payerWalletAddress: "0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45"
+  # busd合约地址
+  busdTokenAddress: "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee"
+  # 资金池地址
+  fundPoolAddress: "0xa2294B906829eD5c2d18618BC724c13889a6173d"
+  # NFT英雄地址
+  nftHeroAddress: "0x1c72906E0392b31D37f07fc72045960bf0D383a4"
+  # NFT装备地址
+  nftEquipAddress: "0x9188353ef930A15dcBC726b028Aa82AcD185E295"
+  # NFT经验道具地址
+  nftExpAddress: "0x82D27810050baEf93f9Af9a6613724E0eA425F16"
+  # 团队地址
+  teamAddress: "0x2A3Ee1e41A8A11546C5732CFB447b752c9F09618"
+  # ABC代币地址
+  abcTokensAddress: "0xCbFeB1140E3A94e6Ca3d901F77a64b380B378bd5"
+  #  测试链地址
+  networks: "https://data-seed-prebsc-1-s1.binance.org:8545/"

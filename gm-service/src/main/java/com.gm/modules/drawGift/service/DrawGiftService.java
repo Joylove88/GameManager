@@ -238,12 +238,12 @@ public class DrawGiftService {
         }
         SummonedEventDto rsp = new SummonedEventDto();
         rsp.setId(id);
-        rsp.setOnePrice(onePrice);
-        rsp.setTenPrice(tenPrice);
-        rsp.setOnePriceNew(onePriceNew);
-        rsp.setTenPriceNew(tenPriceNew);
-        rsp.setRebateOne(rebateOne);
-        rsp.setRebateTen(rebateTen);
+        rsp.setOnePrice(Arith.formatDouble(onePrice));
+        rsp.setTenPrice(Arith.formatDouble(tenPrice));
+        rsp.setOnePriceNew(Arith.formatDouble(onePriceNew));
+        rsp.setTenPriceNew(Arith.formatDouble(tenPriceNew));
+        rsp.setRebateOne(Arith.formatDouble(rebateOne));
+        rsp.setRebateTen(Arith.formatDouble(rebateTen));
         rsp.setQuantityUsed(quantityUsed);
         rsp.setDiscountRate(discountRate);
         rsp.setQuantityAvailable(quantityAvailable);
@@ -258,6 +258,8 @@ public class DrawGiftService {
      * @param num
      */
     private void updateWhitelistPreSale(Long userId, SummonedEventDto summonedEventDto, Integer num, String curType) {
+        // 本次召唤次数
+        Integer summonNum = num;
         GmWhitelistPresaleEntity whitelistPresale = new GmWhitelistPresaleEntity();
         whitelistPresale.setId(summonedEventDto.getId());
         // 如果已购买数量大于可购买数量 直接更新为与可购买数量同值
@@ -268,7 +270,7 @@ public class DrawGiftService {
         // 如玩家支付类型为加密货币并且召唤返利开启的时候则进行返金币
         if (curType.equals(Constant.ONE_) && summonedEventDto.getSummonRebateSwitch().equals(Constant.enable)) {
             // 如十连抽则返十连抽计算后的金币 单抽则返单抽计算后的金币
-            BigDecimal addMoney = BigDecimal.valueOf(num == Constant.SummonNum.NUM10.getValue() ? summonedEventDto.getRebateTen() : summonedEventDto.getRebateOne());
+            BigDecimal addMoney = BigDecimal.valueOf(summonNum == Constant.SummonNum.NUM10.getValue() ? summonedEventDto.getRebateTen() : summonedEventDto.getRebateOne());
             // 更新玩家账户余额
             boolean effect = userAccountService.updateAccountAdd(userId, addMoney, Constant.ZERO_);
             // 用户池入账
@@ -423,22 +425,22 @@ public class DrawGiftService {
             double heroPower = 0d;
             // 计算英雄战力
             heroPower = combatStatsUtilsService.getHeroPower(attributeSimple);
-            userHero.setHeroPower((long) heroPower);
+            userHero.setHeroPower(heroPower);
             // 初始化GAIA经济系统
-            fightCoreService.initTradeBalanceParameter(0);
+            fightCoreService.initTradeBalanceParameter(1);
             // 计算矿工数
             // 获取scale后的战力值
-            BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(userHero.getHeroPower() * scale));
+            BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(heroPower * scale));
             userHero.setMinter(minter);// 矿工数
-            userHero.setOracle(CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1)));// 神谕值
             // 更新系统中保存的市场总鸡蛋
             sysConfigService.updateValueByKey(Constant.SysConfig.MARKET_EGGS.getValue(), CalculateTradeUtil.marketEggs.toString());
             // 每次抽奖总战力累加
-            CalculateTradeUtil.totalPower = Arith.add(CalculateTradeUtil.totalPower, BigDecimal.valueOf(userHero.getHeroPower()));
+            CalculateTradeUtil.totalPower = Arith.add(CalculateTradeUtil.totalPower, BigDecimal.valueOf(heroPower));
             // 每次抽奖副本资金池累加
-            BigDecimal dungeonFee = Arith.multiply(summonReq.getRealFee(), Constant.CashPoolScale._DUNGEON.getValue());// 获取该订单金额的75%
+            BigDecimal dungeonFee = Arith.divide(Arith.multiply(summonReq.getRealFee(), Constant.CashPoolScale._DUNGEON.getValue()), BigDecimal.valueOf(summonReq.getSummonNum()));// 获取该订单金额的75%
             CalculateTradeUtil.FundPool = Arith.add(CalculateTradeUtil.FundPool, dungeonFee);
-
+            // 神谕值
+            userHero.setOracle(CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1)));
             userHeroAdds.add(userHero);
 
             // 存储英雄召唤返回集合
@@ -515,10 +517,14 @@ public class DrawGiftService {
                 tokenIds.remove(0);// 删除当前位置的tokenID
             }
 
+            // 每次抽奖副本资金池累加
+            BigDecimal dungeonFee = Arith.divide(Arith.multiply(summonReq.getRealFee(), Constant.CashPoolScale._DUNGEON.getValue()), BigDecimal.valueOf(summonReq.getSummonNum()));// 获取该订单金额的75%
+            CalculateTradeUtil.FundPool = Arith.add(CalculateTradeUtil.FundPool, dungeonFee);
+
             // 存储英雄召唤返回集合
             GiftBoxHeroRsp giftBoxHeroRsp = new GiftBoxHeroRsp();
             giftBoxHeroRsp.setHeroName(heroFrags.get(heroIndex).getHeroName());// 英雄名称
-            giftBoxHeroRsp.setHeroIconUrl(heroFrags.get(heroIndex).getHeroIconUrl());// 英雄图标
+            giftBoxHeroRsp.setHeroIconUrl(heroFrags.get(heroIndex).getHeroFragIconUrl());// 英雄图标
             giftBoxHeroRsp.setStarCode(Constant.ZERO_I);// 英雄星级
             giftBoxHeroRsp.setHeroFragNum(flagNum);// 英雄碎片数量，如果为星级英雄 数量固定1
             giftBoxHeroRsp.setHeroType(Constant.FragType.FRAG.getValue());// 英雄类型：0星级英雄，1英雄碎片
@@ -543,6 +549,10 @@ public class DrawGiftService {
      * @throws Exception
      */
     private void heroSummonPool(UserEntity user, SummonReq summonReq, List<Double> orignalRates, SummonedEventDto summonedEventDto) throws Exception {
+        // 获取副本池金额
+        String poolBalance = sysConfigService.getValue(Constant.CashPool._DUNGEON.getValue());
+        CalculateTradeUtil.FundPool = new BigDecimal(poolBalance);
+        LOGGER.info("获取副本池金额: " + CalculateTradeUtil.FundPool);
         // 抽奖次数
         Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates, summonReq.getSummonNum());
         // 奖品发放
@@ -647,14 +657,14 @@ public class DrawGiftService {
 
             // 随机装备属性
             Double rap = Arith.randomWithinRangeHundredEquip(eqAttMin, eqAttMax);
-            long health = (long) (equipmentInfos.get(equipmentIndex).getHealth() * rap);// 初始生命值
-            long mana = (long) (equipmentInfos.get(equipmentIndex).getMana() * rap);// 初始法力值
-            double healthRegen = (equipmentInfos.get(equipmentIndex).getHealthRegen() * rap);// 初始生命值恢复
-            double manaRegen = (equipmentInfos.get(equipmentIndex).getManaRegen() * rap);// 初始法力值恢复
-            long armor = (long) (equipmentInfos.get(equipmentIndex).getArmor() * rap);// 初始护甲
-            long magicResist = (long) (equipmentInfos.get(equipmentIndex).getMagicResist() * rap);// 初始魔抗
-            long attackDamage = (long) (equipmentInfos.get(equipmentIndex).getAttackDamage() * rap);// 初始攻击力
-            long attackSpell = (long) (equipmentInfos.get(equipmentIndex).getAttackSpell() * rap);// 初始法攻
+            double health = equipmentInfos.get(equipmentIndex).getHealth() * rap;// 初始生命值
+            double mana = equipmentInfos.get(equipmentIndex).getMana() * rap;// 初始法力值
+            double healthRegen = equipmentInfos.get(equipmentIndex).getHealthRegen() * rap;// 初始生命值恢复
+            double manaRegen = equipmentInfos.get(equipmentIndex).getManaRegen() * rap;// 初始法力值恢复
+            double armor = equipmentInfos.get(equipmentIndex).getArmor() * rap;// 初始护甲
+            double magicResist = equipmentInfos.get(equipmentIndex).getMagicResist() * rap;// 初始魔抗
+            double attackDamage = equipmentInfos.get(equipmentIndex).getAttackDamage() * rap;// 初始攻击力
+            double attackSpell = equipmentInfos.get(equipmentIndex).getAttackSpell() * rap;// 初始法攻
             userEquipment.setHealth(health);
             userEquipment.setMana(mana);
             userEquipment.setHealthRegen(healthRegen);
@@ -665,20 +675,21 @@ public class DrawGiftService {
             userEquipment.setAttackSpell(attackSpell);
             // 更新装备战力
             double equipPower = (health * 0.1) + (mana * 0.1) + attackDamage + attackSpell + ((armor + magicResist) * 4.5) + healthRegen * 0.1 + manaRegen * 0.3;
-            userEquipment.setEquipPower((long) equipPower);
+            userEquipment.setEquipPower(equipPower);
             // 初始化GAIA经济系统
-            fightCoreService.initTradeBalanceParameter(0);
+            fightCoreService.initTradeBalanceParameter(1);
             // 计算矿工数
-            BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(userEquipment.getEquipPower() * scale));
+            BigDecimal minter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(equipPower * scale));
             userEquipment.setMinter(minter);// 矿工数
-            userEquipment.setOracle(CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1)));// 神谕值
             // 更新系统中保存的市场总鸡蛋
             sysConfigService.updateValueByKey(Constant.SysConfig.MARKET_EGGS.getValue(), CalculateTradeUtil.marketEggs.toString());
             // 每次抽奖总战力累加
-            CalculateTradeUtil.totalPower = Arith.add(CalculateTradeUtil.totalPower, BigDecimal.valueOf(userEquipment.getEquipPower()));
+            CalculateTradeUtil.totalPower = Arith.add(CalculateTradeUtil.totalPower, BigDecimal.valueOf(equipPower));
             // 每次抽奖副本资金池累加
-            BigDecimal dungeonFee = Arith.multiply(summonReq.getRealFee(), Constant.CashPoolScale._DUNGEON.getValue());// 获取该订单金额的75%
+            BigDecimal dungeonFee = Arith.divide(Arith.multiply(summonReq.getRealFee(), Constant.CashPoolScale._DUNGEON.getValue()), BigDecimal.valueOf(summonReq.getSummonNum()));// 获取该订单金额的75%
             CalculateTradeUtil.FundPool = Arith.add(CalculateTradeUtil.FundPool, dungeonFee);
+            // 神谕值
+            userEquipment.setOracle(CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1)));
 
             userEquipment.setCreateTime(now);
             userEquipment.setCreateTimeTs(now.getTime());
@@ -751,6 +762,10 @@ public class DrawGiftService {
             userEquipmentFrag.setCreateTime(now);
             userEquipmentFrag.setCreateTimeTs(now.getTime());
             userEquipmentFragAdds.add(userEquipmentFrag);
+            // 每次抽奖副本资金池累加
+            BigDecimal dungeonFee = Arith.divide(Arith.multiply(summonReq.getRealFee(), Constant.CashPoolScale._DUNGEON.getValue()), BigDecimal.valueOf(summonReq.getSummonNum()));// 获取该订单金额的75%
+            CalculateTradeUtil.FundPool = Arith.add(CalculateTradeUtil.FundPool, dungeonFee);
+
             // 存储装备卷轴召唤返回集合
             GiftBoxEquipmentRsp giftBoxEquipmentRsp = new GiftBoxEquipmentRsp();
             giftBoxEquipmentRsp.setEquipName(equipmentFrags.get(equipmentFragIndex).getEquipName());// 名称
@@ -776,6 +791,10 @@ public class DrawGiftService {
      * @param orignalRates
      */
     private void equipmentSummonPool(UserEntity user, SummonReq summonReq, GmCombatRecordEntity combatRecord, List<Double> orignalRates, SummonedEventDto summonedEventDto) {
+        // 获取副本池金额
+        String poolBalance = sysConfigService.getValue(Constant.CashPool._DUNGEON.getValue());
+        CalculateTradeUtil.FundPool = new BigDecimal(poolBalance);
+        LOGGER.info("获取副本池金额: " + CalculateTradeUtil.FundPool);
         // 抽奖次数
         Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates, summonReq.getSummonNum());
         // 奖品发放
@@ -881,20 +900,20 @@ public class DrawGiftService {
             // 当前概率等级奖品的数量
             int giftBoxNum = entry.getValue();
             LOGGER.info("expGiftBoxNum: " + giftBoxNum);
-            switch (entry.getKey()){
-                case 0 :
+            switch (entry.getKey()) {
+                case 0:
                     // 1级概率产出随机1-10件
                     sendExpPropForPlayer(Constant.PrLv.PrLv1.getValue(), giftBoxNum, summonReq, user, summonedEventDto);
                     break;
-                case 1 :
+                case 1:
                     // 2级概率产出随机1-8件
                     sendExpPropForPlayer(Constant.PrLv.PrLv2.getValue(), giftBoxNum, summonReq, user, summonedEventDto);
                     break;
-                case 2 :
+                case 2:
                     // 3级概率产出随机1-4件
-                    sendExpPropForPlayer(Constant.PrLv.PrLv2.getValue(), giftBoxNum, summonReq, user, summonedEventDto);
+                    sendExpPropForPlayer(Constant.PrLv.PrLv3.getValue(), giftBoxNum, summonReq, user, summonedEventDto);
                     break;
-                case 3 :
+                case 3:
                     // 4级概率产出1件
                     sendExpPropForPlayer(Constant.PrLv.PrLv4.getValue(), giftBoxNum, summonReq, user, summonedEventDto);
                     break;

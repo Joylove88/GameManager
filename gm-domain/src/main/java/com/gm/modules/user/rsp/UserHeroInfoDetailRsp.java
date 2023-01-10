@@ -95,11 +95,11 @@ public class UserHeroInfoDetailRsp {
     /**
      * 生命值恢复
      */
-    private Double healthRegen;
+    private Long healthRegen;
     /**
      * 法力值恢复
      */
-    private Double manaRegen;
+    private Long manaRegen;
     /**
      * 护甲
      */

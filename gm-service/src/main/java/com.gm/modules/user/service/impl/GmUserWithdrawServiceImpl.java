@@ -45,15 +45,13 @@ import java.util.concurrent.ExecutionException;
 @Service("gmUserWithdrawService")
 @Transactional
 public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, GmUserWithdrawEntity> implements GmUserWithdrawService {
-    private Web3j web3j = TransactionVerifyUtils.connect();
-
-    @Value("${withdraw.payerWalletAddress:#{null}}")
+    @Value("${contractAddress.payerWalletAddress:#{null}}")
     private String payerWalletAddress;
-    @Value("${withdraw.payerWalletAddressKey:#{null}}")
+    @Value("${contractAddress.payerWalletAddressKey:#{null}}")
     private String payerWalletAddressKey;
-    @Value("${withdraw.busdTokenAddress:#{null}}")
+    @Value("${contractAddress.busdTokenAddress:#{null}}")
     private String busdTokenAddress;
-    @Value("${withdraw.fundPoolAddress:#{null}}")
+    @Value("${contractAddress.fundPoolAddress:#{null}}")
     private String fundPoolAddress;
     @Autowired
     private UserService userService;
@@ -65,6 +63,8 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
     private GmUserVipLevelService gmUserVipLevelService;
     @Autowired
     private SysConfigService sysConfigService;
+
+    private Web3j web3j = new TransactionVerifyUtils().connect();
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -504,7 +504,7 @@ public class GmUserWithdrawServiceImpl extends ServiceImpl<GmUserWithdrawDao, Gm
     public static void main(String[] args) throws IOException {
 //        String hash = "0xc757ef40930cb2c344ad59e46c64d3eeb34904c65f4f2da48ac97a15d21298a4";
         String hash = "0x6eb1475d06b46e67b26e770146a0612720bfec2162f3e0e602b41d5ad3b3e021";
-        Web3j web3j = TransactionVerifyUtils.connect();
+//        Web3j web3j = TransactionVerifyUtils.connect();
 //        EthTransaction send = web3j.ethGetTransactionByHash(hash).send();
 //{"jsonrpc":"2.0","id":0,"result":{"blockHash":"0x774ea2461c184fb9efa985f5cc1149724d74eccfbe65a7ae91109dc9f92ec5a7","blockNumber":"0x17d2b42","from":"0xaa25aa7a19f9c426e07dee59b12f944f4d9f1dd3","gas":"0x5208","gasPrice":"0x430e23400","hash":"0xc757ef40930cb2c344ad59e46c64d3eeb34904c65f4f2da48ac97a15d21298a4","input":"0x","nonce":"0x646314","to":"0x89394dd3903ae07723012292ddb1f5ca1b6bce45","transactionIndex":"0x0","value":"0x6f05b59d3b20000","type":"0x0","v":"0xe6","r":"0x69a9788699c1be77bb88e219742c321d33e57271c8a9c90bc51c5e6e3815f72b","s":"0x31ebcfaf76bb407255e93e9722bbe7236d445482cfda59945793155ca95f5284"}}
 //{"jsonrpc":"2.0","id":0,"result":{"blockHash":"0x1dde6b1f5ad062d03d3f4618c1a984eba64f0ac7ceb00b46bc9aeb29bea531f6","blockNumber":"0x1803967","from":"0xaa25aa7a19f9c426e07dee59b12f944f4d9f1dd3","gas":"0x5208","gasPrice":"0x430e23400","hash":"0x6810d6daa686237f67be5d4439e760cf1d11d1b2bab09a39b5e99bdd7357789b","input":"0x","nonce":"0x656ccc","to":"0xb2bf67468170f1b8f32f29011c2e9ab302d80749","transactionIndex":"0x2","value":"0x6f05b59d3b20000","type":"0x0","v":"0xe6","r":"0x81366c481d587eaef0fe00c0f26ca1959a20a53240a308a002324134fa98784d","s":"0x6b2d60013d57de8752f931b8a34f2afa7404d58bded90e85d41c1bfd28a20183"}}

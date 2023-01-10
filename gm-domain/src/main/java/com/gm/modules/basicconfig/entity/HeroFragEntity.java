@@ -76,6 +76,4 @@ public class HeroFragEntity implements Serializable {
 
 	@TableField(exist = false)
 	private String heroName;
-	@TableField(exist = false)
-	private String heroIconUrl;
 }

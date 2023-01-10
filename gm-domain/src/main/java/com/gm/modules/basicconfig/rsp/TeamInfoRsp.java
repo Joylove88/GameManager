@@ -49,7 +49,7 @@ public class TeamInfoRsp {
     /**
      * 队伍战力
      */
-    private Long teamPower;
+    private Double teamPower;
     /**
      * 队伍矿工数
      */

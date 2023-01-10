@@ -32,7 +32,7 @@ public class UserHeroInfoDetailWithGrowRsp {
     /**
      * 英雄战力
      */
-    private Long heroPower;
+    private Double heroPower;
     /**
      * 矿工数
      */
@@ -80,11 +80,11 @@ public class UserHeroInfoDetailWithGrowRsp {
     /**
      * 生命值
      */
-    private Long health;
+    private Double health;
     /**
      * 法力值
      */
-    private Long mana;
+    private Double mana;
     /**
      * 生命值恢复
      */
@@ -96,27 +96,27 @@ public class UserHeroInfoDetailWithGrowRsp {
     /**
      * 护甲
      */
-    private Long armor;
+    private Double armor;
     /**
      * 魔抗
      */
-    private Long magicResist;
+    private Double magicResist;
     /**
      * 攻击力
      */
-    private Long attackDamage;
+    private Double attackDamage;
     /**
      * 法攻
      */
-    private Long attackSpell;
+    private Double attackSpell;
     /**
      * 成长属性-生命值
      */
-    private Long growHealth;
+    private Double growHealth;
     /**
      * 成长属性-法力值
      */
-    private Long growMana;
+    private Double growMana;
     /**
      * 成长属性-生命值恢复
      */
@@ -128,19 +128,19 @@ public class UserHeroInfoDetailWithGrowRsp {
     /**
      * 成长属性-护甲
      */
-    private Long growArmor;
+    private Double growArmor;
     /**
      * 成长属性-魔抗
      */
-    private Long growMagicResist;
+    private Double growMagicResist;
     /**
      * 成长属性-攻击力
      */
-    private Long growAttackDamage;
+    private Double growAttackDamage;
     /**
      * 成长属性-法攻
      */
-    private Long growAttackSpell;
+    private Double growAttackSpell;
 
 
 }

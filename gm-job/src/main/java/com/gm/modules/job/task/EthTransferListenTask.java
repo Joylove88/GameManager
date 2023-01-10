@@ -22,6 +22,7 @@ import io.reactivex.disposables.Disposable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
@@ -44,22 +45,11 @@ import java.util.Optional;
 @Component("ethTransferListenTask")
 public class EthTransferListenTask implements ITask {
     private Logger logger = LoggerFactory.getLogger(getClass());
+
     private static Disposable ethMissSubscription; //ETH交易空档事件订阅对象
     private static int block_EthMissSub = 0;
     private static Map<String, Object> contractsAddress = new HashMap<>();//代币合约地址列表,可以存放多个地址
     private static Web3j web3j;
-    /**
-     * 英雄合约地址
-     */
-    private static String NFT_HERO_ADDRESS;
-    /**
-     * 装备合约地址
-     */
-    private static String NFT_EQUIP_ADDRESS;
-    /**
-     * 经验合约地址
-     */
-    private static String NFT_EX_ADDRESS;
 
     @Autowired
     private SysConfigService sysConfigService;
@@ -73,20 +63,30 @@ public class EthTransferListenTask implements ITask {
     private SysDictService sysDictService;
     @Autowired
     private EthTransferService ethTransferService;
+    /**
+     * 英雄合约地址
+     */
+    @Value("${contractAddress.nftHeroAddress:#{null}}")
+    private String nftHeroAddress;
+    /**
+     * 装备合约地址
+     */
+    @Value("${contractAddress.nftEquipAddress:#{null}}")
+    private String nftEquipAddress;
+    /**
+     * 经验合约地址
+     */
+    @Value("${contractAddress.nftExpAddress:#{null}}")
+    private String nftExpAddress;
 
     @Override
     public void run(String params) {
         logger.info("ethTransferListenTask定时任务正在执行，参数为：{}", params);
         try {
-            // 获取地址
-            JSONObject address = sysDictService.getContractsAddress("CONTRACTS", "ADDRESS");
-            NFT_HERO_ADDRESS = address.getString("NFT_HERO_ADDRESS");
-            NFT_EQUIP_ADDRESS = address.getString("NFT_EQUIP_ADDRESS");
-            NFT_EX_ADDRESS = address.getString("NFT_EX_ADDRESS");
 
-            contractsAddress.put(NFT_HERO_ADDRESS.toLowerCase(), NFT_HERO_ADDRESS);
-            contractsAddress.put(NFT_EQUIP_ADDRESS.toLowerCase(), NFT_EQUIP_ADDRESS);
-            contractsAddress.put(NFT_EX_ADDRESS.toLowerCase(), NFT_EX_ADDRESS);
+            contractsAddress.put(nftHeroAddress.toLowerCase(), nftHeroAddress);
+            contractsAddress.put(nftEquipAddress.toLowerCase(), nftEquipAddress);
+            contractsAddress.put(nftExpAddress.toLowerCase(), nftExpAddress);
 
             // 获取系统中的区块号
             String blockNum = sysConfigService.getValue(Constant.SysConfig.BLOCK_NUMBER.getValue());
@@ -99,7 +99,7 @@ public class EthTransferListenTask implements ITask {
 
 
     private static void run() throws Exception {
-        web3j = TransactionVerifyUtils.connect();
+        web3j = new TransactionVerifyUtils().connect();
 
     }
 
@@ -145,8 +145,6 @@ public class EthTransferListenTask implements ITask {
                 .subscribe(tx -> {
                     // 更新检查过的区块高度
                     block_EthMissSub = tx.getBlockNumber().intValue();
-                    // 系统设置保存区块号
-                    setBlock_Num(block_EthMissSub);
                     logger.info("  ---replayPastTransactionsFlowable    block_EthMissSub = " + block_EthMissSub);
                     String fromAddress = tx.getFrom();
                     String toAddress = tx.getTo();
@@ -165,6 +163,8 @@ public class EthTransferListenTask implements ITask {
                         }
                         // 监听以太坊上是否有系统生成地址的交易
                         callBack_ETH(txHash, fromAddress, toAddress, value, timestamp);
+                        // 系统设置保存区块号
+                        setBlock_Num(block_EthMissSub);
                     }
                     // 如果当前执行的区块号等于获取的最新区块号 将停止运行。
                     if (block_EthMissSub == finalCurrentBlockNum.intValue()) {

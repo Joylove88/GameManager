@@ -53,17 +53,17 @@ public class BattleDetailsRsp {
     /**
      * 造成伤害
      */
-    private Long dealDamage;
+    private Double dealDamage;
 
     /**
      * 剩余血量
      */
-    private Long HP;
+    private Double HP;
 
     /**
      * 恢复血量
      */
-    private Long HPRegen;
+    private Double HPRegen;
 
     /**
      * 战斗描述
@@ -78,9 +78,9 @@ public class BattleDetailsRsp {
     /**
      * 队伍战力
      */
-    private Long teamPower;
+    private Double teamPower;
 
-    public BattleDetailsRsp(Long level, String name, Long mLevel, String mName, Long starCode, String skillName, Long dealDamage, Long HP, Long HPRegen, String battleDescribe, String type, Long teamPower) {
+    public BattleDetailsRsp(Long level, String name, Long mLevel, String mName, Long starCode, String skillName, Double dealDamage, Double HP, Double HPRegen, String battleDescribe, String type, Double teamPower) {
         this.level = level;
         this.name = name;
         this.mLevel = mLevel;

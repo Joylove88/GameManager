@@ -110,7 +110,7 @@ public class ApiIncreaseCombatPowerController {
         // ===============校验子级装备是否已激活,装备等级是否超出英雄等级限制制END===============
 
         // 装备战力
-        long equpPower = 0;
+        Double equpPower = Constant.ZERO_D;
         Date now = new Date();
         // 穿戴表新增一条装备穿戴记录
         UserHeroEquipmentWearEntity userHeroEquipmentWear = new UserHeroEquipmentWearEntity();
@@ -147,14 +147,14 @@ public class ApiIncreaseCombatPowerController {
             throw new RRException("equipment activated!");
         }
         // 更新矿工、神谕值以及队伍战力、矿工，玩家战力、矿工
-        UserHeroInfoDetailWithGrowRsp rspI = combatStatsUtilsService.updateCombatPower(user, userHero, null, equpPower, scale);
+        UserHeroInfoDetailWithGrowRsp rspI = combatStatsUtilsService.updateCombatPower(user, userHero, equipment, equpPower, scale);
         // 更新英雄scale和矿工和神谕值
         UserHeroEntity userHeroUp = new UserHeroEntity();
         userHeroUp.setScale(scale);
         userHeroUp.setHeroPower(userHero.getHeroPower() + equpPower);
         userHeroUp.setUserHeroId(userHero.getUserHeroId());
         userHeroUp.setOracle(rspI.getOracle());
-        userHeroUp.setMinter(Arith.add(userHero.getMinter(), rspI.getMinter()));
+        userHeroUp.setMinter(rspI.getMinter());
         userHeroUp.setUpdateTime(now);
         userHeroUp.setUpdateTimeTs(now.getTime());
         userHeroService.updateById(userHeroUp);

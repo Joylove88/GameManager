@@ -128,16 +128,16 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
         if (map.size() > 0) {
             Long blockNumber = null == map.get("blockNumber") ? null : Long.valueOf(map.get("blockNumber").toString());
             BigDecimal gasUsed = null == map.get("gasUsed") ? BigDecimal.ZERO : new BigDecimal(map.get("gasUsed").toString());
-            BigDecimal orderFee = null == map.get("orderFee") ? BigDecimal.ZERO : new BigDecimal(map.get("orderFee").toString());
-            BigDecimal realFee = null == map.get("realFee") ? BigDecimal.ZERO : new BigDecimal(map.get("realFee").toString());
             Long userId = null == map.get("userId") ? null : Long.valueOf(map.get("userId").toString());
             String status = null == map.get("status") ? "3" : map.get("status").toString();
             order.setStatus(status);
             order.setBlockNumber(blockNumber);
             order.setGasFee(gasUsed);
             order.setUserId(userId);
-            order.setOrderFee(orderFee);
-            order.setRealFee(realFee);
+            order.setOrderFee(form.getOrderFee());
+            order.setRealFee(form.getRealFee());
+            order.setSummonNum(form.getSummonNum());
+            order.setSummonType(form.getSummonType());
         }
 
         // 通过HASH更新订单

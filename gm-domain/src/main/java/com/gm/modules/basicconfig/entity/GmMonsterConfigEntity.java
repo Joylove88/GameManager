@@ -44,7 +44,7 @@ public class GmMonsterConfigEntity implements Serializable {
 	/**
 	 * 怪物战力
 	 */
-	private Long monsterPower;
+	private Double monsterPower;
 	/**
 	 * 怪物图片URL
 	 */
@@ -56,27 +56,27 @@ public class GmMonsterConfigEntity implements Serializable {
 	/**
 	 * 初始生命值
 	 */
-	private Long monsterHealth;
+	private Double monsterHealth;
 	/**
 	 * 初始生命值恢复
 	 */
-	private Long monsterHealthRegen;
+	private Double monsterHealthRegen;
 	/**
 	 * 初始护甲
 	 */
-	private Long monsterArmor;
+	private Double monsterArmor;
 	/**
 	 * 初始魔抗
 	 */
-	private Long monsterMagicResist;
+	private Double monsterMagicResist;
 	/**
 	 * 初始攻击力
 	 */
-	private Long monsterAttackDamage;
+	private Double monsterAttackDamage;
 	/**
 	 * 法功
 	 */
-	private Long monsterAttackSpell;
+	private Double monsterAttackSpell;
 	/**
 	 * 击杀经验
 	 */

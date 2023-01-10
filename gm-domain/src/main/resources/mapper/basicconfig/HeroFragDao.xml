@@ -29,7 +29,6 @@
     <select id="getHeroFragPro" resultType="com.gm.modules.basicconfig.entity.HeroFragEntity">
         SELECT
             A.*,
-            C.HERO_ICON_URL,
             C.HERO_NAME
         FROM
           GM_HERO_FRAG A

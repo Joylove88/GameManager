@@ -62,34 +62,34 @@ public class UserHeroEquipmentWearRsp implements Serializable {
 	/**
 	 * 生命值
 	 */
-	private Long health;
+	private Double health;
 	/**
 	 * 法力值
 	 */
-	private Long mana;
+	private Double mana;
 	/**
 	 * 生命值恢复
 	 */
-	private Long healthRegen;
+	private Double healthRegen;
 	/**
 	 * 法力值恢复
 	 */
-	private Long manaRegen;
+	private Double manaRegen;
 	/**
 	 * 护甲
 	 */
-	private Long armor;
+	private Double armor;
 	/**
 	 * 魔抗
 	 */
-	private Long magicResist;
+	private Double magicResist;
 	/**
 	 * 攻击力
 	 */
-	private Long attackDamage;
+	private Double attackDamage;
 	/**
 	 * 法功
 	 */
-	private Long attackSpell;
+	private Double attackSpell;
 
 }

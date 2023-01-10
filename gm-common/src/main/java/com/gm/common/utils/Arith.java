@@ -87,18 +87,28 @@ public class Arith {
         return new BigDecimal(System.currentTimeMillis() + "" + randomId);
     }
 
+    /**
+     * double保留两位小数
+     * @param d
+     * @return
+     */
+    public static double formatDouble(double d) {
+        return (double)Math.round(d*10000)/10000;
+    }
+
     public static void main(String[] args) {
-        int i = 0;
-        int n = 0;
-        while (i<100){
-            double num = randomWithinRangeHundred(50.0, 101.8);
-            System.out.println(num);
-            if(num >= 100){
-                n++;
-            }
-            i++;
-        }
-        System.out.println(Math.round(90 * 0.03 * 1));
-        System.out.println(n);
+//        int i = 0;
+//        int n = 0;
+//        while (i<100){
+//            double num = randomWithinRangeHundred(50.0, 101.8);
+//            System.out.println(num);
+//            if(num >= 100){
+//                n++;
+//            }
+//            i++;
+//        }
+//        System.out.println(Math.round(90 * 0.03 * 1));
+//        System.out.println(n);
+        System.out.println(formatDouble(0.01-0.01*0.75));
     }
 }

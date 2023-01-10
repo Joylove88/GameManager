@@ -112,14 +112,14 @@ public class CombatStatsUtilsService {
         attribute.setHeroLevel(level);
 
         // 2.获取英雄成长属性并统计当前级别的属性
-        long health = userHero.getHealth();
-        long mana = userHero.getMana();
+        double health = userHero.getHealth();
+        double mana = userHero.getMana();
         double healthRegen = userHero.getHealthRegen();
         double manaRegen = userHero.getManaRegen();
-        long armor = userHero.getArmor();
-        long magicResist = userHero.getMagicResist();
-        long attackDamage = userHero.getAttackDamage();
-        long attackSpell = userHero.getAttackSpell();
+        double armor = userHero.getArmor();
+        double magicResist = userHero.getMagicResist();
+        double attackDamage = userHero.getAttackDamage();
+        double attackSpell = userHero.getAttackSpell();
 
         attribute.setHp(health);
         attribute.setMp(mana);
@@ -181,11 +181,11 @@ public class CombatStatsUtilsService {
 
 
     // 获取英雄战斗力
-    public int getHeroPower(AttributeSimpleEntity attributeSimple) {
+    public double getHeroPower(AttributeSimpleEntity attributeSimple) {
         double heroPower = ((attributeSimple.getHp() * 0.1) + (attributeSimple.getMp() * 0.1) + attributeSimple.getAttackDamage()
                 + ((attributeSimple.getArmor() + attributeSimple.getMagicResist()) * 4.5) +
                 attributeSimple.getHpRegen() * 0.1 + attributeSimple.getMpRegen() * 0.3);
-        return (int) heroPower;
+        return heroPower;
     }
 
     /**
@@ -195,14 +195,14 @@ public class CombatStatsUtilsService {
      * @return
      */
     public AttributeSimpleEntity getHeroAttribute(HeroInfoEntity heroInfo, Double starBuff) {
-        long hp = Math.round(heroInfo.getHealth() * Constant.HERO_ATTRIBUTE_RATE);// 初始生命值
-        long mp = Math.round(heroInfo.getMana() * Constant.HERO_ATTRIBUTE_RATE);// 初始法力值
+        double hp = Math.round(heroInfo.getHealth() * Constant.HERO_ATTRIBUTE_RATE);// 初始生命值
+        double mp = Math.round(heroInfo.getMana() * Constant.HERO_ATTRIBUTE_RATE);// 初始法力值
         double hpRegen = Math.round(heroInfo.getHealthRegen() * Constant.HERO_ATTRIBUTE_RATE);// 初始生命值恢复
         double mpRegen = Math.round(heroInfo.getManaRegen() * Constant.HERO_ATTRIBUTE_RATE);// 初始法力值恢复
-        long armor = Math.round(heroInfo.getArmor() * Constant.HERO_ATTRIBUTE_RATE);// 初始护甲
-        long magicResist = Math.round(heroInfo.getMagicResist() * Constant.HERO_ATTRIBUTE_RATE);// 初始魔抗
-        long attackDamage = Math.round(heroInfo.getAttackDamage() * Constant.HERO_ATTRIBUTE_RATE);// 初始攻击力
-        long attackSpell = Math.round(heroInfo.getAttackSpell() * Constant.HERO_ATTRIBUTE_RATE);// 初始法功
+        double armor = Math.round(heroInfo.getArmor() * Constant.HERO_ATTRIBUTE_RATE);// 初始护甲
+        double magicResist = Math.round(heroInfo.getMagicResist() * Constant.HERO_ATTRIBUTE_RATE);// 初始魔抗
+        double attackDamage = Math.round(heroInfo.getAttackDamage() * Constant.HERO_ATTRIBUTE_RATE);// 初始攻击力
+        double attackSpell = Math.round(heroInfo.getAttackSpell() * Constant.HERO_ATTRIBUTE_RATE);// 初始法功
         return new AttributeSimpleEntity(hp, mp, hpRegen,
                 mpRegen, armor, magicResist, attackDamage, attackSpell);
     }
@@ -214,14 +214,14 @@ public class CombatStatsUtilsService {
      * @return
      */
     public AttributeSimpleEntity getHeroAttributeWithLv(UserHeroInfoDetailWithGrowRsp heroInfo, Integer Lv) {
-        long hp = Math.round(heroInfo.getGrowHealth() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长生命值
-        long mp = Math.round(heroInfo.getGrowMana() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长法力值
+        double hp = Math.round(heroInfo.getGrowHealth() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长生命值
+        double mp = Math.round(heroInfo.getGrowMana() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长法力值
         double hpRegen = heroInfo.getGrowHealthRegen() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv;// 成长生命值恢复
         double mpRegen = heroInfo.getGrowManaRegen() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv;// 成长法力值恢复
-        long armor = Math.round(heroInfo.getGrowArmor() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长护甲
-        long magicResist = Math.round(heroInfo.getGrowMagicResist() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长魔抗
-        long attackDamage = Math.round(heroInfo.getGrowAttackDamage() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长攻击力
-        long attackSpell = Math.round(heroInfo.getGrowAttackSpell() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长法功
+        double armor = Math.round(heroInfo.getGrowArmor() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长护甲
+        double magicResist = Math.round(heroInfo.getGrowMagicResist() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长魔抗
+        double attackDamage = Math.round(heroInfo.getGrowAttackDamage() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长攻击力
+        double attackSpell = Math.round(heroInfo.getGrowAttackSpell() * heroInfo.getGrowthRate() / Constant.GRI.O.getValue() * Lv);// 成长法功
         return new AttributeSimpleEntity(hp, mp, hpRegen,
                 mpRegen, armor, magicResist, attackDamage, attackSpell);
     }
@@ -233,14 +233,14 @@ public class CombatStatsUtilsService {
      * @return
      */
     public AttributeSimpleEntity getAttributesAddedAfterStarUpgrade(AttributeSimpleEntity attributeStar, AttributeSimpleEntity attributeStarPlus) {
-        long hp = attributeStarPlus.getHp() - attributeStar.getHp();// 增加的生命值
-        long mp = attributeStarPlus.getMp() - attributeStar.getMp();// 增加的法力值
+        double hp = attributeStarPlus.getHp() - attributeStar.getHp();// 增加的生命值
+        double mp = attributeStarPlus.getMp() - attributeStar.getMp();// 增加的法力值
         double hpRegen = attributeStarPlus.getHpRegen() - attributeStar.getHpRegen();// 增加的生命值恢复
         double mpRegen = attributeStarPlus.getMpRegen() - attributeStar.getMpRegen();// 增加的法力值恢复
-        long armor = attributeStarPlus.getArmor() - attributeStar.getArmor();// 增加的护甲
-        long magicResist = attributeStarPlus.getMagicResist() - attributeStar.getMagicResist();// 增加的魔抗
-        long attackDamage = attributeStarPlus.getAttackDamage() - attributeStar.getAttackDamage();// 增加的攻击力
-        long attackSpell = attributeStarPlus.getAttackSpell() - attributeStar.getAttackSpell();// 增加的法功
+        double armor = attributeStarPlus.getArmor() - attributeStar.getArmor();// 增加的护甲
+        double magicResist = attributeStarPlus.getMagicResist() - attributeStar.getMagicResist();// 增加的魔抗
+        double attackDamage = attributeStarPlus.getAttackDamage() - attributeStar.getAttackDamage();// 增加的攻击力
+        double attackSpell = attributeStarPlus.getAttackSpell() - attributeStar.getAttackSpell();// 增加的法功
         return new AttributeSimpleEntity(hp, mp, hpRegen,
                 mpRegen, armor, magicResist, attackDamage, attackSpell);
     }
@@ -278,46 +278,53 @@ public class CombatStatsUtilsService {
      * @param userHero
      * @param changePower
      */
-    public UserHeroInfoDetailWithGrowRsp updateCombatPower(UserEntity user, UserHeroInfoDetailWithGrowRsp userHero, Long userEquipId, Long changePower, Double scale) {
+    public UserHeroInfoDetailWithGrowRsp updateCombatPower(UserEntity user, UserHeroInfoDetailWithGrowRsp userHero, UserEquipInfoDetailRsp equipment, Double changePower, Double scale) {
         // 获取队伍
         Map<String, Object> teamParams = new HashMap<>();
         teamParams.put("userId", user.getUserId());
         teamParams.put("userHeroId", userHero.getUserHeroId());
         List<TeamInfoRsp> teamInfoRsps = teamConfigService.getTeamInfoList(teamParams);
 
-//      (30 / 60 * 68 + 60 / 60 * 10) / （68 + 10) * 60;
-//      更新后的英雄神谕值：(68 + 80) / 68 * 1 = 2.176470588235294
-//      更新后的英雄神谕比: 2.176470588235294 / 2 = 108.8235294117647%
-//      更新后的英雄矿工数：68 + 80 = 148
-
+//        装备神谕值(1 / 100 * 68 + 0.5 / 100 * 68) / (1 / 100 * 68 + 68) * 1
         BigDecimal newOracle = BigDecimal.ZERO;
         BigDecimal newMinter = BigDecimal.ZERO;
         // 初始GAIA系统
         fightCoreService.initTradeBalanceParameter(0);
         // 矿工兑换数量比例
         BigDecimal minterRate = CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1));
-        if (userEquipId != null) {
-            UserEquipmentEntity equip = userEquipmentService.getById(userEquipId);
+        if (equipment != null) {
             // 英雄矿工
             BigDecimal heroMinter = userHero.getMinter();
             // 装备矿工
-            BigDecimal equipMinter = equip.getMinter();
+            BigDecimal equipMinter = equipment.getMinter();
+            // 装备神谕值
+            BigDecimal equipOracle = equipment.getOracle();
             // 英雄的神谕值
             BigDecimal heroOracle = userHero.getOracle();
-            newOracle = Arith.multiply(Arith.divide(Arith.add(heroMinter, equipMinter), heroOracle), heroOracle);
-            newMinter = equip.getMinter();
+            // 价值比
+            BigDecimal topLeft = Arith.multiply(Arith.divide(heroOracle, minterRate), heroMinter);
+            BigDecimal topRight = Arith.multiply(Arith.divide(equipOracle, minterRate), equipMinter);
+            BigDecimal topAmount = Arith.add(topLeft, topRight);
+            BigDecimal bottomAmoumt = Arith.multiply(Arith.divide(heroOracle, minterRate), heroMinter);
+            newOracle = Arith.multiply(Arith.divide(topAmount, bottomAmoumt), heroOracle);
+            newMinter = Arith.add(userHero.getMinter(), equipMinter);
         } else {
             // 获取英雄矿工数量
             CalculateTradeUtil.miners = userHero.getMinter();
             System.out.println("获取当前玩家矿工数量: " + CalculateTradeUtil.miners);
             // 英雄矿工
             BigDecimal heroMinter = userHero.getMinter();
+            // 英雄总矿工包含新增的
+            newMinter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(changePower * scale));
             // 新增的矿工
-            BigDecimal changeMinter = CalculateTradeUtil.updateMiner(BigDecimal.valueOf(changePower * scale));
+            BigDecimal changeMinter = Arith.subtract(newMinter, userHero.getMinter());
             // 英雄的神谕值
             BigDecimal heroOracle = userHero.getOracle();
-            newOracle = Arith.multiply(Arith.divide(Arith.add(heroMinter, changeMinter), heroOracle), heroOracle);
-            newMinter = changeMinter;
+            BigDecimal topLeft = Arith.multiply(Arith.divide(heroOracle, minterRate), heroMinter);
+            BigDecimal topRight = Arith.multiply(Arith.divide(minterRate, minterRate), changeMinter);
+            BigDecimal topAmount = Arith.add(topLeft, topRight);
+            BigDecimal bottomAmoumt = Arith.multiply(Arith.divide(heroOracle, minterRate), heroMinter);
+            newOracle = Arith.multiply(Arith.divide(topAmount, bottomAmoumt), heroOracle);
             // 更新系统中保存的市场总鸡蛋
             sysConfigService.updateValueByKey(Constant.SysConfig.MARKET_EGGS.getValue(), CalculateTradeUtil.marketEggs.toString());
         }
@@ -326,9 +333,9 @@ public class CombatStatsUtilsService {
         if (teamInfoRsps.size() > 0) {
             for (TeamInfoRsp teamInfoRsp : teamInfoRsps) {
                 // 获取队伍旧战力值
-                long oldPower = teamInfoRsp.getTeamPower();
+                double oldPower = teamInfoRsp.getTeamPower();
                 // 获取最新队伍战力（队伍战力+本次操作改变的战力）
-                long newPower = teamInfoRsp.getTeamPower() + changePower;
+                double newPower = teamInfoRsp.getTeamPower() + changePower;
                 // 获取最新队伍矿工数量（队伍矿工数+本次操作改变的矿工数）
                 BigDecimal newTeanMinter = Arith.add(teamInfoRsp.getTeamMinter(), newMinter);
 
@@ -336,13 +343,12 @@ public class CombatStatsUtilsService {
                 BigDecimal oldMinter = teamInfoRsp.getTeamMinter();
                 GmTeamConfigEntity team = new GmTeamConfigEntity();
                 team.setId(teamInfoRsp.getId());
-                fightCoreService.updateCombat(changePower, oldPower, newPower, user, team, newMinter, oldMinter, newTeanMinter);
+                fightCoreService.updateCombat(Constant.disabled, changePower, oldPower, newPower, user, team, newMinter, oldMinter, newTeanMinter);
             }
         }
         UserHeroInfoDetailWithGrowRsp rsp = new UserHeroInfoDetailWithGrowRsp();
-        rsp.setMinter(Arith.add(userHero.getMinter(), newMinter));// 更新矿工
+        rsp.setMinter(newMinter);// 更新矿工
         rsp.setOracle(newOracle);// 更新神谕值
-
         return rsp;
     }
 
@@ -426,10 +432,11 @@ public class CombatStatsUtilsService {
         heroFragMap.put("heroId", rsp.getHeroId());
         UserHeroFragInfoDetailRsp heroFragCount = userHeroFragService.getUserAllHeroFragCount(heroFragMap);
         Integer shardNum = null != heroFragCount ? heroFragCount.getHeroFragNum() : Constant.ZERO_I;
+        Integer upStarShardNum = starCode == Constant.StarLv.Lv5.getValue() ? 0 : starInfo.getUpStarFragNum();
         rsp.setShardNum(shardNum);
-        rsp.setUpStarShardNum(starInfo.getUpStarFragNum());
+        rsp.setUpStarShardNum(upStarShardNum);
 
-        // 战力提升后响应已穿戴装备信息
+        // 战力提升后返回已穿戴装备信息
         if (type.equals(Constant.enable)) {
             // 获取该英雄已穿戴的装备
             Map<String, Object> userWearMap = new HashMap<>();
@@ -444,7 +451,7 @@ public class CombatStatsUtilsService {
         // 矿工兑换数量比例
         BigDecimal minterRate = CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1));
         LOGGER.info("minterRate=========================: " + minterRate);
-        BigDecimal newOracle = BigDecimal.valueOf(Arith.multiply(Arith.divide(rsp.getOracle(), minterRate), BigDecimal.valueOf(100)).intValue());
+        BigDecimal newOracle = Arith.multiply(Arith.divide(rsp.getOracle(), minterRate), BigDecimal.valueOf(100));
         // 按当前市场行情计算神谕值
         rsp.setOracle(newOracle);
         return rsp;

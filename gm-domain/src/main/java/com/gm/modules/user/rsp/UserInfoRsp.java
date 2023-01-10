@@ -11,7 +11,7 @@ public class UserInfoRsp {
 	/**
 	 * 总战力
 	 */
-	private Long power;
+	private Double power;
 	/**
 	 * 当前体力值
 	 */

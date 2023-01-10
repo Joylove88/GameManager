@@ -37,6 +37,7 @@ import java.util.*;
 
 /**
  * 战斗核心业务类
+ *
  * @author Axiang
  * @email Axiang@gmail.com
  * @date 2022-01-23 19:06:59
@@ -115,6 +116,7 @@ public class FightCoreService {
 
     /**
      * 初始化战斗
+     *
      * @param user
      * @param req
      */
@@ -139,7 +141,7 @@ public class FightCoreService {
         long currentTime = System.currentTimeMillis() + 1000 * 60 * 60;
         Date end = new Date(currentTime);
 
-        if (user == null){
+        if (user == null) {
             throw new RRException("玩家不存在");
         }
 
@@ -150,10 +152,10 @@ public class FightCoreService {
         // 获取队伍中的英雄信息及英雄技能英雄装备信息
         // 获取未战斗的队伍
         GmTeamConfigEntity teamConfig = teamConfigDao.selectOne(new QueryWrapper<GmTeamConfigEntity>()
-                        .eq("ID", req.getTeamId())// 玩家队伍ID
+                .eq("ID", req.getTeamId())// 玩家队伍ID
         );
 
-        if (teamConfig == null){
+        if (teamConfig == null) {
             throw new RRException("战斗时获取队伍失败");
         }
 
@@ -165,32 +167,32 @@ public class FightCoreService {
             throw new RRException("该队伍状态为战斗结束，请先领取奖励后发起战斗");
         }
 
-        Long teamPower = teamConfig.getTeamPower() != null ? teamConfig.getTeamPower() : 0;// 队伍战力
+        Double teamPower = teamConfig.getTeamPower() != null ? teamConfig.getTeamPower() : 0d;// 队伍战力
         LOGGER.info("加载英雄中...");
         // 创建集合存储每个英雄的属性
         List<AttributeEntity> attributes = new ArrayList<>();
         // 获取英雄1
-        if(teamConfig.getUserHero1Id() != null && !teamConfig.getUserHero1Id().equals(0L)){
+        if (teamConfig.getUserHero1Id() != null && !teamConfig.getUserHero1Id().equals(0L)) {
             AttributeEntity att = combatStatsUtilsService.getHeroBasicStats(teamConfig.getUserHero1Id());
             attributes.add(att);
         }
         // 获取英雄2
-        if(teamConfig.getUserHero2Id() != null && !teamConfig.getUserHero2Id().equals(0L)){
+        if (teamConfig.getUserHero2Id() != null && !teamConfig.getUserHero2Id().equals(0L)) {
             AttributeEntity att = combatStatsUtilsService.getHeroBasicStats(teamConfig.getUserHero2Id());
             attributes.add(att);
         }
         // 获取英雄3
-        if(teamConfig.getUserHero3Id() != null && !teamConfig.getUserHero3Id().equals(0L)){
+        if (teamConfig.getUserHero3Id() != null && !teamConfig.getUserHero3Id().equals(0L)) {
             AttributeEntity att = combatStatsUtilsService.getHeroBasicStats(teamConfig.getUserHero3Id());
             attributes.add(att);
         }
         // 获取英雄4
-        if(teamConfig.getUserHero4Id() != null && !teamConfig.getUserHero4Id().equals(0L)){
+        if (teamConfig.getUserHero4Id() != null && !teamConfig.getUserHero4Id().equals(0L)) {
             AttributeEntity att = combatStatsUtilsService.getHeroBasicStats(teamConfig.getUserHero4Id());
             attributes.add(att);
         }
         // 获取英雄5
-        if(teamConfig.getUserHero5Id() != null && !teamConfig.getUserHero5Id().equals(0L)){
+        if (teamConfig.getUserHero5Id() != null && !teamConfig.getUserHero5Id().equals(0L)) {
             AttributeEntity att = combatStatsUtilsService.getHeroBasicStats(teamConfig.getUserHero5Id());
             attributes.add(att);
         }
@@ -199,18 +201,18 @@ public class FightCoreService {
         LOGGER.info("加载副本中...");
         // 获取副本信息
         GmDungeonConfigEntity dungeon = dungeonConfigDao.selectById(req.getDungeonId());
-        if (dungeon == null){
+        if (dungeon == null) {
             throw new RRException("副本已关闭");
         }
 
         // 玩家等级校验
         UserLevelEntity userLevel = userLevelDao.selectById(user.getUserLevelId());
-        if ( userLevel.getLevelCode() < dungeon.getDungeonLevelMin() ) {
+        if (userLevel.getLevelCode() < dungeon.getDungeonLevelMin()) {
             throw new RRException("玩家等级不足");
         }
 
         // 玩家体力值校验(小于副本所需体力无法战斗)
-        if(user.getFtg() < dungeon.getRequiresStamina()){
+        if (user.getFtg() < dungeon.getRequiresStamina()) {
             throw new RRException("玩家疲劳值不足");
         }
 
@@ -227,7 +229,7 @@ public class FightCoreService {
 
         LOGGER.info("加载怪物中...");
         // 获取怪物信息
-        Map<String,Object> monsterMap = new HashMap<>();
+        Map<String, Object> monsterMap = new HashMap<>();
         monsterMap.put("STATUS", Constant.enable);
         monsterMap.put("DUNGEON_ID", dungeon.getId());
         List<GmMonsterConfigEntity> monsterList = monsterConfigDao.selectByMap(monsterMap);
@@ -242,7 +244,7 @@ public class FightCoreService {
         // 扣除玩家体力
         UserEntity userFTG = new UserEntity();
         if (user != null) {
-            if (user.getFtg() < dungeon.getRequiresStamina()){
+            if (user.getFtg() < dungeon.getRequiresStamina()) {
                 throw new RRException("玩家疲劳值不足");
             }
             userFTG.setUserId(user.getUserId());
@@ -255,13 +257,13 @@ public class FightCoreService {
         // 开始战斗
         // 随机战斗副本，战斗描述
         LOGGER.info("尊敬的领主指引[" + teamConfig.getTeamName() + "] 战力[" + teamPower + "] 进入[" + dungeon.getDungeonName() + "]");
-        setBattleProcess(new BattleDetailsRsp(null, dungeon.getDungeonName(),null, null,  null, null,
+        setBattleProcess(new BattleDetailsRsp(null, dungeon.getDungeonName(), null, null, null, null,
                 null, null, null,
                 "尊敬的领主指引[" + teamConfig.getTeamName() + "] 战力[{teamPower}] 进入[{name}]", Constant.enable, teamPower));
 
         //获取每个事件的概率
         List<Double> orignalRates = new ArrayList<Double>(dungeonEvents.size());
-        for (GmDungeonEventEntity event: dungeonEvents) {
+        for (GmDungeonEventEntity event : dungeonEvents) {
             double probabilityN = event.getEventPron();
             if (probabilityN < 0) {
                 probabilityN = 0;
@@ -275,7 +277,7 @@ public class FightCoreService {
             String eventDescription = dungeonEvents.get(entry.getKey()).getEventDescription();
             long eventLevel = dungeonEvents.get(entry.getKey()).getEventLevel();
             LOGGER.info("事件等级：" + eventLevel);
-            eventDescription = eventDescription.replace("-","["  + dungeon.getDungeonName() + "]");
+            eventDescription = eventDescription.replace("-", "[" + dungeon.getDungeonName() + "]");
 
             setBattleProcess(new BattleDetailsRsp(null, null, null, null, null, null,
                     null, null, null, eventDescription, Constant.enable, null));
@@ -283,9 +285,9 @@ public class FightCoreService {
             LOGGER.info(eventDescription);
 
             // 事件等级5 为福利关卡 无需战斗 玩家直接胜利 // 惩罚关卡 无需战斗直接失败
-            if ( eventLevel == 5 ) {
+            if (eventLevel == 5) {
                 combatStatus = 2;
-            } else if ( eventLevel == 4 ) {
+            } else if (eventLevel == 4) {
                 combatStatus = 4;
             } else {
 //                combatStatus = attcks(attributes, monsterList, dungeonEvents.get(entry.getKey()).getEventLevel(), dungeon);
@@ -300,14 +302,14 @@ public class FightCoreService {
         Long fightNum = Constant.FTG / dungeon.getRequiresStamina();
         // 获取玩家矿工数量
         CalculateTradeUtil.miners = user.getTotalMinter();
-        LOGGER.info("获取当前玩家矿工数量: " +CalculateTradeUtil.miners);
+        LOGGER.info("获取当前玩家矿工数量: " + CalculateTradeUtil.miners);
         // 获取当日可产出金币数
         BigDecimal goldCoins = getCoinGold();
 
         // 怪物全部击杀 战斗胜利 获取奖励结算信息
-        if (combatStatus == 2){
+        if (combatStatus == 2) {
             // 获取当前副本奖励分配百分比
-            goldCoins = Arith.multiply(goldCoins, BigDecimal.valueOf(dungeon.getRewardDistribution()));
+            goldCoins = Arith.divide(Arith.multiply(Arith.multiply(goldCoins, BigDecimal.valueOf(dungeon.getRewardDistribution())), teamConfig.getTeamMinter()), user.getTotalMinter());
             // 该场战斗可得金币
             goldCoins = Arith.divide(goldCoins, BigDecimal.valueOf(fightNum));
 
@@ -379,6 +381,7 @@ public class FightCoreService {
 
     /**
      * 计算一天可产出的最大收益
+     *
      * @return
      */
     private BigDecimal getCoinGold() {
@@ -386,7 +389,7 @@ public class FightCoreService {
         // 玩家收益参数
         BigDecimal addMoney;
         // 经济平衡系统初始化方法
-        initTradeBalanceParameter(1);
+        initTradeBalanceParameter(0);
         // 出售/计算收益
         LOGGER.info("marketEggs: " + CalculateTradeUtil.marketEggs);
         LOGGER.info("miners: " + CalculateTradeUtil.miners);
@@ -403,18 +406,19 @@ public class FightCoreService {
     /**
      * 初始化经济平衡系统参数
      */
-    public void initTradeBalanceParameter(Integer type){
+    public void initTradeBalanceParameter(Integer type) {
         LOGGER.info("初始化经济平衡系统......");
 
         // 获取市场总鸡蛋数量
         String totalEggs = sysConfigService.getValue(Constant.SysConfig.MARKET_EGGS.getValue());
-        LOGGER.info("获取市场总鸡蛋数量: "+totalEggs);
+        LOGGER.info("获取市场总鸡蛋数量: " + totalEggs);
         CalculateTradeUtil.marketEggs = new BigDecimal(totalEggs);
-
-        // 获取副本池金额
-        String poolBalance = sysConfigService.getValue(Constant.CashPool._DUNGEON.getValue());
-        CalculateTradeUtil.FundPool = new BigDecimal(poolBalance);
-        LOGGER.info("获取副本池金额: " + CalculateTradeUtil.FundPool);
+        if (type == 0) {
+            // 获取副本池金额
+            String poolBalance = sysConfigService.getValue(Constant.CashPool._DUNGEON.getValue());
+            CalculateTradeUtil.FundPool = new BigDecimal(poolBalance);
+            LOGGER.info("获取副本池金额: " + CalculateTradeUtil.FundPool);
+        }
 
         // 玩家赚取总收入
         CalculateTradeUtil.totalPlayersGold = new BigDecimal(sysConfigService.getValue(Constant.SysConfig.PLAYERS_EARN_TOTAL_REVENUE.getValue()));
@@ -427,22 +431,18 @@ public class FightCoreService {
         UserInfoRsp userInfoRsp = userDao.getTotalPower();
         CalculateTradeUtil.totalPower = userInfoRsp.getPower().equals(Constant.ZERO) ? BigDecimal.valueOf(300) : BigDecimal.valueOf(userInfoRsp.getPower());
         LOGGER.info("获取系统全部玩家物品总战力: " + CalculateTradeUtil.totalPower);
-
-        // 如果类型为非副本战斗并副本池金额等于0 则给副本池赋值初始值68U
-        if(type == 0 && CalculateTradeUtil.FundPool.compareTo(BigDecimal.ZERO) == 0){
-            CalculateTradeUtil.FundPool = BigDecimal.valueOf(68);
-        }
     }
 
     /**
      * 获取系统全部用户总战力
+     *
      * @return
      */
-    private Long getTotalPower(){
-        long total = 0;
-        Map<String,Object> map = new HashMap<>();
+    private Double getTotalPower() {
+        Double total = 0d;
+        Map<String, Object> map = new HashMap<>();
         List<UserEntity> users = userDao.selectByMap(map);
-        for (UserEntity userEntity : users){
+        for (UserEntity userEntity : users) {
             total = total + userEntity.getTotalPower();
         }
         return total;
@@ -450,6 +450,7 @@ public class FightCoreService {
 
     /**
      * 构建战斗过程
+     *
      * @param rsp
      */
     private void setBattleProcess(BattleDetailsRsp rsp) {
@@ -459,10 +460,10 @@ public class FightCoreService {
     /**
      * 攻击方法
      */
-    private void attack(GmDungeonConfigEntity dungeon){
+    private void attack(GmDungeonConfigEntity dungeon) {
         // 加载英雄属性
         int initHero = 0;
-        while ( initHero < heros.size() ){
+        while (initHero < heros.size()) {
             attributeAdd(heros.get(initHero), initHero);
             // 英雄等级
             long hLevel = heros.get(initHero).getHeroLevel();
@@ -471,9 +472,9 @@ public class FightCoreService {
             // 英雄名称
             String hName = heros.get(initHero).getHeroName();
             // 英雄血量
-            long hHp = heros.get(initHero).getHp();
+            double hHp = heros.get(initHero).getHp();
             // 英雄魔法值
-            long hMP = heros.get(initHero).getMp();
+            double hMP = heros.get(initHero).getMp();
             LOGGER.info("[LV" + hLevel + " " + hName + " " + hStar + "★] 剩余HP: " + hHp);
             setBattleProcess(new BattleDetailsRsp(hLevel, hName, null, null, hStar, null, null, hHp, null,
                     "[LV{level} {name} {starCode}★] HP: " + hHp, Constant.enable, null));
@@ -484,19 +485,19 @@ public class FightCoreService {
         // 随机怪物出现的数量
         Random rm = new Random();
         int rmon = rm.nextInt(dungeon.getMonsterNum());
-        if ( rmon < 3 ) {
+        if (rmon < 3) {
             rmon = 3;
         }
         // 怪物剩余数量
         survivingMonster = rmon;
         int initMoster = 0;
-        while ( initMoster < rmon ){
+        while (initMoster < rmon) {
             // 怪物名称
             String mname = monsters.get(initMoster).getMonsterName();
             // 怪物等级
-            long mlevel = monsters.get(initMoster).getMonsterLevel();
+            double mlevel = monsters.get(initMoster).getMonsterLevel();
             // 获取当前怪物最大血量
-            long mMaxHP = monsters.get(initMoster).getMonsterHealth();
+            double mMaxHP = monsters.get(initMoster).getMonsterHealth();
 //            LOGGER.info("[LV" + mlevel + " " + mname + "] 剩余HP: " + mMaxHP);
 //            setBattleProcess(new BattleDetailsRsp(null, null, mlevel, mname, null, null, null, mMaxHP, null,
 //                    "[LV{mlevel} {mname}] HP: " + mMaxHP, Constant.disabled, null));
@@ -504,7 +505,7 @@ public class FightCoreService {
         }
 
         int h = 1;// 回合数
-        while (true){
+        while (true) {
             LOGGER.info("英雄剩余数量：" + survivingHero);
             LOGGER.info("怪物剩余数量：" + survivingMonster);
             LOGGER.info("---------------第" + h + "回合---------------");
@@ -512,15 +513,15 @@ public class FightCoreService {
             setBattleProcess(new BattleDetailsRsp(null, null, null, null, null, null,
                     null, null, null, "探索中...", Constant.enable, null));
             LOGGER.info("怪物出现了,接近中...");
-            setBattleProcess(new BattleDetailsRsp(null,null, null, null, null, null, null, null, null,
+            setBattleProcess(new BattleDetailsRsp(null, null, null, null, null, null, null, null, null,
                     "怪物出现了,接近中...", Constant.disabled, null));
             // 玩家攻击怪物
             int hero = 0;
-            while ( hero < survivingHero ){
+            while (hero < survivingHero) {
                 // 开始攻击
                 HAttackM(heros.get(hero), dungeon, hero);
                 // 怪物全部死亡，玩家阵营胜利
-                if ( survivingMonster < 1) {
+                if (survivingMonster < 1) {
                     combatStatus = 2;
                     LOGGER.info("怪物全部击杀 战斗胜利");
                     setBattleProcess(new BattleDetailsRsp(null, null, null, null, null, null,
@@ -529,22 +530,22 @@ public class FightCoreService {
                 }
                 hero++;
             }
-            if ( combatStatus == 2) break;
+            if (combatStatus == 2) break;
             // 怪物攻击玩家
             int mos = 0;
-            while ( mos < survivingMonster){
+            while (mos < survivingMonster) {
                 MAttackH(monsters.get(mos), dungeon, mos);
                 // 英雄全部死亡，玩家阵营失败
-                if ( survivingHero < 1 ) {
+                if (survivingHero < 1) {
                     combatStatus = 4;
                     LOGGER.info("英雄全部被击杀 战斗失败");
-                    setBattleProcess(new BattleDetailsRsp(null, null,null, null, null, null,
+                    setBattleProcess(new BattleDetailsRsp(null, null, null, null, null, null,
                             null, null, null, "英雄全部阵亡 战斗失败", Constant.enable, null));
                     break;
                 }
                 mos++;
             }
-            if ( combatStatus == 4 ) break;
+            if (combatStatus == 4) break;
             h++;
         }
     }
@@ -554,7 +555,7 @@ public class FightCoreService {
      */
     private void attributeAdd(AttributeEntity a, int i) {
         // 装备血量
-        long hMAXHPEQ = a.getEquipHealth() != null ? a.getEquipHealth() : 0;
+        double hMAXHPEQ = a.getEquipHealth() != null ? a.getEquipHealth() : 0;
         // 将装备血量累加到英雄身上
         hMAXHPEQ = a.getHp() + hMAXHPEQ;
         heros.get(i).setHp(hMAXHPEQ);
@@ -562,28 +563,28 @@ public class FightCoreService {
         heros.get(i).setAddMaxHp(hMAXHPEQ);
 
         // 装备魔法值
-        long hMAXMPEQ = a.getEquipMana() != null ? a.getEquipMana() : 0;
+        double hMAXMPEQ = a.getEquipMana() != null ? a.getEquipMana() : 0;
         // 将装备魔法值累加到英雄身上
         hMAXMPEQ = a.getMp() + hMAXMPEQ;
         heros.get(i).setMp(hMAXMPEQ);
         heros.get(i).setMaxMp(hMAXMPEQ);
         // 装备普攻
-        long attackDamagEQ = a.getEquipAttackDamage() != null ? a.getEquipAttackDamage() : 0;
+        double attackDamagEQ = a.getEquipAttackDamage() != null ? a.getEquipAttackDamage() : 0;
         // 将装备普攻累加到英雄身上
         attackDamagEQ = a.getAttackDamage() + attackDamagEQ;
         heros.get(i).setAttackDamage(attackDamagEQ);
         // 装备法功
-        long attackSpellEQ = a.getEquipAttackSpell() != null ? a.getEquipAttackSpell() : 0;
+        double attackSpellEQ = a.getEquipAttackSpell() != null ? a.getEquipAttackSpell() : 0;
         // 将装备法功累加到英雄上
         attackSpellEQ = a.getAttackSpell() + attackSpellEQ;
         heros.get(i).setAttackSpell(attackSpellEQ);
         // 装备护甲
-        long armorEQ = a.getEquipArmor() != null ? a.getEquipArmor() : 0;
+        double armorEQ = a.getEquipArmor() != null ? a.getEquipArmor() : 0;
         // 将装备护甲累加到英雄上
         armorEQ = a.getArmor() + armorEQ;
         heros.get(i).setArmor(armorEQ);
         // 装备魔抗
-        long magicResistEQ = a.getEquipMagicResist() != null ? a.getEquipMagicResist() : 0;
+        double magicResistEQ = a.getEquipMagicResist() != null ? a.getEquipMagicResist() : 0;
         // 将装备魔抗累加到英雄上
         magicResistEQ = a.getMagicResist() + magicResistEQ;
         heros.get(i).setMagicResist(magicResistEQ);
@@ -591,11 +592,12 @@ public class FightCoreService {
 
     /**
      * 玩家英雄攻击怪物
+     *
      * @param a
      * @param dungeon
      * @param index
      */
-    private void HAttackM(AttributeEntity a, GmDungeonConfigEntity dungeon, int index){
+    private void HAttackM(AttributeEntity a, GmDungeonConfigEntity dungeon, int index) {
         //======================玩家英雄信息====================
         // 英雄等级
         long hLevel = a.getHeroLevel();
@@ -604,19 +606,19 @@ public class FightCoreService {
         // 英雄名称
         String hName = a.getHeroName();
         // 英雄血量
-        long hHp = a.getHp();
+        double hHp = a.getHp();
         // 英雄魔法值
-        long hMP = a.getMp();
+        double hMP = a.getMp();
         // 英雄最大魔法值
-        long hMaxMP = a.getMaxMp();
+        double hMaxMP = a.getMaxMp();
 
         Double skillDamage = 0.0;
         // 英雄普攻
-        long attackDamag = a.getAttackDamage();
+        double attackDamag = a.getAttackDamage();
         // 英雄法功
-        long attackSpell = a.getAttackSpell() != null ? a.getAttackSpell() : 0;
+        double attackSpell = a.getAttackSpell() != null ? a.getAttackSpell() : 0;
         // 英雄技能恢复血量
-        long hSkillHp = 0L;
+        double hSkillHp = 0L;
         if (a.getSkillDamageBonusHero() != null) {
             // 获取物攻英雄技能伤害
             skillDamage = a.getSkillFixedDamage() + (attackDamag * (a.getSkillDamageBonusHero() / 10));
@@ -639,23 +641,23 @@ public class FightCoreService {
         // 怪物等级
         long mlevel = monsters.get(attM).getMonsterLevel();
         // 获取当前怪物最大血量
-        long mMaxHP = monsters.get(attM).getMonsterHealth();
+        double mMaxHP = monsters.get(attM).getMonsterHealth();
         // 获取怪物最新血量
-        long mHP = monsters.get(attM).getMonsterHealth();
+        double mHP = monsters.get(attM).getMonsterHealth();
         // 获取怪物恢复血量
-        long mHPRegen = monsters.get(attM).getMonsterHealthRegen();
+        double mHPRegen = monsters.get(attM).getMonsterHealthRegen();
         // 获取怪物护甲
-        long mArmor = monsters.get(attM).getMonsterArmor();
+        double mArmor = monsters.get(attM).getMonsterArmor();
         // 获取怪物魔抗
-        long mMagicResist = monsters.get(attM).getMonsterMagicResist();
+        double mMagicResist = monsters.get(attM).getMonsterMagicResist();
 
 
         // 普攻伤害
-        long at1 = (attackDamag - (mArmor + mMagicResist));
+        double at1 = (attackDamag - (mArmor + mMagicResist));
         // 技能伤害
-        long at3 = (long) (skillDamage - (mArmor + mMagicResist));
+        double at3 = (skillDamage - (mArmor + mMagicResist));
         // 存放普功+技能伤害
-        long[] skillHarm = {at1, at1, at1, at1, at1, at3};
+        double[] skillHarm = {at1, at1, at1, at1, at1, at3};
         //随机普功、技能
         Random rk = new Random();
         int ras = rk.nextInt(skillHarm.length);
@@ -681,7 +683,7 @@ public class FightCoreService {
             // ras=5 攻击方式为技能
             if (ras == 5) {
                 // 消耗MP
-                hMP = (long) (hMP - MPPerTime);
+                hMP = hMP - MPPerTime;
                 heros.get(index).setMp(hMP);
 
                 // 技能名称
@@ -691,27 +693,27 @@ public class FightCoreService {
                 attContentLog += skillName;
 
                 // 输出英雄
-                if ( Constant.SkillType._ATTACK.getValue().equals(a.getSkillType()) ) {
+                if (Constant.SkillType._ATTACK.getValue().equals(a.getSkillType())) {
                     mHP = mHP - skillHarm[ras];
                     mHP = mHP < 1 ? 0 : mHP;
                     attContent += " 对[LV{mlevel} {mname}]造成{dealDamage}的伤害，[LV{mlevel} {mname}]剩余{HP}HP";
                     attContentLog += " 对[LV" + mlevel + " " + mname + "]造成" + skillHarm[ras] + "的伤害，[LV" + mlevel + " " + mname + "]剩余" + (mHP < 1 ? 0 : mHP) + "HP";
-                } else if ( Constant.SkillType._SUP.getValue().equals(a.getSkillType()) ||
-                        Constant.SkillType._SUP_ADD.getValue().equals(a.getSkillType()) ) {// 辅助类英雄
+                } else if (Constant.SkillType._SUP.getValue().equals(a.getSkillType()) ||
+                        Constant.SkillType._SUP_ADD.getValue().equals(a.getSkillType())) {// 辅助类英雄
                     // 对单体英雄或全体英雄恢复血量或血量加成
                     int huifu = 0;
-                    while ( huifu < heros.size() ) {
+                    while (huifu < heros.size()) {
                         // 全体玩家恢复生命值技能
-                        if ( Constant.SkillType._SUP.getValue().equals(a.getSkillType()) ) {
+                        if (Constant.SkillType._SUP.getValue().equals(a.getSkillType())) {
 
-                            long hp = heros.get(huifu).getHp();// 获取英雄的生命值
-                            long addhp = addHP(hp, hSkillHp);
+                            double hp = heros.get(huifu).getHp();// 获取英雄的生命值
+                            double addhp = addHP(hp, hSkillHp);
                             addhp = addhp > hp ? hp : addhp;// 恢复的HP
                             heros.get(huifu).setHp(addhp);
                             attContent += " 全体英雄恢复HP:" + addhp;
                             attContentLog += " 全体英雄恢复HP:" + addhp;
 
-                        } else if ( Constant.SkillType._SUP_ADD.getValue().equals(a.getSkillType()) ) {// 玩家属性加成技能
+                        } else if (Constant.SkillType._SUP_ADD.getValue().equals(a.getSkillType())) {// 玩家属性加成技能
                             // 随机给某个英雄释放辅助技能
                             Random rdSUP = new Random();
                             int supNum = rdSUP.nextInt(heros.size());
@@ -722,9 +724,9 @@ public class FightCoreService {
                             long hStarSUP = heros.get(supNum).getHeroStar();
                             // 英雄名称
                             String hNameSUP = heros.get(supNum).getHeroName();
-                            if ( heros.get(supNum).getMaxHp().equals(heros.get(supNum).getAddMaxHp()) ) {
-                                long hp = heros.get(supNum).getHp();// 获取英雄的生命值
-                                long addhp = addHP(hp, hSkillHp);
+                            if (heros.get(supNum).getMaxHp().equals(heros.get(supNum).getAddMaxHp())) {
+                                double hp = heros.get(supNum).getHp();// 获取英雄的生命值
+                                double addhp = addHP(hp, hSkillHp);
                                 heros.get(supNum).setHp(addhp);
                                 heros.get(supNum).setAddMaxHp(addhp);
                             }
@@ -756,11 +758,11 @@ public class FightCoreService {
             int backHp = rbhp.nextInt(99);
             if (mHP > 0) {
                 if (backHp % 3 == 0) {
-                    long addhp = addHP(mHP, mHPRegen);
+                    double addhp = addHP(mHP, mHPRegen);
                     mHP = addhp > mMaxHP ? mMaxHP : addhp; // 恢复后的HP
 
                     LOGGER.info("[LV" + mlevel + " " + mname + "]" + "触发被动，恢复了" + mHPRegen + "HP，" + "剩余" + (mHP) + "HP");
-                    setBattleProcess(new BattleDetailsRsp(null, null, mlevel, mname, null, null,null, mHP, mHPRegen,
+                    setBattleProcess(new BattleDetailsRsp(null, null, mlevel, mname, null, null, null, mHP, mHPRegen,
                             "[LV{mlevel} {mname}]触发被动，恢复了{HPRegen}HP，" + "剩余{HP}HP", Constant.disabled, null));
                 }
             }
@@ -780,11 +782,12 @@ public class FightCoreService {
 
     /**
      * 怪物攻击玩家英雄
+     *
      * @param m
      * @param dungeon
      * @param index
      */
-    private void MAttackH(GmMonsterConfigEntity m, GmDungeonConfigEntity dungeon, int index){
+    private void MAttackH(GmMonsterConfigEntity m, GmDungeonConfigEntity dungeon, int index) {
         // 随机某个位置的英雄
 //        Random rm = new Random();
 //        int attH = rm.nextInt(survivingHero);
@@ -798,15 +801,15 @@ public class FightCoreService {
         // 英雄等级
         long hLevel = heros.get(attH).getHeroLevel();
         // 当前英雄最大血量
-        long hMaxHP = heros.get(attH).getHp();
+        double hMaxHP = heros.get(attH).getHp();
         // 英雄最新血量
-        long hHP = heros.get(attH).getHp();
+        double hHP = heros.get(attH).getHp();
         // 英雄恢复血量
-        Double hHPRegen = heros.get(attH).getHpRegen();
+        double hHPRegen = heros.get(attH).getHpRegen();
         // 英雄护甲
-        long hArmor = heros.get(attH).getArmor();
+        double hArmor = heros.get(attH).getArmor();
         // 英雄魔抗
-        long hMagicResist = heros.get(attH).getMagicResist();
+        double hMagicResist = heros.get(attH).getMagicResist();
         // 英雄星级
         long hStar = heros.get(attH).getHeroStar();
 
@@ -816,16 +819,16 @@ public class FightCoreService {
         // 怪物等级
         long mlevel = m.getMonsterLevel();
         // 怪物普通攻击
-        long mAttackDamag = m.getMonsterAttackDamage();
+        double mAttackDamag = m.getMonsterAttackDamage();
         // 怪物的专属技能伤害
-        long uniqueSkill = mAttackDamag * m.getUniqueSkillM() - hArmor;
+        double uniqueSkill = mAttackDamag * m.getUniqueSkillM() - hArmor;
         // 怪物的致命一击伤害
-        long criticalHit = mAttackDamag * m.getCriticalHitM() - hArmor;
+        double criticalHit = mAttackDamag * m.getCriticalHitM() - hArmor;
 
         // 存放普功+技能伤害
-        long at1 = (mAttackDamag - (hArmor));
-        long at2 = (mAttackDamag * 2) - (hArmor);
-        long[] skillHarm = {at1, at2, uniqueSkill, uniqueSkill, criticalHit};
+        double at1 = (mAttackDamag - (hArmor));
+        double at2 = (mAttackDamag * 2) - (hArmor);
+        double[] skillHarm = {at1, at2, uniqueSkill, uniqueSkill, criticalHit};
         //随机普功、技能
         Random rk = new Random();
         int ras = rk.nextInt(skillHarm.length);
@@ -841,13 +844,13 @@ public class FightCoreService {
             hHP = (hHP < 1 ? 0 : hHP);
             String skillName = "[普通攻击]";
             if (ras == 2 || ras == 3) {
-                if ( dungeon.getDungeonAward().equals(2L) ) {
+                if (dungeon.getDungeonAward().equals(2L)) {
                     skillName = Constant.SkillNameM.LV2.getValue();
-                } else if ( dungeon.getDungeonAward().equals(3L) ) {
+                } else if (dungeon.getDungeonAward().equals(3L)) {
                     skillName = Constant.SkillNameM.LV3.getValue();
-                } else if ( dungeon.getDungeonAward().equals(4L) ) {
+                } else if (dungeon.getDungeonAward().equals(4L)) {
                     skillName = Constant.SkillNameM.LV4.getValue();
-                } else if ( dungeon.getDungeonAward().equals(5L) ) {
+                } else if (dungeon.getDungeonAward().equals(5L)) {
                     skillName = Constant.SkillNameM.LV5.getValue();
                 } else {
                     skillName = Constant.SkillNameM.LV1.getValue();
@@ -874,54 +877,55 @@ public class FightCoreService {
 
     /**
      * HP恢复
+     *
      * @param HP
      * @param HpRegen
      * @return
      */
-    private long addHP(long HP, long HpRegen){
+    private double addHP(double HP, double HpRegen) {
         return HP + HpRegen;
     }
 
-    private UserHeroInfoRsp getUserHeroInfo(long id){
+    private UserHeroInfoRsp getUserHeroInfo(long id) {
         Map<String, Object> userHeroMap = new HashMap<>();
         userHeroMap.put("userHeroId", id);
         UserHeroInfoRsp userHero = userHeroDao.getUserHeroByIdRsp(userHeroMap);
-        if ( userHero == null ) {
+        if (userHero == null) {
             LOGGER.info("Failed to get hero information");
         }
         return userHero;
     }
 
-    public List<UserHeroInfoRsp> getTeamHeroInfoList(Long teamId, TeamInfoRsp rsp){
+    public List<UserHeroInfoRsp> getTeamHeroInfoList(Long teamId, TeamInfoRsp rsp) {
         if (teamId != null) {
             Map<String, Object> teamParams = new HashMap<>();
             teamParams.put("id", teamId);
             rsp = teamConfigDao.getTeamInfo(teamParams);
         }
-        if (rsp == null){
+        if (rsp == null) {
             throw new RRException("Obtaining team information is abnormal!");
         }
 
         // 存储英雄集合
         List<UserHeroInfoRsp> userHeroInfoRsps = new ArrayList<>();
         // 获取英雄1
-        if(rsp.getUserHero1Id() != null && rsp.getUserHero1Id() != 0){
+        if (rsp.getUserHero1Id() != null && rsp.getUserHero1Id() != 0) {
             userHeroInfoRsps.add(getUserHeroInfo(rsp.getUserHero1Id()));
         }
         // 获取英雄2
-        if(rsp.getUserHero2Id() != null && rsp.getUserHero2Id() != 0){
+        if (rsp.getUserHero2Id() != null && rsp.getUserHero2Id() != 0) {
             userHeroInfoRsps.add(getUserHeroInfo(rsp.getUserHero2Id()));
         }
         // 获取英雄3
-        if(rsp.getUserHero3Id() != null && rsp.getUserHero3Id() != 0){
+        if (rsp.getUserHero3Id() != null && rsp.getUserHero3Id() != 0) {
             userHeroInfoRsps.add(getUserHeroInfo(rsp.getUserHero3Id()));
         }
         // 获取英雄4
-        if(rsp.getUserHero4Id() != null && rsp.getUserHero4Id() != 0){
+        if (rsp.getUserHero4Id() != null && rsp.getUserHero4Id() != 0) {
             userHeroInfoRsps.add(getUserHeroInfo(rsp.getUserHero4Id()));
         }
         // 获取英雄5
-        if(rsp.getUserHero5Id() != null && rsp.getUserHero5Id() != 0){
+        if (rsp.getUserHero5Id() != null && rsp.getUserHero5Id() != 0) {
             userHeroInfoRsps.add(getUserHeroInfo(rsp.getUserHero5Id()));
         }
 
@@ -931,6 +935,7 @@ public class FightCoreService {
 
     /**
      * 玩家点击领取奖励后系统发放奖品到玩家账户
+     *
      * @param user
      * @param id
      * @return
@@ -938,9 +943,9 @@ public class FightCoreService {
     public FightClaimRsp claim(UserEntity user, long id) {
         FightClaimRsp rsp = new FightClaimRsp();
         GmCombatRecordEntity combatRecord = combatRecordDao.selectOne(new QueryWrapper<GmCombatRecordEntity>()
-                .eq("ID",id)
+                .eq("ID", id)
         );
-        if (combatRecord == null){
+        if (combatRecord == null) {
             throw new RRException("战斗记录失效");
         }
 
@@ -954,7 +959,7 @@ public class FightCoreService {
         Map<String, Object> balanceMap = new HashMap<>();
         balanceMap.put("sourceId", combatRecord.getId());// 战斗记录ID
         List<UserBalanceDetailEntity> balanceDetails = userBalanceDetailService.getUserBalanceDetail(balanceMap);
-        if ( balanceDetails.size() > 0 ){
+        if (balanceDetails.size() > 0) {
             throw new RRException("已领取奖励，请刷新页面");
         }
 
@@ -969,7 +974,7 @@ public class FightCoreService {
         if (Constant.BattleResult._WIN.getValue().equals(combatRecord.getStatus()) && balanceDetails.size() == 0) {
 
             // 更新玩家账户余额
-            boolean effect = userAccountService.updateAccountAdd(user.getUserId(), combatRecord.getGetGoldCoins(),Constant.ZERO_);
+            boolean effect = userAccountService.updateAccountAdd(user.getUserId(), combatRecord.getGetGoldCoins(), Constant.ZERO_);
             if (!effect) {
                 throw new RRException("账户金额更新失败!");// 账户金额更新失败
             }
@@ -1012,7 +1017,7 @@ public class FightCoreService {
             // 产出装备
             if (giftBoxEquipmentRsps.size() > 0) {
                 int i = 0;
-                while ( i < giftBoxEquipmentRsps.size()){
+                while (i < giftBoxEquipmentRsps.size()) {
                     UserEquipInfoRsp userEquipInfoRsp = json2bean(giftBoxEquipmentRsps.get(i).toString(), UserEquipInfoRsp.class);
                     userEquipInfoRsps.add(userEquipInfoRsp);
                     i++;
@@ -1026,11 +1031,12 @@ public class FightCoreService {
 
     /**
      * 更新玩家战力，玩家矿工，队伍战力，矿工
+     *
      * @param changePower
      * @param user
      * @param team
      */
-    public void updateCombat(long changePower, long oldPower, long newPower, UserEntity user, GmTeamConfigEntity team, BigDecimal changeMinter, BigDecimal oldMinter, BigDecimal newMinter){
+    public void updateCombat(String type, Double changePower, Double oldPower, Double newPower, UserEntity user, GmTeamConfigEntity team, BigDecimal changeMinter, BigDecimal oldMinter, BigDecimal newMinter) {
         Date now = new Date();
         UserEntity userEntity = new UserEntity();
         userEntity.setUserId(user.getUserId());
@@ -1039,7 +1045,7 @@ public class FightCoreService {
         // 如果改变的战力为0 则无需更新
         if (changePower != 0) {
             // 更新玩家战力,矿工数
-            Long totalPower = (user.getTotalPower() - oldPower) + newPower;// 获取最新用户战力
+            Double totalPower = (user.getTotalPower() - oldPower) + newPower;// 获取最新用户战力
             userEntity.setTotalPower(totalPower);
         }
 
@@ -1059,7 +1065,11 @@ public class FightCoreService {
         team.setUpdateUser(user.getUserId());
         team.setUpdateTime(now);
         team.setUpdateTimeTs(now.getTime());
-        teamConfigDao.setTeamHero(team);
+        if (type.equals(Constant.enable)) {
+            teamConfigDao.setTeamHero(team);
+        } else {
+            teamConfigDao.updateById(team);
+        }
     }
 
 
@@ -1112,8 +1122,8 @@ public class FightCoreService {
 //        LOGGER.info(Arith.UUID20());
 
         int num = 0;
-        int i =0;
-        while (i<100){
+        int i = 0;
+        while (i < 100) {
             Random rd = new Random();
             int rdEQ = rd.nextInt(99);
             if (rdEQ % 16 == 0) {
@@ -1124,7 +1134,7 @@ public class FightCoreService {
         }
 
 
-        LOGGER.info("爆装数量："+ num);
+        LOGGER.info("爆装数量：" + num);
 
     }
 }

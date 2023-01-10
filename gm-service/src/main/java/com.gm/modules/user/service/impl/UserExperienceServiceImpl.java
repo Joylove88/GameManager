@@ -190,9 +190,9 @@ public class UserExperienceServiceImpl extends ServiceImpl<UserExperienceDao, Us
             // 获取本次升级增加的英雄属性
             attribute = combatStatsUtilsService.getHeroAttributeWithLv(userHero, lv);
             // 获取本次升级增加的战力
-            long changePower = combatStatsUtilsService.getHeroPower(attribute);
+            double changePower = combatStatsUtilsService.getHeroPower(attribute);
             // 最新战力
-            long newPower = userHero.getHeroPower() + changePower;
+            double newPower = userHero.getHeroPower() + changePower;
             // 增加玩家英雄属性
             userHeroUp.setHealth(userHero.getHealth() + attribute.getHp());// 累加生命值
             userHeroUp.setMana(userHero.getMana() + attribute.getMp());// 累加法力值
@@ -210,7 +210,7 @@ public class UserExperienceServiceImpl extends ServiceImpl<UserExperienceDao, Us
             userHeroUp.setHeroPower(newPower);
             // 更新矿工、神谕值以及队伍战力、矿工，玩家战力、矿工
             UserHeroInfoDetailWithGrowRsp rsp = combatStatsUtilsService.updateCombatPower(user, userHero, null, changePower, scale);
-            userHeroUp.setMinter(Arith.add(userHero.getMinter(), rsp.getMinter()));
+            userHeroUp.setMinter(rsp.getMinter());
             userHeroUp.setOracle(rsp.getOracle());
         }
         userHeroUp.setUserHeroId(userHeroId);

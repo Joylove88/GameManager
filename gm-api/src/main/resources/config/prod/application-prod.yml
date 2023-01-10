@@ -33,3 +33,23 @@ spring:
         wall:
           config:
             multi-statement-allow: true
+
+contractAddress:
+  # 出款发起地址
+  payerWalletAddress: "0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45"
+  # busd合约地址
+  busdTokenAddress: "0xe9e7cea3dedca5984780bafc599bd69add087d56"
+  # 资金池地址
+  fundPoolAddress: "0x482435b52fD280E7E9A6Dc6CB591366050ddcd02"
+  # NFT英雄地址
+  nftHeroAddress: "0x9Caa1712B23206d3F38ca3C2005AC41B41c77f57"
+  # NFT装备地址
+  nftEquipAddress: "0x5E5fAb47B25d486Fb6c0dB60D3A3f46673E47E33"
+  # NFT经验道具地址
+  nftExpAddress: "0x5627C7372d30dAB3C456b28d15b401cC958A7621"
+  # 团队地址
+  teamAddress: "0x2A3Ee1e41A8A11546C5732CFB447b752c9F09618"
+  # ABC代币地址
+  abcTokensAddress: "0xCbFeB1140E3A94e6Ca3d901F77a64b380B378bd5"
+  # 正式链地址
+  networks: "https://bsc-dataseed2.binance.org/"

@@ -20,7 +20,6 @@ import com.gm.modules.user.dao.UserHeroEquipmentWearDao;
 import com.gm.modules.user.entity.UserEquipmentEntity;
 import com.gm.modules.user.rsp.UserHeroEquipmentWearRsp;
 import com.gm.modules.user.rsp.UserHeroInfoDetailRsp;
-import com.gm.modules.user.rsp.UserHeroInfoRsp;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -166,15 +165,15 @@ public class EquipmentInfoServiceImpl extends ServiceImpl<EquipmentInfoDao, Equi
     private JSONObject getEquipmentAttributes(JSONObject jsonObject, UserEquipmentEntity userEquipment) {
         // 如果该装备状态为已激活则获取该装备属性
         if (userEquipment.getActivationState().equals(Constant.enable)) {
-            jsonObject.put("equipPower", userEquipment.getEquipPower());
-            jsonObject.put("health", userEquipment.getHealth());
-            jsonObject.put("mana", userEquipment.getMana());
-            jsonObject.put("healthRegen", userEquipment.getHealthRegen());
-            jsonObject.put("manaRegen", userEquipment.getManaRegen());
-            jsonObject.put("armor", userEquipment.getArmor());
-            jsonObject.put("magicResist", userEquipment.getMagicResist());
-            jsonObject.put("attackDamage", userEquipment.getAttackDamage());
-            jsonObject.put("attackSpell", userEquipment.getAttackSpell());
+            jsonObject.put("equipPower", Math.round(userEquipment.getEquipPower()));
+            jsonObject.put("health", Math.round(userEquipment.getHealth()));
+            jsonObject.put("mana", Math.round(userEquipment.getMana()));
+            jsonObject.put("healthRegen", Math.round(userEquipment.getHealthRegen()));
+            jsonObject.put("manaRegen", Math.round(userEquipment.getManaRegen()));
+            jsonObject.put("armor", Math.round(userEquipment.getArmor()));
+            jsonObject.put("magicResist", Math.round(userEquipment.getMagicResist()));
+            jsonObject.put("attackDamage", Math.round(userEquipment.getAttackDamage()));
+            jsonObject.put("attackSpell", Math.round(userEquipment.getAttackSpell()));
         }
         return jsonObject;
     }

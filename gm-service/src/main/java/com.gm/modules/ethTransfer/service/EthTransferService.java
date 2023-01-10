@@ -1,6 +1,5 @@
 package com.gm.modules.ethTransfer.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.gm.common.utils.Arith;
 import com.gm.common.utils.Constant;
 import com.gm.common.utils.EthTransferListenUtils;
@@ -17,6 +16,7 @@ import com.gm.modules.user.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.abi.datatypes.Address;
@@ -49,45 +49,43 @@ public class EthTransferService {
     private FundsAccountingService fundsAccountingService;
     @Autowired
     private TransactionOrderService transactionOrderService;
-    /**
-     * 英雄合约地址
-     */
-    private static String NFT_HERO_ADDRESS;
-    /**
-     * 装备合约地址
-     */
-    private static String NFT_EQUIP_ADDRESS;
-    /**
-     * 经验合约地址
-     */
-    private static String NFT_EX_ADDRESS;
-    /**
-     * 团队地址
-     */
-    private static String TEAM_ADDRESS;
-    /**
-     * 资金池地址
-     */
-    private static String CAPITAL_POOL_ADDRESS;
+
     /**
      * BUSD地址
      */
-    private static String BUSD_ADDRESS;
+    @Value("${contractAddress.busdTokenAddress:#{null}}")
+    private String busdTokenAddress;
+    /**
+     * 资金池地址
+     */
+    @Value("${contractAddress.fundPoolAddress:#{null}}")
+    private String fundPoolAddress;
+    /**
+     * 团队地址
+     */
+    @Value("${contractAddress.teamAddress:#{null}}")
+    private String teamAddress;
+    /**
+     * 英雄合约地址
+     */
+    @Value("${contractAddress.nftHeroAddress:#{null}}")
+    private String nftHeroAddress;
+    /**
+     * 装备合约地址
+     */
+    @Value("${contractAddress.nftEquipAddress:#{null}}")
+    private String nftEquipAddress;
+    /**
+     * 经验合约地址
+     */
+    @Value("${contractAddress.nftExAddress:#{null}}")
+    private String nftExpAddress;
 
     @Transactional(rollbackFor = Exception.class)
     public List eth(String txHash, TransactionOrderEntity order, Optional<TransactionReceipt> receipt, SummonReq form) throws Exception {
         // 召唤集合
         List gifts = new ArrayList();
         if (receipt != null) {
-            // 获取地址
-            JSONObject addressJson = sysDictService.getContractsAddress("CONTRACTS", "ADDRESS");
-            NFT_HERO_ADDRESS = addressJson.getString("NFT_HERO_ADDRESS");
-            NFT_EQUIP_ADDRESS = addressJson.getString("NFT_EQUIP_ADDRESS");
-            NFT_EX_ADDRESS = addressJson.getString("NFT_EX_ADDRESS");
-            BUSD_ADDRESS = addressJson.getString("BUSD_ADDRESS");
-            CAPITAL_POOL_ADDRESS = addressJson.getString("CAPITAL_POOL_ADDRESS");
-            TEAM_ADDRESS = addressJson.getString("TEAM_ADDRESS");
-
             // 实例化用户类
             UserEntity user = new UserEntity();
 
@@ -108,31 +106,31 @@ public class EthTransferService {
                     if (receipt.get().getLogs().get(j).getTopics().get(0).equals(topics0)) {
                         // 获取合约收款地址
                         String addressTo = receipt.get().getLogs().get(j).getAddress();
-                        if (NFT_HERO_ADDRESS.toLowerCase().equals(addressTo)) {// 英雄NFT
+                        if (nftHeroAddress.toLowerCase().equals(addressTo)) {// 英雄NFT
                             type = Constant.SummonType.HERO.getValue();
                             tokenNum++;
                             tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
-                        } else if (NFT_EQUIP_ADDRESS.toLowerCase().equals(addressTo)) {// 装备NFT
+                        } else if (nftEquipAddress.toLowerCase().equals(addressTo)) {// 装备NFT
                             type = Constant.SummonType.EQUIPMENT.getValue();
                             tokenNum++;
                             tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
-                        } else if (NFT_EX_ADDRESS.toLowerCase().equals(addressTo)) {// 经验NFT
+                        } else if (nftExpAddress.toLowerCase().equals(addressTo)) {// 经验NFT
                             type = Constant.SummonType.EXPERIENCE.getValue();
                             tokenNum++;
                             tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
-                        } else if (BUSD_ADDRESS.toLowerCase().equals(addressTo)) {// 代币数量（费用+团队抽成）
+                        } else if (busdTokenAddress.toLowerCase().equals(addressTo)) {// 代币数量（费用+团队抽成）
                             Address tokenAddress = new Address(receipt.get().getLogs().get(j).getTopics().get(2));
                             String tokenNumHex = Numeric.toBigInt(receipt.get().getLogs().get(j).getData()).toString();
-                            if (CAPITAL_POOL_ADDRESS.toLowerCase().equals(tokenAddress.toString())) {// 资金池
+                            if (fundPoolAddress.toLowerCase().equals(tokenAddress.toString())) {// 资金池
                                 amount = Arith.add(amount, Convert.fromWei(tokenNumHex, Convert.Unit.ETHER));
-                            } else if (TEAM_ADDRESS.toLowerCase().equals(tokenAddress.toString())) {// 团队抽成
+                            } else if (teamAddress.toLowerCase().equals(tokenAddress.toString())) {// 团队抽成
                                 amountTeam = Arith.add(amountTeam, Convert.fromWei(tokenNumHex, Convert.Unit.ETHER));
                             }
                         }
                     }
                 }
-                LOGGER.info("本次费用：" + amount);
-                LOGGER.info("本次手续费：" + amountTeam);
+                LOGGER.info("amount：" + amount);
+                LOGGER.info("amountTeam：" + amountTeam);
                 LOGGER.info("tokenNum：" + tokenNum);
                 LOGGER.info("type：" + type);
             }
@@ -157,14 +155,10 @@ public class EthTransferService {
             if (amount.compareTo(price) == -1) {
                 return null;
             }
-            BigDecimal rebateGoldCoins = amount.compareTo(price) != 0 ? Arith.subtract(amount, price) : price;
-            LOGGER.info("rebateGoldCoins: " + rebateGoldCoins);
             map.put("userId", user.getUserId());
             map.put("from", address);
             map.put("gasUsed", receipt.get().getGasUsed());
             map.put("blockNumber", receipt.get().getBlockNumber());
-            map.put("orderFee", amount);
-            map.put("realFee", rebateGoldCoins);
 
             // 设置物品类型
             if (type.equals(Constant.SummonType.HERO.getValue())) {
@@ -188,7 +182,7 @@ public class EthTransferService {
             // 设置订单金额
             form.setOrderFee(amount);
             // 设置实付金额
-            form.setRealFee(rebateGoldCoins);
+            form.setRealFee(price);
 
             // 如果订单为空则创建新订单
             if (order == null) {

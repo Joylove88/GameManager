@@ -69,7 +69,7 @@ public class UserHeroEntity implements Serializable {
 	/**
 	 * 英雄战力
 	 */
-	private Long heroPower;
+	private Double heroPower;
 	/**
 	 * 累计获得的经验
 	 */
@@ -81,11 +81,11 @@ public class UserHeroEntity implements Serializable {
 	/**
 	 * 初始生命值
 	 */
-	private Long health;
+	private Double health;
 	/**
 	 * 初始法力值
 	 */
-	private Long mana;
+	private Double mana;
 	/**
 	 * 初始生命值恢复
 	 */
@@ -97,19 +97,19 @@ public class UserHeroEntity implements Serializable {
 	/**
 	 * 初始护甲
 	 */
-	private Long armor;
+	private Double armor;
 	/**
 	 * 初始魔抗
 	 */
-	private Long magicResist;
+	private Double magicResist;
 	/**
 	 * 初始攻击力
 	 */
-	private Long attackDamage;
+	private Double attackDamage;
 	/**
 	 * 初始法攻
 	 */
-	private Long attackSpell;
+	private Double attackSpell;
 	/**
 	 * 铸造状态('0':铸造中，'1':铸造成功，'2':铸造失败)
 	 */

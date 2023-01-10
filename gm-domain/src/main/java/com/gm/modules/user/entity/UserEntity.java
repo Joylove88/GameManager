@@ -45,7 +45,7 @@ public class UserEntity implements Serializable {
 	/**
 	 * 总战力
 	 */
-	private Long totalPower;
+	private Double totalPower;
 	/**
 	 * 总矿工数
 	 */

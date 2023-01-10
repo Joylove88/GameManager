@@ -16,6 +16,7 @@ import com.gm.modules.sys.service.SysDictService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
@@ -45,6 +46,11 @@ public class EthBalanceListenTask implements ITask {
     private Logger logger = LoggerFactory.getLogger(getClass());
     private static List<String> contracts = new ArrayList<>();  //代币合约地址列表,可以存放多个地址
     private static Web3j web3j;
+
+    @Value("${contractAddress.fundPoolAddress:#{null}}")
+    private String fundPoolAddress;
+    @Value("${contractAddress.busdTokenAddress:#{null}}")
+    private String busdTokenAddress;
     @Autowired
     private SysConfigService sysConfigService;
     @Autowired
@@ -55,9 +61,8 @@ public class EthBalanceListenTask implements ITask {
         logger.info("ethBalanceListenTask定时任务正在执行，参数为：{}", params);
         try {
             // 获取地址
-            JSONObject address = sysDictService.getContractsAddress("CONTRACTS", "ADDRESS");
-            contracts.add(address.getString("CAPITAL_POOL_ADDRESS").toLowerCase());
-            contracts.add(address.getString("BUSD_ADDRESS").toLowerCase());
+            contracts.add(fundPoolAddress.toLowerCase());
+            contracts.add(busdTokenAddress.toLowerCase());
             // 开始链上监听
             startReplayListen_ETH();
         } catch (Exception e) {
@@ -67,7 +72,7 @@ public class EthBalanceListenTask implements ITask {
 
 
     private static void run() throws Exception {
-        web3j = TransactionVerifyUtils.connect();
+        web3j = new TransactionVerifyUtils().connect();
     }
 
     // 启动监听以太坊上的过往交易
@@ -122,13 +127,13 @@ public class EthBalanceListenTask implements ITask {
     }
 
     public static void main(String[] args) throws Exception {
-        run();
-        contracts.add("0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45");
-        contracts.add("0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee");
-        BigDecimal balanceValue = new BigDecimal(getERC20Balance(web3j, contracts.get(0), contracts.get(1)));
-        if (balanceValue.compareTo(BigDecimal.ZERO) == 1) {
-            System.out.println(balanceValue);
-        }
+//        run();
+//        contracts.add("0x89394Dd3903aE07723012292Ddb1f5CA1B6bCe45");
+//        contracts.add("0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee");
+//        BigDecimal balanceValue = new BigDecimal(getERC20Balance(web3j, contracts.get(0), contracts.get(1)));
+//        if (balanceValue.compareTo(BigDecimal.ZERO) == 1) {
+//            System.out.println(balanceValue);
+//        }
 //		String address = "0x25B15dE515eBBD047e026D64463801f044785cc6";
 //		String fromAddress = "0x1cabea67c565b5337e688894960839ef1D48b0cD";
 //        Address fromAddress = new Address("0x000000000000000000000000000000000000000000000000002386f26fc10000");

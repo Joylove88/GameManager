@@ -21,6 +21,7 @@ import com.gm.common.utils.R;
 import com.gm.modules.basicconfig.entity.*;
 import com.gm.modules.basicconfig.rsp.*;
 import com.gm.modules.basicconfig.service.*;
+import com.gm.modules.combatStatsUtils.service.CombatStatsUtilsService;
 import com.gm.modules.fightCore.service.FightCoreService;
 import com.gm.modules.sys.service.SysConfigService;
 import com.gm.modules.user.entity.UserEntity;
@@ -75,6 +76,8 @@ public class ApiFightController {
     @Autowired
     private EquipmentInfoService equipmentInfoService;
     @Autowired
+    private CombatStatsUtilsService combatStatsUtilsService;
+    @Autowired
     private UserService userService;
     @Autowired
     private SysConfigService sysConfigService;
@@ -84,7 +87,8 @@ public class ApiFightController {
     @ApiOperation("开始战斗")
     @Transactional(rollbackFor = Exception.class)
     public R attck(@LoginUser UserEntity user, @RequestBody FightInfoReq req) throws Exception {
-
+        // 校验该功能是否开放
+        combatStatsUtilsService.isOpen();
         LOGGER.info("战斗准备阶段：队伍上下阵操作");
         // 队伍上下阵操作
         setTeamHero(user, req);
@@ -119,7 +123,7 @@ public class ApiFightController {
             while (i < 3) {
                 int num = (i + 1);
                 GmTeamConfigEntity teamConfig = new GmTeamConfigEntity();
-                teamConfig.setTeamPower(Constant.ZERO);
+                teamConfig.setTeamPower(Constant.ZERO_D);
                 teamConfig.setTeamName("TEAM" + num);
                 teamConfig.setUserId(user.getUserId());
                 teamConfig.setStatus(Constant.ZERO_);// 默认未战斗
@@ -213,6 +217,8 @@ public class ApiFightController {
     @PostMapping("getDungeonInfo")
     @ApiOperation("获取副本信息获取当前队伍英雄以及背包中的英雄")
     public R getDungeonInfo(@LoginUser UserEntity user, @RequestBody FightInfoReq req) throws Exception {
+        // 校验该功能是否开放
+        combatStatsUtilsService.isOpen();
         Map<String, Object> map = new HashMap<>();
         // 获取副本
         GmDungeonConfigEntity dc = new GmDungeonConfigEntity();
@@ -517,11 +523,11 @@ public class ApiFightController {
         // 实例化队伍信息类
         GmTeamConfigEntity team = new GmTeamConfigEntity();
         // 旧战力
-        long oldPower = 0;
+        double oldPower = 0;
         // 新战力
-        long newPower = 0;
+        double newPower = 0;
         // 改变的战力
-        long changePower = 0;
+        double changePower = 0;
         // 旧的矿工数
         BigDecimal oldMinter = BigDecimal.ZERO;
         // 队伍矿工数
@@ -596,7 +602,7 @@ public class ApiFightController {
             changeMinter = Arith.subtract(newMinter, oldMinter);
             team.setId(req.getTeamId());
             // 更新玩家战力，队伍战力，矿工
-            fightCoreService.updateCombat(changePower, oldPower, newPower, user, team, changeMinter, oldMinter, newMinter);
+            fightCoreService.updateCombat(Constant.enable, changePower, oldPower, newPower, user, team, changeMinter, oldMinter, newMinter);
         }
     }
 

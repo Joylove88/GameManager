@@ -10,11 +10,11 @@ public class AttributeSimpleEntity {
     /**
      * 生命值
      */
-    private Long hp;
+    private Double hp;
     /**
      * 法力值
      */
-    private Long mp;
+    private Double mp;
     /**
      * 生命值恢复
      */
@@ -26,19 +26,19 @@ public class AttributeSimpleEntity {
     /**
      * 护甲
      */
-    private Long armor;
+    private Double armor;
     /**
      * 魔抗
      */
-    private Long magicResist;
+    private Double magicResist;
     /**
      * 攻击力
      */
-    private Long attackDamage;
+    private Double attackDamage;
     /**
      * 法攻
      */
-    private Long attackSpell;
+    private Double attackSpell;
 
     /**
      * 通过星级计算出对应的属性
@@ -51,7 +51,7 @@ public class AttributeSimpleEntity {
      * @param attackDamage
      * @param attackSpell
      */
-    public AttributeSimpleEntity(Long hp, Long mp, Double hpRegen, Double mpRegen, Long armor, Long magicResist, Long attackDamage, Long attackSpell) {
+    public AttributeSimpleEntity(Double hp, Double mp, Double hpRegen, Double mpRegen, Double armor, Double magicResist, Double attackDamage, Double attackSpell) {
         this.hp = hp;
         this.mp = mp;
         this.hpRegen = hpRegen;

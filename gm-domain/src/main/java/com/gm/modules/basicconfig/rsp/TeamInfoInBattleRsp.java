@@ -40,7 +40,7 @@ public class TeamInfoInBattleRsp {
     /**
      * 队伍战力
      */
-    private Long teamPower;
+    private Double teamPower;
     /**
      * 战斗状态（0：未战斗，1：战斗中，2：战斗结束）
      */

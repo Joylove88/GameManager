@@ -54,31 +54,31 @@ public class AttributeEntity {
     /**
      * 最大生命值
      */
-    private Long MaxHp;
+    private Double MaxHp;
     /**
      * 加成的生命
      */
-    private Long addMaxHp;
+    private Double addMaxHp;
     /**
      * 初始生命值
      */
-    private Long hp;
+    private Double hp;
     /**
      * 成长属性-生命值
      */
-    private Long growHp;
+    private Double growHp;
     /**
      * 初始法力值
      */
-    private Long mp;
+    private Double mp;
     /**
      * 最大法力值
      */
-    private Long MaxMp;
+    private Double MaxMp;
     /**
      * 成长属性-法力值
      */
-    private Long growMp;
+    private Double growMp;
     /**
      * 初始生命值恢复
      */
@@ -98,45 +98,45 @@ public class AttributeEntity {
     /**
      * 初始护甲
      */
-    private Long armor;
+    private Double armor;
     /**
      * 成长属性-护甲
      */
-    private Long growArmor;
+    private Double growArmor;
     /**
      * 初始魔抗
      */
-    private Long magicResist;
+    private Double magicResist;
     /**
      * 成长属性-魔抗
      */
-    private Long growMagicResist;
+    private Double growMagicResist;
     /**
      * 初始攻击力
      */
-    private Long attackDamage;
+    private Double attackDamage;
     /**
      * 成长属性-攻击力
      */
-    private Long growAttackDamage;
+    private Double growAttackDamage;
     /**
      * 初始法攻
      */
-    private Long attackSpell;
+    private Double attackSpell;
     /**
      * 成长属性-法攻
      */
-    private Long growAttackSpell;
+    private Double growAttackSpell;
 
 
     /**
      * 装备属性-生命值
      */
-    private Long equipHealth;
+    private Double equipHealth;
     /**
      * 装备属性-法力值
      */
-    private Long equipMana;
+    private Double equipMana;
     /**
      * 装备属性-生命值恢复
      */
@@ -148,17 +148,17 @@ public class AttributeEntity {
     /**
      * 装备属性-护甲
      */
-    private Long equipArmor;
+    private Double equipArmor;
     /**
      * 装备属性-魔抗
      */
-    private Long equipMagicResist;
+    private Double equipMagicResist;
     /**
      * 装备属性-攻击力
      */
-    private Long equipAttackDamage;
+    private Double equipAttackDamage;
     /**
      * 装备属性-法攻
      */
-    private Long equipAttackSpell;
+    private Double equipAttackSpell;
 }
