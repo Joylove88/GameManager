@@ -95,6 +95,8 @@ public class ApiDrawController {
         ValidatorUtils.validateEntity(form);
         // 设置货币类型 为加密货币
         form.setCurType(Constant.CurrencyType._CRYPTO.getValue());
+        // 设置为非免费领取
+        form.setIsFree(Constant.disabled);
         // HASH校验
         if (StringUtils.isNotBlank(form.getTransactionHash())) {
             // HASH安全校验 防止注入攻击;
@@ -148,6 +150,8 @@ public class ApiDrawController {
     public R summonedWithGold(@LoginUser UserEntity user, @RequestBody SummonReq form) throws Exception {
         // 设置货币类型 为金币
         form.setCurType(Constant.CurrencyType._GOLD_COINS.getValue());
+        // 设置为非免费领取
+        form.setIsFree(Constant.disabled);
         List giftBoxs = new ArrayList();
         // 地址校验
         if (StringUtils.isNotBlank(user.getAddress())) {
@@ -204,6 +208,31 @@ public class ApiDrawController {
     public R getSummonedRecord(@LoginUser UserEntity user, @RequestBody Map<String, Object> params) {
         PageUtils page = transactionOrderService.queryUserOrder(user.getUserId(), params);
         return R.ok().put("page", page);
+    }
+
+
+    @PostMapping("freeMintHero")
+    @ApiOperation("领取免费1星英雄")
+    public R freeMintHero(@RequestBody SummonReq form) throws Exception {
+        // 设置为免费领取
+        form.setIsFree(Constant.enable);
+        // 设置货币类型 为加密货币
+        form.setCurType(Constant.CurrencyType._CRYPTO.getValue());
+        List giftBoxs = new ArrayList();
+        Optional<TransactionReceipt> receipt = null;
+        // 实例化用户类
+        UserEntity user = new UserEntity();
+        // 通过交易hash查找订单是否存在
+        TransactionOrderEntity order = transactionOrderService.getOrderHash(form.getTransactionHash());
+        if (order == null) {// 如果订单为空说明是初次请求 先创建订单
+            // 插入一笔订单,订单状态默认待处理
+            transactionOrderService.addOrder(user, null, form);
+        } else {// 订单不为空说明是二次请求 验证成功后执行核心业务
+            // 校验用户是否链上交易成功
+            receipt = TransactionVerifyUtils.isVerify(transactionVerifyUtils.connect(), form.getTransactionHash());
+            giftBoxs = ethTransferService.eth(form.getTransactionHash(), order, receipt, form);
+        }
+        return R.ok().put("giftBoxs", giftBoxs);
     }
 
 

@@ -8,7 +8,6 @@
 
 package com.gm.modules.job.task;
 
-import com.alibaba.fastjson.JSONObject;
 import com.gm.common.utils.Constant;
 import com.gm.common.web3Utils.TransactionVerifyUtils;
 import com.gm.modules.drawGift.service.DrawGiftService;
@@ -40,6 +39,7 @@ import java.util.Optional;
 
 /**
  * 定时器监听链上
+ *
  * @author axiang
  */
 @Component("ethTransferListenTask")
@@ -169,7 +169,7 @@ public class EthTransferListenTask implements ITask {
                         callBack_ETH(txHash, fromAddress, toAddress, value, timestamp);
                     }
 
-                    if (blockNum != block_EthMissSub){
+                    if (blockNum != block_EthMissSub) {
                         // 系统设置保存区块号
                         setBlock_Num(block_EthMissSub);
                         blockNum = block_EthMissSub;
@@ -193,7 +193,10 @@ public class EthTransferListenTask implements ITask {
         logger.info("to = " + to);
         logger.info("value = " + value.doubleValue());
         Optional<TransactionReceipt> receipt = TransactionVerifyUtils.isVerify(web3j, txHash);
-        ethTransferService.eth(txHash, null, receipt, new SummonReq());
+        SummonReq req = new SummonReq();
+        // 设置为非免费领取
+        req.setIsFree(Constant.disabled);
+        ethTransferService.eth(txHash, null, receipt, req);
     }
 
     // 更新系统中保存的区块号

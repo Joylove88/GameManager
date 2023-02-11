@@ -39,4 +39,14 @@
         WHERE
         A.`STATUS` = '1'
     </select>
+
+    <!--获取英雄信息集合-->
+    <select id="getHeroInfoList" resultType="com.gm.modules.basicconfig.rsp.HeroInfoDetailRsp">
+        SELECT
+        A.*
+        FROM
+        GM_HERO_INFO A
+        WHERE
+        A.`STATUS` = '1'
+    </select>
 </mapper>

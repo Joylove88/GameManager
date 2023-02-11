@@ -302,8 +302,7 @@ public class DrawGiftService {
         // 初始化英雄属性
         attributeSimple = null;
         // 根据抽中的盒子数量添加
-        int i = 0;
-        while (i < giftBoxNum) {
+        for (int i = 0; i < giftBoxNum; i++) {
             // 随机某个英雄
             Random randomHeroIndex = new Random();
             int heroIndex = randomHeroIndex.nextInt(heroInfos.size());
@@ -387,12 +386,20 @@ public class DrawGiftService {
                 scale = scale * summonedEventDto.getDiscountRate();
                 quantity--;
             }
+
             UserHeroEntity userHero = new UserHeroEntity();
+            // 本次抽奖为免费领取NFT进入时则稀释SCALE，设置英雄为绑定状态，设置物品转入转出状态为转出
+            if (summonReq.getIsFree().equals(Constant.enable)) {
+                scale = scale * 1 / 68;
+                userHero.setStatus(Constant.used);// 默认转出
+                userHero.setIsBind(Constant.enable);
+            } else {
+                userHero.setStatus(Constant.enable);
+                userHero.setIsBind(Constant.disabled);
+            }
             userHero.setHeroId(heroInfos.get(heroIndex).getHeroId());// 英雄ID
             userHero.setHeroLevelId(100000009L);// 初始等级1
             userHero.setUserId(user.getUserId());// 用户ID
-            userHero.setStatus(Constant.enable);
-            userHero.setIsBind(Constant.disabled);
             userHero.setStatePlay(Constant.disabled);// 默认：未上阵
             userHero.setMintStatus(Constant.enable);
             userHero.setMintHash(summonReq.getTransactionHash());// 交易hash
@@ -454,7 +461,6 @@ public class DrawGiftService {
             int skinType = prLv == Constant.PrLv.PrLv7.getValue() ? Constant.SkinType.GOLD.getValue() : Constant.SkinType.ORIGINAL.getValue();
             giftBoxHeroRsp.setSkinType(skinType);// 皮肤类型
             giftBoxHeroRsps.add(giftBoxHeroRsp);
-            i++;
         }
         if (userHeroAdds.size() > 0) {
             userHeroService.saveBatch(userHeroAdds);
@@ -475,8 +481,7 @@ public class DrawGiftService {
         List<HeroFragEntity> heroFrags = heroFragDao.getHeroFragPro();
         // 存储要添加的碎片集合
         List<UserHeroFragEntity> userHeroFragAdds = new ArrayList<>();
-        int i = 0;
-        while (i < giftBoxNum) {
+        for (int i = 0; i < giftBoxNum; i++) {
             // 随机某个英雄的碎片
             Random randomHeroIndex = new Random();
             int heroIndex = randomHeroIndex.nextInt(heroFrags.size());
@@ -495,8 +500,7 @@ public class DrawGiftService {
                 scale = scale * summonedEventDto.getDiscountRate();
                 quantity--;
             }
-            int j = 0;
-            while (j < flagNum) {
+            for (int j = 0; j < flagNum; j++) {
                 UserHeroFragEntity userHeroFrag = new UserHeroFragEntity();
                 userHeroFrag.setHeroFragId(heroFrags.get(heroIndex).getHeroFragId());
                 userHeroFrag.setUserHeroFragNum(Constant.Quantity.Q1.getValue());
@@ -510,7 +514,6 @@ public class DrawGiftService {
                 Long nftTokenId = summonReq.getCurType().equals(Constant.CurrencyType._CRYPTO.getValue()) ? Long.parseLong(tokenIds.get(0)) : null;
                 userHeroFrag.setNftId(nftTokenId);// NFT_tokenID
                 userHeroFragAdds.add(userHeroFrag);
-                j++;
             }
             LOGGER.info("heroFlagTokenIds: " + tokenIds);
             if (summonReq.getCurType().equals(Constant.CurrencyType._CRYPTO.getValue())) {
@@ -531,8 +534,6 @@ public class DrawGiftService {
             giftBoxHeroRsp.setSkinType(-1);// 皮肤类型
 
             giftBoxHeroRsps.add(giftBoxHeroRsp);
-
-            i++;
         }
         // 批量插入
         if (userHeroFragAdds.size() > 0) {
@@ -553,50 +554,56 @@ public class DrawGiftService {
         String poolBalance = sysConfigService.getValue(Constant.CashPool._DUNGEON.getValue());
         CalculateTradeUtil.FundPool = new BigDecimal(poolBalance);
         LOGGER.info("获取副本池金额: " + CalculateTradeUtil.FundPool);
-        // 抽奖次数
-        Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates, summonReq.getSummonNum());
-        // 奖品发放
-        for (Map.Entry<Integer, Integer> entry : count.entrySet()) {
-            // 当前概率等级奖品的数量
-            int giftBoxNum = entry.getValue();
-            LOGGER.info("heroGiftBoxNum: " + giftBoxNum);
-            // 使用万能策略模式
-            switch (entry.getKey()) {
-                case 0:
-                    // 1级概率产出1-3碎片
-                    sendHeroFlagForPlayer(giftBoxNum, user, summonReq, summonedEventDto);
-                    break;
-                case 1:
-                    // 2级概率产出1星英雄
-                    sendHeroForPlayer(Constant.PrLv.PrLv2.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum());
-                    break;
-                case 2:
-                    // 3级概率产出2星英雄
-                    sendHeroForPlayer(Constant.PrLv.PrLv3.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum());
-                    break;
-                case 3:
-                    // 4级概率产出3星英雄
-                    sendHeroForPlayer(Constant.PrLv.PrLv4.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum());
-                    break;
-                case 4:
-                    // 5级概率产出4星英雄
-                    sendHeroForPlayer(Constant.PrLv.PrLv5.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum());
-                    break;
-                case 5:
-                    // 6级概率产出5星英雄
-                    sendHeroForPlayer(Constant.PrLv.PrLv6.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum());
-                    break;
-                case 6:
-                    // 7级概率产出黄金1星英雄
-                    sendHeroForPlayer(Constant.PrLv.PrLv7.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum());
-                    break;
-                default:
-                    // 1级概率产出1-3碎片
-                    sendHeroFlagForPlayer(giftBoxNum, user, summonReq, summonedEventDto);
-                    break;
-            }
-            //            LOGGER.info(gifts.get(entry.getKey()).getGmHeroStarId() + ", count=" + entry.getValue() + ", probability="
+        // 如果本次召唤为免费NFT则固定发放1星英雄
+        if (summonReq.getIsFree().equals(Constant.enable)) {
+            // 2级概率产出1星英雄
+            sendHeroForPlayer(Constant.PrLv.PrLv2.getValue(), Constant.Quantity.Q1.getValue(), user, summonReq, summonedEventDto, summonReq.getSummonNum());
+        } else {
+            // 抽奖次数
+            Map<Integer, Integer> count = LotteryGiftsUtils.gifPron(orignalRates, summonReq.getSummonNum());
+            // 奖品发放
+            for (Map.Entry<Integer, Integer> entry : count.entrySet()) {
+                // 当前概率等级奖品的数量
+                int giftBoxNum = entry.getValue();
+                LOGGER.info("heroGiftBoxNum: " + giftBoxNum);
+                // 使用万能策略模式
+                switch (entry.getKey()) {
+                    case 0:
+                        // 1级概率产出1-3碎片
+                        sendHeroFlagForPlayer(giftBoxNum, user, summonReq, summonedEventDto);
+                        break;
+                    case 1:
+                        // 2级概率产出1星英雄
+                        sendHeroForPlayer(Constant.PrLv.PrLv2.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum());
+                        break;
+                    case 2:
+                        // 3级概率产出2星英雄
+                        sendHeroForPlayer(Constant.PrLv.PrLv3.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum());
+                        break;
+                    case 3:
+                        // 4级概率产出3星英雄
+                        sendHeroForPlayer(Constant.PrLv.PrLv4.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum());
+                        break;
+                    case 4:
+                        // 5级概率产出4星英雄
+                        sendHeroForPlayer(Constant.PrLv.PrLv5.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum());
+                        break;
+                    case 5:
+                        // 6级概率产出5星英雄
+                        sendHeroForPlayer(Constant.PrLv.PrLv6.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum());
+                        break;
+                    case 6:
+                        // 7级概率产出黄金1星英雄
+                        sendHeroForPlayer(Constant.PrLv.PrLv7.getValue(), giftBoxNum, user, summonReq, summonedEventDto, summonReq.getSummonNum());
+                        break;
+                    default:
+                        // 1级概率产出1-3碎片
+                        sendHeroFlagForPlayer(giftBoxNum, user, summonReq, summonedEventDto);
+                        break;
+                }
+                //            LOGGER.info(gifts.get(entry.getKey()).getGmHeroStarId() + ", count=" + entry.getValue() + ", probability="
 //                    + entry.getValue());
+            }
         }
     }
 
@@ -616,8 +623,7 @@ public class DrawGiftService {
         List<EquipmentInfoEntity> equipmentInfos = equipmentInfoService.getEquipmentInfos(infoMap);
         // 存储发放的装备集合
         List<UserEquipmentEntity> userEquipmentAdds = new ArrayList<>();
-        int i = 0;
-        while (i < giftBoxNum) {
+        for (int i = 0; i < giftBoxNum; i++) {
             // 随机生成一件装备下标
             Random randomHeroIndex = new Random();
             int equipmentIndex = randomHeroIndex.nextInt(equipmentInfos.size());
@@ -702,7 +708,6 @@ public class DrawGiftService {
             giftBoxEquipmentRsp.setEquipType(Constant.FragType.WHOLE.getValue());// 装备类型：0 装备,1 卷轴
             giftBoxEquipmentRsp.setEquipFragNum(Constant.Quantity.Q1.getValue());// 数量
             giftBoxEquipmentRsps.add(giftBoxEquipmentRsp);
-            i++;
         }
         // 批量插入
         if (userEquipmentAdds.size() > 0) {
@@ -726,8 +731,7 @@ public class DrawGiftService {
         List<EquipmentFragEntity> equipmentFrags = equipmentFragService.getEquipmentFragPro(fragMap);
         // 存储发放的装备卷轴集合
         List<UserEquipmentFragEntity> userEquipmentFragAdds = new ArrayList<>();
-        int i = 0;
-        while (i < giftBoxNum) {
+        for (int i = 0; i < giftBoxNum; i++) {
             // 随机生成卷轴下标
             Random randomHeroIndex = new Random();
             int equipmentFragIndex = randomHeroIndex.nextInt(equipmentFrags.size());
@@ -774,7 +778,6 @@ public class DrawGiftService {
             giftBoxEquipmentRsp.setEquipType(Constant.FragType.FRAG.getValue());// 装备类型：0 装备,1 卷轴
             giftBoxEquipmentRsp.setEquipFragNum(Constant.Quantity.Q1.getValue());// 数量
             giftBoxEquipmentRsps.add(giftBoxEquipmentRsp);
-            i++;
         }
         // 批量插入
         if (userEquipmentFragAdds.size() > 0) {
@@ -938,8 +941,7 @@ public class DrawGiftService {
         List<ExperienceEntity> exps = experienceDao.getExpInfos(expMap);
         // 存储要添加的经验的集合
         List<UserExperienceEntity> userExpAdds = new ArrayList<>();
-        int i = 0;
-        while (i < giftBoxNum) {
+        for (int i = 0; i < giftBoxNum; i++) {
             int expsI = prLv - 1;
             Random random = new Random();
             int expNum;
@@ -970,8 +972,7 @@ public class DrawGiftService {
                 quantity--;
             }
 
-            int j = 0;
-            while (j < expNum) {
+            for (int j = 0; j < expNum; j++) {
                 // 开始发放经验至玩家背包
                 UserExperienceEntity userExp = new UserExperienceEntity();
                 userExp.setExpId(exps.get(expsI).getId());
@@ -986,7 +987,6 @@ public class DrawGiftService {
                 Long nftTokenId = summonReq.getCurType().equals(Constant.CurrencyType._CRYPTO.getValue()) ? Long.parseLong(tokenIds.get(0)) : null;
                 userExp.setNftId(nftTokenId);// NFT_tokenID
                 userExpAdds.add(userExp);
-                j++;
             }
             LOGGER.info("expTokenIds: " + tokenIds);
             if (summonReq.getCurType().equals(Constant.CurrencyType._CRYPTO.getValue())) {
@@ -1002,7 +1002,6 @@ public class DrawGiftService {
             giftBoxExpRsp.setIconUrl(exps.get(expsI).getIconUrl());// 图标地址
             giftBoxExpRsp.setDescription(exps.get(expsI).getDescription());// 经验描述
             giftBoxExpRsps.add(giftBoxExpRsp);
-            i++;
         }
         // 批量插入
         if (userExpAdds.size() > 0) {

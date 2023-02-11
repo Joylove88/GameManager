@@ -183,6 +183,9 @@
             <if test="userHeroId != null and userHeroId != ''">
                 AND A.USER_HERO_ID = #{userHeroId}
             </if>
+            <if test="nftId != null and nftId != ''">
+                AND A.NFT_ID = #{nftId}
+            </if>
         </where>
     </select>
 

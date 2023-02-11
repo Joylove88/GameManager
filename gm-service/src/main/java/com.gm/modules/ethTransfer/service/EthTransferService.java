@@ -71,6 +71,11 @@ public class EthTransferService {
     @Value("${contractAddress.nftHeroAddress:#{null}}")
     private String nftHeroAddress;
     /**
+     * NFT免费英雄地址
+     */
+    @Value("${contractAddress.nftFreeHeroAddress:#{null}}")
+    private String nftFreeHeroAddress;
+    /**
      * 装备合约地址
      */
     @Value("${contractAddress.nftEquipAddress:#{null}}")
@@ -102,11 +107,16 @@ public class EthTransferService {
             // 获取生成的token数量
             if (receipt.get().getLogs().size() > 0) {
                 for (int j = 0; j < receipt.get().getLogs().size(); j++) {
-                    String topics0 = EthTransferListenUtils.getTopics0(); // 获取合约事件名称的HASH
+                    String topics0 = EthTransferListenUtils.getTopics0(Constant.disabled); // 获取合约事件名称的HASH
+                    String topics0Mint = EthTransferListenUtils.getTopics0(Constant.enable); // 获取合约事件Mint的HASH
                     if (receipt.get().getLogs().get(j).getTopics().get(0).equals(topics0)) {
                         // 获取合约收款地址
                         String addressTo = receipt.get().getLogs().get(j).getAddress();
                         if (nftHeroAddress.toLowerCase().equals(addressTo)) {// 英雄NFT
+                            type = Constant.SummonType.HERO.getValue();
+                            tokenNum++;
+                            tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
+                        } else if (nftFreeHeroAddress.toLowerCase().equals(addressTo)) {// NFT免费英雄地址
                             type = Constant.SummonType.HERO.getValue();
                             tokenNum++;
                             tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
@@ -127,6 +137,11 @@ public class EthTransferService {
                                 amountTeam = Arith.add(amountTeam, Convert.fromWei(tokenNumHex, Convert.Unit.ETHER));
                             }
                         }
+                    } else if (receipt.get().getLogs().get(j).getTopics().get(0).equals(topics0Mint)) {
+                        // 获取免费领取NFT的GAS费
+                        String tokenNumHex = Numeric.toBigInt(receipt.get().getLogs().get(j).getData()).toString();
+                        System.out.println(tokenNumHex);
+                        amount = Arith.add(amount, Convert.fromWei(tokenNumHex, Convert.Unit.ETHER));
                     }
                 }
                 LOGGER.info("amount：" + amount);
@@ -152,8 +167,10 @@ public class EthTransferService {
             SummonedEventDto summonedEventDto = drawGiftService.getSummonedPrice(user.getAddress());
             BigDecimal price = tokenNum == Constant.Quantity.Q1.getValue() ? BigDecimal.valueOf(summonedEventDto.getOnePriceNew()) : BigDecimal.valueOf(summonedEventDto.getTenPriceNew());
             LOGGER.info("price: " + price);
-            if (amount.compareTo(price) == -1) {
-                return null;
+            if (!form.getIsFree().equals(Constant.enable)) {
+                if (amount.compareTo(price) == -1) {
+                    return null;
+                }
             }
             map.put("userId", user.getUserId());
             map.put("from", address);
@@ -182,7 +199,7 @@ public class EthTransferService {
             // 设置订单金额
             form.setOrderFee(amount);
             // 设置实付金额
-            form.setRealFee(price);
+            form.setRealFee(form.getIsFree().equals(Constant.enable) ? amount : price);
 
             // 如果订单为空则创建新订单
             if (order == null) {

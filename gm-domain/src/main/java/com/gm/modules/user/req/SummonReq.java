@@ -55,6 +55,11 @@ public class SummonReq {
     private BigDecimal realFee;
 
     /**
+     * 是否免费领取0否，1是
+     */
+    private String isFree;
+
+    /**
      * NFT_TOKENID
      */
     private List<String> tokenIds = new ArrayList<>();

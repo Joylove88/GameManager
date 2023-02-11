@@ -146,8 +146,15 @@ public class TransactionOrderServiceImpl extends ServiceImpl<TransactionOrderDao
         transactionOrderDao.update(order, wrapper);
 
         // 如果召唤成功，则升级用户消费等级
-        if (Constant.enable.equals(order.getStatus())) {
+        if (Constant.enable.equals(order.getStatus()) && !form.getIsFree().equals(Constant.enable)) {
             gmUserVipLevelService.updateUserVipLevel(order);
+        }
+
+        // 如果领取免费英雄成功，则更新团队池金额
+        if(Constant.enable.equals(order.getStatus()) && form.getIsFree().equals(Constant.enable)){
+            // 团队抽成池入账
+            BigDecimal teamFee =order.getRealFee();
+            fundsAccountingService.setCashPoolAdd(Constant.CashPool._TEAM.getValue(), teamFee);
         }
 
     }

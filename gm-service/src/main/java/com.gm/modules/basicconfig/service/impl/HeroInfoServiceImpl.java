@@ -3,10 +3,12 @@ package com.gm.modules.basicconfig.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gm.common.utils.Constant;
 import com.gm.common.utils.PageUtils;
 import com.gm.common.utils.Query;
 import com.gm.modules.basicconfig.dao.HeroInfoDao;
 import com.gm.modules.basicconfig.entity.HeroInfoEntity;
+import com.gm.modules.basicconfig.rsp.HeroInfoDetailRsp;
 import com.gm.modules.basicconfig.service.HeroInfoService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,9 +58,14 @@ public class HeroInfoServiceImpl extends ServiceImpl<HeroInfoDao, HeroInfoEntity
 
     @Override
     public List<HeroInfoEntity> queryList() {
-        Map map = new HashMap();
-        map.put("status","1");
+        Map<String, Object> map = new HashMap<>();
+        map.put("status", Constant.enable);
         return heroInfoDao.queryList(map);
+    }
+
+    @Override
+    public List<HeroInfoDetailRsp> getHeroInfoList() {
+        return heroInfoDao.getHeroInfoList();
     }
 
 }

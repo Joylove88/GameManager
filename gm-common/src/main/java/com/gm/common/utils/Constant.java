@@ -34,10 +34,6 @@ public class Constant {
     public static final String FRONT_TYPE_PC = "pc";
     // 副本资金池余额（最新）
     public static final String DUNGEON_POOLING_BALANCE = "dungeon_pooling_balance";
-    /**
-     * 合约事件名称
-     */
-    public static final String EVENT_NAME = "Transfer(address,address,uint256)";
 
     /**
      * 0long
@@ -83,6 +79,10 @@ public class Constant {
      * 英雄合约地址
      */
     public static final String NFT_HERO_ADDRESS = "0x1c72906E0392b31D37f07fc72045960bf0D383a4";
+    /**
+     * 免费英雄合约地址
+     */
+    public static final String NFT_FREE_HERO_ADDRESS = "0xa7eA4890D15256A45deB9EaF106a3a6226b7e78B";
     /**
      * 经验合约地址
      */
@@ -268,6 +268,23 @@ public class Constant {
         private String value;
 
         TradeType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 合约事件名称
+     */
+    public enum EventName {
+        Transfer("Transfer(address,address,uint256)"),
+        MintRecord("MintRecord(address,uint256,uint256)");
+        private String value;
+
+        EventName(String value) {
             this.value = value;
         }
 

@@ -19,6 +19,7 @@ import com.gm.common.utils.*;
 import com.gm.common.validator.ValidatorUtils;
 import com.gm.common.web3Utils.TransactionVerifyUtils;
 import com.gm.modules.basicconfig.entity.*;
+import com.gm.modules.basicconfig.rsp.HeroInfoDetailRsp;
 import com.gm.modules.basicconfig.rsp.HeroLevelRsp;
 import com.gm.modules.basicconfig.rsp.HeroSkillRsp;
 import com.gm.modules.basicconfig.service.*;
@@ -122,7 +123,7 @@ public class ApiUserController {
     }
 
     @PostMapping("getHeroInfo")
-    @ApiOperation("获取英雄信息")
+    @ApiOperation("根据英雄名称获取英雄信息")
     public R getHeroInfo(@RequestBody UserHeroInfoReq req) {
         // 安全校验 防止注入攻击;
         if (ValidatorUtils.securityVerify(req.getHeroName())) {
@@ -138,6 +139,43 @@ public class ApiUserController {
         map.put("description", heroInfo.getHeroDescription());
         return R.ok().put("data", map);
     }
+
+    @PostMapping("getHeroInfoList")
+    @ApiOperation("获取英雄列表")
+    public R getHeroInfoList() {
+        List<HeroInfoDetailRsp> list = heroInfoService.getHeroInfoList();
+        int i = 0;
+        while (i < list.size()) {
+            // 设置英雄职业
+            String[] heroRole = list.get(i).getHeroType().split(",");
+            for (String role : heroRole) {
+                switch (role) {
+                    case "00":
+                        list.get(i).getRoles().add(Constant.HeroRole.Warrior.getValue());
+                        break;
+                    case "01":
+                        list.get(i).getRoles().add(Constant.HeroRole.Mage.getValue());
+                        break;
+                    case "02":
+                        list.get(i).getRoles().add(Constant.HeroRole.Assassin.getValue());
+                        break;
+                    case "03":
+                        list.get(i).getRoles().add(Constant.HeroRole.Tank.getValue());
+                        break;
+                    case "04":
+                        list.get(i).getRoles().add(Constant.HeroRole.Support.getValue());
+                        break;
+                    case "05":
+                        list.get(i).getRoles().add(Constant.HeroRole.Archer.getValue());
+                        break;
+                }
+            }
+            i++;
+        }
+        return R.ok().put("data", list);
+    }
+
+
 
     @Login
     @PostMapping("getUserProps")
@@ -159,7 +197,7 @@ public class ApiUserController {
         int i = 0;
         while (i < heroList.size()) {
             for (UserHeroEquipmentWearRsp wearRsp : wearList) {
-                if (heroList.get(i).getUserHeroId().equals(wearRsp.getUserHeroId())){
+                if (heroList.get(i).getUserHeroId().equals(wearRsp.getUserHeroId())) {
                     heroList.get(i).setWearEQList(wearList);
                 }
             }
@@ -181,7 +219,7 @@ public class ApiUserController {
         List<UserEquipInfoRsp> equipmentEntities = userEquipmentService.getUserEquip(userEquipment);
         // 矿工兑换数量比例
         BigDecimal minterRate = CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1));
-        for (int e = 0; e < equipmentEntities.size(); e++){
+        for (int e = 0; e < equipmentEntities.size(); e++) {
             BigDecimal newOracle = BigDecimal.valueOf(Arith.multiply(Arith.divide(equipmentEntities.get(e).getOracle(), minterRate), BigDecimal.valueOf(100)).intValue());
             equipmentEntities.get(e).setOracle(newOracle);
         }
@@ -258,7 +296,7 @@ public class ApiUserController {
             }
             i++;
         }
-        if(list.size() > 0){
+        if (list.size() > 0) {
             rsp = list.get(0);
             rsp.setMrCoins(mrCoins);
             rsp.setMrCoinsAgent(mrCoinsAgent);
@@ -310,8 +348,8 @@ public class ApiUserController {
 
         // 获取系统全部装备
         List<EquipmentInfoEntity> equipments = equipmentInfoService.getEquipmentInfos(new HashMap<>());
-        for (int i = 0; i< equipments.size(); i++){
-            if(equipments.get(i).getStatus().equals(Constant.disabled)){
+        for (int i = 0; i < equipments.size(); i++) {
+            if (equipments.get(i).getStatus().equals(Constant.disabled)) {
                 equipments.get(i).setEquipName("");
                 equipments.get(i).setDescription("mysterious equipment");
             }
@@ -332,8 +370,8 @@ public class ApiUserController {
         List<EquipSynthesisItemEntity> eqSIEs = equipSynthesisItemService.getEquipSynthesisItemEntitys(eqSIEMap);
         JSONArray jsonArray = new JSONArray();
         for (HeroEquipmentEntity heroEquipment : heroEquipments) {
-            for (EquipSynthesisItemEntity eqSIE: eqSIEs){
-                if(heroEquipment.getEquipId().equals(eqSIE.getEquipmentId())){
+            for (EquipSynthesisItemEntity eqSIE : eqSIEs) {
+                if (heroEquipment.getEquipId().equals(eqSIE.getEquipmentId())) {
                     // 获取英雄已激活/未激活装备
                     jsonArray.add(equipmentInfoService.updateEquipJson2(heroEquipment.getEquipId(), eqSIE, equipments, rsp, wearList));
                 }
@@ -390,7 +428,7 @@ public class ApiUserController {
 //            throw new RRException(ErrorCode.WITHDRAW_OVER_MONEY.getDesc());
 //        }
 //        useWithdrawReq.setWithdrawHandlingFee(new BigDecimal(gmUserVipLevel.getWithdrawHandlingFee()));
-            gmUserWithdrawService.applyWithdraw(user,useWithdrawReq);
+        gmUserWithdrawService.applyWithdraw(user, useWithdrawReq);
 //            gmUserWithdrawService.withdraw(user, gmUserVipLevel, useWithdrawReq);
         return R.ok();
     }

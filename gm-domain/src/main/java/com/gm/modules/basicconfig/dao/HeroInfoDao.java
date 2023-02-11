@@ -3,6 +3,7 @@ package com.gm.modules.basicconfig.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gm.modules.basicconfig.entity.HeroFragEntity;
 import com.gm.modules.basicconfig.entity.HeroInfoEntity;
+import com.gm.modules.basicconfig.rsp.HeroInfoDetailRsp;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -24,4 +25,12 @@ public interface HeroInfoDao extends BaseMapper<HeroInfoEntity> {
      * @return
      */
     List<HeroInfoEntity> getHeroInfoPro();
+
+    /**
+     * 获取英雄信息集合
+     * @return
+     */
+    List<HeroInfoDetailRsp> getHeroInfoList();
+
+
 }

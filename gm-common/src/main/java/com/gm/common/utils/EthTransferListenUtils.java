@@ -47,8 +47,11 @@ public class EthTransferListenUtils {
      * 获取链上交易日志事件名称的hash值
      * @return
      */
-    public static String getTopics0(){
-        byte[] hash = Hash.sha3(String.valueOf(Constant.EVENT_NAME).getBytes());
+    public static String getTopics0(String type){
+        byte[] hash = Hash.sha3(String.valueOf(Constant.EventName.Transfer.getValue()).getBytes());
+        if (type.equals(Constant.enable)){
+            hash = Hash.sha3(String.valueOf(Constant.EventName.MintRecord.getValue()).getBytes());
+        }
         return Numeric.toHexString(hash);
     }
 //
@@ -263,7 +266,7 @@ public class EthTransferListenUtils {
     }
 
     public static void main(String[] args) {
-        byte[] hash = Hash.sha3(String.valueOf(Constant.EVENT_NAME).getBytes());
+        byte[] hash = Hash.sha3(String.valueOf(Constant.EventName.MintRecord.getValue()).getBytes());
         System.out.println(Numeric.toHexString(hash));
     }
 }
