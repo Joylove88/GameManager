@@ -116,35 +116,35 @@ public class ApiMetadataController {
     /**
      * 信息
      */
-    @RequestMapping("/freeHero/{nftId}.json")
-    @ApiOperation("getHeroMetadata")
-    public Map<String, Object> info(@PathVariable("nftId") Long nftId){
+    @RequestMapping("/freehero/{nftId}.json")
+    @ApiOperation("获取元数据")
+    public Map<String, Object> metaData(@PathVariable("nftId") Long nftId){
         // 通过NFTID获取玩家英雄信息
         Map<String, Object> map = new HashMap<>();
-        map.put("status", Constant.enable);
         map.put("nftId", nftId);
         UserHeroInfoDetailRsp rsp = userHeroService.getUserHeroByIdDetailRsp(map);
         // 设置返回信息
         Map<String, Object> rspMap = new HashMap<>();
         rspMap.put("description", rsp.getHeroDescription());// 描述
-        rspMap.put("external_url", "https://metarunes.games/metadata/freehero/" + nftId + ".json");// 外部地址
+        rspMap.put("external_url", "https://metarunes.games");// 外部地址
         rspMap.put("image", rsp.getHeroImgUrl());// 图片
         rspMap.put("name", rsp.getHeroName());// 名称
 
         // 设置属性集合
         Map<String, Object> attMap = new HashMap<>();
-        attMap.put("power", rsp.getHeroPower());
-        attMap.put("star", rsp.getStarCode());
-        attMap.put("level", rsp.getLevelCode());
+        attMap.put("POWER", rsp.getHeroPower());
+        attMap.put("STAR", rsp.getStarCode());
+        attMap.put("LEVEL", rsp.getLevelCode());
         // 初始GAIA系统
         fightCoreService.initTradeBalanceParameter(0);
         // 矿工兑换数量比例
         BigDecimal minterRate = CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1));
         BigDecimal newOracle = Arith.multiply(Arith.divide(rsp.getOracle(), minterRate), BigDecimal.valueOf(100));
         // // 按当前市场行情计算神谕值
-        attMap.put("oracle", newOracle);
-        attMap.put("growthRate", rsp.getGrowthRate());
-        attMap.put("skinType", rsp.getSkinType());
+        attMap.put("ORACLE", newOracle);
+        attMap.put("GROWTH", rsp.getGrowthRate());
+        String skin = Objects.equals(rsp.getSkinType(), Constant.SkinType.GOLD.getValue()) ? "GOLD" : "ORIGINAL";
+        attMap.put("SKIN", skin);
         attMap.put("HP", rsp.getHealth());
         attMap.put("MP", rsp.getMana());
 //        attMap.put("HP Recovery", rsp.getHealthRegen());
