@@ -124,44 +124,43 @@ public class ApiMetadataController {
         map.put("nftId", nftId);
         UserHeroInfoDetailRsp rsp = userHeroService.getUserHeroByIdDetailRsp(map);
         // 设置返回信息
-        Map<String, Object> rspMap = new HashMap<>();
+        Map<String, Object> rspMap = new LinkedHashMap<>();
         rspMap.put("description", rsp.getHeroDescription());// 描述
         rspMap.put("external_url", "https://metarunes.games");// 外部地址
         rspMap.put("image", rsp.getHeroImgUrl());// 图片
         rspMap.put("name", rsp.getHeroName());// 名称
 
         // 设置属性集合
-        Map<String, Object> attMap = new HashMap<>();
-        attMap.put("POWER", rsp.getHeroPower());
-        attMap.put("STAR", rsp.getStarCode());
+        Map<String, Object> attMap = new LinkedHashMap<>();
+        attMap.put("CE", rsp.getHeroPower());
         attMap.put("LEVEL", rsp.getLevelCode());
+        attMap.put("STAR", rsp.getStarCode());
+        String skin = Objects.equals(rsp.getSkinType(), Constant.SkinType.GOLD.getValue()) ? "GOLD" : "ORIGINAL";
+        attMap.put("SKIN", skin);
         // 初始GAIA系统
         fightCoreService.initTradeBalanceParameter(0);
         // 矿工兑换数量比例
         BigDecimal minterRate = CalculateTradeUtil.calculateRateOfMinter(BigDecimal.valueOf(1));
         BigDecimal newOracle = Arith.multiply(Arith.divide(rsp.getOracle(), minterRate), BigDecimal.valueOf(100));
         // // 按当前市场行情计算神谕值
-        attMap.put("ORACLE", newOracle);
-        attMap.put("GROWTH", rsp.getGrowthRate());
-        String skin = Objects.equals(rsp.getSkinType(), Constant.SkinType.GOLD.getValue()) ? "GOLD" : "ORIGINAL";
-        attMap.put("SKIN", skin);
         attMap.put("HP", rsp.getHealth());
         attMap.put("MP", rsp.getMana());
+        attMap.put("ATTACK DAMAGE", rsp.getAttackDamage());
+        attMap.put("ABILITY POWER", rsp.getAttackSpell());
+        attMap.put("ARMOR", rsp.getArmor());
+        attMap.put("MAGIC RESISTANCE", rsp.getMagicResist());
+        attMap.put("GROWTH", rsp.getGrowthRate());
+        attMap.put("ORACLE", newOracle);
 //        attMap.put("HP Recovery", rsp.getHealthRegen());
 //        attMap.put("MP Recovery", rsp.getManaRegen());
-        attMap.put("ARMOR", rsp.getArmor());
-        attMap.put("MR", rsp.getMagicResist());
-        attMap.put("ATK", rsp.getAttackDamage());
-        attMap.put("MATK", rsp.getAttackSpell());
         JSONArray attArray = new JSONArray();
         for (String key : attMap.keySet()) {
             String value = attMap.get(key).toString();
             JSONObject att = new JSONObject();
-            att.put("trait_type", key);
             att.put("value", value);
+            att.put("trait_type", key);
             attArray.add(att);
         }
-
         rspMap.put("attributes", attArray);
         return rspMap;
     }

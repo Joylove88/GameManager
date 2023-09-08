@@ -136,6 +136,7 @@ public class TransactionVerifyUtils {
 			}
 		}
 		System.out.println(tokenIds.get(0));
+		System.out.println(Convert.fromWei("1839209830", Convert.Unit.ETHER));
 //		byte[] hash = Hash.sha3(String.valueOf("Transfer(address,address,uint256)").getBytes());
 //		System.out.println(Numeric.toHexString(hash));
     }

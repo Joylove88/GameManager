@@ -300,6 +300,8 @@ public class FightCoreService {
 
         // 获取一天最大战斗场次
         Long fightNum = Constant.FTG / dungeon.getRequiresStamina();
+        // 经济平衡系统初始化方法
+        initTradeBalanceParameter(0);
         // 获取玩家矿工数量
         CalculateTradeUtil.miners = user.getTotalMinter();
         LOGGER.info("获取当前玩家矿工数量: " + CalculateTradeUtil.miners);
@@ -388,8 +390,6 @@ public class FightCoreService {
         // 开始计算玩家收益
         // 玩家收益参数
         BigDecimal addMoney;
-        // 经济平衡系统初始化方法
-        initTradeBalanceParameter(0);
         // 出售/计算收益
         LOGGER.info("marketEggs: " + CalculateTradeUtil.marketEggs);
         LOGGER.info("miners: " + CalculateTradeUtil.miners);

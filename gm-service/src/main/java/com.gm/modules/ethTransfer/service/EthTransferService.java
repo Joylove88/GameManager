@@ -105,50 +105,48 @@ public class EthTransferService {
             // TOKENID集合
             List<String> tokenIds = new ArrayList<>();
             // 获取生成的token数量
-            if (receipt.get().getLogs().size() > 0) {
-                for (int j = 0; j < receipt.get().getLogs().size(); j++) {
-                    String topics0 = EthTransferListenUtils.getTopics0(Constant.disabled); // 获取合约事件名称的HASH
-                    String topics0Mint = EthTransferListenUtils.getTopics0(Constant.enable); // 获取合约事件Mint的HASH
-                    if (receipt.get().getLogs().get(j).getTopics().get(0).equals(topics0)) {
-                        // 获取合约收款地址
-                        String addressTo = receipt.get().getLogs().get(j).getAddress();
-                        if (nftHeroAddress.toLowerCase().equals(addressTo)) {// 英雄NFT
-                            type = Constant.SummonType.HERO.getValue();
-                            tokenNum++;
-                            tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
-                        } else if (nftFreeHeroAddress.toLowerCase().equals(addressTo)) {// NFT免费英雄地址
-                            type = Constant.SummonType.HERO.getValue();
-                            tokenNum++;
-                            tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
-                        } else if (nftEquipAddress.toLowerCase().equals(addressTo)) {// 装备NFT
-                            type = Constant.SummonType.EQUIPMENT.getValue();
-                            tokenNum++;
-                            tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
-                        } else if (nftExpAddress.toLowerCase().equals(addressTo)) {// 经验NFT
-                            type = Constant.SummonType.EXPERIENCE.getValue();
-                            tokenNum++;
-                            tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
-                        } else if (busdTokenAddress.toLowerCase().equals(addressTo)) {// 代币数量（费用+团队抽成）
-                            Address tokenAddress = new Address(receipt.get().getLogs().get(j).getTopics().get(2));
-                            String tokenNumHex = Numeric.toBigInt(receipt.get().getLogs().get(j).getData()).toString();
-                            if (fundPoolAddress.toLowerCase().equals(tokenAddress.toString())) {// 资金池
-                                amount = Arith.add(amount, Convert.fromWei(tokenNumHex, Convert.Unit.ETHER));
-                            } else if (teamAddress.toLowerCase().equals(tokenAddress.toString())) {// 团队抽成
-                                amountTeam = Arith.add(amountTeam, Convert.fromWei(tokenNumHex, Convert.Unit.ETHER));
-                            }
-                        }
-                    } else if (receipt.get().getLogs().get(j).getTopics().get(0).equals(topics0Mint)) {
-                        // 获取免费领取NFT的GAS费
+            for (int j = 0; j < receipt.get().getLogs().size(); j++) {
+                String topics0 = EthTransferListenUtils.getTopics0(Constant.disabled); // 获取合约事件名称的HASH
+                String topics0Mint = EthTransferListenUtils.getTopics0(Constant.enable); // 获取合约事件Mint的HASH
+                if (receipt.get().getLogs().get(j).getTopics().get(0).equals(topics0)) {
+                    // 获取合约收款地址
+                    String addressTo = receipt.get().getLogs().get(j).getAddress();
+                    if (nftHeroAddress.toLowerCase().equals(addressTo)) {// 英雄NFT
+                        type = Constant.SummonType.HERO.getValue();
+                        tokenNum++;
+                        tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
+                    } else if (nftFreeHeroAddress.toLowerCase().equals(addressTo)) {// NFT免费英雄地址
+                        type = Constant.SummonType.HERO.getValue();
+                        tokenNum++;
+                        tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
+                    } else if (nftEquipAddress.toLowerCase().equals(addressTo)) {// 装备NFT
+                        type = Constant.SummonType.EQUIPMENT.getValue();
+                        tokenNum++;
+                        tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
+                    } else if (nftExpAddress.toLowerCase().equals(addressTo)) {// 经验NFT
+                        type = Constant.SummonType.EXPERIENCE.getValue();
+                        tokenNum++;
+                        tokenIds.add(Numeric.toBigInt(receipt.get().getLogs().get(j).getTopics().get(3)).toString());
+                    } else if (busdTokenAddress.toLowerCase().equals(addressTo)) {// 代币数量（费用+团队抽成）
+                        Address tokenAddress = new Address(receipt.get().getLogs().get(j).getTopics().get(2));
                         String tokenNumHex = Numeric.toBigInt(receipt.get().getLogs().get(j).getData()).toString();
-                        System.out.println(tokenNumHex);
-                        amount = Arith.add(amount, Convert.fromWei(tokenNumHex, Convert.Unit.ETHER));
+                        if (fundPoolAddress.toLowerCase().equals(tokenAddress.toString())) {// 资金池
+                            amount = Arith.add(amount, Convert.fromWei(tokenNumHex, Convert.Unit.ETHER));
+                        } else if (teamAddress.toLowerCase().equals(tokenAddress.toString())) {// 团队抽成
+                            amountTeam = Arith.add(amountTeam, Convert.fromWei(tokenNumHex, Convert.Unit.ETHER));
+                        }
                     }
+                } else if (receipt.get().getLogs().get(j).getTopics().get(0).equals(topics0Mint)) {
+                    // 获取免费领取NFT的GAS费
+                    String tokenNumHex = Numeric.toBigInt(receipt.get().getLogs().get(j).getData()).toString();
+                    System.out.println(tokenNumHex);
+                    amount = Arith.add(amount, Convert.fromWei(tokenNumHex, Convert.Unit.ETHER));
                 }
-                LOGGER.info("amount：" + amount);
-                LOGGER.info("amountTeam：" + amountTeam);
-                LOGGER.info("tokenNum：" + tokenNum);
-                LOGGER.info("type：" + type);
             }
+            LOGGER.info("amount：" + amount);
+            LOGGER.info("amountTeam：" + amountTeam);
+            LOGGER.info("tokenNum：" + tokenNum);
+            LOGGER.info("type：" + type);
             String status = receipt.get().getStatus();
             String address = receipt.get().getFrom();
             // 金额总计

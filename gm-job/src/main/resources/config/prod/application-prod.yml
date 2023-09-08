@@ -3,8 +3,8 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://139.180.186.187:3306/gamemanager_prod?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
-#      url: jdbc:mysql://127.0.0.1:3306/gamemanager_prod?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
+#      url: jdbc:mysql://139.180.186.187:3306/gamemanager_prod?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
+      url: jdbc:mysql://127.0.0.1:3306/gamemanager_prod?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
       username: root
       password: we&68YDryuH$@JDHSFdhfj(@abc1
       initial-size: 10
@@ -44,11 +44,13 @@ contractAddress:
   # 资金池地址
   fundPoolAddress: "0x482435b52fD280E7E9A6Dc6CB591366050ddcd02"
   # NFT英雄地址
-  nftHeroAddress: "0x9Caa1712B23206d3F38ca3C2005AC41B41c77f57"
+  nftHeroAddress: "0xD1eA7c0e9a2a96Ee083B38b631306D9b0826986D"
   # NFT装备地址
-  nftEquipAddress: "0x5E5fAb47B25d486Fb6c0dB60D3A3f46673E47E33"
+  nftEquipAddress: "0x376C9F52A8B1EB8DC30f635d935c22817bE626A0"
   # NFT经验道具地址
-  nftExpAddress: "0x5627C7372d30dAB3C456b28d15b401cC958A7621"
+  nftExpAddress: "0x39Bb067675da932d5AEe91512FFb918a82164119"
+  # NFT免费英雄地址
+  nftFreeHeroAddress: "0xe01dCF7678F78FD2923Cc5c6BFd2e9970C15304a"
   # 团队地址
   teamAddress: "0x2A3Ee1e41A8A11546C5732CFB447b752c9F09618"
   # ABC代币地址
